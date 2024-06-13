@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:nocode_commons/core/base_state.dart';
 import 'package:pinput/pinput.dart';
 import 'package:twin_app/core/constants.dart';
@@ -23,33 +24,35 @@ class _ForgotPasswordOtpPageState extends BaseState<ForgotPasswordOtpPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       body: Container(
         width: double.infinity,
         decoration: purpleGradientBoxDecoration,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            SizedBox(
-              height: 80,
-            ),
-            Padding(
-              padding: EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    "OTP And Password",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold),
-                  ),
-                ],
+        child: SingleChildScrollView(
+          physics: NeverScrollableScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              SizedBox(
+                height: 100,
               ),
-            ),
-            SizedBox(height: 20),
-            Expanded(
-              child: Container(
+              Padding(
+                padding: EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      "OTP And Password",
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 30,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 20),
+              Container(
                 decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.only(
@@ -91,7 +94,7 @@ class _ForgotPasswordOtpPageState extends BaseState<ForgotPasswordOtpPage> {
                         ),
                       ),
                       SizedBox(
-                        height: 40,
+                        height: 60,
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -101,30 +104,29 @@ class _ForgotPasswordOtpPageState extends BaseState<ForgotPasswordOtpPage> {
                               backgroundColor: secondaryColor,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(5),
-                                side:
-                                    const BorderSide(color: Colors.deepPurple),
+                                side: const BorderSide(color: primaryColor),
                               ),
-                              minimumSize: const Size(140, 50),
+                              minimumSize: const Size(140, 40),
                             ),
                             onPressed: () {
-                              Navigator.pop(context);
+                              SystemNavigator.pop();
                             },
                             child: const Text(
                               "Cancel",
                               style: TextStyle(
-                                color: Colors.deepPurple,
-                                fontSize: 18,
+                                color: primaryColor,
+                                fontSize: 14,
                               ),
                             ),
                           ),
                           const BusyIndicator(),
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.purple[900],
+                              backgroundColor: primaryColor,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(5),
                               ),
-                              minimumSize: const Size(140, 50),
+                              minimumSize: const Size(140, 40),
                             ),
                             onPressed: () {
                               Navigator.pushReplacement(
@@ -137,7 +139,7 @@ class _ForgotPasswordOtpPageState extends BaseState<ForgotPasswordOtpPage> {
                             child: const Text(
                               'Verify',
                               style: TextStyle(
-                                fontSize: 18,
+                                fontSize: 14,
                                 color: secondaryColor,
                               ),
                             ),
@@ -145,9 +147,8 @@ class _ForgotPasswordOtpPageState extends BaseState<ForgotPasswordOtpPage> {
                         ],
                       ),
                       const SizedBox(
-                        height: 20,
+                        height: 80,
                       ),
-                      Spacer(),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -162,14 +163,17 @@ class _ForgotPasswordOtpPageState extends BaseState<ForgotPasswordOtpPage> {
                             "assets/images/poweredby.png",
                             width: 300,
                           ),
+                          const SizedBox(
+                            height: 10,
+                          ),
                         ],
                       ),
                     ],
                   ),
                 ),
-              ),
-            )
-          ],
+              )
+            ],
+          ),
         ),
       ),
     );

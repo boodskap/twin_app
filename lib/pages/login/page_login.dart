@@ -24,97 +24,109 @@ class _LoginPageState extends BaseState<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       body: Container(
         width: double.infinity,
         decoration: purpleGradientBoxDecoration,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            SizedBox(
-              height: 80,
-            ),
-            Padding(
-              padding: EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    "Login",
-                    style: TextStyle(
+        child: SingleChildScrollView(
+          physics: NeverScrollableScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              SizedBox(
+                height: 100,
+              ),
+              Padding(
+                padding: EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      "Login",
+                      style: TextStyle(
                         color: Colors.white,
                         fontSize: 30,
-                        fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Text(
-                    "Welcome Back",
-                    style: TextStyle(color: Colors.white, fontSize: 18),
-                  ),
-                ],
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    Text(
+                      "Welcome Back",
+                      style: TextStyle(color: Colors.white, fontSize: 18),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            SizedBox(height: 20),
-            Expanded(
-              child: Container(
+              SizedBox(height: 10),
+              Container(
+                width: double.infinity,
                 decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(60),
-                        topRight: Radius.circular(60))),
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(60),
+                    topRight: Radius.circular(60),
+                  ),
+                ),
                 child: Padding(
                   padding: EdgeInsets.all(30),
                   child: Column(
                     children: <Widget>[
-                      SizedBox(
-                        height: 30,
-                      ),
+                      SizedBox(height: 30),
                       Container(
                         decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                            boxShadow: [
-                              BoxShadow(
-                                  color: Color.fromRGBO(225, 95, 27, .3),
-                                  blurRadius: 20,
-                                  offset: Offset(0, 10))
-                            ]),
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color.fromRGBO(225, 95, 27, .3),
+                              blurRadius: 20,
+                              offset: Offset(0, 10),
+                            ),
+                          ],
+                        ),
                         child: Column(
                           children: <Widget>[
                             Container(
                               padding: EdgeInsets.all(10),
                               decoration: BoxDecoration(
-                                  border: Border(
-                                      bottom: BorderSide(
-                                          color: Colors.grey.shade200))),
+                                border: Border(
+                                  bottom: BorderSide(
+                                    color: Colors.grey.shade200,
+                                  ),
+                                ),
+                              ),
                               child: TextField(
+                                controller: _userController,
                                 decoration: InputDecoration(
-                                    hintText: "Email",
-                                    hintStyle: TextStyle(color: Colors.grey),
-                                    border: InputBorder.none),
+                                  hintText: "Email",
+                                  hintStyle: TextStyle(color: Colors.grey),
+                                  border: InputBorder.none,
+                                ),
                               ),
                             ),
                             Container(
                               padding: EdgeInsets.all(10),
                               decoration: BoxDecoration(
-                                  border: Border(
-                                      bottom: BorderSide(
-                                          color: Colors.grey.shade200))),
+                                border: Border(
+                                  bottom: BorderSide(
+                                    color: Colors.grey.shade200,
+                                  ),
+                                ),
+                              ),
                               child: TextField(
+                                controller: _passwordController,
                                 obscureText: true,
                                 decoration: InputDecoration(
-                                    hintText: "Password",
-                                    hintStyle: TextStyle(color: Colors.grey),
-                                    border: InputBorder.none),
+                                  hintText: "Password",
+                                  hintStyle: TextStyle(color: Colors.grey),
+                                  border: InputBorder.none,
+                                ),
                               ),
                             ),
                           ],
                         ),
                       ),
-                      SizedBox(
-                        height: 40,
-                      ),
+                      SizedBox(height: 20),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -130,15 +142,13 @@ class _LoginPageState extends BaseState<LoginPage> {
                                   value: _rememberMe,
                                   onChanged: (value) {
                                     setState(() {
-                                      _rememberMe = !_rememberMe;
+                                      _rememberMe = value!;
                                     });
                                   },
                                 ),
                                 const Text(
                                   'Remember Me',
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                  ),
+                                  style: TextStyle(fontSize: 14),
                                 ),
                               ],
                             ),
@@ -147,41 +157,41 @@ class _LoginPageState extends BaseState<LoginPage> {
                             child: const Text(
                               'Forgot your password?',
                               style: TextStyle(
-                                fontSize: 15,
-                                color: Color(0xff031b42),
+                                fontSize: 14,
+                                color: primaryColor,
                               ),
                             ),
                             onTap: () {
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) =>
-                                        const ForgotPasswordPage()),
+                                  builder: (context) =>
+                                      const ForgotPasswordPage(),
+                                ),
                               );
                             },
                           ),
                         ],
                       ),
-                      SizedBox(
-                        height: 40,
-                      ),
+                      SizedBox(height: 10),
                       ElevatedButton(
                         onPressed: () {},
                         child: Text(
                           'Login',
-                          style: TextStyle(color: Colors.white, fontSize: 18),
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                          ),
                         ),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.purple[900],
+                          backgroundColor: primaryColor,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(5),
                           ),
                           minimumSize: const Size(330, 50),
                         ),
                       ),
-                      const SizedBox(
-                        height: 20,
-                      ),
+                      const SizedBox(height: 10),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -194,18 +204,21 @@ class _LoginPageState extends BaseState<LoginPage> {
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => const SignUpPage()),
+                                  builder: (context) => const SignUpPage(),
+                                ),
                               );
                             },
                             child: const Text(
                               "Sign Up",
-                              style:
-                                  TextStyle(fontSize: 18, color: Colors.purple),
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: primaryColor,
+                              ),
                             ),
                           ),
                         ],
                       ),
-                      Spacer(),
+                      SizedBox(height: 20),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -226,8 +239,8 @@ class _LoginPageState extends BaseState<LoginPage> {
                   ),
                 ),
               ),
-            )
-          ],
+            ],
+          ),
         ),
       ),
     );
