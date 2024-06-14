@@ -10,19 +10,16 @@ dependencies:
   flutter:
     sdk: flutter
 
-  cupertino_icons: ^1.0.6
-  eventify: ^1.0.1
-  pinput: ^4.0.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
   twinned_widgets:
-    git:
-      url: https://github.com/boodskap/twinned_widgets.git
-  #  path:
-  #    twinned_widgets
+#    git:
+#      url: https://github.com/boodskap/twinned_widgets.git
+    path:
+      twinned_widgets
 
 
 flutter:
@@ -30,4 +27,12 @@ flutter:
   uses-material-design: true
 
   assets:
+    - assets/google_fonts/
+    - assets/translations/
     - assets/images/
+    - assets/
+    - .env
+    - .env.dev
+    - .env.qa
+    - .env.test
+    - default.conf

@@ -1,42 +1,26 @@
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:twin_app/pages/login/page_splashscreen.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-void main() {
-  runApp(const MyApp());
+import 'app.dart';
+import 'flavors/flavor_config.dart';
+
+void main() async {
+  const flavor = String.fromEnvironment("flavor", defaultValue: "dev");
+
+  await dotenv.load(
+    fileName: getEnvFileName(flavor),
+  );
+
+  FlavorConfig.initialize(flavorString: flavor);
+  startApp();
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        textTheme: GoogleFonts.robotoTextTheme(
-          Theme.of(context).textTheme,
-        ),
-      ),
-      home: const MyHomePage(),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      body: SplashScreen(),
-    );
+String getEnvFileName(String flavor) {
+  switch (flavor) {
+    case "prod":
+      return ".env";
+    case "qa":
+      return ".env.qa";
+    default:
+      return ".env.dev";
   }
 }

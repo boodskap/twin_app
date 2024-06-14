@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:nocode_commons/core/base_state.dart';
+import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_app/core/constants.dart';
 import 'package:twin_app/pages/login/page_forgotpassword_otp.dart';
 import 'package:twin_app/pages/login/page_signup.dart';
-import 'package:twin_app/widgets/commons/busy_indicator.dart';
+import 'package:twin_commons/core/busy_indicator.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});
@@ -27,7 +27,7 @@ class _ForgotPasswordPageState extends BaseState<ForgotPasswordPage> {
       resizeToAvoidBottomInset: true,
       body: Container(
         width: double.infinity,
-        decoration: purpleGradientBoxDecoration,
+        decoration: theme.getCredentialsPageDecoration(),
         child: SingleChildScrollView(
           physics: NeverScrollableScrollPhysics(),
           child: Column(
@@ -106,20 +106,21 @@ class _ForgotPasswordPageState extends BaseState<ForgotPasswordPage> {
                         children: [
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: secondaryColor,
+                              backgroundColor: theme.getSecondaryColor(),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(5),
-                                side: const BorderSide(color: primaryColor),
+                                side:
+                                    BorderSide(color: theme.getPrimaryColor()),
                               ),
                               minimumSize: const Size(120, 40),
                             ),
                             onPressed: () {
                               SystemNavigator.pop();
                             },
-                            child: const Text(
+                            child: Text(
                               "Cancel",
                               style: TextStyle(
-                                color: primaryColor,
+                                color: theme.getPrimaryColor(),
                                 fontSize: 14,
                               ),
                             ),
@@ -127,7 +128,7 @@ class _ForgotPasswordPageState extends BaseState<ForgotPasswordPage> {
                           const BusyIndicator(),
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: primaryColor,
+                              backgroundColor: theme.getPrimaryColor(),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(5),
                               ),
@@ -142,11 +143,11 @@ class _ForgotPasswordPageState extends BaseState<ForgotPasswordPage> {
                                 ),
                               );
                             },
-                            child: const Text(
+                            child: Text(
                               'Generate OTP',
                               style: TextStyle(
                                 fontSize: 14,
-                                color: secondaryColor,
+                                color: theme.getSecondaryColor(),
                               ),
                             ),
                           ),
@@ -169,19 +170,20 @@ class _ForgotPasswordPageState extends BaseState<ForgotPasswordPage> {
                                 ),
                               );
                             },
-                            child: const Text(
+                            child: Text(
                               "Sign Up",
                               style: TextStyle(
                                 fontSize: 16,
-                                color: primaryColor,
+                                color: theme.getPrimaryColor(),
                               ),
                             ),
                           ),
                         ],
                       ),
                       SizedBox(height: 80),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      Wrap(
+                        spacing: 10,
+                        crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
                           const Text(
                             "Powered By",
@@ -190,10 +192,7 @@ class _ForgotPasswordPageState extends BaseState<ForgotPasswordPage> {
                               fontSize: 16,
                             ),
                           ),
-                          Image.asset(
-                            "assets/images/poweredby.png",
-                            width: 300,
-                          ),
+                          poweredBy,
                         ],
                       ),
                     ],

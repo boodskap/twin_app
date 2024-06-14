@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:nocode_commons/core/base_state.dart';
+import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_app/core/constants.dart';
 import 'package:twin_app/pages/login/page_login.dart';
-import 'package:twin_app/widgets/commons/busy_indicator.dart';
+import 'package:twin_commons/core/busy_indicator.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class ResetPasswordPage extends StatefulWidget {
   const ResetPasswordPage({super.key});
@@ -26,7 +27,7 @@ class _ResetPasswordPageState extends BaseState<ResetPasswordPage> {
       resizeToAvoidBottomInset: true,
       body: Container(
         width: double.infinity,
-        decoration: purpleGradientBoxDecoration,
+        decoration: theme.getCredentialsPageDecoration(),
         child: SingleChildScrollView(
           physics: NeverScrollableScrollPhysics(),
           child: Column(
@@ -123,10 +124,11 @@ class _ResetPasswordPageState extends BaseState<ResetPasswordPage> {
                         children: [
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: secondaryColor,
+                              backgroundColor: theme.getSecondaryColor(),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(5),
-                                side: BorderSide(color: primaryColor),
+                                side:
+                                    BorderSide(color: theme.getPrimaryColor()),
                               ),
                               minimumSize: Size(140, 40),
                             ),
@@ -136,7 +138,7 @@ class _ResetPasswordPageState extends BaseState<ResetPasswordPage> {
                             child: Text(
                               "Cancel",
                               style: TextStyle(
-                                color: primaryColor,
+                                color: theme.getPrimaryColor(),
                                 fontSize: 14,
                               ),
                             ),
@@ -144,7 +146,7 @@ class _ResetPasswordPageState extends BaseState<ResetPasswordPage> {
                           BusyIndicator(),
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: primaryColor,
+                              backgroundColor: theme.getPrimaryColor(),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(5),
                               ),
@@ -162,16 +164,16 @@ class _ResetPasswordPageState extends BaseState<ResetPasswordPage> {
                               'Continue',
                               style: TextStyle(
                                 fontSize: 14,
-                                color: secondaryColor,
+                                color: theme.getSecondaryColor(),
                               ),
                             ),
                           ),
                         ],
                       ),
                       SizedBox(height: 80),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.end,
+                      Wrap(
+                        spacing: 10,
+                        crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
                           Text(
                             "Powered By",
@@ -180,10 +182,7 @@ class _ResetPasswordPageState extends BaseState<ResetPasswordPage> {
                               fontSize: 14,
                             ),
                           ),
-                          Image.asset(
-                            "assets/images/poweredby.png",
-                            width: 300,
-                          ),
+                          poweredBy,
                         ],
                       ),
                     ],
