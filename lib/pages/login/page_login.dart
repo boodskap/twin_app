@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:nocode_commons/core/base_state.dart';
+import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_app/core/constants.dart';
 import 'package:twin_app/pages/login/page_forgotpassword.dart';
 import 'package:twin_app/pages/login/page_signup.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -27,7 +28,7 @@ class _LoginPageState extends BaseState<LoginPage> {
       resizeToAvoidBottomInset: true,
       body: Container(
         width: double.infinity,
-        decoration: purpleGradientBoxDecoration,
+        decoration: theme.getCredentialsPageDecoration(),
         child: SingleChildScrollView(
           physics: NeverScrollableScrollPhysics(),
           child: Column(
@@ -42,18 +43,18 @@ class _LoginPageState extends BaseState<LoginPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      "Login",
+                      "login",
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 30,
                         fontWeight: FontWeight.bold,
                       ),
-                    ),
+                    ).tr(),
                     SizedBox(height: 10),
                     Text(
-                      "Welcome Back",
+                      "welcomeBack",
                       style: TextStyle(color: Colors.white, fontSize: 18),
-                    ),
+                    ).tr(),
                   ],
                 ),
               ),
@@ -98,7 +99,7 @@ class _LoginPageState extends BaseState<LoginPage> {
                               child: TextField(
                                 controller: _userController,
                                 decoration: InputDecoration(
-                                  hintText: "Email",
+                                  hintText: "email".tr(),
                                   hintStyle: TextStyle(color: Colors.grey),
                                   border: InputBorder.none,
                                 ),
@@ -117,7 +118,7 @@ class _LoginPageState extends BaseState<LoginPage> {
                                 controller: _passwordController,
                                 obscureText: true,
                                 decoration: InputDecoration(
-                                  hintText: "Password",
+                                  hintText: "password".tr(),
                                   hintStyle: TextStyle(color: Colors.grey),
                                   border: InputBorder.none,
                                 ),
@@ -147,20 +148,20 @@ class _LoginPageState extends BaseState<LoginPage> {
                                   },
                                 ),
                                 const Text(
-                                  'Remember Me',
+                                  'rememberMe',
                                   style: TextStyle(fontSize: 14),
-                                ),
+                                ).tr(),
                               ],
                             ),
                           ),
                           InkWell(
-                            child: const Text(
-                              'Forgot your password?',
+                            child: Text(
+                              'forgotPassword',
                               style: TextStyle(
                                 fontSize: 14,
-                                color: primaryColor,
+                                color: theme.getPrimaryColor(),
                               ),
-                            ),
+                            ).tr(),
                             onTap: () {
                               Navigator.pushReplacement(
                                 context,
@@ -177,14 +178,14 @@ class _LoginPageState extends BaseState<LoginPage> {
                       ElevatedButton(
                         onPressed: () {},
                         child: Text(
-                          'Login',
+                          'login',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 18,
                           ),
-                        ),
+                        ).tr(),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: primaryColor,
+                          backgroundColor: theme.getPrimaryColor(),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(5),
                           ),
@@ -196,9 +197,9 @@ class _LoginPageState extends BaseState<LoginPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           const Text(
-                            "Don't have an account?",
+                            "noAccountYet",
                             style: TextStyle(),
-                          ),
+                          ).tr(),
                           TextButton(
                             onPressed: () {
                               Navigator.pushReplacement(
@@ -208,31 +209,29 @@ class _LoginPageState extends BaseState<LoginPage> {
                                 ),
                               );
                             },
-                            child: const Text(
-                              "Sign Up",
+                            child: Text(
+                              "signUp",
                               style: TextStyle(
                                 fontSize: 16,
-                                color: primaryColor,
+                                color: theme.getPrimaryColor(),
                               ),
-                            ),
+                            ).tr(),
                           ),
                         ],
                       ),
                       SizedBox(height: 20),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      Wrap(
+                        spacing: 10,
+                        crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
                           const Text(
-                            "Powered By",
+                            "poweredBy",
                             style: TextStyle(
                               color: Colors.black,
                               fontSize: 16,
                             ),
-                          ),
-                          Image.asset(
-                            "assets/images/poweredby.png",
-                            width: 300,
-                          ),
+                          ).tr(),
+                          poweredBy,
                         ],
                       ),
                     ],

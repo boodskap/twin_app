@@ -1,0 +1,17 @@
+{
+  "appName": "Boodskap IoT Digital Twin",
+  "login": "Login",
+  "welcomeBack": "Welcome Back",
+  "email": "Email",
+  "password": "Password",
+  "rememberMe": "Remember Me",
+  "forgotPassword": "Forgot Your Password?",
+  "noAccountYet": "Don't have an account?",
+  "signUp": "Sign Up",
+  "registerNew": "Register New User",
+  "firstName": "First Name",
+  "lastName": "Last Name",
+  "cancel": "Cancel",
+  "haveAccount": "Already have an account?",
+  "": ""
+}

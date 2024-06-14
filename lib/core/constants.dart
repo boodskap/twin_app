@@ -1,16 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:twin_app/core/twin_theme.dart';
 
-const Color primaryColor = Color(0xFF4A0072);
-const Color secondaryColor = Color(0xFFFFFFFF);
+const TwinTheme theme = const PurpleTheme();
 
-const BoxDecoration purpleGradientBoxDecoration = BoxDecoration(
-  gradient: LinearGradient(
-    begin: Alignment.topCenter,
-    end: Alignment.bottomCenter,
-    colors: [
-      Color(0xFF4A0072),
-      Color(0xFF7B1FA2),
-      Color(0xFFBA68C8),
-    ],
-  ),
+final Image poweredBy = Image.asset(
+  "assets/images/poweredby.png",
+  width: 150,
 );

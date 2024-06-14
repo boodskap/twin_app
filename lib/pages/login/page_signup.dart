@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:twin_app/core/constants.dart';
 import 'package:twin_app/pages/login/page_login.dart';
-import 'package:nocode_commons/core/base_state.dart';
+import 'package:twin_commons/core/base_state.dart';
+import 'package:easy_localization/easy_localization.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({Key? key}) : super(key: key);
@@ -27,7 +28,7 @@ class _SignUpPageState extends BaseState<SignUpPage> {
       resizeToAvoidBottomInset: true,
       body: Container(
         width: double.infinity,
-        decoration: purpleGradientBoxDecoration,
+        decoration: theme.getCredentialsPageDecoration(),
         child: SingleChildScrollView(
           physics: NeverScrollableScrollPhysics(),
           child: Column(
@@ -42,13 +43,13 @@ class _SignUpPageState extends BaseState<SignUpPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      "Register New User",
+                      "registerNew",
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 30,
                         fontWeight: FontWeight.bold,
                       ),
-                    ),
+                    ).tr(),
                   ],
                 ),
               ),
@@ -92,7 +93,7 @@ class _SignUpPageState extends BaseState<SignUpPage> {
                               child: TextField(
                                 controller: _emailController,
                                 decoration: InputDecoration(
-                                  hintText: "Email",
+                                  hintText: "email".tr(),
                                   hintStyle: TextStyle(color: Colors.grey),
                                   border: InputBorder.none,
                                 ),
@@ -110,7 +111,7 @@ class _SignUpPageState extends BaseState<SignUpPage> {
                               child: TextField(
                                 controller: _fnameController,
                                 decoration: InputDecoration(
-                                  hintText: "First Name",
+                                  hintText: "firstName".tr(),
                                   hintStyle: TextStyle(color: Colors.grey),
                                   border: InputBorder.none,
                                 ),
@@ -128,7 +129,7 @@ class _SignUpPageState extends BaseState<SignUpPage> {
                               child: TextField(
                                 controller: _lnameController,
                                 decoration: InputDecoration(
-                                  hintText: "Last Name",
+                                  hintText: "lastName".tr(),
                                   hintStyle: TextStyle(color: Colors.grey),
                                   border: InputBorder.none,
                                 ),
@@ -143,10 +144,11 @@ class _SignUpPageState extends BaseState<SignUpPage> {
                         children: [
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: secondaryColor,
+                              backgroundColor: theme.getSecondaryColor(),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(5),
-                                side: BorderSide(color: primaryColor),
+                                side:
+                                    BorderSide(color: theme.getPrimaryColor()),
                               ),
                               minimumSize: Size(140, 40),
                             ),
@@ -154,16 +156,16 @@ class _SignUpPageState extends BaseState<SignUpPage> {
                               SystemNavigator.pop();
                             },
                             child: Text(
-                              "Cancel",
+                              "cancel",
                               style: TextStyle(
-                                color: primaryColor,
+                                color: theme.getPrimaryColor(),
                                 fontSize: 14,
                               ),
-                            ),
+                            ).tr(),
                           ),
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: primaryColor,
+                              backgroundColor: theme.getPrimaryColor(),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(5),
                               ),
@@ -178,12 +180,12 @@ class _SignUpPageState extends BaseState<SignUpPage> {
                               );
                             },
                             child: Text(
-                              'Sign Up',
+                              'signUp',
                               style: TextStyle(
                                 fontSize: 14,
-                                color: secondaryColor,
+                                color: theme.getSecondaryColor(),
                               ),
-                            ),
+                            ).tr(),
                           ),
                         ],
                       ),
@@ -192,9 +194,9 @@ class _SignUpPageState extends BaseState<SignUpPage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            "Already have an account?",
+                            "haveAccount",
                             style: TextStyle(),
-                          ),
+                          ).tr(),
                           TextButton(
                             onPressed: () {
                               Navigator.pushReplacement(
@@ -205,18 +207,19 @@ class _SignUpPageState extends BaseState<SignUpPage> {
                               );
                             },
                             child: Text(
-                              "Login",
-                              style:
-                                  TextStyle(fontSize: 18, color: primaryColor),
-                            ),
+                              "login",
+                              style: TextStyle(
+                                  fontSize: 18, color: theme.getPrimaryColor()),
+                            ).tr(),
                           ),
                         ],
                       ),
                       const SizedBox(
                         height: 40,
                       ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      Wrap(
+                        spacing: 10,
+                        crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
                           Text(
                             "Powered By",
@@ -225,10 +228,7 @@ class _SignUpPageState extends BaseState<SignUpPage> {
                               fontSize: 16,
                             ),
                           ),
-                          Image.asset(
-                            "assets/images/poweredby.png",
-                            width: 300,
-                          ),
+                          poweredBy,
                         ],
                       ),
                     ],
