@@ -10,6 +10,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:twin_app/router.dart';
 import '/foundation/logger/logger.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
+
+const List<Locale> locales = [Locale("en", "US"), Locale("ta", "IN")];
 
 void startApp() async {
   await initialiseApp();
@@ -22,8 +25,8 @@ void startApp() async {
 
   runApp(
     EasyLocalization(
-      supportedLocales: const [Locale("en", "US"), Locale("ta", "IN")],
-      path: "translations",
+      supportedLocales: locales,
+      path: "assets/translations",
       fallbackLocale: const Locale("en", "US"),
       child: const TwinApp(),
     ),
@@ -79,6 +82,20 @@ class _TwinAppState extends State<TwinApp> {
   void dispose() {
     _loggedInStateInfo.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    initialization();
+  }
+
+  void initialization() async {
+    // This is where you can initialize the resources needed by your app while
+    // the splash screen is displayed.  Remove the following example because
+    // delaying the user experience is a bad design practice!
+    // ignore_for_file: avoid_print
+    FlutterNativeSplash.remove();
   }
 
   @override
