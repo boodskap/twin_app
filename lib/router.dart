@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:twin_app/app.dart';
-import 'package:twin_app/pages/mobile/login/forgotpassword.dart';
-import 'package:twin_app/pages/mobile/login/verify_otp.dart';
-import 'package:twin_app/pages/mobile/login/login.dart';
-import 'package:twin_app/pages/mobile/login/reset_password.dart';
-import 'package:twin_app/pages/mobile/login/signup.dart';
+import 'package:twin_app/pages/login/forgotpassword.dart';
+import 'package:twin_app/pages/login/verify_otp.dart';
+import 'package:twin_app/pages/login/login.dart';
+import 'package:twin_app/pages/login/reset_password.dart';
+import 'package:twin_app/pages/login/signup.dart';
 
 abstract class Routes {
   static const home = '/';
@@ -59,21 +59,19 @@ GoRouter router = GoRouter(
     ),
     GoRoute(
       path: Routes.signup,
-      builder: (_, __) => SignUpMobilePage(loggedInState: _loggedInState),
+      builder: (_, __) => SignUpPage(loggedInState: _loggedInState),
     ),
     GoRoute(
       path: Routes.forgot,
-      builder: (_, __) =>
-          ForgotPasswordMobilePage(loggedInState: _loggedInState),
+      builder: (_, __) => ForgotPasswordPage(loggedInState: _loggedInState),
     ),
     GoRoute(
       path: Routes.otp,
-      builder: (_, __) => VerifyOtpMobilePage(loggedInState: _loggedInState),
+      builder: (_, __) => VerifyOtpPage(loggedInState: _loggedInState),
     ),
     GoRoute(
       path: Routes.reset,
-      builder: (_, __) =>
-          ResetPasswordMobilePage(loggedInState: _loggedInState),
+      builder: (_, __) => ResetPasswordPage(loggedInState: _loggedInState),
     ),
   ],
 );

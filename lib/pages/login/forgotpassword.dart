@@ -1,23 +1,49 @@
 import 'package:flutter/material.dart';
+import 'package:twin_app/pages/landing.dart';
 import 'package:twin_app/router.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:go_router/go_router.dart';
+import 'package:easy_localization/easy_localization.dart';
 
-class ResetPasswordMobilePage extends StatefulWidget {
+class ForgotPasswordPage extends StatefulWidget {
   final LoggedInStateInfo loggedInState;
-  const ResetPasswordMobilePage({super.key, required this.loggedInState});
+  const ForgotPasswordPage({super.key, required this.loggedInState});
 
   @override
-  State<ResetPasswordMobilePage> createState() =>
-      _ResetPasswordMobilePageState();
+  State<ForgotPasswordPage> createState() => _ForgotPasswordPageState();
 }
 
-class _ResetPasswordMobilePageState extends BaseState<ResetPasswordMobilePage> {
-  final TextEditingController _newPassController = TextEditingController();
-  final TextEditingController _confPassController = TextEditingController();
+class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
+  @override
+  Widget build(BuildContext context) {
+    if (smallSreen)
+      return _ForgotPasswordMobilePage(loggedInState: widget.loggedInState);
+    return Row(
+      children: [
+        Expanded(flex: 1, child: LandingPage()),
+        SizedBox(
+            width: credScreenWidth,
+            child:
+                _ForgotPasswordMobilePage(loggedInState: widget.loggedInState)),
+      ],
+    );
+  }
+}
+
+class _ForgotPasswordMobilePage extends StatefulWidget {
+  final LoggedInStateInfo loggedInState;
+  const _ForgotPasswordMobilePage({super.key, required this.loggedInState});
+
+  @override
+  State<_ForgotPasswordMobilePage> createState() =>
+      _ForgotPasswordMobilePageState();
+}
+
+class _ForgotPasswordMobilePageState
+    extends BaseState<_ForgotPasswordMobilePage> {
+  final TextEditingController _emailController = TextEditingController();
 
   @override
   void setup() {
@@ -29,37 +55,36 @@ class _ResetPasswordMobilePageState extends BaseState<ResetPasswordMobilePage> {
     return Scaffold(
       resizeToAvoidBottomInset: true,
       body: Container(
-        width: double.infinity,
         decoration: theme.getCredentialsPageDecoration(),
-        child: SingleChildScrollView(
-          physics: NeverScrollableScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              SizedBox(height: 100),
-              Padding(
-                padding: EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      "resetPassword",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ).tr(),
-                  ],
-                ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            SizedBox(height: 100),
+            Padding(
+              padding: EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    "resetPassword",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ).tr(),
+                ],
               ),
-              SizedBox(height: 30),
-              Container(
+            ),
+            SizedBox(height: 10),
+            Padding(
+              padding: EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
+              child: Container(
+                width: double.infinity,
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(60),
-                    topRight: Radius.circular(60),
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(60),
                   ),
                 ),
                 child: Padding(
@@ -91,28 +116,9 @@ class _ResetPasswordMobilePageState extends BaseState<ResetPasswordMobilePage> {
                                 ),
                               ),
                               child: TextField(
-                                controller: _newPassController,
+                                controller: _emailController,
                                 decoration: InputDecoration(
-                                  hintText: "newPassword".tr(),
-                                  hintStyle: TextStyle(color: Colors.grey),
-                                  border: InputBorder.none,
-                                ),
-                              ),
-                            ),
-                            Container(
-                              padding: EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                border: Border(
-                                  bottom: BorderSide(
-                                    color: Colors.grey.shade200,
-                                  ),
-                                ),
-                              ),
-                              child: TextField(
-                                controller: _confPassController,
-                                obscureText: true,
-                                decoration: InputDecoration(
-                                  hintText: "confirmPassword".tr(),
+                                  hintText: "email".tr(),
                                   hintStyle: TextStyle(color: Colors.grey),
                                   border: InputBorder.none,
                                 ),
@@ -121,7 +127,7 @@ class _ResetPasswordMobilePageState extends BaseState<ResetPasswordMobilePage> {
                           ],
                         ),
                       ),
-                      SizedBox(height: 70),
+                      SizedBox(height: 50),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -133,7 +139,7 @@ class _ResetPasswordMobilePageState extends BaseState<ResetPasswordMobilePage> {
                                 side:
                                     BorderSide(color: theme.getPrimaryColor()),
                               ),
-                              minimumSize: Size(140, 40),
+                              minimumSize: const Size(120, 40),
                             ),
                             onPressed: () {
                               context.pop();
@@ -146,23 +152,45 @@ class _ResetPasswordMobilePageState extends BaseState<ResetPasswordMobilePage> {
                               ),
                             ).tr(),
                           ),
-                          BusyIndicator(),
+                          const BusyIndicator(),
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               backgroundColor: theme.getPrimaryColor(),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(5),
                               ),
-                              minimumSize: Size(140, 40),
+                              minimumSize: const Size(100, 40),
                             ),
                             onPressed: () {
-                              GoRouter.of(context).push(Routes.login);
+                              context.push(Routes.otp);
                             },
                             child: Text(
-                              'continue',
+                              'generateOtp',
                               style: TextStyle(
                                 fontSize: 14,
                                 color: theme.getSecondaryColor(),
+                              ),
+                            ).tr(),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 30),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text(
+                            "noAccountYet",
+                            style: TextStyle(),
+                          ).tr(),
+                          TextButton(
+                            onPressed: () {
+                              GoRouter.of(context).push(Routes.signup);
+                            },
+                            child: Text(
+                              "signUp",
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: theme.getPrimaryColor(),
                               ),
                             ).tr(),
                           ),
@@ -173,11 +201,11 @@ class _ResetPasswordMobilePageState extends BaseState<ResetPasswordMobilePage> {
                         spacing: 10,
                         crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
-                          Text(
+                          const Text(
                             "Powered By",
                             style: TextStyle(
                               color: Colors.black,
-                              fontSize: 14,
+                              fontSize: 16,
                             ),
                           ),
                           poweredBy,
@@ -187,8 +215,8 @@ class _ResetPasswordMobilePageState extends BaseState<ResetPasswordMobilePage> {
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

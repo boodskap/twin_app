@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:twin_app/pages/landing.dart';
 import 'package:twin_app/router.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:pinput/pinput.dart';
@@ -7,15 +8,39 @@ import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:go_router/go_router.dart';
 
-class VerifyOtpMobilePage extends StatefulWidget {
+class VerifyOtpPage extends StatefulWidget {
   final LoggedInStateInfo loggedInState;
-  const VerifyOtpMobilePage({super.key, required this.loggedInState});
+  const VerifyOtpPage({super.key, required this.loggedInState});
 
   @override
-  State<VerifyOtpMobilePage> createState() => _VerifyOtpMobilePageState();
+  State<VerifyOtpPage> createState() => _VerifyOtpPageState();
 }
 
-class _VerifyOtpMobilePageState extends BaseState<VerifyOtpMobilePage> {
+class _VerifyOtpPageState extends State<VerifyOtpPage> {
+  @override
+  Widget build(BuildContext context) {
+    if (smallSreen)
+      return _VerifyOtpMobilePage(loggedInState: widget.loggedInState);
+    return Row(
+      children: [
+        Expanded(flex: 1, child: LandingPage()),
+        SizedBox(
+            width: credScreenWidth,
+            child: _VerifyOtpMobilePage(loggedInState: widget.loggedInState)),
+      ],
+    );
+  }
+}
+
+class _VerifyOtpMobilePage extends StatefulWidget {
+  final LoggedInStateInfo loggedInState;
+  const _VerifyOtpMobilePage({super.key, required this.loggedInState});
+
+  @override
+  State<_VerifyOtpMobilePage> createState() => _VerifyOtpMobilePageState();
+}
+
+class _VerifyOtpMobilePageState extends BaseState<_VerifyOtpMobilePage> {
   final TextEditingController pinController = TextEditingController();
 
   @override
@@ -30,36 +55,36 @@ class _VerifyOtpMobilePageState extends BaseState<VerifyOtpMobilePage> {
       body: Container(
         width: double.infinity,
         decoration: theme.getCredentialsPageDecoration(),
-        child: SingleChildScrollView(
-          physics: NeverScrollableScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              SizedBox(
-                height: 100,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            SizedBox(
+              height: 100,
+            ),
+            Padding(
+              padding: EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    "verifyOtp",
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold),
+                  ).tr(),
+                ],
               ),
-              Padding(
-                padding: EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      "verifyOtp",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold),
-                    ).tr(),
-                  ],
-                ),
-              ),
-              SizedBox(height: 20),
-              Container(
+            ),
+            SizedBox(height: 10),
+            Padding(
+              padding: EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
+              child: Container(
                 decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(60),
-                        topRight: Radius.circular(60))),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(60),
+                    )),
                 child: Padding(
                   padding: EdgeInsets.all(30),
                   child: Column(
@@ -167,9 +192,9 @@ class _VerifyOtpMobilePageState extends BaseState<VerifyOtpMobilePage> {
                     ],
                   ),
                 ),
-              )
-            ],
-          ),
+              ),
+            )
+          ],
         ),
       ),
     );

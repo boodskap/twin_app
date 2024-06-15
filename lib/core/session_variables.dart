@@ -16,3 +16,4 @@ final Image poweredBy = Image.asset(
 late ConfigValues config;
 vapi.PlatformSession? session;
 bool smallSreen = true;
+double credScreenWidth = 450;

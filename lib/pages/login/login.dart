@@ -21,9 +21,9 @@ class _LoginPageState extends State<LoginPage> {
       return _LoginMobilePage(loggedInState: widget.loggedInState);
     return Row(
       children: [
-        Expanded(flex: 3, child: LandingPage()),
-        Expanded(
-            flex: 1,
+        Expanded(flex: 1, child: LandingPage()),
+        SizedBox(
+            width: credScreenWidth,
             child: _LoginMobilePage(loggedInState: widget.loggedInState)),
       ],
     );

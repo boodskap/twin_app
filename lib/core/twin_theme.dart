@@ -14,14 +14,10 @@ abstract class TwinTheme {
   Decoration getCredentialsPageDecoration() {
     return BoxDecoration(
       gradient: LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        stops: [0.3, 0.6, 0.9],
-        colors: [
-          Color(0xFF4A0072),
-          Color(0xFF7B1FA2),
-          Color(0xFFBA68C8),
-        ],
+        colors: [Color(0xff1d6095), Color(0xff1b8a9d), Color(0xff14aaa2)],
+        stops: [0, 0.5, 1],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
       ),
     );
   }

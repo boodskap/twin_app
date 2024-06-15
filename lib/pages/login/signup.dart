@@ -1,20 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:twin_app/core/session_variables.dart';
+import 'package:twin_app/pages/landing.dart';
 import 'package:twin_app/router.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:go_router/go_router.dart';
 
-class SignUpMobilePage extends StatefulWidget {
+class SignUpPage extends StatefulWidget {
   final LoggedInStateInfo loggedInState;
-  const SignUpMobilePage({super.key, required this.loggedInState});
+  const SignUpPage({super.key, required this.loggedInState});
 
   @override
-  State<SignUpMobilePage> createState() => _SignUpMobilePageState();
+  State<SignUpPage> createState() => _SignUpPageState();
 }
 
-class _SignUpMobilePageState extends BaseState<SignUpMobilePage> {
+class _SignUpPageState extends State<SignUpPage> {
+  @override
+  Widget build(BuildContext context) {
+    if (smallSreen)
+      return _SignUpMobilePage(loggedInState: widget.loggedInState);
+    return Row(
+      children: [
+        Expanded(flex: 1, child: LandingPage()),
+        SizedBox(
+            width: credScreenWidth,
+            child: _SignUpMobilePage(loggedInState: widget.loggedInState)),
+      ],
+    );
+  }
+}
+
+class _SignUpMobilePage extends StatefulWidget {
+  final LoggedInStateInfo loggedInState;
+  const _SignUpMobilePage({super.key, required this.loggedInState});
+
+  @override
+  State<_SignUpMobilePage> createState() => _SignUpMobilePageState();
+}
+
+class _SignUpMobilePageState extends BaseState<_SignUpMobilePage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
@@ -29,39 +54,37 @@ class _SignUpMobilePageState extends BaseState<SignUpMobilePage> {
     return Scaffold(
       resizeToAvoidBottomInset: true,
       body: Container(
-        width: double.infinity,
         decoration: theme.getCredentialsPageDecoration(),
-        child: SingleChildScrollView(
-          physics: NeverScrollableScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              SizedBox(
-                height: 80,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            SizedBox(
+              height: 128,
+            ),
+            Padding(
+              padding: EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    "registerNew",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ).tr(),
+                ],
               ),
-              Padding(
-                padding: EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      "registerNew",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ).tr(),
-                  ],
-                ),
-              ),
-              SizedBox(height: 20),
-              Container(
+            ),
+            SizedBox(height: 10),
+            Padding(
+              padding: EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
+              child: Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(60),
-                    topRight: Radius.circular(60),
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(60),
                   ),
                 ),
                 child: Padding(
@@ -155,7 +178,7 @@ class _SignUpMobilePageState extends BaseState<SignUpMobilePage> {
                               minimumSize: Size(140, 40),
                             ),
                             onPressed: () {
-                              SystemNavigator.pop();
+                              context.pop();
                             },
                             child: Text(
                               "cancel",
@@ -227,8 +250,8 @@ class _SignUpMobilePageState extends BaseState<SignUpMobilePage> {
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

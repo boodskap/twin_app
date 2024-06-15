@@ -1,23 +1,50 @@
 import 'package:flutter/material.dart';
+import 'package:twin_app/pages/landing.dart';
 import 'package:twin_app/router.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
-import 'package:go_router/go_router.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:go_router/go_router.dart';
 
-class ForgotPasswordMobilePage extends StatefulWidget {
+class ResetPasswordPage extends StatefulWidget {
   final LoggedInStateInfo loggedInState;
-  const ForgotPasswordMobilePage({super.key, required this.loggedInState});
+  const ResetPasswordPage({super.key, required this.loggedInState});
 
   @override
-  State<ForgotPasswordMobilePage> createState() =>
-      _ForgotPasswordMobilePageState();
+  State<ResetPasswordPage> createState() => _ResetPasswordPageState();
 }
 
-class _ForgotPasswordMobilePageState
-    extends BaseState<ForgotPasswordMobilePage> {
-  final TextEditingController _emailController = TextEditingController();
+class _ResetPasswordPageState extends State<ResetPasswordPage> {
+  @override
+  Widget build(BuildContext context) {
+    if (smallSreen)
+      return _ResetPasswordMobilePage(loggedInState: widget.loggedInState);
+    return Row(
+      children: [
+        Expanded(flex: 1, child: LandingPage()),
+        SizedBox(
+            width: credScreenWidth,
+            child:
+                _ResetPasswordMobilePage(loggedInState: widget.loggedInState)),
+      ],
+    );
+  }
+}
+
+class _ResetPasswordMobilePage extends StatefulWidget {
+  final LoggedInStateInfo loggedInState;
+  const _ResetPasswordMobilePage({super.key, required this.loggedInState});
+
+  @override
+  State<_ResetPasswordMobilePage> createState() =>
+      _ResetPasswordMobilePageState();
+}
+
+class _ResetPasswordMobilePageState
+    extends BaseState<_ResetPasswordMobilePage> {
+  final TextEditingController _newPassController = TextEditingController();
+  final TextEditingController _confPassController = TextEditingController();
 
   @override
   void setup() {
@@ -31,36 +58,34 @@ class _ForgotPasswordMobilePageState
       body: Container(
         width: double.infinity,
         decoration: theme.getCredentialsPageDecoration(),
-        child: SingleChildScrollView(
-          physics: NeverScrollableScrollPhysics(),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              SizedBox(height: 100),
-              Padding(
-                padding: EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text(
-                      "resetPassword",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ).tr(),
-                  ],
-                ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            SizedBox(height: 100),
+            Padding(
+              padding: EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    "changePassword",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ).tr(),
+                ],
               ),
-              SizedBox(height: 50),
-              Container(
-                width: double.infinity,
+            ),
+            SizedBox(height: 10),
+            Padding(
+              padding: EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
+              child: Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(60),
-                    topRight: Radius.circular(60),
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(60),
                   ),
                 ),
                 child: Padding(
@@ -92,9 +117,28 @@ class _ForgotPasswordMobilePageState
                                 ),
                               ),
                               child: TextField(
-                                controller: _emailController,
+                                controller: _newPassController,
                                 decoration: InputDecoration(
-                                  hintText: "email".tr(),
+                                  hintText: "newPassword".tr(),
+                                  hintStyle: TextStyle(color: Colors.grey),
+                                  border: InputBorder.none,
+                                ),
+                              ),
+                            ),
+                            Container(
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(
+                                    color: Colors.grey.shade200,
+                                  ),
+                                ),
+                              ),
+                              child: TextField(
+                                controller: _confPassController,
+                                obscureText: true,
+                                decoration: InputDecoration(
+                                  hintText: "confirmPassword".tr(),
                                   hintStyle: TextStyle(color: Colors.grey),
                                   border: InputBorder.none,
                                 ),
@@ -103,7 +147,7 @@ class _ForgotPasswordMobilePageState
                           ],
                         ),
                       ),
-                      SizedBox(height: 50),
+                      SizedBox(height: 70),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -115,7 +159,7 @@ class _ForgotPasswordMobilePageState
                                 side:
                                     BorderSide(color: theme.getPrimaryColor()),
                               ),
-                              minimumSize: const Size(120, 40),
+                              minimumSize: Size(140, 40),
                             ),
                             onPressed: () {
                               context.pop();
@@ -128,45 +172,23 @@ class _ForgotPasswordMobilePageState
                               ),
                             ).tr(),
                           ),
-                          const BusyIndicator(),
+                          BusyIndicator(),
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               backgroundColor: theme.getPrimaryColor(),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(5),
                               ),
-                              minimumSize: const Size(100, 40),
+                              minimumSize: Size(140, 40),
                             ),
                             onPressed: () {
-                              context.push(Routes.otp);
+                              GoRouter.of(context).push(Routes.login);
                             },
                             child: Text(
-                              'generateOtp',
+                              'continue',
                               style: TextStyle(
                                 fontSize: 14,
                                 color: theme.getSecondaryColor(),
-                              ),
-                            ).tr(),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 30),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text(
-                            "noAccountYet",
-                            style: TextStyle(),
-                          ).tr(),
-                          TextButton(
-                            onPressed: () {
-                              GoRouter.of(context).push(Routes.signup);
-                            },
-                            child: Text(
-                              "signUp",
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: theme.getPrimaryColor(),
                               ),
                             ).tr(),
                           ),
@@ -177,11 +199,11 @@ class _ForgotPasswordMobilePageState
                         spacing: 10,
                         crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
-                          const Text(
+                          Text(
                             "Powered By",
                             style: TextStyle(
                               color: Colors.black,
-                              fontSize: 16,
+                              fontSize: 14,
                             ),
                           ),
                           poweredBy,
@@ -191,8 +213,8 @@ class _ForgotPasswordMobilePageState
                   ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
