@@ -16,6 +16,7 @@ abstract class TwinTheme {
       gradient: LinearGradient(
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
+        stops: [0.3, 0.6, 0.9],
         colors: [
           Color(0xFF4A0072),
           Color(0xFF7B1FA2),

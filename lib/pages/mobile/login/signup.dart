@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:twin_app/core/session_variables.dart';
+import 'package:twin_app/router.dart';
 import 'package:twin_commons/core/base_state.dart';
-import 'package:twin_app/core/constants.dart';
-import 'package:twin_app/pages/login/page_forgotpassword.dart';
-import 'package:twin_app/pages/login/page_signup.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:go_router/go_router.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class SignUpMobilePage extends StatefulWidget {
+  final LoggedInStateInfo loggedInState;
+  const SignUpMobilePage({super.key, required this.loggedInState});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<SignUpMobilePage> createState() => _SignUpMobilePageState();
 }
 
-class _LoginPageState extends BaseState<LoginPage> {
-  final TextEditingController _userController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  bool _rememberMe = false;
+class _SignUpMobilePageState extends BaseState<SignUpMobilePage> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
 
   @override
   void setup() {
@@ -35,7 +37,7 @@ class _LoginPageState extends BaseState<LoginPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               SizedBox(
-                height: 100,
+                height: 80,
               ),
               Padding(
                 padding: EdgeInsets.all(20),
@@ -43,24 +45,18 @@ class _LoginPageState extends BaseState<LoginPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      "login",
+                      "registerNew",
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 30,
                         fontWeight: FontWeight.bold,
                       ),
                     ).tr(),
-                    SizedBox(height: 10),
-                    Text(
-                      "welcomeBack",
-                      style: TextStyle(color: Colors.white, fontSize: 18),
-                    ).tr(),
                   ],
                 ),
               ),
-              SizedBox(height: 10),
+              SizedBox(height: 20),
               Container(
-                width: double.infinity,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
@@ -97,7 +93,7 @@ class _LoginPageState extends BaseState<LoginPage> {
                                 ),
                               ),
                               child: TextField(
-                                controller: _userController,
+                                controller: _emailController,
                                 decoration: InputDecoration(
                                   hintText: "email".tr(),
                                   hintStyle: TextStyle(color: Colors.grey),
@@ -115,10 +111,27 @@ class _LoginPageState extends BaseState<LoginPage> {
                                 ),
                               ),
                               child: TextField(
-                                controller: _passwordController,
-                                obscureText: true,
+                                controller: _firstNameController,
                                 decoration: InputDecoration(
-                                  hintText: "password".tr(),
+                                  hintText: "firstName".tr(),
+                                  hintStyle: TextStyle(color: Colors.grey),
+                                  border: InputBorder.none,
+                                ),
+                              ),
+                            ),
+                            Container(
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(
+                                    color: Colors.grey.shade200,
+                                  ),
+                                ),
+                              ),
+                              child: TextField(
+                                controller: _lastNameController,
+                                decoration: InputDecoration(
+                                  hintText: "lastName".tr(),
                                   hintStyle: TextStyle(color: Colors.grey),
                                   border: InputBorder.none,
                                 ),
@@ -131,106 +144,82 @@ class _LoginPageState extends BaseState<LoginPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          InkWell(
-                            onTap: () {
-                              setState(() {
-                                _rememberMe = !_rememberMe;
-                              });
-                            },
-                            child: Row(
-                              children: [
-                                Checkbox(
-                                  value: _rememberMe,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _rememberMe = value!;
-                                    });
-                                  },
-                                ),
-                                const Text(
-                                  'rememberMe',
-                                  style: TextStyle(fontSize: 14),
-                                ).tr(),
-                              ],
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: theme.getSecondaryColor(),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(5),
+                                side:
+                                    BorderSide(color: theme.getPrimaryColor()),
+                              ),
+                              minimumSize: Size(140, 40),
                             ),
-                          ),
-                          InkWell(
+                            onPressed: () {
+                              SystemNavigator.pop();
+                            },
                             child: Text(
-                              'forgotPassword',
+                              "cancel",
                               style: TextStyle(
-                                fontSize: 14,
                                 color: theme.getPrimaryColor(),
+                                fontSize: 14,
                               ),
                             ).tr(),
-                            onTap: () {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      const ForgotPasswordPage(),
-                                ),
-                              );
-                            },
                           ),
-                        ],
-                      ),
-                      SizedBox(height: 10),
-                      ElevatedButton(
-                        onPressed: () {},
-                        child: Text(
-                          'login',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                          ),
-                        ).tr(),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: theme.getPrimaryColor(),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          minimumSize: const Size(330, 50),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text(
-                            "noAccountYet",
-                            style: TextStyle(),
-                          ).tr(),
-                          TextButton(
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: theme.getPrimaryColor(),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              minimumSize: Size(140, 40),
+                            ),
                             onPressed: () {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const SignUpPage(),
-                                ),
-                              );
+                              GoRouter.of(context).push(Routes.login);
                             },
                             child: Text(
-                              "signUp",
+                              'signUp',
                               style: TextStyle(
-                                fontSize: 16,
-                                color: theme.getPrimaryColor(),
+                                fontSize: 14,
+                                color: theme.getSecondaryColor(),
                               ),
                             ).tr(),
                           ),
                         ],
                       ),
                       SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "haveAccount",
+                            style: TextStyle(),
+                          ).tr(),
+                          TextButton(
+                            onPressed: () {
+                              GoRouter.of(context).push(Routes.login);
+                            },
+                            child: Text(
+                              "login",
+                              style: TextStyle(
+                                  fontSize: 18, color: theme.getPrimaryColor()),
+                            ).tr(),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 40,
+                      ),
                       Wrap(
                         spacing: 10,
                         crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
-                          const Text(
-                            "poweredBy",
+                          Text(
+                            "Powered By",
                             style: TextStyle(
                               color: Colors.black,
                               fontSize: 16,
                             ),
-                          ).tr(),
+                          ),
                           poweredBy,
                         ],
                       ),

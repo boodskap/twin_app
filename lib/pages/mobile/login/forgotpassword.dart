@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:twin_app/router.dart';
 import 'package:twin_commons/core/base_state.dart';
-import 'package:pinput/pinput.dart';
-import 'package:twin_app/core/constants.dart';
-import 'package:twin_app/pages/login/page_reset_password.dart';
+import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
+import 'package:go_router/go_router.dart';
 import 'package:easy_localization/easy_localization.dart';
 
-class ForgotPasswordOtpPage extends StatefulWidget {
-  const ForgotPasswordOtpPage({super.key});
+class ForgotPasswordMobilePage extends StatefulWidget {
+  final LoggedInStateInfo loggedInState;
+  const ForgotPasswordMobilePage({super.key, required this.loggedInState});
 
   @override
-  State<ForgotPasswordOtpPage> createState() => _ForgotPasswordOtpPageState();
+  State<ForgotPasswordMobilePage> createState() =>
+      _ForgotPasswordMobilePageState();
 }
 
-class _ForgotPasswordOtpPageState extends BaseState<ForgotPasswordOtpPage> {
-  final TextEditingController pinController = TextEditingController();
+class _ForgotPasswordMobilePageState
+    extends BaseState<ForgotPasswordMobilePage> {
+  final TextEditingController _emailController = TextEditingController();
 
   @override
   void setup() {
@@ -34,69 +36,74 @@ class _ForgotPasswordOtpPageState extends BaseState<ForgotPasswordOtpPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              SizedBox(
-                height: 100,
-              ),
+              SizedBox(height: 100),
               Padding(
                 padding: EdgeInsets.all(20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      "OTP And Password",
+                      "resetPassword",
                       style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold),
-                    ),
+                        color: Colors.white,
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ).tr(),
                   ],
                 ),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 50),
               Container(
+                width: double.infinity,
                 decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(60),
-                        topRight: Radius.circular(60))),
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(60),
+                    topRight: Radius.circular(60),
+                  ),
+                ),
                 child: Padding(
                   padding: EdgeInsets.all(30),
                   child: Column(
                     children: <Widget>[
-                      const SizedBox(
-                        height: 50,
-                      ),
+                      SizedBox(height: 50),
                       Container(
                         decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                            boxShadow: [
-                              BoxShadow(
-                                  color: Color.fromRGBO(225, 95, 27, .3),
-                                  blurRadius: 20,
-                                  offset: Offset(0, 10))
-                            ]),
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Color.fromRGBO(225, 95, 27, .3),
+                              blurRadius: 20,
+                              offset: Offset(0, 10),
+                            ),
+                          ],
+                        ),
                         child: Column(
                           children: <Widget>[
-                            SizedBox(
-                              height: 40,
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Pinput(
-                                controller: pinController,
-                                length: 6,
+                            Container(
+                              padding: EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(
+                                    color: Colors.grey.shade200,
+                                  ),
+                                ),
                               ),
-                            ),
-                            SizedBox(
-                              height: 40,
+                              child: TextField(
+                                controller: _emailController,
+                                decoration: InputDecoration(
+                                  hintText: "email".tr(),
+                                  hintStyle: TextStyle(color: Colors.grey),
+                                  border: InputBorder.none,
+                                ),
+                              ),
                             ),
                           ],
                         ),
                       ),
-                      SizedBox(
-                        height: 60,
-                      ),
+                      SizedBox(height: 50),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -108,18 +115,18 @@ class _ForgotPasswordOtpPageState extends BaseState<ForgotPasswordOtpPage> {
                                 side:
                                     BorderSide(color: theme.getPrimaryColor()),
                               ),
-                              minimumSize: const Size(140, 40),
+                              minimumSize: const Size(120, 40),
                             ),
                             onPressed: () {
-                              SystemNavigator.pop();
+                              context.pop();
                             },
                             child: Text(
-                              "Cancel",
+                              "cancel",
                               style: TextStyle(
                                 color: theme.getPrimaryColor(),
                                 fontSize: 14,
                               ),
-                            ),
+                            ).tr(),
                           ),
                           const BusyIndicator(),
                           ElevatedButton(
@@ -128,29 +135,44 @@ class _ForgotPasswordOtpPageState extends BaseState<ForgotPasswordOtpPage> {
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(5),
                               ),
-                              minimumSize: const Size(140, 40),
+                              minimumSize: const Size(100, 40),
                             ),
                             onPressed: () {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const ResetPasswordPage()),
-                              );
+                              context.push(Routes.otp);
                             },
                             child: Text(
-                              'Verify',
+                              'generateOtp',
                               style: TextStyle(
                                 fontSize: 14,
                                 color: theme.getSecondaryColor(),
                               ),
-                            ),
+                            ).tr(),
                           ),
                         ],
                       ),
-                      const SizedBox(
-                        height: 80,
+                      SizedBox(height: 30),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text(
+                            "noAccountYet",
+                            style: TextStyle(),
+                          ).tr(),
+                          TextButton(
+                            onPressed: () {
+                              GoRouter.of(context).push(Routes.signup);
+                            },
+                            child: Text(
+                              "signUp",
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: theme.getPrimaryColor(),
+                              ),
+                            ).tr(),
+                          ),
+                        ],
                       ),
+                      SizedBox(height: 80),
                       Wrap(
                         spacing: 10,
                         crossAxisAlignment: WrapCrossAlignment.center,
@@ -163,15 +185,12 @@ class _ForgotPasswordOtpPageState extends BaseState<ForgotPasswordOtpPage> {
                             ),
                           ),
                           poweredBy,
-                          const SizedBox(
-                            height: 10,
-                          ),
                         ],
                       ),
                     ],
                   ),
                 ),
-              )
+              ),
             ],
           ),
         ),

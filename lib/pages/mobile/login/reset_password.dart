@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:twin_app/core/constants.dart';
-import 'package:twin_app/pages/login/page_login.dart';
+import 'package:twin_app/router.dart';
 import 'package:twin_commons/core/base_state.dart';
+import 'package:twin_app/core/session_variables.dart';
+import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:go_router/go_router.dart';
 
-class SignUpPage extends StatefulWidget {
-  const SignUpPage({Key? key}) : super(key: key);
+class ResetPasswordMobilePage extends StatefulWidget {
+  final LoggedInStateInfo loggedInState;
+  const ResetPasswordMobilePage({super.key, required this.loggedInState});
 
   @override
-  State<SignUpPage> createState() => _SignUpPageState();
+  State<ResetPasswordMobilePage> createState() =>
+      _ResetPasswordMobilePageState();
 }
 
-class _SignUpPageState extends BaseState<SignUpPage> {
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _fnameController = TextEditingController();
-  final TextEditingController _lnameController = TextEditingController();
+class _ResetPasswordMobilePageState extends BaseState<ResetPasswordMobilePage> {
+  final TextEditingController _newPassController = TextEditingController();
+  final TextEditingController _confPassController = TextEditingController();
 
   @override
   void setup() {
@@ -34,16 +36,14 @@ class _SignUpPageState extends BaseState<SignUpPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              SizedBox(
-                height: 80,
-              ),
+              SizedBox(height: 100),
               Padding(
                 padding: EdgeInsets.all(20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text(
-                      "registerNew",
+                      "resetPassword",
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 30,
@@ -53,7 +53,7 @@ class _SignUpPageState extends BaseState<SignUpPage> {
                   ],
                 ),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 30),
               Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -66,7 +66,7 @@ class _SignUpPageState extends BaseState<SignUpPage> {
                   padding: EdgeInsets.all(30),
                   child: Column(
                     children: <Widget>[
-                      SizedBox(height: 30),
+                      SizedBox(height: 50),
                       Container(
                         decoration: BoxDecoration(
                           color: Colors.white,
@@ -91,9 +91,9 @@ class _SignUpPageState extends BaseState<SignUpPage> {
                                 ),
                               ),
                               child: TextField(
-                                controller: _emailController,
+                                controller: _newPassController,
                                 decoration: InputDecoration(
-                                  hintText: "email".tr(),
+                                  hintText: "newPassword".tr(),
                                   hintStyle: TextStyle(color: Colors.grey),
                                   border: InputBorder.none,
                                 ),
@@ -109,27 +109,10 @@ class _SignUpPageState extends BaseState<SignUpPage> {
                                 ),
                               ),
                               child: TextField(
-                                controller: _fnameController,
+                                controller: _confPassController,
+                                obscureText: true,
                                 decoration: InputDecoration(
-                                  hintText: "firstName".tr(),
-                                  hintStyle: TextStyle(color: Colors.grey),
-                                  border: InputBorder.none,
-                                ),
-                              ),
-                            ),
-                            Container(
-                              padding: EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                border: Border(
-                                  bottom: BorderSide(
-                                    color: Colors.grey.shade200,
-                                  ),
-                                ),
-                              ),
-                              child: TextField(
-                                controller: _lnameController,
-                                decoration: InputDecoration(
-                                  hintText: "lastName".tr(),
+                                  hintText: "confirmPassword".tr(),
                                   hintStyle: TextStyle(color: Colors.grey),
                                   border: InputBorder.none,
                                 ),
@@ -138,7 +121,7 @@ class _SignUpPageState extends BaseState<SignUpPage> {
                           ],
                         ),
                       ),
-                      SizedBox(height: 20),
+                      SizedBox(height: 70),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -153,7 +136,7 @@ class _SignUpPageState extends BaseState<SignUpPage> {
                               minimumSize: Size(140, 40),
                             ),
                             onPressed: () {
-                              SystemNavigator.pop();
+                              context.pop();
                             },
                             child: Text(
                               "cancel",
@@ -163,6 +146,7 @@ class _SignUpPageState extends BaseState<SignUpPage> {
                               ),
                             ).tr(),
                           ),
+                          BusyIndicator(),
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               backgroundColor: theme.getPrimaryColor(),
@@ -172,15 +156,10 @@ class _SignUpPageState extends BaseState<SignUpPage> {
                               minimumSize: Size(140, 40),
                             ),
                             onPressed: () {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const LoginPage(),
-                                ),
-                              );
+                              GoRouter.of(context).push(Routes.login);
                             },
                             child: Text(
-                              'signUp',
+                              'continue',
                               style: TextStyle(
                                 fontSize: 14,
                                 color: theme.getSecondaryColor(),
@@ -189,34 +168,7 @@ class _SignUpPageState extends BaseState<SignUpPage> {
                           ),
                         ],
                       ),
-                      SizedBox(height: 20),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "haveAccount",
-                            style: TextStyle(),
-                          ).tr(),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const LoginPage(),
-                                ),
-                              );
-                            },
-                            child: Text(
-                              "login",
-                              style: TextStyle(
-                                  fontSize: 18, color: theme.getPrimaryColor()),
-                            ).tr(),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 40,
-                      ),
+                      SizedBox(height: 80),
                       Wrap(
                         spacing: 10,
                         crossAxisAlignment: WrapCrossAlignment.center,
@@ -225,7 +177,7 @@ class _SignUpPageState extends BaseState<SignUpPage> {
                             "Powered By",
                             style: TextStyle(
                               color: Colors.black,
-                              fontSize: 16,
+                              fontSize: 14,
                             ),
                           ),
                           poweredBy,
