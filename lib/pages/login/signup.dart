@@ -3,9 +3,13 @@ import 'package:flutter/services.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/pages/landing.dart';
 import 'package:twin_app/router.dart';
+import 'package:twin_app/widgets/commons/email_field.dart';
+import 'package:twin_app/widgets/commons/primary_button.dart';
+import 'package:twin_app/widgets/commons/secondary_button.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:go_router/go_router.dart';
+import 'package:twin_commons/core/busy_indicator.dart';
 
 class SignUpPage extends StatefulWidget {
   final LoggedInStateInfo loggedInState;
@@ -58,8 +62,9 @@ class _SignUpMobilePageState extends BaseState<_SignUpMobilePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            SizedBox(
-              height: 128,
+            Padding(
+              padding: const EdgeInsets.all(25.0),
+              child: Align(alignment: Alignment.center, child: logo),
             ),
             Padding(
               padding: EdgeInsets.all(20),
@@ -68,11 +73,11 @@ class _SignUpMobilePageState extends BaseState<_SignUpMobilePage> {
                 children: <Widget>[
                   Text(
                     "registerNew",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 30,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: theme.getStyle().copyWith(
+                          color: Colors.white,
+                          fontSize: 30,
+                          fontWeight: FontWeight.bold,
+                        ),
                   ).tr(),
                 ],
               ),
@@ -81,12 +86,7 @@ class _SignUpMobilePageState extends BaseState<_SignUpMobilePage> {
             Padding(
               padding: EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
               child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(60),
-                  ),
-                ),
+                decoration: theme.getCredentialsContentDecoration(),
                 child: Padding(
                   padding: EdgeInsets.all(30),
                   child: Column(
@@ -106,23 +106,8 @@ class _SignUpMobilePageState extends BaseState<_SignUpMobilePage> {
                         ),
                         child: Column(
                           children: <Widget>[
-                            Container(
-                              padding: EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                border: Border(
-                                  bottom: BorderSide(
-                                    color: Colors.grey.shade200,
-                                  ),
-                                ),
-                              ),
-                              child: TextField(
-                                controller: _emailController,
-                                decoration: InputDecoration(
-                                  hintText: "email".tr(),
-                                  hintStyle: TextStyle(color: Colors.grey),
-                                  border: InputBorder.none,
-                                ),
-                              ),
+                            EmailField(
+                              controller: _emailController,
                             ),
                             Container(
                               padding: EdgeInsets.all(10),
@@ -137,7 +122,9 @@ class _SignUpMobilePageState extends BaseState<_SignUpMobilePage> {
                                 controller: _firstNameController,
                                 decoration: InputDecoration(
                                   hintText: "firstName".tr(),
-                                  hintStyle: TextStyle(color: Colors.grey),
+                                  hintStyle: theme
+                                      .getStyle()
+                                      .copyWith(color: Colors.grey),
                                   border: InputBorder.none,
                                 ),
                               ),
@@ -155,7 +142,9 @@ class _SignUpMobilePageState extends BaseState<_SignUpMobilePage> {
                                 controller: _lastNameController,
                                 decoration: InputDecoration(
                                   hintText: "lastName".tr(),
-                                  hintStyle: TextStyle(color: Colors.grey),
+                                  hintStyle: theme
+                                      .getStyle()
+                                      .copyWith(color: Colors.grey),
                                   border: InputBorder.none,
                                 ),
                               ),
@@ -167,45 +156,19 @@ class _SignUpMobilePageState extends BaseState<_SignUpMobilePage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: theme.getSecondaryColor(),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(5),
-                                side:
-                                    BorderSide(color: theme.getPrimaryColor()),
-                              ),
-                              minimumSize: Size(140, 40),
-                            ),
+                          SecondaryButton(
+                            labelKey: 'cancel',
                             onPressed: () {
                               context.pop();
                             },
-                            child: Text(
-                              "cancel",
-                              style: TextStyle(
-                                color: theme.getPrimaryColor(),
-                                fontSize: 14,
-                              ),
-                            ).tr(),
                           ),
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: theme.getPrimaryColor(),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              minimumSize: Size(140, 40),
-                            ),
+                          BusyIndicator(),
+                          PrimaryButton(
+                            labelKey: 'signUp',
+                            minimumSize: Size(200, 50),
                             onPressed: () {
-                              GoRouter.of(context).push(Routes.login);
+                              context.push(Routes.login);
                             },
-                            child: Text(
-                              'signUp',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: theme.getSecondaryColor(),
-                              ),
-                            ).tr(),
                           ),
                         ],
                       ),
@@ -215,7 +178,7 @@ class _SignUpMobilePageState extends BaseState<_SignUpMobilePage> {
                         children: [
                           Text(
                             "haveAccount",
-                            style: TextStyle(),
+                            style: theme.getStyle().copyWith(),
                           ).tr(),
                           TextButton(
                             onPressed: () {
@@ -223,28 +186,31 @@ class _SignUpMobilePageState extends BaseState<_SignUpMobilePage> {
                             },
                             child: Text(
                               "login",
-                              style: TextStyle(
+                              style: theme.getStyle().copyWith(
                                   fontSize: 18, color: theme.getPrimaryColor()),
                             ).tr(),
                           ),
                         ],
                       ),
                       const SizedBox(
-                        height: 40,
+                        height: 50,
                       ),
-                      Wrap(
-                        spacing: 10,
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        children: [
-                          Text(
-                            "Powered By",
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 16,
+                      Align(
+                        alignment: Alignment.bottomRight,
+                        child: Wrap(
+                          spacing: 10,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            Text(
+                              "Powered By",
+                              style: theme.getStyle().copyWith(
+                                    color: Colors.black,
+                                    fontSize: 16,
+                                  ),
                             ),
-                          ),
-                          poweredBy,
-                        ],
+                            poweredBy,
+                          ],
+                        ),
                       ),
                     ],
                   ),

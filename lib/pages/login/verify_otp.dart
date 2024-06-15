@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:twin_app/pages/landing.dart';
 import 'package:twin_app/router.dart';
+import 'package:twin_app/widgets/commons/primary_button.dart';
+import 'package:twin_app/widgets/commons/secondary_button.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:pinput/pinput.dart';
 import 'package:twin_app/core/session_variables.dart';
@@ -58,8 +60,9 @@ class _VerifyOtpMobilePageState extends BaseState<_VerifyOtpMobilePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            SizedBox(
-              height: 100,
+            Padding(
+              padding: const EdgeInsets.all(25.0),
+              child: Align(alignment: Alignment.center, child: logo),
             ),
             Padding(
               padding: EdgeInsets.all(20),
@@ -68,7 +71,7 @@ class _VerifyOtpMobilePageState extends BaseState<_VerifyOtpMobilePage> {
                 children: <Widget>[
                   Text(
                     "verifyOtp",
-                    style: TextStyle(
+                    style: theme.getStyle().copyWith(
                         color: Colors.white,
                         fontSize: 30,
                         fontWeight: FontWeight.bold),
@@ -80,11 +83,7 @@ class _VerifyOtpMobilePageState extends BaseState<_VerifyOtpMobilePage> {
             Padding(
               padding: EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
               child: Container(
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(60),
-                    )),
+                decoration: theme.getCredentialsContentDecoration(),
                 child: Padding(
                   padding: EdgeInsets.all(30),
                   child: Column(
@@ -126,68 +125,44 @@ class _VerifyOtpMobilePageState extends BaseState<_VerifyOtpMobilePage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: theme.getSecondaryColor(),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(5),
-                                side:
-                                    BorderSide(color: theme.getPrimaryColor()),
-                              ),
-                              minimumSize: const Size(140, 40),
-                            ),
+                          SecondaryButton(
+                            labelKey: 'cancel',
                             onPressed: () {
                               context.pop();
                             },
-                            child: Text(
-                              "cancel",
-                              style: TextStyle(
-                                color: theme.getPrimaryColor(),
-                                fontSize: 14,
-                              ),
-                            ).tr(),
                           ),
                           const BusyIndicator(),
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: theme.getPrimaryColor(),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              minimumSize: const Size(140, 40),
-                            ),
+                          PrimaryButton(
+                            labelKey: 'verify',
+                            minimumSize: Size(200, 50),
                             onPressed: () {
-                              GoRouter.of(context).push(Routes.reset);
+                              context.push(Routes.reset);
                             },
-                            child: Text(
-                              'verify',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: theme.getSecondaryColor(),
-                              ),
-                            ).tr(),
-                          ),
+                          )
                         ],
                       ),
                       const SizedBox(
-                        height: 80,
+                        height: 50,
                       ),
-                      Wrap(
-                        spacing: 10,
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        children: [
-                          const Text(
-                            "Powered By",
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 16,
+                      Align(
+                        alignment: Alignment.bottomRight,
+                        child: Wrap(
+                          spacing: 10,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            Text(
+                              "Powered By",
+                              style: theme.getStyle().copyWith(
+                                    color: Colors.black,
+                                    fontSize: 16,
+                                  ),
                             ),
-                          ),
-                          poweredBy,
-                          const SizedBox(
-                            height: 10,
-                          ),
-                        ],
+                            poweredBy,
+                            const SizedBox(
+                              height: 10,
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),

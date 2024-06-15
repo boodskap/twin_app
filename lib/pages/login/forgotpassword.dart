@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:twin_app/core/twin_theme.dart';
 import 'package:twin_app/pages/landing.dart';
 import 'package:twin_app/router.dart';
+import 'package:twin_app/widgets/commons/email_field.dart';
+import 'package:twin_app/widgets/commons/primary_button.dart';
+import 'package:twin_app/widgets/commons/secondary_button.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
@@ -59,7 +63,10 @@ class _ForgotPasswordMobilePageState
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            SizedBox(height: 100),
+            Padding(
+              padding: const EdgeInsets.all(25.0),
+              child: Align(alignment: Alignment.center, child: logo),
+            ),
             Padding(
               padding: EdgeInsets.all(20),
               child: Column(
@@ -67,11 +74,11 @@ class _ForgotPasswordMobilePageState
                 children: <Widget>[
                   Text(
                     "resetPassword",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 30,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: theme.getStyle().copyWith(
+                          color: Colors.white,
+                          fontSize: 30,
+                          fontWeight: FontWeight.bold,
+                        ),
                   ).tr(),
                 ],
               ),
@@ -81,12 +88,7 @@ class _ForgotPasswordMobilePageState
               padding: EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
               child: Container(
                 width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(60),
-                  ),
-                ),
+                decoration: theme.getCredentialsContentDecoration(),
                 child: Padding(
                   padding: EdgeInsets.all(30),
                   child: Column(
@@ -98,7 +100,7 @@ class _ForgotPasswordMobilePageState
                           borderRadius: BorderRadius.circular(10),
                           boxShadow: [
                             BoxShadow(
-                              color: Color.fromRGBO(225, 95, 27, .3),
+                              color: theme.getSecondaryColor(),
                               blurRadius: 20,
                               offset: Offset(0, 10),
                             ),
@@ -106,23 +108,8 @@ class _ForgotPasswordMobilePageState
                         ),
                         child: Column(
                           children: <Widget>[
-                            Container(
-                              padding: EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                border: Border(
-                                  bottom: BorderSide(
-                                    color: Colors.grey.shade200,
-                                  ),
-                                ),
-                              ),
-                              child: TextField(
-                                controller: _emailController,
-                                decoration: InputDecoration(
-                                  hintText: "email".tr(),
-                                  hintStyle: TextStyle(color: Colors.grey),
-                                  border: InputBorder.none,
-                                ),
-                              ),
+                            EmailField(
+                              controller: _emailController,
                             ),
                           ],
                         ),
@@ -131,46 +118,20 @@ class _ForgotPasswordMobilePageState
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: theme.getSecondaryColor(),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(5),
-                                side:
-                                    BorderSide(color: theme.getPrimaryColor()),
-                              ),
-                              minimumSize: const Size(120, 40),
-                            ),
+                          SecondaryButton(
+                            labelKey: 'cancel',
+                            minimumSize: Size(125, 50),
                             onPressed: () {
                               context.pop();
                             },
-                            child: Text(
-                              "cancel",
-                              style: TextStyle(
-                                color: theme.getPrimaryColor(),
-                                fontSize: 14,
-                              ),
-                            ).tr(),
                           ),
                           const BusyIndicator(),
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: theme.getPrimaryColor(),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              minimumSize: const Size(100, 40),
-                            ),
+                          PrimaryButton(
+                            labelKey: 'generateOtp',
+                            minimumSize: Size(200, 50),
                             onPressed: () {
                               context.push(Routes.otp);
                             },
-                            child: Text(
-                              'generateOtp',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: theme.getSecondaryColor(),
-                              ),
-                            ).tr(),
                           ),
                         ],
                       ),
@@ -178,9 +139,9 @@ class _ForgotPasswordMobilePageState
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text(
+                          Text(
                             "noAccountYet",
-                            style: TextStyle(),
+                            style: theme.getStyle().copyWith(),
                           ).tr(),
                           TextButton(
                             onPressed: () {
@@ -188,28 +149,31 @@ class _ForgotPasswordMobilePageState
                             },
                             child: Text(
                               "signUp",
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: theme.getPrimaryColor(),
-                              ),
+                              style: theme.getStyle().copyWith(
+                                    fontSize: 16,
+                                    color: theme.getPrimaryColor(),
+                                  ),
                             ).tr(),
                           ),
                         ],
                       ),
-                      SizedBox(height: 80),
-                      Wrap(
-                        spacing: 10,
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        children: [
-                          const Text(
-                            "Powered By",
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 16,
+                      SizedBox(height: 50),
+                      Align(
+                        alignment: Alignment.bottomRight,
+                        child: Wrap(
+                          spacing: 10,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            Text(
+                              "Powered By",
+                              style: theme.getStyle().copyWith(
+                                    color: Colors.black,
+                                    fontSize: 16,
+                                  ),
                             ),
-                          ),
-                          poweredBy,
-                        ],
+                            poweredBy,
+                          ],
+                        ),
                       ),
                     ],
                   ),

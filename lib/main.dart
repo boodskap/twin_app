@@ -9,10 +9,8 @@ import 'app.dart';
 import 'flavors/flavor_config.dart';
 
 void main() async {
-  if (!kIsWeb) {
-    WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-    FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-  }
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   const flavor = String.fromEnvironment("flavor", defaultValue: "dev");
 

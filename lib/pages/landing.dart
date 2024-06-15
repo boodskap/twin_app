@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_commons/core/base_state.dart';
 
 class LandingPage extends StatefulWidget {
@@ -21,7 +22,7 @@ class _LandingPageState extends BaseState<LandingPage> {
               Center(
                 child: Text(
                   'Heading',
-                  style: TextStyle(
+                  style: theme.getStyle().copyWith(
                       fontSize: 30,
                       fontFamily: 'OpenSans',
                       fontWeight: FontWeight.bold),

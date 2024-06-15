@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:twin_app/pages/landing.dart';
 import 'package:twin_app/router.dart';
+import 'package:twin_app/widgets/commons/password_field.dart';
+import 'package:twin_app/widgets/commons/primary_button.dart';
+import 'package:twin_app/widgets/commons/secondary_button.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
@@ -61,7 +64,10 @@ class _ResetPasswordMobilePageState
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            SizedBox(height: 100),
+            Padding(
+              padding: const EdgeInsets.all(25.0),
+              child: Align(alignment: Alignment.center, child: logo),
+            ),
             Padding(
               padding: EdgeInsets.all(20),
               child: Column(
@@ -69,11 +75,11 @@ class _ResetPasswordMobilePageState
                 children: <Widget>[
                   Text(
                     "changePassword",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 30,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: theme.getStyle().copyWith(
+                          color: Colors.white,
+                          fontSize: 30,
+                          fontWeight: FontWeight.bold,
+                        ),
                   ).tr(),
                 ],
               ),
@@ -82,12 +88,7 @@ class _ResetPasswordMobilePageState
             Padding(
               padding: EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
               child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(60),
-                  ),
-                ),
+                decoration: theme.getCredentialsContentDecoration(),
                 child: Padding(
                   padding: EdgeInsets.all(30),
                   child: Column(
@@ -107,42 +108,12 @@ class _ResetPasswordMobilePageState
                         ),
                         child: Column(
                           children: <Widget>[
-                            Container(
-                              padding: EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                border: Border(
-                                  bottom: BorderSide(
-                                    color: Colors.grey.shade200,
-                                  ),
-                                ),
-                              ),
-                              child: TextField(
-                                controller: _newPassController,
-                                decoration: InputDecoration(
-                                  hintText: "newPassword".tr(),
-                                  hintStyle: TextStyle(color: Colors.grey),
-                                  border: InputBorder.none,
-                                ),
-                              ),
+                            PasswordField(
+                              controller: _newPassController,
                             ),
-                            Container(
-                              padding: EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                border: Border(
-                                  bottom: BorderSide(
-                                    color: Colors.grey.shade200,
-                                  ),
-                                ),
-                              ),
-                              child: TextField(
-                                controller: _confPassController,
-                                obscureText: true,
-                                decoration: InputDecoration(
-                                  hintText: "confirmPassword".tr(),
-                                  hintStyle: TextStyle(color: Colors.grey),
-                                  border: InputBorder.none,
-                                ),
-                              ),
+                            PasswordField(
+                              hintKey: 'confirmPassword',
+                              controller: _confPassController,
                             ),
                           ],
                         ),
@@ -151,63 +122,40 @@ class _ResetPasswordMobilePageState
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: theme.getSecondaryColor(),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(5),
-                                side:
-                                    BorderSide(color: theme.getPrimaryColor()),
-                              ),
-                              minimumSize: Size(140, 40),
-                            ),
+                          SecondaryButton(
+                            labelKey: 'cancel',
+                            minimumSize: Size(125, 50),
                             onPressed: () {
                               context.pop();
                             },
-                            child: Text(
-                              "cancel",
-                              style: TextStyle(
-                                color: theme.getPrimaryColor(),
-                                fontSize: 14,
-                              ),
-                            ).tr(),
                           ),
-                          BusyIndicator(),
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: theme.getPrimaryColor(),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              minimumSize: Size(140, 40),
-                            ),
+                          const BusyIndicator(),
+                          PrimaryButton(
+                            labelKey: 'continue',
+                            minimumSize: Size(200, 50),
                             onPressed: () {
-                              GoRouter.of(context).push(Routes.login);
+                              context.push(Routes.login);
                             },
-                            child: Text(
-                              'continue',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: theme.getSecondaryColor(),
-                              ),
-                            ).tr(),
                           ),
                         ],
                       ),
-                      SizedBox(height: 80),
-                      Wrap(
-                        spacing: 10,
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        children: [
-                          Text(
-                            "Powered By",
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 14,
+                      SizedBox(height: 50),
+                      Align(
+                        alignment: Alignment.bottomRight,
+                        child: Wrap(
+                          spacing: 10,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            Text(
+                              "Powered By",
+                              style: theme.getStyle().copyWith(
+                                    color: Colors.black,
+                                    fontSize: 14,
+                                  ),
                             ),
-                          ),
-                          poweredBy,
-                        ],
+                            poweredBy,
+                          ],
+                        ),
                       ),
                     ],
                   ),

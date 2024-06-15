@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/router.dart';
 import '/foundation/logger/logger.dart';
 import 'package:go_router/go_router.dart';
@@ -133,9 +134,11 @@ class _HomeScreenState extends State<HomeScreen> {
               onTap: () {
                 context.go(Routes.otp);
               },
-              child: const Text(
+              child: Text(
                 'appName',
-                style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                style: theme
+                    .getStyle()
+                    .copyWith(fontSize: 30, fontWeight: FontWeight.bold),
               ).tr(),
             )
           ],

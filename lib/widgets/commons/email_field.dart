@@ -2,18 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:twin_app/core/session_variables.dart';
 
-class PasswordField extends StatefulWidget {
+class EmailField extends StatefulWidget {
   final TextEditingController? controller;
   final ValueChanged<String>? onChanged;
-  final String hintKey;
-  const PasswordField(
-      {super.key, this.controller, this.hintKey = 'password', this.onChanged});
+  const EmailField({super.key, this.controller, this.onChanged});
 
   @override
-  State<PasswordField> createState() => _PasswordFieldState();
+  State<EmailField> createState() => _EmailFieldState();
 }
 
-class _PasswordFieldState extends State<PasswordField> {
+class _EmailFieldState extends State<EmailField> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -28,10 +26,9 @@ class _PasswordFieldState extends State<PasswordField> {
       child: TextField(
         controller: widget.controller,
         onChanged: widget.onChanged,
-        obscureText: true,
-        autofillHints: [AutofillHints.password],
+        autofillHints: [AutofillHints.username],
         decoration: InputDecoration(
-          hintText: widget.hintKey.tr(),
+          hintText: "email".tr(),
           hintStyle:
               theme.getStyle().copyWith(color: theme.getIntermediateColor()),
           border: InputBorder.none,

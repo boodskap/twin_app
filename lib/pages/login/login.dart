@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:twin_app/pages/landing.dart';
 import 'package:twin_app/router.dart';
+import 'package:twin_app/widgets/commons/email_field.dart';
+import 'package:twin_app/widgets/commons/password_field.dart';
+import 'package:twin_app/widgets/commons/primary_button.dart';
+import 'package:twin_app/widgets/commons/primary_text_button.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:go_router/go_router.dart';
+import 'package:twin_commons/core/busy_indicator.dart';
 
 class LoginPage extends StatefulWidget {
   final LoggedInStateInfo loggedInState;
@@ -57,8 +62,9 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            SizedBox(
-              height: 100,
+            Padding(
+              padding: const EdgeInsets.all(25.0),
+              child: Align(alignment: Alignment.center, child: logo),
             ),
             Padding(
               padding: EdgeInsets.all(20),
@@ -67,16 +73,18 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
                 children: <Widget>[
                   Text(
                     "login",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 30,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: theme.getStyle().copyWith(
+                          color: Colors.white,
+                          fontSize: 30,
+                          fontWeight: FontWeight.bold,
+                        ),
                   ).tr(),
                   SizedBox(height: 10),
                   Text(
                     "welcomeBack",
-                    style: TextStyle(color: Colors.white, fontSize: 18),
+                    style: theme
+                        .getStyle()
+                        .copyWith(color: Colors.white, fontSize: 18),
                   ).tr(),
                 ],
               ),
@@ -87,12 +95,7 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
                   const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
               child: Container(
                 width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(60),
-                  ),
-                ),
+                decoration: theme.getCredentialsContentDecoration(),
                 child: Padding(
                   padding: EdgeInsets.all(30),
                   child: Column(
@@ -104,7 +107,7 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
                           borderRadius: BorderRadius.circular(10),
                           boxShadow: [
                             BoxShadow(
-                              color: Color.fromRGBO(225, 95, 27, .3),
+                              color: theme.getSecondaryColor(),
                               blurRadius: 20,
                               offset: Offset(0, 10),
                             ),
@@ -112,42 +115,11 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
                         ),
                         child: Column(
                           children: <Widget>[
-                            Container(
-                              padding: EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                border: Border(
-                                  bottom: BorderSide(
-                                    color: Colors.grey.shade200,
-                                  ),
-                                ),
-                              ),
-                              child: TextField(
-                                controller: _userController,
-                                decoration: InputDecoration(
-                                  hintText: "email".tr(),
-                                  hintStyle: TextStyle(color: Colors.grey),
-                                  border: InputBorder.none,
-                                ),
-                              ),
+                            EmailField(
+                              controller: _userController,
                             ),
-                            Container(
-                              padding: EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                border: Border(
-                                  bottom: BorderSide(
-                                    color: Colors.grey.shade200,
-                                  ),
-                                ),
-                              ),
-                              child: TextField(
-                                controller: _passwordController,
-                                obscureText: true,
-                                decoration: InputDecoration(
-                                  hintText: "password".tr(),
-                                  hintStyle: TextStyle(color: Colors.grey),
-                                  border: InputBorder.none,
-                                ),
-                              ),
+                            PasswordField(
+                              controller: _passwordController,
                             ),
                           ],
                         ),
@@ -172,85 +144,66 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
                                     });
                                   },
                                 ),
-                                const Text(
+                                Text(
                                   'rememberMe',
-                                  style: TextStyle(fontSize: 14),
+                                  style:
+                                      theme.getStyle().copyWith(fontSize: 14),
                                 ).tr(),
                               ],
                             ),
                           ),
-                          InkWell(
-                            child: Text(
-                              'forgotPassword',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: theme.getPrimaryColor(),
-                              ),
-                            ).tr(),
-                            onTap: () {
-                              GoRouter.of(context).push(Routes.forgot);
+                          BusyIndicator(),
+                          PrimaryTextButton(
+                            labelKey: 'forgotPassword',
+                            onPressed: () {
+                              context.push(Routes.forgot);
                             },
                           ),
                         ],
                       ),
-                      SizedBox(height: 10),
-                      ElevatedButton(
+                      SizedBox(height: 30),
+                      PrimaryButton(
+                        labelKey: 'login',
+                        minimumSize: Size(400, 50),
                         onPressed: () {
                           setState(() {
                             widget.loggedInState.login();
                           });
                         },
-                        child: Text(
-                          'login',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                          ),
-                        ).tr(),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: theme.getPrimaryColor(),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          minimumSize: const Size(330, 50),
-                        ),
                       ),
                       const SizedBox(height: 10),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Text(
+                          Text(
                             "noAccountYet",
-                            style: TextStyle(),
+                            style: theme.getStyle().copyWith(),
                           ).tr(),
-                          TextButton(
+                          PrimaryTextButton(
+                            labelKey: 'signUp',
                             onPressed: () {
                               GoRouter.of(context).push(Routes.signup);
                             },
-                            child: Text(
-                              "signUp",
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: theme.getPrimaryColor(),
-                              ),
-                            ).tr(),
                           ),
                         ],
                       ),
-                      SizedBox(height: 20),
-                      Wrap(
-                        spacing: 10,
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        children: [
-                          const Text(
-                            "Powered By",
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 16,
+                      SizedBox(height: 50),
+                      Align(
+                        alignment: Alignment.bottomRight,
+                        child: Wrap(
+                          spacing: 10,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            Text(
+                              "Powered By",
+                              style: theme.getStyle().copyWith(
+                                    color: Colors.black,
+                                    fontSize: 16,
+                                  ),
                             ),
-                          ),
-                          poweredBy,
-                        ],
+                            poweredBy,
+                          ],
+                        ),
                       ),
                     ],
                   ),
