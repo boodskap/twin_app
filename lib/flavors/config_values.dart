@@ -3,6 +3,7 @@ import '/foundation/extensions/dotenv_ext.dart';
 import 'package:twinned_api/twinned_api.dart' as tapi;
 import 'package:verification_api/api/verification.swagger.dart' as vapi;
 import 'package:nocode_api/api/nocode.swagger.dart' as ncapi;
+import 'package:universal_html/html.dart' as html;
 
 class ConfigValues {
   final bool showLogs;
