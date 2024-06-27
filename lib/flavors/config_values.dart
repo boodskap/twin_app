@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '/foundation/extensions/dotenv_ext.dart';
 import 'package:twinned_api/twinned_api.dart' as tapi;
@@ -37,6 +38,9 @@ class ConfigValues {
     String noCodeDomainKey = dotenv.env['NOCODE_DKEY']!;
     String? twinDomainKey = dotenv.env['TWIN_DKEY'];
     String? twinClientId = dotenv.env['TWIN_CID'];
+
+    debugPrint(
+        'N_DKEY: $noCodeDomainKey, T_DKEY $twinDomainKey, T_CID: $twinClientId');
 
     return ConfigValues(
         showLogs: dotenv.getBoolOrDefault("SHOW_LOGS", fallback: false),
