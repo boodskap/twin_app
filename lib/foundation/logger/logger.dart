@@ -1,5 +1,5 @@
+//import 'package:flutter/foundation.dart';
 import 'package:easy_logger/easy_logger.dart';
-import 'package:flutter/foundation.dart';
 import 'package:logger/logger.dart';
 import '/flavors/flavor_config.dart';
 
@@ -41,7 +41,8 @@ class _FlutterTemplateLogFilter extends LogFilter {
   @override
   bool shouldLog(LogEvent event) {
     try {
-      return kDebugMode && FlavorConfig.values.showLogs;
+      //return kDebugMode && FlavorConfig.values.showLogs;
+      return FlavorConfig.values.showLogs;
     } catch (_) {
       return true;
     }

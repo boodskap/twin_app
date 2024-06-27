@@ -1,6 +1,6 @@
 {
-    "name": "twin_app",
-    "short_name": "twin_app",
+    "name": "twinned",
+    "short_name": "twinned",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

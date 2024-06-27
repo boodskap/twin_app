@@ -1,61 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:twin_app/core/session_variables.dart';
 
-class PasswordTextField extends StatefulWidget {
-  const PasswordTextField(
-      {super.key, required this.hintText, required this.controller});
-
-  final String hintText;
-  final TextEditingController controller;
+class PasswordField extends StatefulWidget {
+  final TextEditingController? controller;
+  final ValueChanged<String>? onChanged;
+  final String hintKey;
+  const PasswordField(
+      {super.key, this.controller, this.hintKey = 'password', this.onChanged});
 
   @override
-  State<PasswordTextField> createState() => _PasswordTextFieldState();
+  State<PasswordField> createState() => _PasswordFieldState();
 }
 
-class _PasswordTextFieldState extends State<PasswordTextField> {
-  final textFieldFocusNode = FocusNode();
-  bool _obscured = true;
-
-  void _toggleObscured() {
-    setState(() {
-      _obscured = !_obscured;
-      if (textFieldFocusNode.hasPrimaryFocus) {
-        return;
-      }
-
-      textFieldFocusNode.canRequestFocus = false;
-    });
-  }
-
+class _PasswordFieldState extends State<PasswordField> {
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      keyboardType: TextInputType.visiblePassword,
-      autocorrect: false,
-      controller: widget.controller,
-      obscureText: _obscured,
-      focusNode: textFieldFocusNode,
-      validator: (value) {
-        if (value!.length < 4) return "Minimum 4 characters required";
-        return null;
-      },
-      autovalidateMode: AutovalidateMode.onUserInteraction,
-      decoration: InputDecoration(
-        floatingLabelBehavior: FloatingLabelBehavior.never,
-        labelText: widget.hintText,
-        filled: false,
-        isDense: true,
-        prefixIcon: const Icon(Icons.lock_rounded, size: 24),
-        suffixIcon: Padding(
-          padding: const EdgeInsets.fromLTRB(0, 0, 4, 0),
-          child: GestureDetector(
-            onTap: _toggleObscured,
-            child: Icon(
-              _obscured
-                  ? Icons.visibility_off_rounded
-                  : Icons.visibility_rounded,
-              size: 24,
-            ),
+    return Container(
+      padding: EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color: theme.getSecondaryColor(),
           ),
+        ),
+      ),
+      child: TextField(
+        controller: widget.controller,
+        onChanged: widget.onChanged,
+        obscureText: true,
+        autofillHints: [AutofillHints.password],
+        decoration: InputDecoration(
+          hintText: widget.hintKey.tr(),
+          hintStyle:
+              theme.getStyle().copyWith(color: theme.getIntermediateColor()),
+          border: InputBorder.none,
         ),
       ),
     );

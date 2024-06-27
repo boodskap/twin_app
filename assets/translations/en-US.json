@@ -13,5 +13,13 @@
   "lastName": "Last Name",
   "cancel": "Cancel",
   "haveAccount": "Already have an account?",
+  "generateOtp": "Generate OTP",
+  "resetPassword": "Reset Your Password",
+  "changePassword": "Change Your Password",
+  "verifyOtp": "Verify OTP",
+  "verify": "Verify",
+  "newPassword": "New Password",
+  "confirmPassword": "Confirm Password",
+  "continue": "Continue",
   "": ""
 }

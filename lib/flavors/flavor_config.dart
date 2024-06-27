@@ -1,17 +1,17 @@
-import '/flavors/flavor.dart';
-import '/flavors/flavor_values.dart';
+import '/flavors/config.dart';
+import '/flavors/config_values.dart';
 
 class FlavorConfig {
-  final Flavor _flavor;
-  final FlavorValues _values;
+  final Config _flavor;
+  final ConfigValues _values;
 
   static late FlavorConfig _instance;
   static var _initialized = false;
 
   factory FlavorConfig.initialize({required String flavorString}) {
     if (!_initialized) {
-      final flavor = Flavor.fromString(flavor: flavorString);
-      final values = FlavorValues.fromEnvironment();
+      final flavor = Config.fromString(flavor: flavorString);
+      final values = ConfigValues.fromEnvironment();
       _instance = FlavorConfig._internal(flavor: flavor, values: values);
       _initialized = true;
     }
@@ -19,18 +19,18 @@ class FlavorConfig {
   }
 
   FlavorConfig._internal({
-    required Flavor flavor,
-    required FlavorValues values,
+    required Config flavor,
+    required ConfigValues values,
   })  : _flavor = flavor,
         _values = values;
 
-  static Flavor get flavor => _instance._flavor;
+  static Config get flavor => _instance._flavor;
 
-  static FlavorValues get values => _instance._values;
+  static ConfigValues get values => _instance._values;
 
-  static bool isPROD() => _instance._flavor == Flavor.prod;
+  static bool isPROD() => _instance._flavor == Config.prod;
 
-  static bool isQA() => _instance._flavor == Flavor.qa;
+  static bool isQA() => _instance._flavor == Config.qa;
 
-  static bool isDEV() => _instance._flavor == Flavor.dev;
+  static bool isDEV() => _instance._flavor == Config.dev;
 }
