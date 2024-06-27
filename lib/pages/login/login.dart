@@ -10,6 +10,7 @@ import 'package:twin_app/core/session_variables.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:go_router/go_router.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
+import 'package:verification_api/api/verification.swagger.dart' as vapi;
 
 class LoginPage extends StatefulWidget {
   final LoggedInStateInfo loggedInState;
@@ -47,10 +48,31 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
   final TextEditingController _userController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _rememberMe = false;
+  bool _canLogin = false;
 
   @override
   void setup() {
     // TODO: implement setup
+  }
+
+  Future _doLogin() async {
+    if (loading) return false;
+    loading = true;
+
+    await execute(() async {
+      var lRes = await config.verification.loginUser(
+          dkey: config.twinDomainKey,
+          body: vapi.Login(
+              userId: _userController.text.trim(),
+              password: _passwordController.text.trim()));
+      if (validateResponse(lRes)) {
+        setState(() {
+          widget.loggedInState.login();
+        });
+      }
+    });
+
+    loading = false;
   }
 
   @override
@@ -117,9 +139,29 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
                           children: <Widget>[
                             EmailField(
                               controller: _userController,
+                              onChanged: (value) {
+                                setState(() {
+                                  _canLogin =
+                                      _userController.text.trim().length > 0 &&
+                                          _passwordController.text
+                                                  .trim()
+                                                  .length >
+                                              0;
+                                });
+                              },
                             ),
                             PasswordField(
                               controller: _passwordController,
+                              onChanged: (value) {
+                                setState(() {
+                                  _canLogin =
+                                      _userController.text.trim().length > 0 &&
+                                          _passwordController.text
+                                                  .trim()
+                                                  .length >
+                                              0;
+                                });
+                              },
                             ),
                           ],
                         ),
@@ -165,11 +207,11 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
                       PrimaryButton(
                         labelKey: 'login',
                         minimumSize: Size(400, 50),
-                        onPressed: () {
-                          setState(() {
-                            widget.loggedInState.login();
-                          });
-                        },
+                        onPressed: !_canLogin
+                            ? null
+                            : () {
+                                _doLogin();
+                              },
                       ),
                       const SizedBox(height: 10),
                       Row(

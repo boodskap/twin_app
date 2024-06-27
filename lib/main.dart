@@ -13,9 +13,12 @@ void main() async {
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   const flavor = String.fromEnvironment("flavor", defaultValue: "dev");
+  final String envFile = getEnvFileName(flavor);
+
+  debugPrint('ENV FILE: $envFile');
 
   await dotenv.load(
-    fileName: getEnvFileName(flavor),
+    fileName: envFile,
   );
 
   FlavorConfig.initialize(flavorString: flavor);
