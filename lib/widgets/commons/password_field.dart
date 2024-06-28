@@ -14,6 +14,8 @@ class PasswordField extends StatefulWidget {
 }
 
 class _PasswordFieldState extends State<PasswordField> {
+  bool _isObscure = true;
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -28,14 +30,21 @@ class _PasswordFieldState extends State<PasswordField> {
       child: TextField(
         controller: widget.controller,
         onChanged: widget.onChanged,
-        obscureText: true,
+        obscureText: _isObscure,
         autofillHints: [AutofillHints.password],
         decoration: InputDecoration(
-          hintText: widget.hintKey.tr(),
-          hintStyle:
-              theme.getStyle().copyWith(color: theme.getIntermediateColor()),
-          border: InputBorder.none,
-        ),
+            hintText: widget.hintKey.tr(),
+            hintStyle:
+                theme.getStyle().copyWith(color: theme.getIntermediateColor()),
+            border: InputBorder.none,
+            suffixIcon: IconButton(
+              icon: Icon(_isObscure ? Icons.visibility_off : Icons.visibility),
+              onPressed: () {
+                setState(() {
+                  _isObscure = !_isObscure;
+                });
+              },
+            )),
       ),
     );
   }

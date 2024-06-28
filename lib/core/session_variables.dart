@@ -17,6 +17,7 @@ final Image poweredBy = Image.asset(
   width: 150,
 );
 
+final Map<String, dynamic> localVariables = <String, dynamic>{};
 final LoggedInStateInfo loggedInState = LoggedInStateInfo();
 final List<vapi.PlatformSession> sessions = [];
 late ConfigValues config;
