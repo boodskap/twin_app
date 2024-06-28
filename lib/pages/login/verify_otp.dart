@@ -9,6 +9,7 @@ import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:go_router/go_router.dart';
+import 'package:verification_api/api/verification.swagger.dart' as vapi;
 
 class VerifyOtpPage extends StatefulWidget {
   final LoggedInStateInfo loggedInState;
@@ -43,11 +44,47 @@ class _VerifyOtpMobilePage extends StatefulWidget {
 }
 
 class _VerifyOtpMobilePageState extends BaseState<_VerifyOtpMobilePage> {
-  final TextEditingController pinController = TextEditingController();
+  final TextEditingController _pinController = TextEditingController();
 
   @override
   void setup() {
     // TODO: implement setup
+  }
+
+  void _doShowResetPassword(String userId, String pinToken, String pin) {
+    context.push(Routes.reset);
+  }
+
+  Future<void> _doVerifyPin() async {
+    String pinToken = localVariables['rsets']?.pinToken ?? '';
+    if (pinToken.isEmpty) {
+      alert("", "Pin token is missing");
+      return;
+    }
+
+    try {
+      var body = vapi.VerificationReq(
+        pin: _pinController.text,
+        pinToken: pinToken,
+      );
+      var res = await config.verification
+          .verifyPin(body: body, dkey: config.twinDomainKey);
+      if (res.body!.ok) {
+        var rSets = vapi.ResetPassword(
+          userId: res.body!.user!.email,
+          pinToken: pinToken,
+          pin: _pinController.text,
+          password: "",
+        );
+        localVariables['rsets'] = rSets;
+        _doShowResetPassword(
+            res.body!.user!.email ?? '', body.pinToken, _pinController.text);
+      } else {
+        alert("", "Verification failed: ${res.body?.msg ?? 'Unknown error'}");
+      }
+    } catch (e) {
+      alert("", "Error: $e");
+    }
   }
 
   @override
@@ -109,8 +146,12 @@ class _VerifyOtpMobilePageState extends BaseState<_VerifyOtpMobilePage> {
                             Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Pinput(
-                                controller: pinController,
+                                controller: _pinController,
                                 length: 6,
+                                onChanged: (value) {
+                                  setState(() {
+                                  });
+                                },
                               ),
                             ),
                             SizedBox(
@@ -135,8 +176,16 @@ class _VerifyOtpMobilePageState extends BaseState<_VerifyOtpMobilePage> {
                           PrimaryButton(
                             labelKey: 'verify',
                             minimumSize: Size(200, 50),
-                            onPressed: () {
-                              context.push(Routes.reset);
+                            onPressed: () async {
+                              if (_pinController.text.isNotEmpty) {
+                                if (_pinController.text.length == 6) {
+                                  _doVerifyPin();
+                                } else {
+                                  alert("Pin Mismatch", "");
+                                }
+                              } else {
+                                alert("", "Pin Required");
+                              }
                             },
                           )
                         ],

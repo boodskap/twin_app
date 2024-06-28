@@ -15,6 +15,10 @@ class ConfigValues {
   final String noCodeDomainKey;
   final String? twinDomainKey;
   final String? twinClientId;
+  final List<String> roles;
+  final String emailSubject;
+  final String activationTemplate;
+  final String resetPswdTemplate;
 
   const ConfigValues({
     required this.showLogs,
@@ -25,6 +29,10 @@ class ConfigValues {
     required this.noCodeDomainKey,
     this.twinDomainKey,
     this.twinClientId,
+    required this.roles,
+    required this.emailSubject,
+    required this.activationTemplate,
+    required this.resetPswdTemplate,
   });
 
   static ConfigValues fromEnvironment() {
@@ -38,18 +46,27 @@ class ConfigValues {
     String noCodeDomainKey = dotenv.env['NOCODE_DKEY']!;
     String? twinDomainKey = dotenv.env['TWIN_DKEY'];
     String? twinClientId = dotenv.env['TWIN_CID'];
+    List<String> roles = dotenv.env['ROLES']?.split(',') ?? [];
+    String emailSubject = dotenv.env["EMAIL_SUBJECT"]!;
+    String activationTemplate = dotenv.env["ACTIVATION_TEMPLATE"]!;
+    String resetPswdTemplate = dotenv.env["RESET_PSWD_TEMPLATE"]!;
 
     debugPrint(
         'N_DKEY: $noCodeDomainKey, T_DKEY $twinDomainKey, T_CID: $twinClientId');
 
     return ConfigValues(
-        showLogs: dotenv.getBoolOrDefault("SHOW_LOGS", fallback: false),
-        apiHost: apiHost,
-        nocode: nocode,
-        noCodeDomainKey: noCodeDomainKey,
-        twinned: twinned,
-        verification: verification,
-        twinClientId: twinClientId,
-        twinDomainKey: twinDomainKey);
+      showLogs: dotenv.getBoolOrDefault("SHOW_LOGS", fallback: false),
+      apiHost: apiHost,
+      nocode: nocode,
+      noCodeDomainKey: noCodeDomainKey,
+      twinned: twinned,
+      verification: verification,
+      twinClientId: twinClientId,
+      twinDomainKey: twinDomainKey,
+      roles: roles,
+      emailSubject: emailSubject,
+      activationTemplate: activationTemplate,
+      resetPswdTemplate:resetPswdTemplate,
+    );
   }
 }
