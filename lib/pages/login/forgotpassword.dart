@@ -23,7 +23,7 @@ class ForgotPasswordPage extends StatefulWidget {
 class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   @override
   Widget build(BuildContext context) {
-    if (smallSreen)
+    if (smallScreen)
       return _ForgotPasswordMobilePage(loggedInState: widget.loggedInState);
     return Row(
       children: [

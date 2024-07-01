@@ -24,7 +24,7 @@ class ResetPasswordPage extends StatefulWidget {
 class _ResetPasswordPageState extends State<ResetPasswordPage> {
   @override
   Widget build(BuildContext context) {
-    if (smallSreen)
+    if (smallScreen)
       return _ResetPasswordMobilePage(loggedInState: widget.loggedInState);
     return Row(
       children: [

@@ -22,7 +22,7 @@ class VerifyOtpPage extends StatefulWidget {
 class _VerifyOtpPageState extends State<VerifyOtpPage> {
   @override
   Widget build(BuildContext context) {
-    if (smallSreen)
+    if (smallScreen)
       return _VerifyOtpMobilePage(loggedInState: widget.loggedInState);
     return Row(
       children: [

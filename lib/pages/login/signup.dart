@@ -23,7 +23,7 @@ class SignUpPage extends StatefulWidget {
 class _SignUpPageState extends State<SignUpPage> {
   @override
   Widget build(BuildContext context) {
-    if (smallSreen)
+    if (smallScreen)
       return _SignUpMobilePage(loggedInState: widget.loggedInState);
     return Row(
       children: [
