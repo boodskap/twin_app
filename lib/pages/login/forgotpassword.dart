@@ -10,6 +10,7 @@ import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:verification_api/api/verification.swagger.dart' as vapi;
 
 class ForgotPasswordPage extends StatefulWidget {
   final LoggedInStateInfo loggedInState;
@@ -52,6 +53,39 @@ class _ForgotPasswordMobilePageState
   @override
   void setup() {
     // TODO: implement setup
+  }
+
+  void _showForgotOtpPage(String userId, String pinToken) {
+    context.push(Routes.otp);
+  }
+
+  Future<void> _doChangePassword() async {
+    try {
+      var userEmail = _emailController.text;
+      var body = vapi.ForgotPassword(
+        userId: userEmail,
+        subject: config.emailSubject,
+        template: config.resetPswdTemplate,
+      );
+      var res = await config.verification.forgotPassword(
+        body: body,
+        dkey: config.twinDomainKey,
+      );
+
+      if (res.body!.ok) {
+        var rsets = vapi.ResetPassword(
+          userId: userEmail,
+          password: "",
+          pin: "",
+          pinToken: res.body!.pinToken,
+        );
+        localVariables['rsets'] = rsets;
+        // _showForgotOtpPage(
+        //   res.body!.user!.email ?? '',
+        //   body.pinToken,
+        // );
+      }
+    } catch (e) {}
   }
 
   @override
@@ -130,7 +164,7 @@ class _ForgotPasswordMobilePageState
                             labelKey: 'generateOtp',
                             minimumSize: Size(200, 50),
                             onPressed: () {
-                              context.push(Routes.otp);
+                               _doChangePassword();
                             },
                           ),
                         ],

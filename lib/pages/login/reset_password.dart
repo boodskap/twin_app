@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:twin_app/pages/landing.dart';
 import 'package:twin_app/router.dart';
@@ -9,6 +11,7 @@ import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:go_router/go_router.dart';
+import 'package:verification_api/api/verification.swagger.dart' as vapi;
 
 class ResetPasswordPage extends StatefulWidget {
   final LoggedInStateInfo loggedInState;
@@ -52,6 +55,45 @@ class _ResetPasswordMobilePageState
   @override
   void setup() {
     // TODO: implement setup
+  }
+
+  Future<void> _doResetPassword() async {
+    var rsets = localVariables['rsets'];
+    String userId = rsets?.userId ?? '';
+    String pinToken = rsets?.pinToken ?? '';
+    String pin = rsets?.pin ?? '';
+
+    if (userId.isEmpty || pinToken.isEmpty || pin.isEmpty) {
+      alert("", "Missing required information for password reset.");
+      return;
+    }
+
+    try {
+      final vapi.ResetPassword body = vapi.ResetPassword(
+        userId: userId,
+        pinToken: pinToken,
+        pin: pin,
+        password: _confPassController.text,
+      );
+      var res = await config.verification
+          .resetPassword(body: body, dkey: config.twinDomainKey);
+      if (res.body!.ok) {
+        var newRsets = vapi.ResetPassword(
+          userId: userId,
+          pinToken: pinToken,
+          pin: pin,
+          password: _confPassController.text,
+        );
+        localVariables['rsets'] = newRsets;
+        alert("", "Password Changed Successfully");
+        context.push(Routes.login);
+      } else {
+        alert("",
+            "Failed to change password: ${res.body?.msg ?? 'Unknown error'}");
+      }
+    } catch (e) {
+      alert("", "Error: $e");
+    }
   }
 
   @override
@@ -110,10 +152,28 @@ class _ResetPasswordMobilePageState
                           children: <Widget>[
                             PasswordField(
                               controller: _newPassController,
+                              // onChanged: (value) {
+                              //   setState(() {
+                              //     if (value == null || value.isEmpty) {
+                              //       return;
+                              //     }
+                              //     return null;
+                              //   });
+                              // },
                             ),
                             PasswordField(
                               hintKey: 'confirmPassword',
                               controller: _confPassController,
+                              // onChanged: (value) {
+                              //   setState(() {
+                              //     if (_newPassController.text ==
+                              //         _confPassController.text) {
+                              //       _doResetPassword();
+                              //     } else {
+                              //       alert("", "Password Mismatch");
+                              //     }
+                              //   });
+                              // },
                             ),
                           ],
                         ),
@@ -134,7 +194,18 @@ class _ResetPasswordMobilePageState
                             labelKey: 'continue',
                             minimumSize: Size(200, 50),
                             onPressed: () {
-                              context.push(Routes.login);
+                              // if (_newPassController.text ==
+                              //     _confPassController.text) {
+                              //   _doResetPassword();
+                              // } else {
+                              //   alert("", "Password Mismatch");
+                              // }
+                              if (_newPassController.text ==
+                                  _confPassController.text) {
+                                _doResetPassword();
+                              } else {
+                                alert("", "Password Mismatch");
+                              }
                             },
                           ),
                         ],

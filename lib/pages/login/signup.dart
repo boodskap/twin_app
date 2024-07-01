@@ -10,6 +10,7 @@ import 'package:twin_commons/core/base_state.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:go_router/go_router.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
+import 'package:verification_api/api/verification.swagger.dart' as vapi;
 
 class SignUpPage extends StatefulWidget {
   final LoggedInStateInfo loggedInState;
@@ -45,12 +46,51 @@ class _SignUpMobilePage extends StatefulWidget {
 
 class _SignUpMobilePageState extends BaseState<_SignUpMobilePage> {
   final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _firstNameController = TextEditingController();
-  final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _fnameController = TextEditingController();
+  final TextEditingController _lnameController = TextEditingController();
+  bool _canSignup = false;
 
   @override
   void setup() {
     // TODO: implement setup
+  }
+  void _showOtpPage(vapi.RegistrationRes registrationRes) {
+    context.push(Routes.otp);
+  }
+
+  Future<void> _doSignup() async {
+    if (loading) return;
+    loading = true;
+
+    await execute(() async {
+      var fname = _fnameController.text.trim();
+      var lname = _lnameController.text.trim();
+      var email = _emailController.text.trim();
+
+      var body = vapi.Registration(
+        email: email,
+        fname: fname,
+        lname: lname,
+        phone: "",
+        roles: config.roles,
+        subject: config.emailSubject,
+        template: config.activationTemplate,
+        properties: {},
+      );
+      var res = await config.verification
+          .registerUser(dkey: config.twinDomainKey, body: body);
+      if (validateResponse(res)) {
+        var rsets = vapi.ResetPassword(
+          userId: email.trim(),
+          pinToken: res.body!.pinToken,
+          pin: "",
+          password: "",
+        );
+        localVariables['rsets'] = rsets;
+               _showOtpPage(res.body!);
+      }
+    });
+    loading = false;
   }
 
   @override
@@ -108,6 +148,16 @@ class _SignUpMobilePageState extends BaseState<_SignUpMobilePage> {
                           children: <Widget>[
                             EmailField(
                               controller: _emailController,
+                              onChanged: (value) {
+                                setState(() {
+                                  _canSignup = _emailController.text
+                                              .trim()
+                                              .length >
+                                          0 &&
+                                      _fnameController.text.trim().length > 0 &&
+                                      _lnameController.text.trim().length > 0;
+                                });
+                              },
                             ),
                             Container(
                               padding: EdgeInsets.all(10),
@@ -119,7 +169,18 @@ class _SignUpMobilePageState extends BaseState<_SignUpMobilePage> {
                                 ),
                               ),
                               child: TextField(
-                                controller: _firstNameController,
+                                controller: _fnameController,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _canSignup = _emailController.text
+                                                .trim()
+                                                .length >
+                                            0 &&
+                                        _fnameController.text.trim().length >
+                                            0 &&
+                                        _lnameController.text.trim().length > 0;
+                                  });
+                                },
                                 decoration: InputDecoration(
                                   hintText: "firstName".tr(),
                                   hintStyle: theme
@@ -139,7 +200,18 @@ class _SignUpMobilePageState extends BaseState<_SignUpMobilePage> {
                                 ),
                               ),
                               child: TextField(
-                                controller: _lastNameController,
+                                controller: _lnameController,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _canSignup = _emailController.text
+                                                .trim()
+                                                .length >
+                                            0 &&
+                                        _fnameController.text.trim().length >
+                                            0 &&
+                                        _lnameController.text.trim().length > 0;
+                                  });
+                                },
                                 decoration: InputDecoration(
                                   hintText: "lastName".tr(),
                                   hintStyle: theme
@@ -166,9 +238,11 @@ class _SignUpMobilePageState extends BaseState<_SignUpMobilePage> {
                           PrimaryButton(
                             labelKey: 'signUp',
                             minimumSize: Size(200, 50),
-                            onPressed: () {
-                              context.push(Routes.login);
-                            },
+                            onPressed: !_canSignup
+                                ? null
+                                : () {
+                                    _doSignup();
+                                  },
                           ),
                         ],
                       ),
