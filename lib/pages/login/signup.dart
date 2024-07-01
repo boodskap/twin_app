@@ -80,14 +80,9 @@ class _SignUpMobilePageState extends BaseState<_SignUpMobilePage> {
       var res = await config.verification
           .registerUser(dkey: config.twinDomainKey, body: body);
       if (validateResponse(res)) {
-        var rsets = vapi.ResetPassword(
-          userId: email.trim(),
-          pinToken: res.body!.pinToken,
-          pin: "",
-          password: "",
-        );
-        localVariables['rsets'] = rsets;
-               _showOtpPage(res.body!);
+        localVariables['userId'] = email;
+        localVariables['pinToken'] = res.body!.pinToken;
+        _showOtpPage(res.body!);
       }
     });
     loading = false;
