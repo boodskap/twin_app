@@ -23,7 +23,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
-    if (smallSreen)
+    if (smallScreen)
       return _LoginMobilePage(loggedInState: widget.loggedInState);
     return Row(
       children: [

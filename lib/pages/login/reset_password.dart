@@ -24,7 +24,7 @@ class ResetPasswordPage extends StatefulWidget {
 class _ResetPasswordPageState extends State<ResetPasswordPage> {
   @override
   Widget build(BuildContext context) {
-    if (smallSreen)
+    if (smallScreen)
       return _ResetPasswordMobilePage(loggedInState: widget.loggedInState);
     return Row(
       children: [
@@ -58,13 +58,12 @@ class _ResetPasswordMobilePageState
   }
 
   Future<void> _doResetPassword() async {
-    var rsets = localVariables['rsets'];
-    String userId = rsets?.userId ?? '';
-    String pinToken = rsets?.pinToken ?? '';
-    String pin = rsets?.pin ?? '';
+    String userId = localVariables['userId'] ?? '';
+    String pinToken = localVariables['pinToken'] ?? '';
+    String pin = localVariables['pin'] ?? '';
 
     if (userId.isEmpty || pinToken.isEmpty || pin.isEmpty) {
-      alert("", "Missing required information for password reset.");
+      alert("Failure", "Missing required information for password reset.");
       return;
     }
 
@@ -77,19 +76,10 @@ class _ResetPasswordMobilePageState
       );
       var res = await config.verification
           .resetPassword(body: body, dkey: config.twinDomainKey);
-      if (res.body!.ok) {
-        var newRsets = vapi.ResetPassword(
-          userId: userId,
-          pinToken: pinToken,
-          pin: pin,
-          password: _confPassController.text,
-        );
-        localVariables['rsets'] = newRsets;
-        alert("", "Password Changed Successfully");
+      if (validateResponse(res)) {
+        localVariables.clear();
+        alert("Success", "Password Changed Successfully");
         context.push(Routes.login);
-      } else {
-        alert("",
-            "Failed to change password: ${res.body?.msg ?? 'Unknown error'}");
       }
     } catch (e) {
       alert("", "Error: $e");

@@ -22,5 +22,5 @@ final LoggedInStateInfo loggedInState = LoggedInStateInfo();
 final List<vapi.PlatformSession> sessions = [];
 late ConfigValues config;
 vapi.PlatformSession? session;
-bool smallSreen = true;
+bool smallScreen = true;
 double credScreenWidth = 450;

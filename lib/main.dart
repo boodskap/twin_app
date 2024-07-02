@@ -26,11 +26,11 @@ void main() async {
   config = FlavorConfig.values;
 
   if (kIsWeb) {
-    smallSreen = false;
+    smallScreen = false;
   }
 
-  if (smallSreen) {
-    smallSreen = Platform.isAndroid || Platform.isIOS;
+  if (smallScreen) {
+    smallScreen = Platform.isAndroid || Platform.isIOS;
   }
 
   startApp();

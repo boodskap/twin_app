@@ -23,7 +23,7 @@ class ForgotPasswordPage extends StatefulWidget {
 class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   @override
   Widget build(BuildContext context) {
-    if (smallSreen)
+    if (smallScreen)
       return _ForgotPasswordMobilePage(loggedInState: widget.loggedInState);
     return Row(
       children: [
@@ -55,13 +55,13 @@ class _ForgotPasswordMobilePageState
     // TODO: implement setup
   }
 
-  void _showForgotOtpPage(String userId, String pinToken) {
+  void _showForgotOtpPage() {
     context.push(Routes.otp);
   }
 
   Future<void> _doChangePassword() async {
     try {
-      var userEmail = _emailController.text;
+      var userEmail = _emailController.text.trim();
       var body = vapi.ForgotPassword(
         userId: userEmail,
         subject: config.emailSubject,
@@ -72,14 +72,14 @@ class _ForgotPasswordMobilePageState
         dkey: config.twinDomainKey,
       );
 
+      if (validateResponse(res)) {
+        localVariables['userId'] = userEmail;
+        localVariables['pinToken'] = res.body!.pinToken;
+
+        _showForgotOtpPage();
+      }
+
       if (res.body!.ok) {
-        var rsets = vapi.ResetPassword(
-          userId: userEmail,
-          password: "",
-          pin: "",
-          pinToken: res.body!.pinToken,
-        );
-        localVariables['rsets'] = rsets;
         // _showForgotOtpPage(
         //   res.body!.user!.email ?? '',
         //   body.pinToken,
@@ -164,7 +164,7 @@ class _ForgotPasswordMobilePageState
                             labelKey: 'generateOtp',
                             minimumSize: Size(200, 50),
                             onPressed: () {
-                               _doChangePassword();
+                              _doChangePassword();
                             },
                           ),
                         ],

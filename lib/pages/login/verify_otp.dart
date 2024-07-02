@@ -22,7 +22,7 @@ class VerifyOtpPage extends StatefulWidget {
 class _VerifyOtpPageState extends State<VerifyOtpPage> {
   @override
   Widget build(BuildContext context) {
-    if (smallSreen)
+    if (smallScreen)
       return _VerifyOtpMobilePage(loggedInState: widget.loggedInState);
     return Row(
       children: [
@@ -51,36 +51,30 @@ class _VerifyOtpMobilePageState extends BaseState<_VerifyOtpMobilePage> {
     // TODO: implement setup
   }
 
-  void _doShowResetPassword(String userId, String pinToken, String pin) {
+  void _doShowResetPassword() {
     context.push(Routes.reset);
   }
 
   Future<void> _doVerifyPin() async {
-    String pinToken = localVariables['rsets']?.pinToken ?? '';
+    debugPrint('VARIABLES: $localVariables');
+    String pinToken = localVariables['pinToken'] ?? '';
     if (pinToken.isEmpty) {
       alert("", "Pin token is missing");
       return;
     }
 
     try {
+      String pin = _pinController.text;
       var body = vapi.VerificationReq(
-        pin: _pinController.text,
+        pin: pin,
         pinToken: pinToken,
       );
       var res = await config.verification
           .verifyPin(body: body, dkey: config.twinDomainKey);
-      if (res.body!.ok) {
-        var rSets = vapi.ResetPassword(
-          userId: res.body!.user!.email,
-          pinToken: pinToken,
-          pin: _pinController.text,
-          password: "",
-        );
-        localVariables['rsets'] = rSets;
-        _doShowResetPassword(
-            res.body!.user!.email ?? '', body.pinToken, _pinController.text);
-      } else {
-        alert("", "Verification failed: ${res.body?.msg ?? 'Unknown error'}");
+      if (validateResponse(res)) {
+        localVariables['authToken'] = res.body!.authToken;
+        localVariables['pin'] = pin;
+        _doShowResetPassword();
       }
     } catch (e) {
       alert("", "Error: $e");
@@ -149,8 +143,7 @@ class _VerifyOtpMobilePageState extends BaseState<_VerifyOtpMobilePage> {
                                 controller: _pinController,
                                 length: 6,
                                 onChanged: (value) {
-                                  setState(() {
-                                  });
+                                  setState(() {});
                                 },
                               ),
                             ),
@@ -177,12 +170,8 @@ class _VerifyOtpMobilePageState extends BaseState<_VerifyOtpMobilePage> {
                             labelKey: 'verify',
                             minimumSize: Size(200, 50),
                             onPressed: () async {
-                              if (_pinController.text.isNotEmpty) {
-                                if (_pinController.text.length == 6) {
-                                  _doVerifyPin();
-                                } else {
-                                  alert("Pin Mismatch", "");
-                                }
+                              if (_pinController.text.length == 6) {
+                                _doVerifyPin();
                               } else {
                                 alert("", "Pin Required");
                               }
