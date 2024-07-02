@@ -1,18 +1,38 @@
+import 'package:collapsible_sidebar/collapsible_sidebar.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:twin_app/core/session_variables.dart';
+import 'package:twin_app/core/session_variables.dart' as session;
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:twin_app/widgets/commons/theme_collapsible_sidebar.dart';
+import 'package:twin_commons/core/twinned_session.dart';
 import 'dart:io' show Platform;
 
 import 'app.dart';
 import 'flavors/flavor_config.dart';
 
 void main() async {
-  start();
+  start(
+      appTitle: 'My Twin App',
+      menuItems: [],
+      bottomMenus: [],
+      homeMenu: 'HOME',
+      onMenuSelected: (id) => Placeholder());
 }
 
-void start() async {
+void start({
+  required String appTitle,
+  required List<CollapsibleItem> menuItems,
+  required List<BottomMenuItem> bottomMenus,
+  required session.OnMenuSelected onMenuSelected,
+  required String homeMenu,
+}) async {
+  session.appTitle = appTitle;
+  session.menuItems.addAll(menuItems);
+  session.bottomMenus.addAll(bottomMenus);
+  session.onMenuSelected = onMenuSelected;
+  session.homeMenu = homeMenu;
+
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
@@ -27,15 +47,12 @@ void start() async {
 
   FlavorConfig.initialize(flavorString: flavor);
 
-  config = FlavorConfig.values;
+  session.config = FlavorConfig.values;
 
-  if (kIsWeb) {
-    smallScreen = false;
-  }
-
-  if (smallScreen) {
-    smallScreen = Platform.isAndroid || Platform.isIOS;
-  }
+  TwinnedSession.instance.init(
+      debug: session.config.showLogs,
+      domainKey: session.config.twinDomainKey ?? '',
+      host: session.config.apiHost);
 
   startApp();
 }

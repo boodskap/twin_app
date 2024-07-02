@@ -1,9 +1,14 @@
+import 'package:collapsible_sidebar/collapsible_sidebar.dart';
 import 'package:flutter/material.dart';
+import 'package:twin_app/app.dart';
 import 'package:twin_app/core/twin_theme.dart';
 import 'package:twin_app/flavors/config_values.dart';
 import 'package:twin_app/router.dart';
+import 'package:twin_app/widgets/commons/theme_collapsible_sidebar.dart';
 import 'package:verification_api/api/verification.swagger.dart' as vapi;
 import 'package:twinned_api/api/twinned.swagger.dart' as tapi;
+
+typedef OnMenuSelected = Widget Function(String ID);
 
 TwinTheme theme = themes[2];
 
@@ -21,9 +26,17 @@ final Image poweredBy = Image.asset(
 final Map<String, dynamic> localVariables = <String, dynamic>{};
 final LoggedInStateInfo loggedInState = LoggedInStateInfo();
 final List<vapi.PlatformSession> sessions = [];
+final List<Widget> landingPages = [];
 late ConfigValues config;
-tapi.TwinSysInfo? sysInfo;
+tapi.TwinSysInfo? twinSysInfo;
 vapi.PlatformSession? session;
 bool smallScreen = true;
 double credScreenWidth = 450;
-Widget? homeScreen;
+//Widget? homeScreen;
+final String defaultFont = 'Open Sans';
+final List<CollapsibleItem> menuItems = [];
+String appTitle = 'My Digital Twin App';
+final List<BottomMenuItem> bottomMenus = [];
+late OnMenuSelected onMenuSelected;
+String homeMenu = 'HOME';
+final GlobalKey<ThemeCollapsibleSidebarState> application = GlobalKey();

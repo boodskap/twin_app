@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -9,9 +10,11 @@ import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/router.dart';
+import 'package:twin_app/widgets/commons/theme_collapsible_sidebar.dart';
 import '/foundation/logger/logger.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:twin_commons/core/twinned_session.dart';
 
 const List<Locale> locales = [Locale("en", "US"), Locale("ta", "IN")];
 
@@ -101,6 +104,17 @@ class _TwinAppState extends State<TwinApp> {
 
   @override
   Widget build(BuildContext context) {
+    if (kIsWeb) {
+      smallScreen = false;
+    }
+    // if (!smallScreen) {
+    //   smallScreen = Platform.isAndroid || Platform.isIOS;
+    // }
+    //
+    if (!smallScreen) {
+      smallScreen = MediaQuery.of(context).size.width <= 800;
+    }
+
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       debugShowMaterialGrid: false,
@@ -126,24 +140,42 @@ class _HomeScreenState extends State<HomeScreen> {
     //context.setLocale(const Locale('ta', 'IN'));
     //context.setLocale(const Locale('en', 'US'));
     return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            InkWell(
-              onTap: () {
-                context.go(Routes.otp);
-              },
-              child: Text(
-                'appName',
-                style: theme
-                    .getStyle()
-                    .copyWith(fontSize: 30, fontWeight: FontWeight.bold),
-              ).tr(),
-            )
-          ],
-        ),
+      body: ThemeCollapsibleSidebar(
+        key: application,
+        items: menuItems,
+        title: appTitle,
       ),
+      bottomNavigationBar: (smallScreen && bottomMenus.isNotEmpty)
+          ? CurvedNavigationBar(
+              height: 50,
+              backgroundColor: theme.getSecondaryColor(),
+              items: bottomMenus,
+              onTap: (index) {
+                application.currentState!.showScreen(bottomMenus[index].id);
+              },
+            )
+          : null,
+    );
+  }
+}
+
+class BottomMenuItem extends StatelessWidget {
+  final String id;
+  final Widget icon;
+  final String label;
+  const BottomMenuItem(
+      {super.key, required this.id, required this.icon, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        icon,
+        Text(
+          label,
+          style: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
+        ),
+      ],
     );
   }
 }

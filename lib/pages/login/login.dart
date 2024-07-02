@@ -45,8 +45,10 @@ class _LoginMobilePage extends StatefulWidget {
 }
 
 class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
-  final TextEditingController _userController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _userController =
+      TextEditingController(text: 'jeganbose.vincent@gmail.com');
+  final TextEditingController _passwordController =
+      TextEditingController(text: 'welcome123');
   bool _rememberMe = false;
   bool _canLogin = false;
 
