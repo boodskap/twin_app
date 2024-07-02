@@ -9,6 +9,10 @@ import 'app.dart';
 import 'flavors/flavor_config.dart';
 
 void main() async {
+  start();
+}
+
+void start() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
