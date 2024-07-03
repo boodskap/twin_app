@@ -1,10 +1,8 @@
-import 'package:collapsible_sidebar/collapsible_sidebar.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:twin_app/core/session_variables.dart' as session;
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:twin_app/widgets/commons/theme_collapsible_sidebar.dart';
 import 'package:twin_commons/core/twinned_session.dart';
 import 'dart:io' show Platform;
 
@@ -22,7 +20,7 @@ void main() async {
 
 void start({
   required String appTitle,
-  required List<CollapsibleItem> menuItems,
+  required List<session.TwinMenuItem> menuItems,
   required Map<dynamic, List<BottomMenuItem>> bottomMenus,
   required session.OnMenuSelected onMenuSelected,
   required dynamic homeMenu,

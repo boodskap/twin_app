@@ -1,4 +1,3 @@
-import 'package:collapsible_sidebar/collapsible_sidebar.dart';
 import 'package:flutter/material.dart';
 import 'package:twin_app/app.dart';
 import 'package:twin_app/core/twin_theme.dart';
@@ -33,7 +32,7 @@ bool smallScreen = true;
 double credScreenWidth = 450;
 //Widget? homeScreen;
 final String defaultFont = 'Open Sans';
-final List<CollapsibleItem> menuItems = [];
+final List<TwinMenuItem> menuItems = [];
 String appTitle = 'My Digital Twin App';
 final Map<dynamic, List<BottomMenuItem>> bottomMenus =
     <dynamic, List<BottomMenuItem>>{};
@@ -42,3 +41,23 @@ late OnMenuSelected onMenuSelected;
 dynamic homeMenu = 'HOME';
 dynamic selectedMenu = homeMenu;
 int bottomMenuIndex = 0;
+
+class TwinMenuItem {
+  TwinMenuItem({
+    required this.id,
+    required this.text,
+    this.badgeCount,
+    this.icon,
+    this.iconImage,
+    required this.onPressed,
+    this.subItems,
+  });
+
+  final dynamic id;
+  final String text;
+  int? badgeCount;
+  IconData? icon;
+  ImageProvider? iconImage;
+  final Function onPressed;
+  List<TwinMenuItem>? subItems;
+}
