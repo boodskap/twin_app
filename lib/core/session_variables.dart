@@ -41,3 +41,4 @@ final List<BottomMenuItem> pageBottomMenus = [];
 late OnMenuSelected onMenuSelected;
 dynamic homeMenu = 'HOME';
 dynamic selectedMenu = homeMenu;
+int bottomMenuIndex = 0;

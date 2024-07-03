@@ -138,11 +138,11 @@ class HomeScreen extends StatefulWidget {
 
 class HomeScreenState extends State<HomeScreen> {
   void showScreen(dynamic id) {
+    selectedMenu = id;
     menu.currentState!.showScreen(id);
+    pageBottomMenus.clear();
     setState(() {
-      pageBottomMenus.clear();
       pageBottomMenus.addAll(bottomMenus[id] ?? []);
-      selectedMenu = id;
     });
   }
 
@@ -161,6 +161,7 @@ class HomeScreenState extends State<HomeScreen> {
               height: 50,
               backgroundColor: theme.getSecondaryColor(),
               items: pageBottomMenus,
+              index: bottomMenuIndex,
               onTap: (index) {
                 menu.currentState!.showScreen(pageBottomMenus[index].id);
               },
