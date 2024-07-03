@@ -23,6 +23,7 @@ class ThemeCollapsibleSidebar extends StatefulWidget {
 
 class ThemeCollapsibleSidebarState extends BaseState<ThemeCollapsibleSidebar> {
   bool _isSidebarOpen = !smallScreen;
+  bool _collapsed = false;
   Widget? body;
 
   @override
@@ -34,6 +35,7 @@ class ThemeCollapsibleSidebarState extends BaseState<ThemeCollapsibleSidebar> {
   void showScreen(dynamic id) {
     setState(() {
       body = onMenuSelected(id);
+      _collapsed = !_collapsed;
     });
   }
 
@@ -51,7 +53,7 @@ class ThemeCollapsibleSidebarState extends BaseState<ThemeCollapsibleSidebar> {
                 child: CollapsibleSidebar(
                   showToggleButton: true,
                   toggleButtonIcon: Icons.toggle_off,
-                  isCollapsed: true,
+                  isCollapsed: _collapsed,
                   items: widget.items,
                   avatarImg: widget.avatarImg,
                   title: widget.title,

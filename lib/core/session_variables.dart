@@ -40,3 +40,4 @@ final Map<dynamic, List<BottomMenuItem>> bottomMenus =
 final List<BottomMenuItem> pageBottomMenus = [];
 late OnMenuSelected onMenuSelected;
 dynamic homeMenu = 'HOME';
+dynamic selectedMenu = homeMenu;

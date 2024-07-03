@@ -142,6 +142,7 @@ class HomeScreenState extends State<HomeScreen> {
     setState(() {
       pageBottomMenus.clear();
       pageBottomMenus.addAll(bottomMenus[id] ?? []);
+      selectedMenu = id;
     });
   }
 
