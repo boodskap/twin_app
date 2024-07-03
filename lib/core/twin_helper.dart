@@ -75,11 +75,24 @@ class TwinHelper {
     return added;
   }
 
+  static Future<bool> addStoredPassword(String userId, String password) async {
+    Storage.putString('recent.user', userId);
+    return await Storage.putString('${userId}.password', password);
+  }
+
+  static Future<String> getStoredPassword(String userId) async {
+    return await Storage.getString('${userId}.password', '');
+  }
+
   static Future<bool> removeStoredUser(String userId) async {
     List<String> users = await getStoredUsers();
     bool removed = users.remove(userId);
     await Storage.putStringList('users', users);
     return removed;
+  }
+
+  static Future<String> getLastStoredUser() async {
+    return await Storage.getString('recent.user', '');
   }
 
   static Future<vapi.PlatformSession?> getStoredSession() async {

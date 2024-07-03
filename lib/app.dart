@@ -139,6 +139,12 @@ class HomeScreenState extends State<HomeScreen> {
   final List<Widget> _sideMenus = [];
   Widget? body;
 
+  @override
+  initState() {
+    super.initState();
+    showScreen(homeMenu);
+  }
+
   ListTile _createMenuItem(TwinMenuItem cci) {
     return ListTile(
       onTap: () {
@@ -235,10 +241,19 @@ class HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text('$selectedMenu'),
+        title: Text(
+          '$selectedMenu',
+          style: theme.getStyle().copyWith(
+              color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: theme.getPrimaryColor(),
+        elevation: 5,
+        iconTheme: IconThemeData(color: Colors.white),
       ),
       body: body,
       drawer: Drawer(
+        elevation: 5,
+        semanticLabel: 'Main menu',
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
@@ -249,9 +264,10 @@ class HomeScreenState extends State<HomeScreen> {
               ),
               child: Text(
                 appTitle,
-                style: theme
-                    .getStyle()
-                    .copyWith(fontSize: 22, fontWeight: FontWeight.bold),
+                style: theme.getStyle().copyWith(
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold),
               ),
             ),
             ..._sideMenus,

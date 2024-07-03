@@ -34,7 +34,7 @@ void start({
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
-  const flavor = String.fromEnvironment("flavor", defaultValue: "dev");
+  const flavor = String.fromEnvironment("flavor", defaultValue: "");
   final String envFile = getEnvFileName(flavor);
 
   debugPrint('ENV FILE: $envFile');
@@ -48,23 +48,26 @@ void start({
   session.config = FlavorConfig.values;
 
   TwinnedSession.instance.init(
-      debug: session.config.showLogs,
-      domainKey: session.config.twinDomainKey ?? '',
-      host: session.config.apiHost);
+    debug: session.config.showLogs,
+    domainKey: session.config.twinDomainKey ?? '',
+    host: session.config.apiHost,
+    authToken: '',
+    noCodeAuthToken: '',
+  );
 
   startApp();
 }
 
 String getEnvFileName(String flavor) {
   switch (flavor) {
-    case "prod":
-      return ".env";
     case "qa":
       return ".env.qa";
     case "test":
       return ".env.test";
     case "dev":
-    default:
       return ".env.dev";
+    case "prod":
+    default:
+      return ".env";
   }
 }
