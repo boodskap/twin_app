@@ -17,6 +17,8 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:twin_commons/core/twinned_session.dart';
 
 const List<Locale> locales = [Locale("en", "US"), Locale("ta", "IN")];
+final GlobalKey<ThemeCollapsibleSidebarState> menu = GlobalKey();
+final GlobalKey<HomeScreenState> application = GlobalKey();
 
 void startApp() async {
   await initialiseApp();
@@ -131,27 +133,35 @@ class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key, required this.loggedInState});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<HomeScreen> createState() => HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class HomeScreenState extends State<HomeScreen> {
+  void showScreen(dynamic id) {
+    menu.currentState!.showScreen(id);
+    setState(() {
+      pageBottomMenus.clear();
+      pageBottomMenus.addAll(bottomMenus[id] ?? []);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     //context.setLocale(const Locale('ta', 'IN'));
     //context.setLocale(const Locale('en', 'US'));
     return Scaffold(
       body: ThemeCollapsibleSidebar(
-        key: application,
+        key: menu,
         items: menuItems,
         title: appTitle,
       ),
-      bottomNavigationBar: (smallScreen && bottomMenus.isNotEmpty)
+      bottomNavigationBar: (pageBottomMenus.isNotEmpty)
           ? CurvedNavigationBar(
               height: 50,
               backgroundColor: theme.getSecondaryColor(),
-              items: bottomMenus,
+              items: pageBottomMenus,
               onTap: (index) {
-                application.currentState!.showScreen(bottomMenus[index].id);
+                menu.currentState!.showScreen(pageBottomMenus[index].id);
               },
             )
           : null,
@@ -160,7 +170,7 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class BottomMenuItem extends StatelessWidget {
-  final String id;
+  final dynamic id;
   final Widget icon;
   final String label;
   const BottomMenuItem(

@@ -4,11 +4,10 @@ import 'package:twin_app/app.dart';
 import 'package:twin_app/core/twin_theme.dart';
 import 'package:twin_app/flavors/config_values.dart';
 import 'package:twin_app/router.dart';
-import 'package:twin_app/widgets/commons/theme_collapsible_sidebar.dart';
 import 'package:verification_api/api/verification.swagger.dart' as vapi;
 import 'package:twinned_api/api/twinned.swagger.dart' as tapi;
 
-typedef OnMenuSelected = Widget Function(String ID);
+typedef OnMenuSelected = Widget Function(dynamic id);
 
 TwinTheme theme = themes[2];
 
@@ -36,7 +35,8 @@ double credScreenWidth = 450;
 final String defaultFont = 'Open Sans';
 final List<CollapsibleItem> menuItems = [];
 String appTitle = 'My Digital Twin App';
-final List<BottomMenuItem> bottomMenus = [];
+final Map<dynamic, List<BottomMenuItem>> bottomMenus =
+    <dynamic, List<BottomMenuItem>>{};
+final List<BottomMenuItem> pageBottomMenus = [];
 late OnMenuSelected onMenuSelected;
-String homeMenu = 'HOME';
-final GlobalKey<ThemeCollapsibleSidebarState> application = GlobalKey();
+dynamic homeMenu = 'HOME';

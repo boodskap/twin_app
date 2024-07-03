@@ -47,6 +47,7 @@ GoRouter router = GoRouter(
     GoRoute(
       path: Routes.home,
       builder: (_, __) => HomeScreen(
+        key: application,
         loggedInState: loggedInState,
       ),
     ),

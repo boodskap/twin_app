@@ -15,7 +15,7 @@ void main() async {
   start(
       appTitle: 'My Twin App',
       menuItems: [],
-      bottomMenus: [],
+      bottomMenus: {},
       homeMenu: 'HOME',
       onMenuSelected: (id) => Placeholder());
 }
@@ -23,9 +23,9 @@ void main() async {
 void start({
   required String appTitle,
   required List<CollapsibleItem> menuItems,
-  required List<BottomMenuItem> bottomMenus,
+  required Map<dynamic, List<BottomMenuItem>> bottomMenus,
   required session.OnMenuSelected onMenuSelected,
-  required String homeMenu,
+  required dynamic homeMenu,
 }) async {
   session.appTitle = appTitle;
   session.menuItems.addAll(menuItems);
