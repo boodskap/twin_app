@@ -31,7 +31,7 @@ class ThemeCollapsibleSidebarState extends BaseState<ThemeCollapsibleSidebar> {
     body = onMenuSelected(homeMenu);
   }
 
-  void showScreen(String id) {
+  void showScreen(dynamic id) {
     setState(() {
       body = onMenuSelected(id);
     });
