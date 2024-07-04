@@ -15,17 +15,20 @@ void main() async {
       menuItems: [],
       bottomMenus: {},
       homeMenu: 'HOME',
+      homeMenuTitle: 'Home',
       onMenuSelected: (id) => Placeholder());
 }
 
 void start({
   required String appTitle,
+  required dynamic homeMenu,
+  required String homeMenuTitle,
   required List<session.TwinMenuItem> menuItems,
   required Map<dynamic, List<BottomMenuItem>> bottomMenus,
   required session.OnMenuSelected onMenuSelected,
-  required dynamic homeMenu,
 }) async {
   session.appTitle = appTitle;
+  session.selectedMenuTitle = homeMenuTitle;
   session.menuItems.addAll(menuItems);
   session.bottomMenus.addAll(bottomMenus);
   session.onMenuSelected = onMenuSelected;

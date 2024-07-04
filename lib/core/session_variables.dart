@@ -40,6 +40,7 @@ final List<BottomMenuItem> pageBottomMenus = [];
 late OnMenuSelected onMenuSelected;
 dynamic homeMenu = 'HOME';
 dynamic selectedMenu = homeMenu;
+String selectedMenuTitle = '';
 int bottomMenuIndex = 0;
 
 class TwinMenuItem {

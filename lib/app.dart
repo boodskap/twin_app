@@ -151,6 +151,7 @@ class HomeScreenState extends State<HomeScreen> {
         cci.onPressed();
         setState(() {
           selectedMenu = cci.id;
+          selectedMenuTitle = cci.text;
         });
       },
       selected: selectedMenu == cci.id,
@@ -225,11 +226,15 @@ class HomeScreenState extends State<HomeScreen> {
 
   void showScreen(dynamic id) {
     pageBottomMenus.clear();
-    setState(() {
-      selectedMenu = id;
-      body = onMenuSelected(id);
-      pageBottomMenus.addAll(bottomMenus[id] ?? []);
-    });
+    selectedMenu = id;
+    body = onMenuSelected(id);
+    pageBottomMenus.addAll(bottomMenus[id] ?? []);
+    for (BottomMenuItem bmi in pageBottomMenus) {
+      if (bmi.id == id) {
+        selectedMenuTitle = bmi.label;
+      }
+    }
+    setState(() {});
   }
 
   @override
@@ -242,7 +247,7 @@ class HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         centerTitle: true,
         title: Text(
-          '$selectedMenu',
+          '$selectedMenuTitle',
           style: theme.getStyle().copyWith(
               color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
         ),
