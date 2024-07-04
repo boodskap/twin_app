@@ -1,5 +1,5 @@
 import 'dart:io';
-
+import 'dart:js_interop';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
@@ -17,7 +17,6 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:twin_commons/core/twinned_session.dart';
 
 const List<Locale> locales = [Locale("en", "US"), Locale("ta", "IN")];
-final GlobalKey<ThemeCollapsibleSidebarState> menu = GlobalKey();
 final GlobalKey<HomeScreenState> application = GlobalKey();
 
 void startApp() async {
@@ -137,24 +136,148 @@ class HomeScreen extends StatefulWidget {
 }
 
 class HomeScreenState extends State<HomeScreen> {
+  final List<Widget> _sideMenus = [];
+  Widget? body;
+
+  @override
+  initState() {
+    super.initState();
+    showScreen(homeMenu);
+  }
+
+  ListTile _createMenuItem(TwinMenuItem cci) {
+    return ListTile(
+      onTap: () {
+        cci.onPressed();
+        setState(() {
+          selectedMenu = cci.id;
+          selectedMenuTitle = cci.text;
+        });
+      },
+      selected: selectedMenu == cci.id,
+      selectedTileColor: theme.getIntermediateColor(),
+      leading: (null == cci.icon)
+          ? null
+          : Icon(
+              cci.icon,
+              color: selectedMenu == cci.id
+                  ? Colors.white
+                  : theme.getPrimaryColor(),
+            ),
+      title: Text(
+        cci.text,
+        style: theme.getStyle().copyWith(
+            color: selectedMenu == cci.id ? Colors.white : null,
+            fontWeight: selectedMenu == cci.id ? FontWeight.bold : null),
+      ),
+    );
+  }
+
+  ExpansionTile _createMenu(TwinMenuItem item, int index) {
+    List<Widget> children = [];
+    for (TwinMenuItem cci in item.subItems!) {
+      if (null != cci.subItems && cci.subItems!.isNotEmpty) {
+        children.add(Padding(
+          padding: EdgeInsets.only(left: 8.0 * index.toDouble()),
+          child: _createMenu(cci, ++index),
+        ));
+      } else {
+        children.add(Padding(
+          padding: EdgeInsets.only(left: 16.0 * index.toDouble()),
+          child: _createMenuItem(cci),
+        ));
+      }
+    }
+    return ExpansionTile(
+      title: Wrap(
+        spacing: 5.0,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          if (null != item.icon)
+            Icon(
+              item.icon!,
+              color: selectedMenu == item.id
+                  ? Colors.white
+                  : theme.getPrimaryColor(),
+            ),
+          Text(
+            item.text,
+            style: theme.getStyle().copyWith(
+                color: selectedMenu == item.id ? Colors.white : null,
+                fontWeight: selectedMenu == item.id ? FontWeight.bold : null),
+          ),
+        ],
+      ),
+      children: children,
+    );
+  }
+
+  void _initMenus() {
+    _sideMenus.clear();
+
+    for (TwinMenuItem ci in menuItems) {
+      if (null != ci.subItems && ci.subItems!.isNotEmpty) {
+        _sideMenus.add(_createMenu(ci, 1));
+      } else {
+        _sideMenus.add(_createMenuItem(ci));
+      }
+    }
+  }
+
   void showScreen(dynamic id) {
-    selectedMenu = id;
-    menu.currentState!.showScreen(id);
     pageBottomMenus.clear();
-    setState(() {
-      pageBottomMenus.addAll(bottomMenus[id] ?? []);
-    });
+    selectedMenu = id;
+    body = onMenuSelected(id);
+    pageBottomMenus.addAll(bottomMenus[id] ?? []);
+    for (BottomMenuItem bmi in pageBottomMenus) {
+      if (bmi.id == id) {
+        selectedMenuTitle = bmi.label;
+      }
+    }
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     //context.setLocale(const Locale('ta', 'IN'));
     //context.setLocale(const Locale('en', 'US'));
+    _initMenus();
+
     return Scaffold(
-      body: ThemeCollapsibleSidebar(
-        key: menu,
-        items: menuItems,
-        title: appTitle,
+      appBar: AppBar(
+        centerTitle: true,
+        title: Text(
+          '$selectedMenuTitle',
+          style: theme.getStyle().copyWith(
+              color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: theme.getPrimaryColor(),
+        elevation: 5,
+        iconTheme: IconThemeData(color: Colors.white),
+      ),
+      body: body,
+      drawer: Drawer(
+        elevation: 5,
+        semanticLabel: 'Main menu',
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              margin: const EdgeInsets.only(bottom: 0.0),
+              decoration: BoxDecoration(
+                color: theme.getPrimaryColor(),
+              ),
+              child: Text(
+                appTitle,
+                style: theme.getStyle().copyWith(
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
+            ..._sideMenus,
+          ],
+        ),
       ),
       bottomNavigationBar: (pageBottomMenus.isNotEmpty)
           ? CurvedNavigationBar(
@@ -163,7 +286,7 @@ class HomeScreenState extends State<HomeScreen> {
               items: pageBottomMenus,
               index: bottomMenuIndex,
               onTap: (index) {
-                menu.currentState!.showScreen(pageBottomMenus[index].id);
+                showScreen(pageBottomMenus[index].id);
               },
             )
           : null,
