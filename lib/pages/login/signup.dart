@@ -97,10 +97,7 @@ class _SignUpMobilePageState extends BaseState<_SignUpMobilePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.all(25.0),
-              child: Align(alignment: Alignment.center, child: logo),
-            ),
+            SizedBox(height: 100, child: logo),
             Padding(
               padding: EdgeInsets.all(20),
               child: Column(
