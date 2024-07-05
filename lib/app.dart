@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:twin_app/auth.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/router.dart';
+import 'package:twin_app/widgets/profile_info_screen.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:twin_commons/core/twin_image_helper.dart';
@@ -289,8 +290,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
         ),
         onTap: () {
           setState(() {
-            //TODO
-            //body = ProfileSnippet();
+            body = ProfilePage();
           });
         },
       ));
