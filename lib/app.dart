@@ -11,10 +11,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/router.dart';
 import 'package:twin_app/widgets/commons/theme_collapsible_sidebar.dart';
+import 'package:twin_commons/core/base_state.dart';
 import '/foundation/logger/logger.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:twin_commons/core/twinned_session.dart';
+import 'package:twinned_api/twinned_api.dart' as tapi;
 
 const List<Locale> locales = [Locale("en", "US"), Locale("ta", "IN")];
 final GlobalKey<HomeScreenState> application = GlobalKey();
@@ -135,9 +137,10 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => HomeScreenState();
 }
 
-class HomeScreenState extends State<HomeScreen> {
+class HomeScreenState extends BaseState<HomeScreen> {
   final List<Widget> _sideMenus = [];
   Widget? body;
+  tapi.TwinUser? user;
 
   @override
   initState() {
@@ -145,7 +148,11 @@ class HomeScreenState extends State<HomeScreen> {
     showScreen(homeMenu);
   }
 
-  ListTile _createMenuItem(TwinMenuItem cci) {
+  ListTile? _createMenuItem(TwinMenuItem cci) {
+    if (!isMenuVisible(cci.id)) {
+      return null;
+    }
+
     return ListTile(
       onTap: () {
         cci.onPressed();
@@ -173,7 +180,11 @@ class HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  ExpansionTile _createMenu(TwinMenuItem item, int index) {
+  ExpansionTile? _createMenu(TwinMenuItem item, int index) {
+    if (!isMenuVisible(item.id)) {
+      return null;
+    }
+
     List<Widget> children = [];
     for (TwinMenuItem cci in item.subItems!) {
       if (null != cci.subItems && cci.subItems!.isNotEmpty) {
@@ -189,6 +200,7 @@ class HomeScreenState extends State<HomeScreen> {
       }
     }
     return ExpansionTile(
+      initiallyExpanded: true,
       title: Wrap(
         spacing: 5.0,
         crossAxisAlignment: WrapCrossAlignment.center,
@@ -215,11 +227,21 @@ class HomeScreenState extends State<HomeScreen> {
   void _initMenus() {
     _sideMenus.clear();
 
+    if (null == user) {
+      return;
+    }
+
     for (TwinMenuItem ci in menuItems) {
       if (null != ci.subItems && ci.subItems!.isNotEmpty) {
-        _sideMenus.add(_createMenu(ci, 1));
+        var m = _createMenu(ci, 1);
+        if (null != m) {
+          _sideMenus.add(m);
+        }
       } else {
-        _sideMenus.add(_createMenuItem(ci));
+        var mi = _createMenuItem(ci);
+        if (null != mi) {
+          _sideMenus.add(mi);
+        }
       }
     }
   }
@@ -259,23 +281,56 @@ class HomeScreenState extends State<HomeScreen> {
       drawer: Drawer(
         elevation: 5,
         semanticLabel: 'Main menu',
-        child: ListView(
-          padding: EdgeInsets.zero,
+        child: Column(
+          //padding: EdgeInsets.zero,
           children: [
-            DrawerHeader(
-              margin: const EdgeInsets.only(bottom: 0.0),
-              decoration: BoxDecoration(
-                color: theme.getPrimaryColor(),
-              ),
-              child: Text(
-                appTitle,
-                style: theme.getStyle().copyWith(
-                    color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold),
+            Expanded(
+              flex: 10,
+              child: DrawerHeader(
+                margin: const EdgeInsets.only(bottom: 0.0),
+                decoration: BoxDecoration(
+                  color: theme.getPrimaryColor(),
+                ),
+                child: Row(
+                  children: [
+                    Text(
+                      appTitle,
+                      style: theme.getStyle().copyWith(
+                          color: Colors.white,
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
               ),
             ),
-            ..._sideMenus,
+            Expanded(
+              flex: 80,
+              child: Column(
+                children: _sideMenus,
+              ),
+            ),
+            //..._sideMenus,
+            Expanded(
+              flex: 10,
+              child: DrawerHeader(
+                margin: const EdgeInsets.only(bottom: 0.0),
+                decoration: BoxDecoration(
+                  color: theme.getIntermediateColor(),
+                ),
+                child: Row(
+                  children: [
+                    Text(
+                      appTitle,
+                      style: theme.getStyle().copyWith(
+                          color: Colors.white,
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -291,6 +346,12 @@ class HomeScreenState extends State<HomeScreen> {
             )
           : null,
     );
+  }
+
+  @override
+  void setup() async {
+    user = await TwinnedSession.instance.getUser();
+    refresh();
   }
 }
 

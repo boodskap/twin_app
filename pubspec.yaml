@@ -14,12 +14,8 @@ dependencies:
     git:
       url: https://github.com/boodskap/twin_commons.git
       ref: main
-
-#  twinned_widgets:
-#    git:
-#      url: https://github.com/boodskap/twinned_widgets.git
-#      # path:
-#      #   twinned_widgets
+#       path:
+#         twin_commons
 
   curved_navigation_bar: ^1.0.6
 
