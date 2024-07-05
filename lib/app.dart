@@ -337,7 +337,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
             onPressed: () {
               setState(() {
                 //TODO
-                //body = ProfileSnipper
+                body = ProfileInfoScreen();
               });
             },
           ),
