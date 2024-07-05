@@ -6,14 +6,14 @@ import 'package:twin_commons/core/twinned_session.dart';
 
 import 'package:twinned_api/api/twinned.swagger.dart';
 
-class ProfilePage extends StatefulWidget {
-  const ProfilePage({Key? key}) : super(key: key);
+class ProfileInfoScreen extends StatefulWidget {
+  const ProfileInfoScreen({Key? key}) : super(key: key);
 
   @override
-  State<ProfilePage> createState() => _ProfilePageState();
+  State<ProfileInfoScreen> createState() => _ProfileInfoScreenState();
 }
 
-class _ProfilePageState extends BaseState<ProfilePage>
+class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
     with SingleTickerProviderStateMixin {
   late Image bannerImage;
   late TabController _tabController;
