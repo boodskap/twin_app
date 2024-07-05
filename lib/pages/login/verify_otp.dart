@@ -12,8 +12,7 @@ import 'package:go_router/go_router.dart';
 import 'package:verification_api/api/verification.swagger.dart' as vapi;
 
 class VerifyOtpPage extends StatefulWidget {
-  final LoggedInStateInfo loggedInState;
-  const VerifyOtpPage({super.key, required this.loggedInState});
+  const VerifyOtpPage({super.key});
 
   @override
   State<VerifyOtpPage> createState() => _VerifyOtpPageState();
@@ -22,22 +21,18 @@ class VerifyOtpPage extends StatefulWidget {
 class _VerifyOtpPageState extends State<VerifyOtpPage> {
   @override
   Widget build(BuildContext context) {
-    if (smallScreen)
-      return _VerifyOtpMobilePage(loggedInState: widget.loggedInState);
+    if (smallScreen) return _VerifyOtpMobilePage();
     return Row(
       children: [
         Expanded(flex: 1, child: LandingPage()),
-        SizedBox(
-            width: credScreenWidth,
-            child: _VerifyOtpMobilePage(loggedInState: widget.loggedInState)),
+        SizedBox(width: credScreenWidth, child: _VerifyOtpMobilePage()),
       ],
     );
   }
 }
 
 class _VerifyOtpMobilePage extends StatefulWidget {
-  final LoggedInStateInfo loggedInState;
-  const _VerifyOtpMobilePage({super.key, required this.loggedInState});
+  const _VerifyOtpMobilePage();
 
   @override
   State<_VerifyOtpMobilePage> createState() => _VerifyOtpMobilePageState();

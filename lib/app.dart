@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:js_interop';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
@@ -8,10 +7,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:twin_app/auth.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/router.dart';
-import 'package:twin_app/widgets/commons/theme_collapsible_sidebar.dart';
 import 'package:twin_commons/core/base_state.dart';
+import 'package:twin_commons/core/busy_indicator.dart';
+import 'package:twin_commons/core/twin_image_helper.dart';
 import '/foundation/logger/logger.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -19,7 +20,6 @@ import 'package:twin_commons/core/twinned_session.dart';
 import 'package:twinned_api/twinned_api.dart' as tapi;
 
 const List<Locale> locales = [Locale("en", "US"), Locale("ta", "IN")];
-final GlobalKey<HomeScreenState> application = GlobalKey();
 
 void startApp() async {
   await initialiseApp();
@@ -31,11 +31,13 @@ void startApp() async {
   });
 
   runApp(
-    EasyLocalization(
-      supportedLocales: locales,
-      path: "assets/translations",
-      fallbackLocale: const Locale("en", "US"),
-      child: const TwinApp(),
+    StreamAuthScope(
+      child: EasyLocalization(
+        supportedLocales: locales,
+        path: "assets/translations",
+        fallbackLocale: const Locale("en", "US"),
+        child: const TwinApp(),
+      ),
     ),
   );
 }
@@ -83,14 +85,6 @@ class TwinApp extends StatefulWidget {
 }
 
 class _TwinAppState extends State<TwinApp> {
-  final _loggedInStateInfo = LoggedInStateInfo();
-
-  @override
-  void dispose() {
-    _loggedInStateInfo.dispose();
-    super.dispose();
-  }
-
   @override
   void initState() {
     super.initState();
@@ -130,8 +124,7 @@ class _TwinAppState extends State<TwinApp> {
 }
 
 class HomeScreen extends StatefulWidget {
-  final LoggedInStateInfo loggedInState;
-  const HomeScreen({super.key, required this.loggedInState});
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => HomeScreenState();
@@ -139,8 +132,10 @@ class HomeScreen extends StatefulWidget {
 
 class HomeScreenState extends BaseState<HomeScreen> {
   final List<Widget> _sideMenus = [];
+  final List<tapi.Client> _clients = [];
   Widget? body;
   tapi.TwinUser? user;
+  int _selectedClient = -1;
 
   @override
   initState() {
@@ -226,11 +221,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
 
   void _initMenus() {
     _sideMenus.clear();
-
-    if (null == user) {
-      return;
-    }
-
+    if (null == user) return;
     for (TwinMenuItem ci in menuItems) {
       if (null != ci.subItems && ci.subItems!.isNotEmpty) {
         var m = _createMenu(ci, 1);
@@ -263,7 +254,65 @@ class HomeScreenState extends BaseState<HomeScreen> {
   Widget build(BuildContext context) {
     //context.setLocale(const Locale('ta', 'IN'));
     //context.setLocale(const Locale('en', 'US'));
+    if (null == user) {
+      return Container(
+        color: Colors.white,
+        child: SizedBox(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(
+                  width: 100,
+                  height: 100,
+                  child: CircularProgressIndicator(
+                    color: theme.getPrimaryColor(),
+                  )),
+            ],
+          ),
+        ),
+      );
+    }
+
+    final StreamAuth auth = StreamAuthScope.of(context);
+
     _initMenus();
+
+    if (null != user) {
+      _sideMenus.add(ListTile(
+        leading: Icon(Icons.person),
+        title: Text(
+          'My Profile',
+          style: theme.getStyle(),
+        ),
+        onTap: () {
+          setState(() {
+            //TODO
+            //body = ProfileSnippet();
+          });
+        },
+      ));
+
+      _sideMenus.add(ListTile(
+        leading: Icon(Icons.logout),
+        title: Text(
+          'Sign Out',
+          style: theme.getStyle(),
+        ),
+        onTap: () {
+          setState(() {
+            user = null;
+          });
+          auth.signOut();
+        },
+      ));
+
+      _sideMenus.add(Divider(
+        color: theme.getPrimaryColor(),
+      ));
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -294,12 +343,22 @@ class HomeScreenState extends BaseState<HomeScreen> {
                 child: Row(
                   children: [
                     Text(
-                      appTitle,
+                      _selectedClient == -1
+                          ? appTitle
+                          : '${_clients[_selectedClient].name}',
                       style: theme.getStyle().copyWith(
                           color: Colors.white,
                           fontSize: 22,
                           fontWeight: FontWeight.bold),
                     ),
+                    if (_selectedClient >= 0 &&
+                        null != _clients[_selectedClient].icon &&
+                        _clients[_selectedClient].icon!.isNotEmpty)
+                      SizedBox(
+                          width: 185,
+                          height: 100,
+                          child: TwinImageHelper.getDomainImage(
+                              _clients[_selectedClient].icon!)),
                   ],
                 ),
               ),
@@ -313,23 +372,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
             //..._sideMenus,
             Expanded(
               flex: 10,
-              child: DrawerHeader(
-                margin: const EdgeInsets.only(bottom: 0.0),
-                decoration: BoxDecoration(
-                  color: theme.getIntermediateColor(),
-                ),
-                child: Row(
-                  children: [
-                    Text(
-                      appTitle,
-                      style: theme.getStyle().copyWith(
-                          color: Colors.white,
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-              ),
+              child: SizedBox(width: 200, child: logo),
             ),
           ],
         ),
@@ -351,6 +394,11 @@ class HomeScreenState extends BaseState<HomeScreen> {
   @override
   void setup() async {
     user = await TwinnedSession.instance.getUser();
+    var clients = await TwinnedSession.instance.getClients();
+    _clients.addAll(clients);
+    if (_clients.isNotEmpty) {
+      _selectedClient = 0;
+    }
     refresh();
   }
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:twin_app/core/twin_theme.dart';
 import 'package:twin_app/pages/landing.dart';
 import 'package:twin_app/router.dart';
 import 'package:twin_app/widgets/commons/email_field.dart';
@@ -13,8 +12,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:verification_api/api/verification.swagger.dart' as vapi;
 
 class ForgotPasswordPage extends StatefulWidget {
-  final LoggedInStateInfo loggedInState;
-  const ForgotPasswordPage({super.key, required this.loggedInState});
+  const ForgotPasswordPage({super.key});
 
   @override
   State<ForgotPasswordPage> createState() => _ForgotPasswordPageState();
@@ -23,23 +21,18 @@ class ForgotPasswordPage extends StatefulWidget {
 class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   @override
   Widget build(BuildContext context) {
-    if (smallScreen)
-      return _ForgotPasswordMobilePage(loggedInState: widget.loggedInState);
+    if (smallScreen) return _ForgotPasswordMobilePage();
     return Row(
       children: [
         Expanded(flex: 1, child: LandingPage()),
-        SizedBox(
-            width: credScreenWidth,
-            child:
-                _ForgotPasswordMobilePage(loggedInState: widget.loggedInState)),
+        SizedBox(width: credScreenWidth, child: _ForgotPasswordMobilePage()),
       ],
     );
   }
 }
 
 class _ForgotPasswordMobilePage extends StatefulWidget {
-  final LoggedInStateInfo loggedInState;
-  const _ForgotPasswordMobilePage({super.key, required this.loggedInState});
+  const _ForgotPasswordMobilePage();
 
   @override
   State<_ForgotPasswordMobilePage> createState() =>
