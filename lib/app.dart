@@ -290,7 +290,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
         ),
         onTap: () {
           setState(() {
-            body = ProfilePage();
+            body = ProfileInfoScreen();
           });
         },
       ));
