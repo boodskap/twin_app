@@ -25,7 +25,13 @@ class _EmailFieldState extends State<EmailField> {
       ),
       child: TextField(
         controller: widget.controller,
-        onChanged: widget.onChanged,
+        onChanged: (value) {
+          if (RegExp(
+                  r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
+              .hasMatch(value ?? '')) {
+            widget.onChanged!(value);
+          }
+        },
         autofillHints: [AutofillHints.username],
         decoration: InputDecoration(
           hintText: "email".tr(),

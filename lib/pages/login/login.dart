@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:twin_app/core/twin_helper.dart';
 import 'package:twin_app/pages/landing.dart';
 import 'package:twin_app/router.dart';
 import 'package:twin_app/widgets/commons/email_field.dart';
@@ -10,6 +11,7 @@ import 'package:twin_app/core/session_variables.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:go_router/go_router.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
+import 'package:twin_commons/core/twinned_session.dart';
 import 'package:verification_api/api/verification.swagger.dart' as vapi;
 
 class LoginPage extends StatefulWidget {
@@ -48,11 +50,28 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
   final TextEditingController _userController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _rememberMe = false;
-  bool _canLogin = false;
+  bool _hasEmail = false;
+  bool _hasPassword = false;
 
   @override
-  void setup() {
-    // TODO: implement setup
+  void setup() async {
+    _userController.text = await TwinHelper.getLastStoredUser();
+    if (_userController.text.trim().isNotEmpty) {
+      _rememberMe = true;
+      _passwordController.text =
+          await TwinHelper.getStoredPassword(_userController.text.trim());
+    }
+    if (_userController.text.trim().isNotEmpty &&
+        _passwordController.text.trim().isNotEmpty) {
+      _hasEmail = true;
+      _hasPassword = true;
+    }
+    refresh();
+  }
+
+  @override
+  void initState() {
+    super.initState();
   }
 
   Future _doLogin() async {
@@ -60,12 +79,25 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
     loading = true;
 
     await execute(() async {
+      String userId = _userController.text.trim();
+      String password = _passwordController.text.trim();
       var lRes = await config.verification.loginUser(
           dkey: config.twinDomainKey,
-          body: vapi.Login(
-              userId: _userController.text.trim(),
-              password: _passwordController.text.trim()));
+          body: vapi.Login(userId: userId, password: password));
       if (validateResponse(lRes)) {
+        bool debug = TwinnedSession.instance.debug;
+        String host = TwinnedSession.instance.host;
+        String domainKey = TwinnedSession.instance.domainKey;
+        String noCodeAuthToken = TwinnedSession.instance.noCodeAuthToken;
+        TwinnedSession.instance.init(
+            debug: debug,
+            host: host,
+            authToken: lRes.body!.authToken ?? '',
+            domainKey: domainKey,
+            noCodeAuthToken: noCodeAuthToken);
+        if (_rememberMe) {
+          TwinHelper.addStoredPassword(userId, password);
+        }
         setState(() {
           widget.loggedInState.login();
         });
@@ -82,36 +114,35 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
       body: Container(
         decoration: theme.getCredentialsPageDecoration(),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
+            SizedBox(height: 100, child: logo),
             Padding(
-              padding: const EdgeInsets.all(25.0),
-              child: Align(alignment: Alignment.center, child: logo),
-            ),
-            Padding(
-              padding: EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    "login",
-                    style: theme.getStyle().copyWith(
-                          color: Colors.white,
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold,
-                        ),
-                  ).tr(),
-                  SizedBox(height: 10),
-                  Text(
-                    "welcomeBack",
-                    style: theme
-                        .getStyle()
-                        .copyWith(color: Colors.white, fontSize: 18),
-                  ).tr(),
-                ],
+              padding: const EdgeInsets.only(left: 8.0),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "login",
+                  style: theme.getStyle().copyWith(
+                        color: Colors.white,
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                      ),
+                ).tr(),
               ),
             ),
-            SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0, top: 4),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "welcomeBack",
+                  style: theme
+                      .getStyle()
+                      .copyWith(color: Colors.white, fontSize: 18),
+                ).tr(),
+              ),
+            ),
+            divider(),
             Padding(
               padding:
                   const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
@@ -139,14 +170,15 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
                           children: <Widget>[
                             EmailField(
                               controller: _userController,
-                              onChanged: (value) {
+                              onChanged: (value) async {
+                                String password =
+                                    await TwinHelper.getStoredPassword(
+                                        _userController.text.trim());
                                 setState(() {
-                                  _canLogin =
-                                      _userController.text.trim().length > 0 &&
-                                          _passwordController.text
-                                                  .trim()
-                                                  .length >
-                                              0;
+                                  _hasEmail = true;
+                                  if (password.isNotEmpty) {
+                                    _passwordController.text = password;
+                                  }
                                 });
                               },
                             ),
@@ -154,12 +186,9 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
                               controller: _passwordController,
                               onChanged: (value) {
                                 setState(() {
-                                  _canLogin =
-                                      _userController.text.trim().length > 0 &&
-                                          _passwordController.text
-                                                  .trim()
-                                                  .length >
-                                              0;
+                                  _hasPassword =
+                                      _passwordController.text.trim().length >
+                                          0;
                                 });
                               },
                             ),
@@ -207,7 +236,7 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
                       PrimaryButton(
                         labelKey: 'login',
                         minimumSize: Size(400, 50),
-                        onPressed: !_canLogin
+                        onPressed: (!_hasEmail || !_hasPassword)
                             ? null
                             : () {
                                 _doLogin();

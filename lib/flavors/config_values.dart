@@ -36,7 +36,7 @@ class ConfigValues {
   });
 
   static ConfigValues fromEnvironment() {
-    String apiHost = dotenv.env['API_HOST'] ?? 'restdev.boodskap.io';
+    String apiHost = dotenv.env['API_HOST'] ?? 'unknown.boodskap.io';
     var twinned =
         tapi.Twinned.create(baseUrl: Uri.https(apiHost, '/rest/nocode'));
     var verification =
@@ -66,7 +66,7 @@ class ConfigValues {
       roles: roles,
       emailSubject: emailSubject,
       activationTemplate: activationTemplate,
-      resetPswdTemplate:resetPswdTemplate,
+      resetPswdTemplate: resetPswdTemplate,
     );
   }
 }

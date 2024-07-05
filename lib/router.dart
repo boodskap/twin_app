@@ -44,18 +44,13 @@ GoRouter router = GoRouter(
     return s.fullPath;
   },
   routes: [
-    if (null != homeScreen)
-      GoRoute(
-        path: Routes.home,
-        builder: (_, __) => homeScreen!,
+    GoRoute(
+      path: Routes.home,
+      builder: (_, __) => HomeScreen(
+        key: application,
+        loggedInState: loggedInState,
       ),
-    if (null == homeScreen)
-      GoRoute(
-        path: Routes.home,
-        builder: (_, __) => HomeScreen(
-          loggedInState: loggedInState,
-        ),
-      ),
+    ),
     GoRoute(
       path: Routes.login,
       builder: (_, __) {

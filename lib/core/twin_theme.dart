@@ -6,10 +6,14 @@ class TwinTheme {
   final String name;
   final List<Color> colors;
   final String fontFamily;
+  final Color menuColor;
+  final Color selectedMenuColor;
   const TwinTheme(
       {required this.name,
       required this.colors,
-      this.fontFamily = 'Roboto Condensed'});
+      this.fontFamily = 'Roboto Condensed',
+      this.menuColor = Colors.white,
+      this.selectedMenuColor = Colors.white});
 
   Color getPrimaryColor() {
     return colors[0];
