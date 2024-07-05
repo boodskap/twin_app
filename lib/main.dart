@@ -10,13 +10,19 @@ import 'app.dart';
 import 'flavors/flavor_config.dart';
 
 void main() async {
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+
   start(
-      appTitle: 'My Twin App',
-      menuItems: [],
-      bottomMenus: {},
-      homeMenu: 'HOME',
-      homeMenuTitle: 'Home',
-      onMenuSelected: (id) => Placeholder());
+    appTitle: 'My Twin App',
+    menuItems: [],
+    bottomMenus: {},
+    homeMenu: 'HOME',
+    homeMenuTitle: 'Home',
+    onMenuSelected: (id) => Placeholder(),
+    isMenuVisible: (id) => false,
+  );
 }
 
 void start({
@@ -26,16 +32,15 @@ void start({
   required List<session.TwinMenuItem> menuItems,
   required Map<dynamic, List<BottomMenuItem>> bottomMenus,
   required session.OnMenuSelected onMenuSelected,
+  required session.IsMenuVisible isMenuVisible,
 }) async {
   session.appTitle = appTitle;
   session.selectedMenuTitle = homeMenuTitle;
   session.menuItems.addAll(menuItems);
   session.bottomMenus.addAll(bottomMenus);
   session.onMenuSelected = onMenuSelected;
+  session.isMenuVisible = isMenuVisible;
   session.homeMenu = homeMenu;
-
-  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
-  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   const flavor = String.fromEnvironment("flavor", defaultValue: "");
   final String envFile = getEnvFileName(flavor);

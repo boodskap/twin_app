@@ -114,36 +114,35 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
       body: Container(
         decoration: theme.getCredentialsPageDecoration(),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
+            SizedBox(height: 100, child: logo),
             Padding(
-              padding: const EdgeInsets.all(25.0),
-              child: Align(alignment: Alignment.center, child: logo),
-            ),
-            Padding(
-              padding: EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    "login",
-                    style: theme.getStyle().copyWith(
-                          color: Colors.white,
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold,
-                        ),
-                  ).tr(),
-                  SizedBox(height: 10),
-                  Text(
-                    "welcomeBack",
-                    style: theme
-                        .getStyle()
-                        .copyWith(color: Colors.white, fontSize: 18),
-                  ).tr(),
-                ],
+              padding: const EdgeInsets.only(left: 8.0),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "login",
+                  style: theme.getStyle().copyWith(
+                        color: Colors.white,
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                      ),
+                ).tr(),
               ),
             ),
-            SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0, top: 4),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "welcomeBack",
+                  style: theme
+                      .getStyle()
+                      .copyWith(color: Colors.white, fontSize: 18),
+                ).tr(),
+              ),
+            ),
+            divider(),
             Padding(
               padding:
                   const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),

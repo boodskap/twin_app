@@ -7,12 +7,13 @@ import 'package:verification_api/api/verification.swagger.dart' as vapi;
 import 'package:twinned_api/api/twinned.swagger.dart' as tapi;
 
 typedef OnMenuSelected = Widget Function(dynamic id);
+typedef IsMenuVisible = bool Function(dynamic id);
 
 TwinTheme theme = themes[2];
 
 final Image logo = Image.asset(
   "assets/images/icon.png",
-  width: 150,
+  //width: 150,
   fit: BoxFit.contain,
 );
 
@@ -38,6 +39,7 @@ final Map<dynamic, List<BottomMenuItem>> bottomMenus =
     <dynamic, List<BottomMenuItem>>{};
 final List<BottomMenuItem> pageBottomMenus = [];
 late OnMenuSelected onMenuSelected;
+late IsMenuVisible isMenuVisible;
 dynamic homeMenu = 'HOME';
 dynamic selectedMenu = homeMenu;
 String selectedMenuTitle = '';
