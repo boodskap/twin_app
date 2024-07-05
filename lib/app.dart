@@ -140,7 +140,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
   @override
   initState() {
     super.initState();
-    showScreen(homeMenu);
+    showScreen(selectedMenu);
   }
 
   ListTile? _createMenuItem(TwinMenuItem cci) {
@@ -242,9 +242,11 @@ class HomeScreenState extends BaseState<HomeScreen> {
     selectedMenu = id;
     body = onMenuSelected(id);
     pageBottomMenus.addAll(bottomMenus[id] ?? []);
-    for (BottomMenuItem bmi in pageBottomMenus) {
-      if (bmi.id == id) {
-        selectedMenuTitle = bmi.label;
+    bottomMenuIndex = 0;
+    for (int i = 0; i < pageBottomMenus.length; i++) {
+      if (pageBottomMenus[i].id == id) {
+        bottomMenuIndex = i;
+        break;
       }
     }
     setState(() {});
@@ -325,8 +327,25 @@ class HomeScreenState extends BaseState<HomeScreen> {
         backgroundColor: theme.getPrimaryColor(),
         elevation: 5,
         iconTheme: IconThemeData(color: Colors.white),
+        actions: [
+          Text(
+            user!.name,
+            style: theme.getStyle().copyWith(color: Colors.white),
+          ),
+          IconButton(
+            icon: Icon(Icons.person),
+            onPressed: () {
+              setState(() {
+                //TODO
+                //body = ProfileSnipper
+              });
+            },
+          ),
+          SizedBox(
+            width: 10,
+          ),
+        ],
       ),
-      body: body,
       drawer: Drawer(
         elevation: 5,
         semanticLabel: 'Main menu',
@@ -380,14 +399,18 @@ class HomeScreenState extends BaseState<HomeScreen> {
       bottomNavigationBar: (pageBottomMenus.isNotEmpty)
           ? CurvedNavigationBar(
               height: 50,
-              backgroundColor: theme.getSecondaryColor(),
+              backgroundColor: theme.getPrimaryColor(),
+              buttonBackgroundColor: theme.getSecondaryColor(),
+              //color: theme.getSecondaryColor(),
               items: pageBottomMenus,
               index: bottomMenuIndex,
               onTap: (index) {
+                selectedMenuTitle = pageBottomMenus[index].label;
                 showScreen(pageBottomMenus[index].id);
               },
             )
           : null,
+      body: body,
     );
   }
 
