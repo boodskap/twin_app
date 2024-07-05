@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:twin_app/pages/landing.dart';
 import 'package:twin_app/router.dart';
@@ -14,8 +12,7 @@ import 'package:go_router/go_router.dart';
 import 'package:verification_api/api/verification.swagger.dart' as vapi;
 
 class ResetPasswordPage extends StatefulWidget {
-  final LoggedInStateInfo loggedInState;
-  const ResetPasswordPage({super.key, required this.loggedInState});
+  const ResetPasswordPage({super.key});
 
   @override
   State<ResetPasswordPage> createState() => _ResetPasswordPageState();
@@ -24,23 +21,18 @@ class ResetPasswordPage extends StatefulWidget {
 class _ResetPasswordPageState extends State<ResetPasswordPage> {
   @override
   Widget build(BuildContext context) {
-    if (smallScreen)
-      return _ResetPasswordMobilePage(loggedInState: widget.loggedInState);
+    if (smallScreen) return _ResetPasswordMobilePage();
     return Row(
       children: [
         Expanded(flex: 1, child: LandingPage()),
-        SizedBox(
-            width: credScreenWidth,
-            child:
-                _ResetPasswordMobilePage(loggedInState: widget.loggedInState)),
+        SizedBox(width: credScreenWidth, child: _ResetPasswordMobilePage()),
       ],
     );
   }
 }
 
 class _ResetPasswordMobilePage extends StatefulWidget {
-  final LoggedInStateInfo loggedInState;
-  const _ResetPasswordMobilePage({super.key, required this.loggedInState});
+  const _ResetPasswordMobilePage();
 
   @override
   State<_ResetPasswordMobilePage> createState() =>

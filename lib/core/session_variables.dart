@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:twin_app/app.dart';
 import 'package:twin_app/core/twin_theme.dart';
 import 'package:twin_app/flavors/config_values.dart';
-import 'package:twin_app/router.dart';
 import 'package:verification_api/api/verification.swagger.dart' as vapi;
 import 'package:twinned_api/api/twinned.swagger.dart' as tapi;
 
@@ -23,7 +22,6 @@ final Image poweredBy = Image.asset(
 );
 
 final Map<String, dynamic> localVariables = <String, dynamic>{};
-final LoggedInStateInfo loggedInState = LoggedInStateInfo();
 final List<vapi.PlatformSession> sessions = [];
 final List<Widget> landingPages = [];
 late ConfigValues config;

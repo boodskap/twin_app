@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:twin_app/app.dart';
+import 'package:twin_app/auth.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/pages/login/forgotpassword.dart';
 import 'package:twin_app/pages/login/verify_otp.dart';
 import 'package:twin_app/pages/login/login.dart';
 import 'package:twin_app/pages/login/reset_password.dart';
 import 'package:twin_app/pages/login/signup.dart';
+import 'package:twin_commons/core/twinned_session.dart';
 
 abstract class Routes {
   static const home = '/';
@@ -17,28 +19,16 @@ abstract class Routes {
   static const reset = '/reset';
 }
 
-class LoggedInStateInfo extends ChangeNotifier {
-  bool _isLoggedIn = false;
-  bool get isLoggedIn => _isLoggedIn;
-
-  void login() {
-    _isLoggedIn = true;
-    notifyListeners();
-  }
-
-  void logout() {
-    _isLoggedIn = false;
-    notifyListeners();
-  }
-}
+GlobalKey<HomeScreenState> application = GlobalKey<HomeScreenState>();
 
 GoRouter router = GoRouter(
   initialLocation: Routes.home,
-  redirect: (c, s) {
+  redirect: (BuildContext c, GoRouterState s) async {
     debugPrint('NAME: ${s.name} PATH: ${s.path}, FULL PATH:${s.fullPath}');
-    if (Routes.home == s.fullPath && !loggedInState.isLoggedIn) {
+    final bool loggedIn = await StreamAuthScope.of(c).isSignedIn();
+    if (!loggedIn && Routes.home == s.fullPath) {
       return Routes.login;
-    } else if (s.fullPath != Routes.home && loggedInState.isLoggedIn) {
+    } else if (loggedIn) {
       return Routes.home;
     }
     return s.fullPath;
@@ -48,35 +38,29 @@ GoRouter router = GoRouter(
       path: Routes.home,
       builder: (_, __) => HomeScreen(
         key: application,
-        loggedInState: loggedInState,
       ),
     ),
     GoRoute(
       path: Routes.login,
       builder: (_, __) {
-        loggedInState.addListener(() {
-          if (loggedInState.isLoggedIn) {
-            GoRouter.of(_).pushReplacement(Routes.home);
-          }
-        });
-        return LoginPage(loggedInState: loggedInState);
+        return LoginPage();
       },
     ),
     GoRoute(
       path: Routes.signup,
-      builder: (_, __) => SignUpPage(loggedInState: loggedInState),
+      builder: (_, __) => SignUpPage(),
     ),
     GoRoute(
       path: Routes.forgot,
-      builder: (_, __) => ForgotPasswordPage(loggedInState: loggedInState),
+      builder: (_, __) => ForgotPasswordPage(),
     ),
     GoRoute(
       path: Routes.otp,
-      builder: (_, __) => VerifyOtpPage(loggedInState: loggedInState),
+      builder: (_, __) => VerifyOtpPage(),
     ),
     GoRoute(
       path: Routes.reset,
-      builder: (_, __) => ResetPasswordPage(loggedInState: loggedInState),
+      builder: (_, __) => ResetPasswordPage(),
     ),
   ],
 );

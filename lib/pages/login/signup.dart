@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/pages/landing.dart';
 import 'package:twin_app/router.dart';
@@ -13,8 +12,7 @@ import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:verification_api/api/verification.swagger.dart' as vapi;
 
 class SignUpPage extends StatefulWidget {
-  final LoggedInStateInfo loggedInState;
-  const SignUpPage({super.key, required this.loggedInState});
+  const SignUpPage({super.key});
 
   @override
   State<SignUpPage> createState() => _SignUpPageState();
@@ -23,22 +21,18 @@ class SignUpPage extends StatefulWidget {
 class _SignUpPageState extends State<SignUpPage> {
   @override
   Widget build(BuildContext context) {
-    if (smallScreen)
-      return _SignUpMobilePage(loggedInState: widget.loggedInState);
+    if (smallScreen) return _SignUpMobilePage();
     return Row(
       children: [
         Expanded(flex: 1, child: LandingPage()),
-        SizedBox(
-            width: credScreenWidth,
-            child: _SignUpMobilePage(loggedInState: widget.loggedInState)),
+        SizedBox(width: credScreenWidth, child: _SignUpMobilePage()),
       ],
     );
   }
 }
 
 class _SignUpMobilePage extends StatefulWidget {
-  final LoggedInStateInfo loggedInState;
-  const _SignUpMobilePage({super.key, required this.loggedInState});
+  const _SignUpMobilePage();
 
   @override
   State<_SignUpMobilePage> createState() => _SignUpMobilePageState();
