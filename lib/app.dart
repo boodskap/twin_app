@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:twin_app/auth.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/router.dart';
+import 'package:twin_app/widgets/profile_info_screen.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:twin_commons/core/twin_image_helper.dart';
@@ -136,11 +137,12 @@ class HomeScreenState extends BaseState<HomeScreen> {
   Widget? body;
   tapi.TwinUser? user;
   int _selectedClient = -1;
+  GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   @override
   initState() {
     super.initState();
-    showScreen(homeMenu);
+    showScreen(selectedMenu);
   }
 
   ListTile? _createMenuItem(TwinMenuItem cci) {
@@ -238,13 +240,20 @@ class HomeScreenState extends BaseState<HomeScreen> {
   }
 
   void showScreen(dynamic id) {
+    if (null != _scaffoldKey.currentState &&
+        _scaffoldKey.currentState!.isDrawerOpen) {
+      _scaffoldKey.currentState!.closeDrawer();
+    }
+
     pageBottomMenus.clear();
     selectedMenu = id;
     body = onMenuSelected(id);
     pageBottomMenus.addAll(bottomMenus[id] ?? []);
-    for (BottomMenuItem bmi in pageBottomMenus) {
-      if (bmi.id == id) {
-        selectedMenuTitle = bmi.label;
+    bottomMenuIndex = 0;
+    for (int i = 0; i < pageBottomMenus.length; i++) {
+      if (pageBottomMenus[i].id == id) {
+        bottomMenuIndex = i;
+        break;
       }
     }
     setState(() {});
@@ -289,8 +298,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
         ),
         onTap: () {
           setState(() {
-            //TODO
-            //body = ProfileSnippet();
+            body = ProfileInfoScreen();
           });
         },
       ));
@@ -315,6 +323,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
     }
 
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         centerTitle: true,
         title: Text(
@@ -325,8 +334,25 @@ class HomeScreenState extends BaseState<HomeScreen> {
         backgroundColor: theme.getPrimaryColor(),
         elevation: 5,
         iconTheme: IconThemeData(color: Colors.white),
+        actions: [
+          Text(
+            user!.name,
+            style: theme.getStyle().copyWith(color: Colors.white),
+          ),
+          IconButton(
+            icon: Icon(Icons.person),
+            onPressed: () {
+              setState(() {
+                //TODO
+                body = ProfileInfoScreen();
+              });
+            },
+          ),
+          SizedBox(
+            width: 10,
+          ),
+        ],
       ),
-      body: body,
       drawer: Drawer(
         elevation: 5,
         semanticLabel: 'Main menu',
@@ -380,14 +406,18 @@ class HomeScreenState extends BaseState<HomeScreen> {
       bottomNavigationBar: (pageBottomMenus.isNotEmpty)
           ? CurvedNavigationBar(
               height: 50,
-              backgroundColor: theme.getSecondaryColor(),
+              backgroundColor: theme.getPrimaryColor(),
+              buttonBackgroundColor: theme.getSecondaryColor(),
+              //color: theme.getSecondaryColor(),
               items: pageBottomMenus,
               index: bottomMenuIndex,
               onTap: (index) {
+                selectedMenuTitle = pageBottomMenus[index].label;
                 showScreen(pageBottomMenus[index].id);
               },
             )
           : null,
+      body: body,
     );
   }
 
