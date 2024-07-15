@@ -137,6 +137,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
   Widget? body;
   tapi.TwinUser? user;
   int _selectedClient = -1;
+  GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   @override
   initState() {
@@ -239,6 +240,11 @@ class HomeScreenState extends BaseState<HomeScreen> {
   }
 
   void showScreen(dynamic id) {
+    if (null != _scaffoldKey.currentState &&
+        _scaffoldKey.currentState!.isDrawerOpen) {
+      _scaffoldKey.currentState!.closeDrawer();
+    }
+
     pageBottomMenus.clear();
     selectedMenu = id;
     body = onMenuSelected(id);
@@ -317,6 +323,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
     }
 
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         centerTitle: true,
         title: Text(
