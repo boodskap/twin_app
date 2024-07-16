@@ -7,7 +7,8 @@ import 'package:twin_commons/core/twinned_session.dart';
 import 'package:twinned_api/api/twinned.swagger.dart';
 
 class ProfileInfoScreen extends StatefulWidget {
-  const ProfileInfoScreen({Key? key}) : super(key: key);
+  final int selectedTab;
+  const ProfileInfoScreen({Key? key, this.selectedTab = 0}) : super(key: key);
 
   @override
   State<ProfileInfoScreen> createState() => _ProfileInfoScreenState();
@@ -42,8 +43,8 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
     super.initState();
     bannerImage =
         Image.asset('assets/images/ldashboard_banner.png', fit: BoxFit.fill);
-    _tabController = TabController(length: 3, vsync: this);
-    setup();
+    _tabController =
+        TabController(length: 3, vsync: this, initialIndex: widget.selectedTab);
   }
 
   Future<void> load() async {
@@ -439,7 +440,8 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
                                 children: [
                                   Column(
                                     mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Row(
                                         children: [
@@ -459,7 +461,8 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
                                                 children: roleNames.map((role) {
                                                   return Padding(
                                                     padding:
-                                                        const EdgeInsets.all(8.0),
+                                                        const EdgeInsets.all(
+                                                            8.0),
                                                     child: Chip(
                                                       label: Text(role),
                                                       backgroundColor:
@@ -490,8 +493,7 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
                                               children: clients.map((name) {
                                                 return Padding(
                                                   padding:
-                                                      const EdgeInsets.all(
-                                                          8.0),
+                                                      const EdgeInsets.all(8.0),
                                                   child: Chip(
                                                     label: Text(name),
                                                     backgroundColor:

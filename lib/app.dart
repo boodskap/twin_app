@@ -239,11 +239,15 @@ class HomeScreenState extends BaseState<HomeScreen> {
     }
   }
 
-  void showScreen(dynamic id) {
+  void closeDrawer() {
     if (null != _scaffoldKey.currentState &&
         _scaffoldKey.currentState!.isDrawerOpen) {
       _scaffoldKey.currentState!.closeDrawer();
     }
+  }
+
+  void showScreen(dynamic id) {
+    closeDrawer();
 
     pageBottomMenus.clear();
     selectedMenu = id;
@@ -291,12 +295,29 @@ class HomeScreenState extends BaseState<HomeScreen> {
 
     if (null != user) {
       _sideMenus.add(ListTile(
+        leading: Icon(Icons.event_available),
+        title: Text(
+          'My Events',
+          style: theme.getStyle(),
+        ),
+        onTap: () {
+          closeDrawer();
+          setState(() {
+            body = ProfileInfoScreen(
+              selectedTab: 2,
+            );
+          });
+        },
+      ));
+
+      _sideMenus.add(ListTile(
         leading: Icon(Icons.person),
         title: Text(
           'My Profile',
           style: theme.getStyle(),
         ),
         onTap: () {
+          closeDrawer();
           setState(() {
             body = ProfileInfoScreen();
           });
