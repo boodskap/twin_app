@@ -35,6 +35,7 @@ void start({
   required session.OnMenuSelected onMenuSelected,
   required session.IsMenuVisible isMenuVisible,
   required session.BuildLandingPages buildLandingPages,
+  bool setDrawerOpen = true,
 }) async {
   session.appTitle = appTitle;
   session.selectedMenuTitle = homeMenuTitle;
@@ -44,6 +45,7 @@ void start({
   session.isMenuVisible = isMenuVisible;
   session.homeMenu = homeMenu;
   session.buildLandingPages = buildLandingPages;
+  session.setDrawerOpen = setDrawerOpen;
 
   final String envFile = getEnvFileName(session.flavor);
 
