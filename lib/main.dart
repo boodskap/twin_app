@@ -22,6 +22,7 @@ void main() async {
     homeMenuTitle: 'Home',
     onMenuSelected: (id) => Placeholder(),
     isMenuVisible: (id) => false,
+    buildLandingPages: (_) {},
   );
 }
 
@@ -33,6 +34,7 @@ void start({
   required Map<dynamic, List<BottomMenuItem>> bottomMenus,
   required session.OnMenuSelected onMenuSelected,
   required session.IsMenuVisible isMenuVisible,
+  required session.BuildLandingPages buildLandingPages,
 }) async {
   session.appTitle = appTitle;
   session.selectedMenuTitle = homeMenuTitle;
@@ -41,6 +43,7 @@ void start({
   session.onMenuSelected = onMenuSelected;
   session.isMenuVisible = isMenuVisible;
   session.homeMenu = homeMenu;
+  session.buildLandingPages = buildLandingPages;
 
   final String envFile = getEnvFileName(session.flavor);
 
