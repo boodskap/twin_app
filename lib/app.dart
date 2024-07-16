@@ -12,15 +12,19 @@ import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/router.dart';
 import 'package:twin_app/widgets/profile_info_screen.dart';
 import 'package:twin_commons/core/base_state.dart';
-import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:twin_commons/core/twin_image_helper.dart';
 import '/foundation/logger/logger.dart';
-import 'package:go_router/go_router.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:twin_commons/core/twinned_session.dart';
 import 'package:twinned_api/twinned_api.dart' as tapi;
+import 'package:uuid/uuid.dart';
 
 const List<Locale> locales = [Locale("en", "US"), Locale("ta", "IN")];
+
+enum TwinAppMenu {
+  myEvents,
+  myProfile,
+}
 
 void startApp() async {
   await initialiseApp();
@@ -139,6 +143,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
   Widget? body;
   tapi.TwinUser? user;
   int _selectedClient = -1;
+  bool firstTime = true;
   GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   @override
@@ -253,13 +258,31 @@ class HomeScreenState extends BaseState<HomeScreen> {
 
     pageBottomMenus.clear();
     selectedMenu = id;
-    body = onMenuSelected(id);
-    pageBottomMenus.addAll(bottomMenus[id] ?? []);
-    bottomMenuIndex = 0;
-    for (int i = 0; i < pageBottomMenus.length; i++) {
-      if (pageBottomMenus[i].id == id) {
-        bottomMenuIndex = i;
-        break;
+
+    if (id is TwinAppMenu) {
+      switch (id) {
+        case TwinAppMenu.myEvents:
+          body = ProfileInfoScreen(
+            key: Key(Uuid().v4()),
+            selectedTab: 2,
+          );
+          break;
+        case TwinAppMenu.myProfile:
+          body = ProfileInfoScreen(
+            key: Key(Uuid().v4()),
+            selectedTab: 0,
+          );
+          break;
+      }
+    } else {
+      body = onMenuSelected(id);
+      pageBottomMenus.addAll(bottomMenus[id] ?? []);
+      bottomMenuIndex = 0;
+      for (int i = 0; i < pageBottomMenus.length; i++) {
+        if (pageBottomMenus[i].id == id) {
+          bottomMenuIndex = i;
+          break;
+        }
       }
     }
     setState(() {});
@@ -297,32 +320,43 @@ class HomeScreenState extends BaseState<HomeScreen> {
 
     if (null != user) {
       _sideMenus.add(ListTile(
-        leading: Icon(Icons.event_available),
+        leading: Icon(
+          Icons.event_available,
+          color: selectedMenu == TwinAppMenu.myEvents ? Colors.white : null,
+        ),
         title: Text(
           'My Events',
-          style: theme.getStyle(),
+          style: theme.getStyle().copyWith(
+              color: selectedMenu == TwinAppMenu.myEvents ? Colors.white : null,
+              fontWeight: selectedMenu == TwinAppMenu.myEvents
+                  ? FontWeight.bold
+                  : null),
         ),
+        selected: selectedMenu == TwinAppMenu.myEvents,
+        selectedTileColor: theme.getIntermediateColor(),
         onTap: () {
-          closeDrawer();
-          setState(() {
-            body = ProfileInfoScreen(
-              selectedTab: 2,
-            );
-          });
+          showScreen(TwinAppMenu.myEvents);
         },
       ));
 
       _sideMenus.add(ListTile(
-        leading: Icon(Icons.person),
+        leading: Icon(
+          Icons.person,
+          color: selectedMenu == TwinAppMenu.myProfile ? Colors.white : null,
+        ),
         title: Text(
           'My Profile',
-          style: theme.getStyle(),
+          style: theme.getStyle().copyWith(
+              color:
+                  selectedMenu == TwinAppMenu.myProfile ? Colors.white : null,
+              fontWeight: selectedMenu == TwinAppMenu.myProfile
+                  ? FontWeight.bold
+                  : null),
         ),
+        selected: selectedMenu == TwinAppMenu.myProfile,
+        selectedTileColor: theme.getIntermediateColor(),
         onTap: () {
-          closeDrawer();
-          setState(() {
-            body = ProfileInfoScreen();
-          });
+          showScreen(TwinAppMenu.myProfile);
         },
       ));
 
@@ -345,7 +379,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
       ));
     }
 
-    return Scaffold(
+    Widget widget = Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
         centerTitle: true,
@@ -442,6 +476,12 @@ class HomeScreenState extends BaseState<HomeScreen> {
           : null,
       body: body,
     );
+
+    if (setDrawerOpen) {
+      _openDrawer();
+    }
+
+    return widget;
   }
 
   @override
@@ -453,6 +493,13 @@ class HomeScreenState extends BaseState<HomeScreen> {
       _selectedClient = 0;
     }
     refresh();
+  }
+
+  Future _openDrawer() async {
+    if (!firstTime) return;
+    await Future.delayed(Duration.zero);
+    _scaffoldKey.currentState!.openDrawer();
+    firstTime = false;
   }
 }
 
