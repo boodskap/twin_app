@@ -42,8 +42,7 @@ void start({
   session.isMenuVisible = isMenuVisible;
   session.homeMenu = homeMenu;
 
-  const flavor = String.fromEnvironment("flavor", defaultValue: "");
-  final String envFile = getEnvFileName(flavor);
+  final String envFile = getEnvFileName(session.flavor);
 
   debugPrint('ENV FILE: $envFile');
 
@@ -51,7 +50,7 @@ void start({
     fileName: envFile,
   );
 
-  FlavorConfig.initialize(flavorString: flavor);
+  FlavorConfig.initialize(flavorString: session.flavor);
 
   session.config = FlavorConfig.values;
 
@@ -75,7 +74,8 @@ String getEnvFileName(String flavor) {
     case "dev":
       return ".env.dev";
     case "prod":
-    default:
       return ".env";
+    default:
+      return ".env.$flavor";
   }
 }
