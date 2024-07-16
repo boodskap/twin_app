@@ -3,12 +3,10 @@ import 'package:twin_app/widgets/change_password_alert_snippet.dart';
 import 'package:twin_app/widgets/subscription_snippet.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/twinned_session.dart';
-
 import 'package:twinned_api/api/twinned.swagger.dart';
 
 class ProfileInfoScreen extends StatefulWidget {
-  final int selectedTab;
-  const ProfileInfoScreen({Key? key, this.selectedTab = 0}) : super(key: key);
+  const ProfileInfoScreen({Key? key}) : super(key: key);
 
   @override
   State<ProfileInfoScreen> createState() => _ProfileInfoScreenState();
@@ -43,8 +41,8 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
     super.initState();
     bannerImage =
         Image.asset('assets/images/ldashboard_banner.png', fit: BoxFit.fill);
-    _tabController =
-        TabController(length: 3, vsync: this, initialIndex: widget.selectedTab);
+    _tabController = TabController(length: 3, vsync: this);
+    setup();
   }
 
   Future<void> load() async {
@@ -212,7 +210,6 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
                   _nameController.text = _nameController.text;
                   _addressController.text = _addressController.text;
                   _phoneController.text = _phoneController.text;
-
                   _descController.text = _descController.text;
                 });
                 updateProfile();
@@ -435,80 +432,69 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
                           child: Card(
                             color: Colors.transparent,
                             elevation: 0,
-                            child: Expanded(
-                              child: Row(
-                                children: [
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          const Padding(
-                                            padding: EdgeInsets.all(8.0),
-                                            child: Text(
-                                              "Roles ",
-                                              style: TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
+                            child: Row(
+                              children: [
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        const Padding(
+                                          padding: EdgeInsets.all(8.0),
+                                          child: Text(
+                                            "Roles ",
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
                                           ),
-                                          Row(
-                                            children: [
-                                              Wrap(
-                                                spacing: 8.0,
-                                                children: roleNames.map((role) {
-                                                  return Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            8.0),
-                                                    child: Chip(
-                                                      label: Text(role),
-                                                      backgroundColor:
-                                                          Colors.grey[300],
-                                                    ),
-                                                  );
-                                                }).toList(),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                      Expanded(
-                                        child: Row(
-                                          children: [
-                                            const Padding(
-                                              padding: EdgeInsets.all(8.0),
-                                              child: Text(
-                                                "Clients ",
-                                                style: TextStyle(
-                                                    fontSize: 16,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                            ),
-                                            Wrap(
-                                              spacing: 8.0,
-                                              children: clients.map((name) {
-                                                return Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: Chip(
-                                                    label: Text(name),
-                                                    backgroundColor:
-                                                        Colors.grey[300],
-                                                  ),
-                                                );
-                                              }).toList(),
-                                            ),
-                                          ],
                                         ),
-                                      )
-                                    ],
-                                  ),
-                                ],
-                              ),
+                                        Wrap(
+                                          spacing: 8.0,
+                                          children: roleNames.map((role) {
+                                            return Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Chip(
+                                                label: Text(role),
+                                                backgroundColor:
+                                                    Colors.grey[300],
+                                              ),
+                                            );
+                                          }).toList(),
+                                        ),
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        const Padding(
+                                          padding: EdgeInsets.all(8.0),
+                                          child: Text(
+                                            "Clients ",
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        Wrap(
+                                          spacing: 8.0,
+                                          children: clients.map((name) {
+                                            return Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Chip(
+                                                label: Text(name),
+                                                backgroundColor:
+                                                    Colors.grey[300],
+                                              ),
+                                            );
+                                          }).toList(),
+                                        ),
+                                      ],
+                                    )
+                                  ],
+                                ),
+                              ],
                             ),
                           ),
                         ),
