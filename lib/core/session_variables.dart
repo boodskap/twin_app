@@ -45,6 +45,7 @@ dynamic selectedMenu = homeMenu;
 String selectedMenuTitle = '';
 int bottomMenuIndex = 0;
 String flavor = "dev";
+bool setDrawerOpen = false;
 
 class TwinMenuItem {
   TwinMenuItem({
