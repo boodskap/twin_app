@@ -102,6 +102,8 @@ class _TwinAppState extends State<TwinApp> {
 
   @override
   Widget build(BuildContext context) {
+    buildLandingPages(context);
+
     if (kIsWeb) {
       smallScreen = false;
     }
