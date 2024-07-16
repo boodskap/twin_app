@@ -6,7 +6,8 @@ import 'package:twin_commons/core/twinned_session.dart';
 import 'package:twinned_api/api/twinned.swagger.dart';
 
 class ProfileInfoScreen extends StatefulWidget {
-  const ProfileInfoScreen({Key? key}) : super(key: key);
+  final int selectedTab;
+  const ProfileInfoScreen({Key? key, this.selectedTab = 0}) : super(key: key);
 
   @override
   State<ProfileInfoScreen> createState() => _ProfileInfoScreenState();
@@ -41,8 +42,8 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
     super.initState();
     bannerImage =
         Image.asset('assets/images/ldashboard_banner.png', fit: BoxFit.fill);
-    _tabController = TabController(length: 3, vsync: this);
-    setup();
+    _tabController =
+        TabController(length: 3, vsync: this, initialIndex: widget.selectedTab);
   }
 
   Future<void> load() async {
