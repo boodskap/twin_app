@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:twin_app/widgets/change_password_alert_snippet.dart';
+import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:twin_app/widgets/subscription_snippet.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/twinned_session.dart';
 import 'package:twinned_api/api/twinned.swagger.dart';
+import 'package:twin_app/core/session_variables.dart';
 
 class ProfileInfoScreen extends StatefulWidget {
   final int selectedTab;
@@ -149,13 +151,11 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Edit Personal Details',
-                style: TextStyle(
-                  color: Color(0xff754893),
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
+                style: theme.getStyle().copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
               ),
               InkWell(
                 onTap: () => Navigator.pop(context),
@@ -192,9 +192,11 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
                       Expanded(
                         flex: 90,
                         child: TextField(
+                          style: theme.getStyle(),
                           controller: controller,
                           readOnly: label == 'Email',
-                          decoration: InputDecoration(labelText: label),
+                          decoration: InputDecoration(
+                              labelText: label, labelStyle: theme.getStyle()),
                         ),
                       ),
                     ],
@@ -204,7 +206,8 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
             ),
           ),
           actions: [
-            ElevatedButton(
+            PrimaryButton(
+              labelKey: "Save",
               onPressed: () {
                 setState(() {
                   _emailController.text = _emailController.text;
@@ -216,14 +219,6 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
                 updateProfile();
                 Navigator.of(context).pop();
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xff754893),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(3),
-                ),
-              ),
-              child: const Text('Save',
-                  style: TextStyle(color: Color(0xffffffff))),
             ),
           ],
         );
@@ -239,13 +234,12 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
           : const Icon(Icons.chevron_right),
       initiallyExpanded: true,
       onExpansionChanged: onExpansionChanged,
-      title: Text(title,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+      title: Text(title, style: theme.getStyle()),
       childrenPadding: const EdgeInsets.symmetric(horizontal: 20),
       expandedAlignment: Alignment.centerLeft,
       shape: const Border(bottom: BorderSide.none),
       children: [
-        Text(controller.text, style: const TextStyle(fontSize: 14)),
+        Text(controller.text, style: theme.getStyle()),
       ],
     );
   }
@@ -260,20 +254,21 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
           child: Scaffold(
             appBar: AppBar(
               backgroundColor: const Color(0xFFACD0EC),
-              title: const Text(
+              title: Text(
                 'Profile',
-                style: TextStyle(
-                    color: Color(0xFF245f96),
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold),
+                style: theme.getStyle().copyWith(fontSize: 20),
               ),
               bottom: TabBar(
                 labelColor: const Color(0xFF245f96),
                 unselectedLabelColor: const Color(0xFF245f96),
-                labelStyle: const TextStyle(
-                    fontSize: 18.0, fontWeight: FontWeight.bold),
-                unselectedLabelStyle: const TextStyle(
-                    fontSize: 18.0, fontWeight: FontWeight.normal),
+                labelStyle: theme.getStyle().copyWith(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                unselectedLabelStyle: theme.getStyle().copyWith(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                    ),
                 controller: _tabController,
                 tabs: const [
                   Tab(text: 'Personal Details'),
@@ -287,7 +282,6 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
             body: TabBarView(
               controller: _tabController,
               children: [
-                // Personal Details Tab
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
@@ -301,13 +295,13 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
                               radius: 35,
                               child: Text(
                                 initials,
-                                style: const TextStyle(fontSize: 24),
+                                style: theme.getStyle().copyWith(fontSize: 24),
                               ),
                             ),
                             const SizedBox(height: 8),
                             Text(
                               _nameController.text,
-                              style: const TextStyle(
+                              style: theme.getStyle().copyWith(
                                   fontSize: 14, fontWeight: FontWeight.bold),
                             ),
                           ],
@@ -324,12 +318,10 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
-                                  const Text(
-                                    'Personal Details',
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold),
-                                  ),
+                                  Text('Personal Details',
+                                      style: theme.getStyle().copyWith(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold)),
                                   Row(
                                     children: [
                                       Tooltip(
@@ -359,8 +351,7 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
                                       color: Colors.black.withOpacity(0.2),
                                       spreadRadius: 2,
                                       blurRadius: 10,
-                                      offset: const Offset(
-                                          0, 3), // changes position of shadow
+                                      offset: const Offset(0, 3),
                                     ),
                                   ],
                                 ),
@@ -441,11 +432,11 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
                                   children: [
                                     Row(
                                       children: [
-                                        const Padding(
+                                        Padding(
                                           padding: EdgeInsets.all(8.0),
                                           child: Text(
                                             "Roles ",
-                                            style: TextStyle(
+                                            style: theme.getStyle().copyWith(
                                                 fontSize: 16,
                                                 fontWeight: FontWeight.bold),
                                           ),
@@ -457,7 +448,10 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
                                               padding:
                                                   const EdgeInsets.all(8.0),
                                               child: Chip(
-                                                label: Text(role),
+                                                label: Text(
+                                                  role,
+                                                  style: theme.getStyle(),
+                                                ),
                                                 backgroundColor:
                                                     Colors.grey[300],
                                               ),
@@ -468,14 +462,12 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
                                     ),
                                     Row(
                                       children: [
-                                        const Padding(
+                                        Padding(
                                           padding: EdgeInsets.all(8.0),
-                                          child: Text(
-                                            "Clients ",
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold),
-                                          ),
+                                          child: Text("Clients ",
+                                              style: theme.getStyle().copyWith(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold)),
                                         ),
                                         Wrap(
                                           spacing: 8.0,
@@ -484,7 +476,10 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
                                               padding:
                                                   const EdgeInsets.all(8.0),
                                               child: Chip(
-                                                label: Text(name),
+                                                label: Text(
+                                                  name,
+                                                  style: theme.getStyle(),
+                                                ),
                                                 backgroundColor:
                                                     Colors.grey[300],
                                               ),
@@ -503,14 +498,12 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
                     ],
                   ),
                 ),
-
                 const Padding(
                   padding: EdgeInsets.all(8.0),
                   child: Center(
                     child: ChangePasswordSnippet(),
                   ),
                 ),
-
                 const Padding(
                   padding: EdgeInsets.all(8.0),
                   child: Center(child: SubscriptionsPage()),
