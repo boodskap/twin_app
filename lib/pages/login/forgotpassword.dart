@@ -133,6 +133,9 @@ class _ForgotPasswordMobilePageState
                         child: Column(
                           children: <Widget>[
                             EmailField(
+                              onSubmitted: (value) {
+                                _doChangePassword();
+                              },
                               controller: _emailController,
                             ),
                           ],

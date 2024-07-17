@@ -188,12 +188,17 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
                                 },
                               ),
                               PasswordField(
+                                onSubmitted: (!_hasEmail || !_hasPassword)
+                                    ? null
+                                    : (value) {
+                                        _doLogin();
+                                      },
                                 controller: _passwordController,
                                 onChanged: (value) {
                                   setState(() {
-                                    _hasPassword =
-                                        _passwordController.text.trim().length >
-                                            0;
+                                    _hasPassword = _passwordController.text
+                                        .trim()
+                                        .isNotEmpty;
                                   });
                                 },
                               ),
