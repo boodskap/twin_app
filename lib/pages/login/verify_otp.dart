@@ -132,6 +132,13 @@ class _VerifyOtpMobilePageState extends BaseState<_VerifyOtpMobilePage> {
                             Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Pinput(
+                                onSubmitted: (value) async {
+                                  if (value.length == 6) {
+                                    await _doVerifyPin();
+                                  } else {
+                                    alert("", "Pin Required");
+                                  }
+                                },
                                 controller: _pinController,
                                 length: 6,
                                 onChanged: (value) {
@@ -163,7 +170,7 @@ class _VerifyOtpMobilePageState extends BaseState<_VerifyOtpMobilePage> {
                             minimumSize: Size(200, 50),
                             onPressed: () async {
                               if (_pinController.text.length == 6) {
-                                _doVerifyPin();
+                                await _doVerifyPin();
                               } else {
                                 alert("", "Pin Required");
                               }

@@ -141,6 +141,14 @@ class _ResetPasswordMobilePageState
                               // },
                             ),
                             PasswordField(
+                              onSubmitted: (value) {
+                                if (_newPassController.text ==
+                                    _confPassController.text) {
+                                  _doResetPassword();
+                                } else {
+                                  alert("", "Password Mismatch");
+                                }
+                              },
                               hintKey: 'confirmPassword',
                               controller: _confPassController,
                               // onChanged: (value) {
