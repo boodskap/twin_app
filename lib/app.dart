@@ -9,6 +9,8 @@ import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:twin_app/auth.dart';
 import 'package:twin_app/core/session_variables.dart';
+import 'package:twin_app/pages/admin/clients.dart';
+import 'package:twin_app/pages/admin/users.dart';
 import 'package:twin_app/router.dart';
 import 'package:twin_app/widgets/page_conditions.dart';
 import 'package:twin_app/widgets/profile_info_screen.dart';
@@ -26,6 +28,40 @@ enum TwinAppMenu {
   myEvents,
   myProfile,
   myConditions,
+  adminUsers,
+  adminClients,
+}
+
+List<BottomMenuItem> _adminBottomMenus({
+  bool users = true,
+  bool clients = true,
+}) {
+  return [
+    if (users)
+      const BottomMenuItem(
+        id: TwinAppMenu.adminUsers,
+        icon: Icon(Icons.person, size: 30),
+        label: 'Users',
+      ),
+    if (clients)
+      const BottomMenuItem(
+        id: TwinAppMenu.adminClients,
+        icon: Icon(Icons.group, size: 30),
+        label: 'Clients',
+      ),
+  ];
+}
+
+bool _isAppMenuVisible(TwinAppMenu id) {
+  switch (id) {
+    case TwinAppMenu.adminUsers:
+      return (TwinnedSession.instance.isAdmin() ||
+          TwinnedSession.instance.isClientAdmin());
+    case TwinAppMenu.adminClients:
+      return (TwinnedSession.instance.isAdmin());
+    default:
+      return true;
+  }
 }
 
 void startApp() async {
@@ -222,7 +258,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
             item.text,
             style: theme.getStyle().copyWith(
                 color: selectedMenu == item.id ? Colors.white : null,
-                fontWeight: selectedMenu == item.id ? FontWeight.bold : null),
+                fontWeight: FontWeight.bold),
           ),
         ],
       ),
@@ -278,7 +314,15 @@ class HomeScreenState extends BaseState<HomeScreen> {
         case TwinAppMenu.myConditions:
           body = MyConditions(
             key: Key(Uuid().v4()),
-                     );
+          );
+          break;
+        case TwinAppMenu.adminUsers:
+          body = const Users();
+          pageBottomMenus.addAll(_adminBottomMenus());
+          break;
+        case TwinAppMenu.adminClients:
+          body = const Clients();
+          pageBottomMenus.addAll(_adminBottomMenus());
           break;
       }
     } else {
@@ -329,7 +373,9 @@ class HomeScreenState extends BaseState<HomeScreen> {
       _sideMenus.add(ListTile(
         leading: Icon(
           Icons.event_available,
-          color: selectedMenu == TwinAppMenu.myEvents ? Colors.white : null,
+          color: selectedMenu == TwinAppMenu.myEvents
+              ? Colors.white
+              : theme.getPrimaryColor(),
         ),
         title: Text(
           'My Events',
@@ -349,7 +395,9 @@ class HomeScreenState extends BaseState<HomeScreen> {
       _sideMenus.add(ListTile(
         leading: Icon(
           Icons.person,
-          color: selectedMenu == TwinAppMenu.myProfile ? Colors.white : null,
+          color: selectedMenu == TwinAppMenu.myProfile
+              ? Colors.white
+              : theme.getPrimaryColor(),
         ),
         title: Text(
           'My Profile',
@@ -367,30 +415,111 @@ class HomeScreenState extends BaseState<HomeScreen> {
         },
       ));
 
-      _sideMenus.add(ListTile(
-        leading: Icon(
-          Icons.alarm_on,
-          color: selectedMenu == TwinAppMenu.myConditions ? Colors.white : null,
-        ),
+      _sideMenus.add(ExpansionTile(
         title: Text(
-          'My Conditions',
-          style: theme.getStyle().copyWith(
-              color: selectedMenu == TwinAppMenu.myConditions
-                  ? Colors.white
-                  : null,
-              fontWeight: selectedMenu == TwinAppMenu.myConditions
-                  ? FontWeight.bold
-                  : null),
+          'Admin',
+          style: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
         ),
-        selected: selectedMenu == TwinAppMenu.myConditions,
-        selectedTileColor: theme.getIntermediateColor(),
-        onTap: () {
-          showScreen(TwinAppMenu.myConditions);
-        },
+        leading: Icon(
+          Icons.shield,
+          color: theme.getPrimaryColor(),
+        ),
+        initiallyExpanded: (selectedMenu == TwinAppMenu.adminUsers ||
+            selectedMenu == TwinAppMenu.adminClients),
+        children: [
+          ListTile(
+            leading: Icon(
+              Icons.person,
+              color: selectedMenu == TwinAppMenu.adminUsers
+                  ? Colors.white
+                  : theme.getPrimaryColor(),
+            ),
+            title: Text(
+              'Users',
+              style: theme.getStyle().copyWith(
+                  color: selectedMenu == TwinAppMenu.adminUsers
+                      ? Colors.white
+                      : null,
+                  fontWeight: selectedMenu == TwinAppMenu.adminUsers
+                      ? FontWeight.bold
+                      : null),
+            ),
+            selected: selectedMenu == TwinAppMenu.adminUsers,
+            selectedTileColor: theme.getIntermediateColor(),
+            onTap: () {
+              showScreen(TwinAppMenu.adminUsers);
+            },
+          ),
+          ListTile(
+            leading: Icon(
+              Icons.group,
+              color: selectedMenu == TwinAppMenu.adminClients
+                  ? Colors.white
+                  : theme.getPrimaryColor(),
+            ),
+            title: Text(
+              'Clients',
+              style: theme.getStyle().copyWith(
+                  color: selectedMenu == TwinAppMenu.adminClients
+                      ? Colors.white
+                      : null,
+                  fontWeight: selectedMenu == TwinAppMenu.adminClients
+                      ? FontWeight.bold
+                      : null),
+            ),
+            selected: selectedMenu == TwinAppMenu.adminClients,
+            selectedTileColor: theme.getIntermediateColor(),
+            onTap: () {
+              showScreen(TwinAppMenu.adminClients);
+            },
+          ),
+        ],
       ));
 
+      _sideMenus.add(ExpansionTile(
+        title: Text(
+          'Components',
+          style: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
+        ),
+        leading: Icon(
+          Icons.account_tree,
+          color: theme.getPrimaryColor(),
+        ),
+        initiallyExpanded: (selectedMenu == TwinAppMenu.myConditions),
+        children: [
+          ListTile(
+            leading: Icon(
+              Icons.alarm_on,
+              color: selectedMenu == TwinAppMenu.myConditions
+                  ? Colors.white
+                  : theme.getPrimaryColor(),
+            ),
+            title: Text(
+              'Condition Rules',
+              style: theme.getStyle().copyWith(
+                  color: selectedMenu == TwinAppMenu.myConditions
+                      ? Colors.white
+                      : null,
+                  fontWeight: selectedMenu == TwinAppMenu.myConditions
+                      ? FontWeight.bold
+                      : null),
+            ),
+            selected: selectedMenu == TwinAppMenu.myConditions,
+            selectedTileColor: theme.getIntermediateColor(),
+            onTap: () {
+              showScreen(TwinAppMenu.myConditions);
+            },
+          )
+        ],
+      ));
+
+      _sideMenus.add(Divider());
+
       _sideMenus.add(ListTile(
-        leading: Icon(Icons.logout),
+        leading: Icon(
+          Icons.logout,
+          color: theme.getPrimaryColor(),
+        ),
         title: Text(
           'Sign Out',
           style: theme.getStyle(),

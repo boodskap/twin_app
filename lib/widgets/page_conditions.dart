@@ -17,6 +17,15 @@ class MyConditions extends StatefulWidget {
 class _MyConditionsState extends BaseState<MyConditions> {
   List<tapi.Condition> _conditionEntities = [];
   String _searchQuery = '*';
+  bool isAdmin = false;
+  bool isClientAdmin = false;
+
+  @override
+  void initState() {
+    super.initState();
+    isAdmin = TwinnedSession.instance.isAdmin();
+    isClientAdmin = TwinnedSession.instance.isClientAdmin();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,10 +49,15 @@ class _MyConditionsState extends BaseState<MyConditions> {
             divider(
               horizontal: true,
             ),
-            PrimaryButton(
-              labelKey: 'Add New Condition',
-              onPressed: () {},
-            ),
+            if (isAdmin || isClientAdmin)
+              PrimaryButton(
+                leading: Icon(
+                  Icons.add,
+                  color: Colors.white,
+                ),
+                labelKey: 'Add New Condition',
+                onPressed: (isAdmin || isClientAdmin) ? () {} : null,
+              ),
             divider(
               horizontal: true,
             ),
@@ -89,7 +103,7 @@ class _MyConditionsState extends BaseState<MyConditions> {
     );
   }
 
-  Future _load({String? filter, String search = '*'}) async {
+  Future _load() async {
     if (loading) return;
     loading = true;
 
@@ -116,6 +130,7 @@ class _MyConditionsState extends BaseState<MyConditions> {
 
       if (validateResponse(qRes)) {
         _conditionEntities.addAll(qRes.body!.values!);
+        debugPrint('Found ${_conditionEntities.length} conditions');
       }
     });
 
@@ -163,32 +178,34 @@ class _MyConditionsState extends BaseState<MyConditions> {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  Expanded(
-                    flex: 1,
-                    child: Tooltip(
-                      message: 'Delete',
-                      child: InkWell(
-                        child: const Icon(
-                          Icons.delete,
-                          color: Colors.black,
-                        ),
-                        onTap: () {},
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: Tooltip(
-                      message: "Update",
-                      child: InkWell(
-                        onTap: () {},
-                        child: const Icon(
-                          Icons.edit,
-                          color: Colors.black,
+                  if (isAdmin || isClientAdmin)
+                    Expanded(
+                      flex: 1,
+                      child: Tooltip(
+                        message: 'Delete',
+                        child: InkWell(
+                          child: const Icon(
+                            Icons.delete,
+                            color: Colors.black,
+                          ),
+                          onTap: (isAdmin || isClientAdmin) ? () {} : null,
                         ),
                       ),
                     ),
-                  ),
+                  if (isAdmin || isClientAdmin)
+                    Expanded(
+                      flex: 1,
+                      child: Tooltip(
+                        message: "Update",
+                        child: InkWell(
+                          onTap: (isAdmin || isClientAdmin) ? () {} : null,
+                          child: const Icon(
+                            Icons.edit,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                    ),
                 ],
               ),
               Divider(
