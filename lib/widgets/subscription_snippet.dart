@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:twin_app/core/twin_theme.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/twinned_session.dart';
 import 'package:twinned_api/api/twinned.swagger.dart';
+import 'package:twin_app/core/session_variables.dart';
 
 class SubscriptionsPage extends StatefulWidget {
   const SubscriptionsPage({super.key});
@@ -234,13 +236,13 @@ class _SubscriptionsPageState extends BaseState<SubscriptionsPage> {
                         Expanded(
                           child: Text(
                             er.event!.name.toString(),
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 18,
-                            ),
+                            style: theme.getStyle().copyWith(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 18,
+                                ),
                           ),
                         ),
-                        const Text('Email'),
+                        Text('Email', style: theme.getStyle()),
                         const SizedBox(width: 10),
                         Checkbox(
                           value: email,
@@ -273,7 +275,10 @@ class _SubscriptionsPageState extends BaseState<SubscriptionsPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text('SMS'),
+                        Text(
+                          'SMS',
+                          style: theme.getStyle(),
+                        ),
                         const SizedBox(width: 10),
                         Checkbox(
                           value: sms,
@@ -306,7 +311,10 @@ class _SubscriptionsPageState extends BaseState<SubscriptionsPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text('Voice'),
+                        Text(
+                          'Voice',
+                          style: theme.getStyle(),
+                        ),
                         const SizedBox(width: 10),
                         Checkbox(
                           value: voice,
@@ -381,10 +389,10 @@ class _SubscriptionsPageState extends BaseState<SubscriptionsPage> {
               const SizedBox(height: 10),
               Expanded(
                 child: _rows.isEmpty
-                    ? const Center(
+                    ? Center(
                         child: Text(
                           'No subscriptions found',
-                          style: TextStyle(fontSize: 18),
+                          style: theme.getStyle().copyWith(fontSize: 18),
                         ),
                       )
                     : SizedBox(

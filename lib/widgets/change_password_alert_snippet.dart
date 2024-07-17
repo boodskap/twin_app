@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:twin_app/widgets/commons/primary_button.dart';
+import 'package:twin_app/widgets/commons/secondary_button.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/twinned_session.dart';
 import 'package:twinned_api/twinned_api.dart';
+import 'package:twin_app/core/session_variables.dart';
 
 class ChangePasswordSnippet extends StatefulWidget {
   const ChangePasswordSnippet({super.key});
@@ -66,7 +69,7 @@ class _ChangePasswordSnippetState extends BaseState<ChangePasswordSnippet> {
           alert('Warning', 'Wrong Old Password');
         }
       }
-    } catch (e, x) {}
+    } catch (e) {}
   }
 
   @override
@@ -107,19 +110,18 @@ class _ChangePasswordSnippetState extends BaseState<ChangePasswordSnippet> {
               children: [
                 Row(
                   children: [
-                    const Expanded(
+                    Expanded(
                       flex: 1,
                       child: Text(
                         "Existing Password",
-                        style: TextStyle(
-                          color: Colors.black,
-                        ),
+                        style: theme.getStyle(),
                       ),
                     ),
                     hDivider,
                     Expanded(
                       flex: 2,
                       child: TextFormField(
+                        style: theme.getStyle(),
                         controller: oldPasswordController,
                         decoration: InputDecoration(
                           suffixIcon: IconButton(
@@ -148,19 +150,15 @@ class _ChangePasswordSnippetState extends BaseState<ChangePasswordSnippet> {
                 vDivider,
                 Row(
                   children: [
-                    const Expanded(
+                    Expanded(
                       flex: 1,
-                      child: Text(
-                        "New Password",
-                        style: TextStyle(
-                          color: Colors.black,
-                        ),
-                      ),
+                      child: Text("New Password", style: theme.getStyle()),
                     ),
                     hDivider,
                     Expanded(
                       flex: 2,
                       child: TextFormField(
+                        style: theme.getStyle(),
                         controller: newPasswordController,
                         decoration: InputDecoration(
                           suffixIcon: IconButton(
@@ -189,19 +187,18 @@ class _ChangePasswordSnippetState extends BaseState<ChangePasswordSnippet> {
                 vDivider,
                 Row(
                   children: [
-                    const Expanded(
+                    Expanded(
                       flex: 1,
                       child: Text(
                         "Confirm Password",
-                        style: TextStyle(
-                          color: Colors.black,
-                        ),
+                        style: theme.getStyle(),
                       ),
                     ),
                     hDivider,
                     Expanded(
                       flex: 2,
                       child: TextFormField(
+                        style: theme.getStyle(),
                         controller: confirmPasswordController,
                         decoration: InputDecoration(
                           suffixIcon: IconButton(
@@ -234,34 +231,16 @@ class _ChangePasswordSnippetState extends BaseState<ChangePasswordSnippet> {
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: secondaryColor,
-                  shape: RoundedRectangleBorder(
-                    side: BorderSide(
-                      color: primaryColor,
-                    ),
-                    borderRadius: BorderRadius.circular(3),
-                  ),
-                ),
+              SecondaryButton(
+                labelKey: "Cancel",
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                child: Text(
-                  'Cancel',
-                  style: TextStyle(color: primaryColor),
-                ),
               ),
               const SizedBox(width: 8),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(3),
-                  ),
-                ),
+              PrimaryButton(
+                labelKey: "Change",
                 onPressed: _changePassword,
-                child: Text('Change', style: TextStyle(color: secondaryColor)),
               ),
             ],
           ),
