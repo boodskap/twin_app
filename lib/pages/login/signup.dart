@@ -198,6 +198,11 @@ class _SignUpMobilePageState extends BaseState<_SignUpMobilePage> {
                                         _lnameController.text.trim().length > 0;
                                   });
                                 },
+                                onSubmitted: !_canSignup
+                                    ? null
+                                    : (value) {
+                                        _doSignup();
+                                      },
                                 decoration: InputDecoration(
                                   hintText: "lastName".tr(),
                                   hintStyle: theme
