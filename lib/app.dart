@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:twin_app/auth.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/router.dart';
+import 'package:twin_app/widgets/page_conditions.dart';
 import 'package:twin_app/widgets/profile_info_screen.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/twin_image_helper.dart';
@@ -24,6 +25,7 @@ const List<Locale> locales = [Locale("en", "US"), Locale("ta", "IN")];
 enum TwinAppMenu {
   myEvents,
   myProfile,
+  myConditions,
 }
 
 void startApp() async {
@@ -273,6 +275,11 @@ class HomeScreenState extends BaseState<HomeScreen> {
             selectedTab: 0,
           );
           break;
+        case TwinAppMenu.myConditions:
+          body = MyConditions(
+            key: Key(Uuid().v4()),
+                     );
+          break;
       }
     } else {
       body = onMenuSelected(id);
@@ -357,6 +364,28 @@ class HomeScreenState extends BaseState<HomeScreen> {
         selectedTileColor: theme.getIntermediateColor(),
         onTap: () {
           showScreen(TwinAppMenu.myProfile);
+        },
+      ));
+
+      _sideMenus.add(ListTile(
+        leading: Icon(
+          Icons.alarm_on,
+          color: selectedMenu == TwinAppMenu.myConditions ? Colors.white : null,
+        ),
+        title: Text(
+          'My Conditions',
+          style: theme.getStyle().copyWith(
+              color: selectedMenu == TwinAppMenu.myConditions
+                  ? Colors.white
+                  : null,
+              fontWeight: selectedMenu == TwinAppMenu.myConditions
+                  ? FontWeight.bold
+                  : null),
+        ),
+        selected: selectedMenu == TwinAppMenu.myConditions,
+        selectedTileColor: theme.getIntermediateColor(),
+        onTap: () {
+          showScreen(TwinAppMenu.myConditions);
         },
       ));
 
