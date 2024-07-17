@@ -12,6 +12,7 @@ import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/pages/admin/clients.dart';
 import 'package:twin_app/pages/admin/users.dart';
 import 'package:twin_app/router.dart';
+import 'package:twin_app/widgets/notifications.dart';
 import 'package:twin_app/widgets/page_conditions.dart';
 import 'package:twin_app/widgets/profile_info_screen.dart';
 import 'package:twin_commons/core/base_state.dart';
@@ -25,6 +26,7 @@ import 'package:uuid/uuid.dart';
 const List<Locale> locales = [Locale("en", "US"), Locale("ta", "IN")];
 
 enum TwinAppMenu {
+  myNotifications,
   myEvents,
   myProfile,
   myConditions,
@@ -299,6 +301,10 @@ class HomeScreenState extends BaseState<HomeScreen> {
 
     if (id is TwinAppMenu) {
       switch (id) {
+        case TwinAppMenu.myNotifications:
+          selectedMenuTitle = 'My Notifications';
+          body = AlarmsNotificationsGrid();
+          break;
         case TwinAppMenu.myEvents:
           selectedMenuTitle = 'My Events';
           body = ProfileInfoScreen(
@@ -375,6 +381,29 @@ class HomeScreenState extends BaseState<HomeScreen> {
     _initMenus();
 
     if (null != user) {
+      _sideMenus.add(ListTile(
+        leading: Icon(
+          Icons.notification_add,
+          color: selectedMenu == TwinAppMenu.myNotifications
+              ? Colors.white
+              : theme.getPrimaryColor(),
+        ),
+        title: Text(
+          'My Notifications',
+          style: theme.getStyle().copyWith(
+              color: selectedMenu == TwinAppMenu.myNotifications
+                  ? Colors.white
+                  : null,
+              fontWeight: selectedMenu == TwinAppMenu.myNotifications
+                  ? FontWeight.bold
+                  : null),
+        ),
+        selected: selectedMenu == TwinAppMenu.myNotifications,
+        selectedTileColor: theme.getIntermediateColor(),
+        onTap: () {
+          showScreen(TwinAppMenu.myNotifications);
+        },
+      ));
       _sideMenus.add(ListTile(
         leading: Icon(
           Icons.event_available,
