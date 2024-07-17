@@ -1,12 +1,12 @@
 import 'dart:convert';
 
-import 'package:twinned_api/twinned_api.dart' as tapi;
 import 'package:verification_api/api/verification.swagger.dart' as vapi;
 import 'package:nocode_api/api/nocode.swagger.dart' as ncapi;
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_commons/util/nocode_utils.dart';
 import 'package:twin_commons/core/storage.dart';
 import '/foundation/logger/logger.dart';
+import 'package:chopper/chopper.dart' as chopper;
 
 class TwinHelper {
   static void registerNoCode() {}
@@ -17,6 +17,16 @@ class TwinHelper {
     } catch (e, s) {
       log.e('Call failed', time: DateTime.now(), error: e, stackTrace: s);
     }
+  }
+
+  static bool validateResponse(chopper.Response r) {
+    if (null == r.body) {
+      return false;
+    }
+    if (!r.body.ok) {
+      return false;
+    }
+    return true;
   }
 
   static Future<vapi.MultiVerificationRes?> login(
