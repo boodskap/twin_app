@@ -267,23 +267,24 @@ class _UserAddUpdateSnippetState extends BaseState<UserAddUpdateSnippet> {
   Future _uploadImage() async {
     if (loading) return;
     loading = true;
-
-    bool imageUploaded = false;
+    String? tempImageId;
 
     await execute(() async {
       var uRes = await TwinImageHelper.uploadDomainImage();
       if (null != uRes && null != uRes.entity) {
-        imageUploaded = true;
-        _twinUserInfo = _twinUserInfo.copyWith(images: [uRes!.entity!.id]);
+        tempImageId = uRes.entity!.id;
       }
     });
+    if (tempImageId != null) {
+      refresh(
+        sync: () {
+          _twinUserInfo = _twinUserInfo.copyWith(images: [tempImageId!]);
+        },
+      );
+    }
 
     loading = false;
     refresh();
-
-    if (imageUploaded && widget.twinUser != null) {
-      await _save(silent: true);
-    }
   }
 
   @override
