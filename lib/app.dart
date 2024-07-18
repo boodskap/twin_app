@@ -597,14 +597,31 @@ class HomeScreenState extends BaseState<HomeScreen> {
             user!.name,
             style: theme.getStyle().copyWith(color: Colors.white),
           ),
-          IconButton(
-            icon: Icon(Icons.person),
-            onPressed: () {
-              setState(() {
-                //TODO
-                body = ProfileInfoScreen();
-              });
-            },
+          divider(horizontal: true, width: 4),
+          Tooltip(
+            message: 'Profile',
+            child: IconButton(
+              icon: Icon(Icons.person),
+              onPressed: () {
+                setState(() {
+                  //TODO
+                  body = ProfileInfoScreen();
+                });
+              },
+            ),
+          ),
+          divider(horizontal: true, width: 4),
+          Tooltip(
+            message: 'Logout',
+            child: IconButton(
+              onPressed: () {
+                setState(() {
+                  user = null;
+                });
+                auth.signOut();
+              },
+              icon: Icon(Icons.logout),
+            ),
           ),
           SizedBox(
             width: 10,
