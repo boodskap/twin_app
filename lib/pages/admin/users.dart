@@ -40,20 +40,21 @@ class _UsersState extends BaseState<Users> {
           children: [
             const BusyIndicator(),
             divider(horizontal: true),
-            IconButton(
-              onPressed: () {
-                _load();
-              },
-              icon: const Icon(Icons.refresh),
+            Tooltip(
+              message: 'Refresh',
+              child: IconButton(
+                onPressed: () => _load,
+                icon: const Icon(Icons.refresh),
+              ),
             ),
             divider(horizontal: true),
-            PrimaryButton(
-              // minimumSize: const Size(170, 50),
+           PrimaryButton(
+              minimumSize: const Size(130, 40),
               leading: const Icon(
                 Icons.add,
                 color: Colors.white,
               ),
-              labelKey: 'Add New User',
+              labelKey: 'Add User',
               onPressed: _addUpdateUserDialog,
             ),
             divider(horizontal: true),
@@ -85,7 +86,7 @@ class _UsersState extends BaseState<Users> {
                     'User not found',
                     style: theme.getStyle().copyWith(
                         color: Colors.red,
-                        fontSize: 18,
+                        fontSize: 16,
                         fontWeight: FontWeight.bold),
                   ),
                 )
@@ -254,7 +255,7 @@ class _UsersState extends BaseState<Users> {
         "Deleting a User can not be undone.\nYou will loose all of the user data, history, etc.\n\nAre you sure you want to delete?",
         style: theme.getStyle().copyWith(
               color: Colors.red,
-              fontSize: 20,
+              fontSize: 14,
               fontWeight: FontWeight.bold,
             ),
         maxLines: 10,
