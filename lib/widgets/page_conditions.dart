@@ -7,6 +7,7 @@ import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:twin_commons/core/twin_image_helper.dart';
 import 'package:twin_commons/core/twinned_session.dart';
 import 'package:twinned_api/twinned_api.dart' as tapi;
+import 'package:twin_commons/widgets/common/label_text_field.dart';
 
 class MyConditions extends StatefulWidget {
   const MyConditions({super.key});
@@ -20,6 +21,10 @@ class _MyConditionsState extends BaseState<MyConditions> {
   String _searchQuery = '*';
   bool isAdmin = false;
   bool isClientAdmin = false;
+  TextEditingController _valueController = TextEditingController();
+  TextEditingController _leftValueController = TextEditingController();
+  TextEditingController _rightValueController = TextEditingController();
+  tapi.DeviceModel? _selectedModel;
 
   @override
   void initState() {
@@ -52,7 +57,7 @@ class _MyConditionsState extends BaseState<MyConditions> {
             ),
             if (isAdmin || isClientAdmin)
               PrimaryButton(
-                leading: Icon(
+                leading: const Icon(
                   Icons.add,
                   color: Colors.white,
                 ),
@@ -75,7 +80,7 @@ class _MyConditionsState extends BaseState<MyConditions> {
                 hintText: "Search Conditions",
                 textStyle: WidgetStatePropertyAll(theme.getStyle()),
                 hintStyle: WidgetStatePropertyAll(theme.getStyle()),
-                leading: Icon(
+                leading: const Icon(
                   Icons.search,
                 ),
               ),
@@ -272,15 +277,15 @@ class _MyConditionsState extends BaseState<MyConditions> {
                       child: Tooltip(
                         message: 'Delete',
                         child: InkWell(
-                          child: const Icon(
-                            Icons.delete_forever,
-                            color: Colors.red,
-                          ),
                           onTap: (isAdmin || isClientAdmin)
                               ? () {
                                   _confirmDeletionDialog(context, c.id);
                                 }
                               : null,
+                          child: const Icon(
+                            Icons.delete_forever,
+                            color: Colors.red,
+                          ),
                         ),
                       ),
                     ),
@@ -290,6 +295,95 @@ class _MyConditionsState extends BaseState<MyConditions> {
                 color: theme.getPrimaryColor(),
                 thickness: 2.0,
               ),
+              divider(
+                height: 20,
+              ),
+              Text(
+                'IN',
+                style: theme.getStyle().copyWith(
+                      // color: theme.getPrimaryColor(),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                    ),
+              ),
+              divider(
+                height: 10,
+              ),
+              Text(
+                _selectedModel != null ? _selectedModel!.name : '',
+                style: theme.getStyle().copyWith(
+                      color: theme.getPrimaryColor(),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                    ),
+              ),
+              divider(
+                height: 10,
+              ),
+              Text(
+                'IF',
+                style: theme.getStyle().copyWith(
+                      color: Colors.red,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                    ),
+              ),
+              divider(
+                height: 10,
+              ),
+              Text(
+                c.field,
+                style: theme.getStyle().copyWith(
+                      // color: theme.getPrimaryColor(),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                    ),
+              ),
+              divider(
+                height: 10,
+              ),
+              Text(
+                c.condition.toString(),
+                style: theme.getStyle().copyWith(
+                      color: theme.getPrimaryColor(),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+              ),
+              divider(
+                height: 10,
+              ),
+              SizedBox(
+                width: 150,
+                child: LabelTextField(
+                  label: 'Value',
+                  controller: _valueController,
+                  readOnlyVal: true,
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              //   crossAxisAlignment: CrossAxisAlignment.center,
+              //   children: [
+              //     SizedBox(
+              //       width: 150,
+              //       child: LabelTextField(
+              //         label: 'Left Value',
+              //         controller: _leftValueController,
+              //         readOnlyVal: true,
+              //       ),
+              //     ),
+              //     SizedBox(
+              //       width: 150,
+              //       child: LabelTextField(
+              //         label: 'Right Value',
+              //         controller: _rightValueController,
+              //         readOnlyVal: true,
+              //       ),
+              //     ),
+              //   ],
+              // ),
             ],
           ),
         ),
