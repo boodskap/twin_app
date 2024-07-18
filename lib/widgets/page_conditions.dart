@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
+import 'package:twin_app/widgets/commons/secondary_button.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:twin_commons/core/twin_image_helper.dart';
@@ -63,7 +64,7 @@ class _MyConditionsState extends BaseState<MyConditions> {
             ),
             SizedBox(
               width: 250,
-              height: 30,
+              height: 40,
               child: SearchBar(
                 onChanged: (value) {
                   setState(() {
@@ -72,6 +73,8 @@ class _MyConditionsState extends BaseState<MyConditions> {
                   _load();
                 },
                 hintText: "Search Conditions",
+                textStyle: WidgetStatePropertyAll(theme.getStyle()),
+                hintStyle: WidgetStatePropertyAll(theme.getStyle()),
                 leading: Icon(
                   Icons.search,
                 ),
@@ -138,6 +141,77 @@ class _MyConditionsState extends BaseState<MyConditions> {
     refresh();
   }
 
+  void _removeCondition(String id) async {
+    if (loading) return;
+    loading = true;
+
+    await execute(() async {
+      int index = _conditionEntities.indexWhere((element) => element.id == id);
+      var res = await TwinnedSession.instance.twin.deleteCondition(
+        apikey: TwinnedSession.instance.authToken,
+        conditionId: id,
+      );
+
+      if (validateResponse(res)) {
+        _conditionEntities.removeAt(index);
+      }
+    });
+
+    loading = false;
+    refresh();
+  }
+
+  _confirmDeletionDialog(BuildContext context, String id) {
+    Widget cancelButton = SecondaryButton(
+      labelKey: 'Cancel',
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
+    Widget continueButton = PrimaryButton(
+      leading: const Icon(
+        Icons.delete_forever,
+        color: Colors.white,
+      ),
+      labelKey: 'Delete',
+      onPressed: () {
+        Navigator.pop(context);
+        _removeCondition(id);
+      },
+    );
+
+    AlertDialog alert = AlertDialog(
+      title: Text(
+        "WARNING",
+        style: theme.getStyle().copyWith(
+              color: Colors.red,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+      ),
+      content: Text(
+        "Deleting a Condition Rule can not be undone.\nYou will loose all of the Condition Rule data, history, etc.\n\nAre you sure you want to delete?",
+        style: theme.getStyle().copyWith(
+              color: Colors.red,
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+            ),
+        maxLines: 10,
+      ),
+      actions: [
+        cancelButton,
+        continueButton,
+      ],
+    );
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
   @override
   void setup() {
     _load();
@@ -182,20 +256,6 @@ class _MyConditionsState extends BaseState<MyConditions> {
                     Expanded(
                       flex: 1,
                       child: Tooltip(
-                        message: 'Delete',
-                        child: InkWell(
-                          child: const Icon(
-                            Icons.delete,
-                            color: Colors.black,
-                          ),
-                          onTap: (isAdmin || isClientAdmin) ? () {} : null,
-                        ),
-                      ),
-                    ),
-                  if (isAdmin || isClientAdmin)
-                    Expanded(
-                      flex: 1,
-                      child: Tooltip(
                         message: "Update",
                         child: InkWell(
                           onTap: (isAdmin || isClientAdmin) ? () {} : null,
@@ -203,6 +263,24 @@ class _MyConditionsState extends BaseState<MyConditions> {
                             Icons.edit,
                             color: Colors.black,
                           ),
+                        ),
+                      ),
+                    ),
+                  if (isAdmin || isClientAdmin)
+                    Expanded(
+                      flex: 1,
+                      child: Tooltip(
+                        message: 'Delete',
+                        child: InkWell(
+                          child: const Icon(
+                            Icons.delete_forever,
+                            color: Colors.red,
+                          ),
+                          onTap: (isAdmin || isClientAdmin)
+                              ? () {
+                                  _confirmDeletionDialog(context, c.id);
+                                }
+                              : null,
                         ),
                       ),
                     ),

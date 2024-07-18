@@ -48,7 +48,7 @@ List<BottomMenuItem> _adminBottomMenus({
     if (clients)
       const BottomMenuItem(
         id: TwinAppMenu.adminClients,
-        icon: Icon(Icons.group, size: 30),
+        icon: Icon(Icons.man_rounded, size: 30),
         label: 'Clients',
       ),
   ];
@@ -491,7 +491,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
             padding: const EdgeInsets.only(left: 16.0),
             child: ListTile(
               leading: Icon(
-                Icons.group,
+                Icons.man_rounded,
                 color: selectedMenu == TwinAppMenu.adminClients
                     ? Colors.white
                     : theme.getPrimaryColor(),
