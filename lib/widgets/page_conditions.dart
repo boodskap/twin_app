@@ -21,16 +21,17 @@ class _MyConditionsState extends BaseState<MyConditions> {
   String _searchQuery = '*';
   bool isAdmin = false;
   bool isClientAdmin = false;
-  TextEditingController _valueController = TextEditingController();
-  TextEditingController _leftValueController = TextEditingController();
-  TextEditingController _rightValueController = TextEditingController();
-  tapi.DeviceModel? _selectedModel;
+
+  Set<String> _selectedModel = {};
+  Map<String, String> _modelNames = {};
+  String mId = '';
 
   @override
   void initState() {
     super.initState();
     isAdmin = TwinnedSession.instance.isAdmin();
     isClientAdmin = TwinnedSession.instance.isClientAdmin();
+    _load();
   }
 
   @override
@@ -42,9 +43,7 @@ class _MyConditionsState extends BaseState<MyConditions> {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             const BusyIndicator(),
-            divider(
-              horizontal: true,
-            ),
+            divider(horizontal: true),
             Tooltip(
               message: "Refresh",
               child: IconButton(
@@ -52,9 +51,7 @@ class _MyConditionsState extends BaseState<MyConditions> {
                 icon: const Icon(Icons.refresh),
               ),
             ),
-            divider(
-              horizontal: true,
-            ),
+            divider(horizontal: true),
             if (isAdmin || isClientAdmin)
               PrimaryButton(
                 leading: const Icon(
@@ -64,9 +61,7 @@ class _MyConditionsState extends BaseState<MyConditions> {
                 labelKey: 'Add New Condition',
                 onPressed: (isAdmin || isClientAdmin) ? () {} : null,
               ),
-            divider(
-              horizontal: true,
-            ),
+            divider(horizontal: true),
             SizedBox(
               width: 250,
               height: 40,
@@ -80,14 +75,10 @@ class _MyConditionsState extends BaseState<MyConditions> {
                 hintText: "Search Conditions",
                 textStyle: WidgetStatePropertyAll(theme.getStyle()),
                 hintStyle: WidgetStatePropertyAll(theme.getStyle()),
-                leading: const Icon(
-                  Icons.search,
-                ),
+                leading: const Icon(Icons.search),
               ),
             ),
-            divider(
-              horizontal: true,
-            ),
+            divider(horizontal: true),
           ],
         ),
         divider(),
@@ -111,11 +102,32 @@ class _MyConditionsState extends BaseState<MyConditions> {
     );
   }
 
+  Future _getDeviceModel() async {
+    await execute(() async {
+      for (var modelId in _selectedModel) {
+        var mRes = await TwinnedSession.instance.twin.getDeviceModel(
+          apikey: TwinnedSession.instance.authToken,
+          modelId: modelId,
+        );
+        if (mRes.body != null) {
+          refresh(sync: () {
+            _modelNames[modelId] = mRes.body!.entity!.name;
+          });
+        } else {}
+      }
+    });
+
+    loading = false;
+    refresh();
+  }
+
   Future _load() async {
     if (loading) return;
     loading = true;
 
     _conditionEntities.clear();
+    _selectedModel.clear();
+    _modelNames.clear();
 
     await execute(() async {
       var qRes = await TwinnedSession.instance.twin.queryEqlCondition(
@@ -138,7 +150,9 @@ class _MyConditionsState extends BaseState<MyConditions> {
 
       if (validateResponse(qRes)) {
         _conditionEntities.addAll(qRes.body!.values!);
-        debugPrint('Found ${_conditionEntities.length} conditions');
+        _selectedModel
+            .addAll(_conditionEntities.map((condition) => condition.modelId));
+        await _getDeviceModel();
       }
     });
 
@@ -223,171 +237,376 @@ class _MyConditionsState extends BaseState<MyConditions> {
   }
 
   Widget _buildCard(tapi.Condition c) {
-    return Tooltip(
-      message: c.description,
-      child: Card(
-        color: Colors.transparent,
-        elevation: 5,
-        child: Container(
-          height: 350,
-          width: 350,
-          margin: const EdgeInsets.all(5),
-          padding: const EdgeInsets.all(5),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(
-              color: theme.getPrimaryColor(),
+    mId = c.modelId;
+    List<String> conditionsList = c.condition.toString().split(',');
+    List<String>? values = c.values;
+    TextEditingController valueController =
+        TextEditingController(text: c.$value);
+    TextEditingController leftValueController =
+        TextEditingController(text: c.leftValue);
+    TextEditingController rightValueController =
+        TextEditingController(text: c.rightValue);
+    // String valuesString = values?.join(', ') ?? '';
+    List<String> valuesList = values ?? [];
+
+    // TextEditingController valuesController =
+    //     TextEditingController(text: valuesString);
+    TextEditingController valuesController = TextEditingController(
+      text: values?.join('\n') ?? '', // Join values with new lines
+    );
+
+    bool showLeftRightValues = conditionsList.any((condition) {
+      String conditionType = condition.split('.').last;
+      return conditionType == 'between' || conditionType == 'nbetween';
+    });
+    Map<String, String> conditionTypeMapping = {
+      'lt': '<',
+      'lte': '<=',
+      'gt': '>',
+      'gte': '>=',
+      'eq': '==',
+      'neq': '!=',
+      'between': 'BETWEEN',
+      'nbetween': 'NOT BETWEEN',
+      'contains': 'CONTAINS',
+      'ncontains': 'NOT CONTAINS',
+    };
+
+    String conditionType =
+        conditionsList.isNotEmpty ? conditionsList.first.split('.').last : '';
+    if (!(conditionType == 'contains' || conditionType == 'ncontains')) {
+      return Tooltip(
+        message: c.description,
+        child: Card(
+          color: Colors.transparent,
+          elevation: 5,
+          child: Container(
+            height: 350,
+            width: 350,
+            margin: const EdgeInsets.all(5),
+            padding: const EdgeInsets.all(5),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border.all(
+                color: theme.getPrimaryColor(),
+              ),
+              borderRadius: const BorderRadius.all(
+                Radius.circular(20),
+              ),
             ),
-            borderRadius: const BorderRadius.all(
-              Radius.circular(20),
-            ),
-          ),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    flex: 4,
-                    child: Text(
-                      c.name,
-                      style: theme.getStyle().copyWith(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      flex: 4,
+                      child: Text(
+                        c.name,
+                        style: theme.getStyle().copyWith(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    if (isAdmin || isClientAdmin)
+                      Expanded(
+                        flex: 1,
+                        child: Tooltip(
+                          message: "Update",
+                          child: InkWell(
+                            onTap: (isAdmin || isClientAdmin) ? () {} : null,
+                            child: const Icon(
+                              Icons.edit,
+                              color: Colors.black,
+                            ),
                           ),
-                      overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    if (isAdmin || isClientAdmin)
+                      Expanded(
+                        flex: 1,
+                        child: Tooltip(
+                          message: 'Delete',
+                          child: InkWell(
+                            onTap: (isAdmin || isClientAdmin)
+                                ? () {
+                                    _confirmDeletionDialog(context, c.id);
+                                  }
+                                : null,
+                            child: const Icon(
+                              Icons.delete_forever,
+                              color: Colors.red,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                Divider(
+                  color: theme.getPrimaryColor(),
+                  thickness: 2.0,
+                ),
+                divider(height: 20),
+                Text(
+                  'IN',
+                  style: theme.getStyle().copyWith(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
+                ),
+                divider(height: 10),
+                Text(
+                  _modelNames[mId] ?? '--',
+                  style: theme.getStyle().copyWith(
+                        color: theme.getPrimaryColor(),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
+                ),
+                divider(height: 10),
+                Text(
+                  'IF',
+                  style: theme.getStyle().copyWith(
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
+                ),
+                divider(height: 10),
+                Text(
+                  c.field,
+                  style: theme.getStyle().copyWith(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
+                ),
+                divider(height: 10),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: conditionsList.map((condition) {
+                    String conditionType = condition.split('.').last;
+                    String conditionText =
+                        conditionTypeMapping[conditionType] ?? conditionType;
+                    return Text(
+                      conditionText,
+                      style: theme.getStyle().copyWith(
+                            color: theme.getPrimaryColor(),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                    );
+                  }).toList(),
+                ),
+                divider(height: 10),
+                if (!showLeftRightValues)
+                  SizedBox(
+                    width: 150,
+                    child: LabelTextField(
+                      label: 'Value',
+                      controller: valueController,
+                      readOnlyVal: true,
+                      textAlign: TextAlign.center,
                     ),
                   ),
-                  if (isAdmin || isClientAdmin)
-                    Expanded(
-                      flex: 1,
-                      child: Tooltip(
-                        message: "Update",
-                        child: InkWell(
-                          onTap: (isAdmin || isClientAdmin) ? () {} : null,
-                          child: const Icon(
-                            Icons.edit,
-                            color: Colors.black,
-                          ),
+                if (showLeftRightValues)
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      SizedBox(
+                        width: 150,
+                        child: LabelTextField(
+                          label: 'Left Value',
+                          controller: leftValueController,
+                          readOnlyVal: true,
+                          textAlign: TextAlign.center,
                         ),
                       ),
-                    ),
-                  if (isAdmin || isClientAdmin)
-                    Expanded(
-                      flex: 1,
-                      child: Tooltip(
-                        message: 'Delete',
-                        child: InkWell(
-                          onTap: (isAdmin || isClientAdmin)
-                              ? () {
-                                  _confirmDeletionDialog(context, c.id);
-                                }
-                              : null,
-                          child: const Icon(
-                            Icons.delete_forever,
-                            color: Colors.red,
-                          ),
+                      SizedBox(
+                        width: 150,
+                        child: LabelTextField(
+                          label: 'Right Value',
+                          controller: rightValueController,
+                          readOnlyVal: true,
+                          textAlign: TextAlign.center,
                         ),
                       ),
-                    ),
-                ],
-              ),
-              Divider(
-                color: theme.getPrimaryColor(),
-                thickness: 2.0,
-              ),
-              divider(
-                height: 20,
-              ),
-              Text(
-                'IN',
-                style: theme.getStyle().copyWith(
-                      // color: theme.getPrimaryColor(),
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                    ),
-              ),
-              divider(
-                height: 10,
-              ),
-              Text(
-                _selectedModel != null ? _selectedModel!.name : '',
-                style: theme.getStyle().copyWith(
-                      color: theme.getPrimaryColor(),
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                    ),
-              ),
-              divider(
-                height: 10,
-              ),
-              Text(
-                'IF',
-                style: theme.getStyle().copyWith(
-                      color: Colors.red,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                    ),
-              ),
-              divider(
-                height: 10,
-              ),
-              Text(
-                c.field,
-                style: theme.getStyle().copyWith(
-                      // color: theme.getPrimaryColor(),
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
-                    ),
-              ),
-              divider(
-                height: 10,
-              ),
-              Text(
-                c.condition.toString(),
-                style: theme.getStyle().copyWith(
-                      color: theme.getPrimaryColor(),
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-              ),
-              divider(
-                height: 10,
-              ),
-              SizedBox(
-                width: 150,
-                child: LabelTextField(
-                  label: 'Value',
-                  controller: _valueController,
-                  readOnlyVal: true,
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              // Row(
-              //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              //   crossAxisAlignment: CrossAxisAlignment.center,
-              //   children: [
-              //     SizedBox(
-              //       width: 150,
-              //       child: LabelTextField(
-              //         label: 'Left Value',
-              //         controller: _leftValueController,
-              //         readOnlyVal: true,
-              //       ),
-              //     ),
-              //     SizedBox(
-              //       width: 150,
-              //       child: LabelTextField(
-              //         label: 'Right Value',
-              //         controller: _rightValueController,
-              //         readOnlyVal: true,
-              //       ),
-              //     ),
-              //   ],
-              // ),
-            ],
+                    ],
+                  )
+              ],
+            ),
           ),
         ),
-      ),
-    );
+      );
+    }
+    if (conditionType == 'contains' || conditionType == 'ncontains') {
+      return Tooltip(
+        message: c.description,
+        child: Card(
+          color: Colors.transparent,
+          elevation: 5,
+          child: Container(
+            height: 350,
+            width: 350,
+            margin: const EdgeInsets.all(5),
+            padding: const EdgeInsets.all(5),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border.all(
+                color: theme.getPrimaryColor(),
+              ),
+              borderRadius: const BorderRadius.all(
+                Radius.circular(20),
+              ),
+            ),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      flex: 4,
+                      child: Text(
+                        c.name,
+                        style: theme.getStyle().copyWith(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    if (isAdmin || isClientAdmin)
+                      Expanded(
+                        flex: 1,
+                        child: Tooltip(
+                          message: "Update",
+                          child: InkWell(
+                            onTap: (isAdmin || isClientAdmin) ? () {} : null,
+                            child: const Icon(
+                              Icons.edit,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                      ),
+                    if (isAdmin || isClientAdmin)
+                      Expanded(
+                        flex: 1,
+                        child: Tooltip(
+                          message: 'Delete',
+                          child: InkWell(
+                            onTap: (isAdmin || isClientAdmin)
+                                ? () {
+                                    _confirmDeletionDialog(context, c.id);
+                                  }
+                                : null,
+                            child: const Icon(
+                              Icons.delete_forever,
+                              color: Colors.red,
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                Divider(
+                  color: theme.getPrimaryColor(),
+                  thickness: 2.0,
+                ),
+                divider(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Text(
+                      'IN',
+                      style: theme.getStyle().copyWith(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                          ),
+                    ),
+                    divider(
+                      horizontal: true,
+                    ),
+                    Text(
+                      _modelNames[mId] ?? '--',
+                      style: theme.getStyle().copyWith(
+                            color: theme.getPrimaryColor(),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                          ),
+                    ),
+                    divider(
+                      horizontal: true,
+                    ),
+                    Text(
+                      'IF',
+                      style: theme.getStyle().copyWith(
+                            color: Colors.red,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                          ),
+                    ),
+                  ],
+                ),
+                divider(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    divider(
+                      horizontal: true,
+                    ),
+                    Text(
+                      c.field,
+                      style: theme.getStyle().copyWith(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                          ),
+                    ),
+                    divider(
+                      horizontal: true,
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: conditionsList.map((condition) {
+                        String conditionType = condition.split('.').last;
+                        String conditionText =
+                            conditionTypeMapping[conditionType] ??
+                                conditionType;
+                        return Text(
+                          conditionText,
+                          style: theme.getStyle().copyWith(
+                                color: theme.getPrimaryColor(),
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ),
+                divider(height: 20),
+                SizedBox(
+                  width: 200,
+                  child: SingleChildScrollView(
+                    child: LabelTextField(
+                      controller: valuesController,
+                      readOnlyVal: true,
+                      textAlign: TextAlign.center,
+                      style: theme.getStyle().copyWith(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                      label: 'Values',
+                      maxLines: null,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Container();
   }
 }
