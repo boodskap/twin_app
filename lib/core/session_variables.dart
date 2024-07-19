@@ -7,7 +7,9 @@ import 'package:twinned_api/api/twinned.swagger.dart' as tapi;
 
 typedef OnMenuSelected = Widget Function(dynamic id);
 typedef IsMenuVisible = bool Function(dynamic id);
-typedef BuildLandingPages = void Function(BuildContext context);
+typedef BuildLandingPages = List<Widget>? Function(BuildContext context);
+typedef PostLoginHook = Future Function();
+typedef PostSignUpHook = Future Function(vapi.VerificationRes res);
 
 TwinTheme theme = themes[2];
 
@@ -39,13 +41,15 @@ final Map<dynamic, List<BottomMenuItem>> bottomMenus =
 final List<BottomMenuItem> pageBottomMenus = [];
 late OnMenuSelected onMenuSelected;
 late IsMenuVisible isMenuVisible;
-late BuildLandingPages buildLandingPages;
+BuildLandingPages? buildLandingPages;
 dynamic homeMenu = 'HOME';
 dynamic selectedMenu = homeMenu;
 String selectedMenuTitle = '';
 int bottomMenuIndex = 0;
 String flavor = "dev";
 bool setDrawerOpen = false;
+PostLoginHook? postLoginHook;
+PostSignUpHook? postSignUpHook;
 
 class TwinMenuItem {
   TwinMenuItem({

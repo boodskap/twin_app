@@ -9,6 +9,7 @@ import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:twin_commons/core/twinned_session.dart';
 import 'package:verification_api/api/verification.swagger.dart' as vapi;
 
 class ForgotPasswordPage extends StatefulWidget {
@@ -21,7 +22,7 @@ class ForgotPasswordPage extends StatefulWidget {
 class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   @override
   Widget build(BuildContext context) {
-    if (smallScreen) return _ForgotPasswordMobilePage();
+    if (smallScreen || landingPages.isEmpty) return _ForgotPasswordMobilePage();
     return Row(
       children: [
         Expanded(flex: 1, child: LandingPage()),
@@ -42,10 +43,24 @@ class _ForgotPasswordMobilePage extends StatefulWidget {
 class _ForgotPasswordMobilePageState
     extends BaseState<_ForgotPasswordMobilePage> {
   final TextEditingController _emailController = TextEditingController();
+  bool _canSignUp = false;
 
   @override
-  void setup() {
-    // TODO: implement setup
+  void setup() async {
+    await execute(() async {
+      var uRes = await TwinnedSession.instance.twin
+          .getUsageByDomainKey(domainKey: config.twinDomainKey);
+      if (validateResponse(uRes)) {
+        var usage = uRes.body!.entity!;
+        if (config.signUpAsClient) {
+          _canSignUp = usage.availableClients > usage.usedClients;
+        } else {
+          _canSignUp = usage.availableUsers > usage.usedUsers;
+        }
+      }
+    });
+
+    refresh();
   }
 
   void _showForgotOtpPage() {
@@ -85,126 +100,140 @@ class _ForgotPasswordMobilePageState
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      body: Container(
-        decoration: theme.getCredentialsPageDecoration(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            SizedBox(height: 100, child: logo),
-            Padding(
-              padding: EdgeInsets.all(20),
+      backgroundColor: Colors.white,
+      body: SizedBox(
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Container(
+              width: smallScreen ? null : credScreenWidth,
+              decoration: theme.getCredentialsPageDecoration(),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  Text(
-                    "resetPassword",
-                    style: theme.getStyle().copyWith(
-                          color: Colors.white,
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold,
-                        ),
-                  ).tr(),
-                ],
-              ),
-            ),
-            SizedBox(height: 10),
-            Padding(
-              padding: EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
-              child: Container(
-                width: double.infinity,
-                decoration: theme.getCredentialsContentDecoration(),
-                child: Padding(
-                  padding: EdgeInsets.all(30),
-                  child: Column(
-                    children: <Widget>[
-                      SizedBox(height: 50),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                          boxShadow: [
-                            BoxShadow(
-                              color: theme.getSecondaryColor(),
-                              blurRadius: 20,
-                              offset: Offset(0, 10),
-                            ),
-                          ],
-                        ),
+                  SizedBox(height: 100, child: logo),
+                  Padding(
+                    padding: EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          "resetPassword",
+                          style: theme.getStyle().copyWith(
+                                color: theme.getPrimaryColor(),
+                                fontSize: 30,
+                                fontWeight: FontWeight.bold,
+                              ),
+                        ).tr(),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Padding(
+                    padding:
+                        EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
+                    child: Container(
+                      width: double.infinity,
+                      decoration: theme.getCredentialsContentDecoration(),
+                      child: Padding(
+                        padding: EdgeInsets.all(30),
                         child: Column(
                           children: <Widget>[
-                            EmailField(
-                              onSubmitted: (value) {
-                                _doChangePassword();
-                              },
-                              controller: _emailController,
+                            SizedBox(height: 50),
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: theme.getSecondaryColor(),
+                                    blurRadius: 20,
+                                    offset: Offset(0, 10),
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                children: <Widget>[
+                                  EmailField(
+                                    onSubmitted: (value) {
+                                      _doChangePassword();
+                                    },
+                                    controller: _emailController,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(height: 50),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                SecondaryButton(
+                                  labelKey: 'cancel',
+                                  minimumSize: Size(125, 50),
+                                  onPressed: () {
+                                    context.pop();
+                                  },
+                                ),
+                                const BusyIndicator(),
+                                PrimaryButton(
+                                  labelKey: 'generateOtp',
+                                  minimumSize: Size(200, 50),
+                                  onPressed: () {
+                                    _doChangePassword();
+                                  },
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 30),
+                            if (_canSignUp)
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    "noAccountYet",
+                                    style: theme.getStyle().copyWith(),
+                                  ).tr(),
+                                  TextButton(
+                                    onPressed: () {
+                                      GoRouter.of(context).push(Routes.signup);
+                                    },
+                                    child: Text(
+                                      "signUp",
+                                      style: theme.getStyle().copyWith(
+                                            fontSize: 16,
+                                            color: theme.getPrimaryColor(),
+                                          ),
+                                    ).tr(),
+                                  ),
+                                ],
+                              ),
+                            SizedBox(height: 50),
+                            Align(
+                              alignment: Alignment.bottomRight,
+                              child: Wrap(
+                                spacing: 10,
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                children: [
+                                  Text(
+                                    "Powered By",
+                                    style: theme.getStyle().copyWith(
+                                          color: Colors.black,
+                                          fontSize: 16,
+                                        ),
+                                  ),
+                                  poweredBy,
+                                ],
+                              ),
                             ),
                           ],
                         ),
                       ),
-                      SizedBox(height: 50),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          SecondaryButton(
-                            labelKey: 'cancel',
-                            minimumSize: Size(125, 50),
-                            onPressed: () {
-                              context.pop();
-                            },
-                          ),
-                          const BusyIndicator(),
-                          PrimaryButton(
-                            labelKey: 'generateOtp',
-                            minimumSize: Size(200, 50),
-                            onPressed: () {
-                              _doChangePassword();
-                            },
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 30),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "noAccountYet",
-                            style: theme.getStyle().copyWith(),
-                          ).tr(),
-                          TextButton(
-                            onPressed: () {
-                              GoRouter.of(context).push(Routes.signup);
-                            },
-                            child: Text(
-                              "signUp",
-                              style: theme.getStyle().copyWith(
-                                    fontSize: 16,
-                                    color: theme.getPrimaryColor(),
-                                  ),
-                            ).tr(),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 50),
-                      Align(
-                        alignment: Alignment.bottomRight,
-                        child: Wrap(
-                          spacing: 10,
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          children: [
-                            Text(
-                              "Powered By",
-                              style: theme.getStyle().copyWith(
-                                    color: Colors.black,
-                                    fontSize: 16,
-                                  ),
-                            ),
-                            poweredBy,
-                          ],
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
+                ],
               ),
             ),
           ],

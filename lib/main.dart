@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:twin_app/core/session_variables.dart' as session;
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:twin_app/core/twin_helper.dart';
 import 'package:twin_commons/core/twinned_session.dart';
+import 'package:verification_api/api/verification.swagger.dart' as vapi;
 import 'dart:io' show Platform;
 
 import 'app.dart';
@@ -23,6 +25,7 @@ void main() async {
     onMenuSelected: (id) => Placeholder(),
     isMenuVisible: (id) => false,
     buildLandingPages: (_) {},
+    setDrawerOpen: false,
   );
 }
 
@@ -34,8 +37,10 @@ void start({
   required Map<dynamic, List<BottomMenuItem>> bottomMenus,
   required session.OnMenuSelected onMenuSelected,
   required session.IsMenuVisible isMenuVisible,
-  required session.BuildLandingPages buildLandingPages,
+  session.BuildLandingPages? buildLandingPages,
   bool setDrawerOpen = true,
+  session.PostLoginHook? postLoginHook,
+  session.PostSignUpHook? postSignUpHook = _createDefaultClient,
 }) async {
   session.appTitle = appTitle;
   session.selectedMenuTitle = homeMenuTitle;
@@ -46,6 +51,8 @@ void start({
   session.homeMenu = homeMenu;
   session.buildLandingPages = buildLandingPages;
   session.setDrawerOpen = setDrawerOpen;
+  session.postLoginHook = postLoginHook;
+  session.postSignUpHook = postSignUpHook;
 
   final String envFile = getEnvFileName(session.flavor);
 
@@ -83,4 +90,16 @@ String getEnvFileName(String flavor) {
     default:
       return ".env.$flavor";
   }
+}
+
+Future _createDefaultClient(vapi.VerificationRes res) async {
+  if (!session.config.signUpAsClient) return;
+
+  await TwinHelper.execute(() async {
+    var cRes = await TwinnedSession.instance.twin
+        .makeMyselfAsNewClient(apikey: res.authToken);
+    if (!TwinHelper.validateResponse(cRes)) {
+      debugPrint(cRes.bodyString);
+    }
+  });
 }

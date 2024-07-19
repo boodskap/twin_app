@@ -54,7 +54,6 @@ class StreamAuth {
   /// Checks whether current user is signed in with an artificial delay to mimic
   /// async operation.
   Future<bool> isSignedIn() async {
-    await Future<void>.delayed(const Duration(seconds: 1));
     return _currentUser != null;
   }
 
@@ -72,6 +71,6 @@ class StreamAuth {
   /// Signs out the current user.
   Future<void> signOut() async {
     _userStreamController.add(null);
-    //TwinnedSession.instance.logout();
+    TwinnedSession.instance.logout();
   }
 }

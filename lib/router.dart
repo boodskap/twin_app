@@ -48,7 +48,9 @@ GoRouter router = GoRouter(
     ),
     GoRoute(
       path: Routes.signup,
-      builder: (_, __) => SignUpPage(),
+      builder: (_, __) {
+        return SignUpPage();
+      },
     ),
     GoRoute(
       path: Routes.forgot,
@@ -56,11 +58,29 @@ GoRouter router = GoRouter(
     ),
     GoRoute(
       path: Routes.otp,
-      builder: (_, __) => VerifyOtpPage(),
+      builder: (_, state) {
+        bool signUp = false;
+        if (null != state.extra) {
+          Map<String, dynamic> map = state.extra! as Map<String, dynamic>;
+          signUp = map['signUp'] ?? false;
+        }
+        return VerifyOtpPage(
+          signUp: signUp,
+        );
+      },
     ),
     GoRoute(
       path: Routes.reset,
-      builder: (_, __) => ResetPasswordPage(),
+      builder: (_, state) {
+        bool signUp = false;
+        if (null != state.extra) {
+          Map<String, dynamic> map = state.extra! as Map<String, dynamic>;
+          signUp = map['signUp'] ?? false;
+        }
+        return ResetPasswordPage(
+          signUp: signUp,
+        );
+      },
     ),
   ],
 );
