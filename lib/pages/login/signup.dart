@@ -21,7 +21,7 @@ class SignUpPage extends StatefulWidget {
 class _SignUpPageState extends State<SignUpPage> {
   @override
   Widget build(BuildContext context) {
-    if (smallScreen) return _SignUpMobilePage();
+    if (smallScreen || landingPages.isEmpty) return _SignUpMobilePage();
     return Row(
       children: [
         Expanded(flex: 1, child: LandingPage()),
@@ -49,7 +49,7 @@ class _SignUpMobilePageState extends BaseState<_SignUpMobilePage> {
     // TODO: implement setup
   }
   void _showOtpPage(vapi.RegistrationRes registrationRes) {
-    context.push(Routes.otp);
+    context.push(Routes.otp, extra: {'signUp': true});
   }
 
   Future<void> _doSignup() async {
@@ -86,200 +86,230 @@ class _SignUpMobilePageState extends BaseState<_SignUpMobilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      body: Container(
-        decoration: theme.getCredentialsPageDecoration(),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            SizedBox(height: 100, child: logo),
-            Padding(
-              padding: EdgeInsets.all(20),
+      backgroundColor: Colors.white,
+      body: SizedBox(
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Container(
+              width: smallScreen ? null : credScreenWidth,
+              decoration: theme.getCredentialsPageDecoration(),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  Text(
-                    "registerNew",
-                    style: theme.getStyle().copyWith(
-                          color: Colors.white,
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold,
-                        ),
-                  ).tr(),
-                ],
-              ),
-            ),
-            SizedBox(height: 10),
-            Padding(
-              padding: EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
-              child: Container(
-                decoration: theme.getCredentialsContentDecoration(),
-                child: Padding(
-                  padding: EdgeInsets.all(30),
-                  child: Column(
-                    children: <Widget>[
-                      SizedBox(height: 30),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(10),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Color.fromRGBO(225, 95, 27, .3),
-                              blurRadius: 20,
-                              offset: Offset(0, 10),
-                            ),
-                          ],
-                        ),
+                  SizedBox(height: 100, child: logo),
+                  Padding(
+                    padding: EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          "registerNew",
+                          style: theme.getStyle().copyWith(
+                                color: theme.getPrimaryColor(),
+                                fontSize: 30,
+                                fontWeight: FontWeight.bold,
+                              ),
+                        ).tr(),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Padding(
+                    padding:
+                        EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
+                    child: Container(
+                      decoration: theme.getCredentialsContentDecoration(),
+                      child: Padding(
+                        padding: EdgeInsets.all(30),
                         child: Column(
                           children: <Widget>[
-                            EmailField(
-                              controller: _emailController,
-                              onChanged: (value) {
-                                setState(() {
-                                  _canSignup = _emailController.text
-                                              .trim()
-                                              .length >
-                                          0 &&
-                                      _fnameController.text.trim().length > 0 &&
-                                      _lnameController.text.trim().length > 0;
-                                });
-                              },
-                            ),
+                            SizedBox(height: 30),
                             Container(
-                              padding: EdgeInsets.all(10),
                               decoration: BoxDecoration(
-                                border: Border(
-                                  bottom: BorderSide(
-                                    color: Colors.grey.shade200,
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Color.fromRGBO(225, 95, 27, .3),
+                                    blurRadius: 20,
+                                    offset: Offset(0, 10),
                                   ),
-                                ),
+                                ],
                               ),
-                              child: TextField(
-                                controller: _fnameController,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _canSignup = _emailController.text
-                                                .trim()
-                                                .length >
-                                            0 &&
-                                        _fnameController.text.trim().length >
-                                            0 &&
-                                        _lnameController.text.trim().length > 0;
-                                  });
-                                },
-                                decoration: InputDecoration(
-                                  hintText: "firstName".tr(),
-                                  hintStyle: theme
-                                      .getStyle()
-                                      .copyWith(color: Colors.grey),
-                                  border: InputBorder.none,
-                                ),
-                              ),
-                            ),
-                            Container(
-                              padding: EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                border: Border(
-                                  bottom: BorderSide(
-                                    color: Colors.grey.shade200,
+                              child: Column(
+                                children: <Widget>[
+                                  EmailField(
+                                    controller: _emailController,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _canSignup = _emailController.text
+                                                    .trim()
+                                                    .length >
+                                                0 &&
+                                            _fnameController.text
+                                                    .trim()
+                                                    .length >
+                                                0 &&
+                                            _lnameController.text
+                                                    .trim()
+                                                    .length >
+                                                0;
+                                      });
+                                    },
                                   ),
-                                ),
-                              ),
-                              child: TextField(
-                                controller: _lnameController,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _canSignup = _emailController.text
-                                                .trim()
-                                                .length >
-                                            0 &&
-                                        _fnameController.text.trim().length >
-                                            0 &&
-                                        _lnameController.text.trim().length > 0;
-                                  });
-                                },
-                                onSubmitted: !_canSignup
-                                    ? null
-                                    : (value) {
-                                        _doSignup();
+                                  Container(
+                                    padding: EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      border: Border(
+                                        bottom: BorderSide(
+                                          color: Colors.grey.shade200,
+                                        ),
+                                      ),
+                                    ),
+                                    child: TextField(
+                                      controller: _fnameController,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _canSignup = _emailController.text
+                                                      .trim()
+                                                      .length >
+                                                  0 &&
+                                              _fnameController.text
+                                                      .trim()
+                                                      .length >
+                                                  0 &&
+                                              _lnameController.text
+                                                      .trim()
+                                                      .length >
+                                                  0;
+                                        });
                                       },
-                                decoration: InputDecoration(
-                                  hintText: "lastName".tr(),
-                                  hintStyle: theme
-                                      .getStyle()
-                                      .copyWith(color: Colors.grey),
-                                  border: InputBorder.none,
+                                      decoration: InputDecoration(
+                                        hintText: "firstName".tr(),
+                                        hintStyle: theme
+                                            .getStyle()
+                                            .copyWith(color: Colors.grey),
+                                        border: InputBorder.none,
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      border: Border(
+                                        bottom: BorderSide(
+                                          color: Colors.grey.shade200,
+                                        ),
+                                      ),
+                                    ),
+                                    child: TextField(
+                                      controller: _lnameController,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _canSignup = _emailController.text
+                                                      .trim()
+                                                      .length >
+                                                  0 &&
+                                              _fnameController.text
+                                                      .trim()
+                                                      .length >
+                                                  0 &&
+                                              _lnameController.text
+                                                      .trim()
+                                                      .length >
+                                                  0;
+                                        });
+                                      },
+                                      onSubmitted: !_canSignup
+                                          ? null
+                                          : (value) {
+                                              _doSignup();
+                                            },
+                                      decoration: InputDecoration(
+                                        hintText: "lastName".tr(),
+                                        hintStyle: theme
+                                            .getStyle()
+                                            .copyWith(color: Colors.grey),
+                                        border: InputBorder.none,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(height: 20),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                SecondaryButton(
+                                  labelKey: 'cancel',
+                                  onPressed: () {
+                                    context.pop();
+                                  },
                                 ),
+                                BusyIndicator(),
+                                PrimaryButton(
+                                  labelKey: 'signUp',
+                                  minimumSize: Size(200, 50),
+                                  onPressed: !_canSignup
+                                      ? null
+                                      : () {
+                                          _doSignup();
+                                        },
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 20),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  "haveAccount",
+                                  style: theme.getStyle().copyWith(),
+                                ).tr(),
+                                TextButton(
+                                  onPressed: () {
+                                    GoRouter.of(context).push(Routes.login);
+                                  },
+                                  child: Text(
+                                    "login",
+                                    style: theme.getStyle().copyWith(
+                                        fontSize: 18,
+                                        color: theme.getPrimaryColor()),
+                                  ).tr(),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(
+                              height: 50,
+                            ),
+                            Align(
+                              alignment: Alignment.bottomRight,
+                              child: Wrap(
+                                spacing: 10,
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                children: [
+                                  Text(
+                                    "Powered By",
+                                    style: theme.getStyle().copyWith(
+                                          color: Colors.black,
+                                          fontSize: 16,
+                                        ),
+                                  ),
+                                  poweredBy,
+                                ],
                               ),
                             ),
                           ],
                         ),
                       ),
-                      SizedBox(height: 20),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          SecondaryButton(
-                            labelKey: 'cancel',
-                            onPressed: () {
-                              context.pop();
-                            },
-                          ),
-                          BusyIndicator(),
-                          PrimaryButton(
-                            labelKey: 'signUp',
-                            minimumSize: Size(200, 50),
-                            onPressed: !_canSignup
-                                ? null
-                                : () {
-                                    _doSignup();
-                                  },
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 20),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "haveAccount",
-                            style: theme.getStyle().copyWith(),
-                          ).tr(),
-                          TextButton(
-                            onPressed: () {
-                              GoRouter.of(context).push(Routes.login);
-                            },
-                            child: Text(
-                              "login",
-                              style: theme.getStyle().copyWith(
-                                  fontSize: 18, color: theme.getPrimaryColor()),
-                            ).tr(),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 50,
-                      ),
-                      Align(
-                        alignment: Alignment.bottomRight,
-                        child: Wrap(
-                          spacing: 10,
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          children: [
-                            Text(
-                              "Powered By",
-                              style: theme.getStyle().copyWith(
-                                    color: Colors.black,
-                                    fontSize: 16,
-                                  ),
-                            ),
-                            poweredBy,
-                          ],
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
+                ],
               ),
             ),
           ],

@@ -41,7 +41,8 @@ class _LandingPageState extends BaseState<LandingPage> {
         twinSysInfo = res.body!.entity!;
       }
 
-      if (landingPages.isEmpty &&
+      if (config.loadLandingPages &&
+          landingPages.isEmpty &&
           null != twinSysInfo &&
           null != twinSysInfo!.landingPages) {
         for (var p in twinSysInfo!.landingPages!) {
