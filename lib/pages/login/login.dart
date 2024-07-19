@@ -25,7 +25,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
-    if (smallScreen) return _LoginMobilePage();
+    if (smallScreen || landingPages.isEmpty) return _LoginMobilePage();
     return Row(
       children: [
         Expanded(flex: 1, child: LandingPage()),
@@ -49,20 +49,35 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
   bool _hasEmail = false;
   bool _hasPassword = false;
   bool _loggedIn = false;
+  bool _canSignUp = false;
 
   @override
   void setup() async {
-    _userController.text = await TwinHelper.getLastStoredUser();
-    if (_userController.text.trim().isNotEmpty) {
-      _rememberMe = true;
-      _passwordController.text =
-          await TwinHelper.getStoredPassword(_userController.text.trim());
-    }
-    if (_userController.text.trim().isNotEmpty &&
-        _passwordController.text.trim().isNotEmpty) {
-      _hasEmail = true;
-      _hasPassword = true;
-    }
+    await execute(() async {
+      _userController.text = await TwinHelper.getLastStoredUser();
+      if (_userController.text.trim().isNotEmpty) {
+        _rememberMe = true;
+        _passwordController.text =
+            await TwinHelper.getStoredPassword(_userController.text.trim());
+      }
+      if (_userController.text.trim().isNotEmpty &&
+          _passwordController.text.trim().isNotEmpty) {
+        _hasEmail = true;
+        _hasPassword = true;
+      }
+
+      var uRes = await TwinnedSession.instance.twin
+          .getUsageByDomainKey(domainKey: config.twinDomainKey);
+      if (validateResponse(uRes)) {
+        var usage = uRes.body!.entity!;
+        if (config.signUpAsClient) {
+          _canSignUp = usage.availableClients > usage.usedClients;
+        } else {
+          _canSignUp = usage.availableUsers > usage.usedUsers;
+        }
+      }
+    });
+
     refresh();
   }
 
@@ -93,6 +108,11 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
         if (_rememberMe) {
           TwinHelper.addStoredPassword(userId, password);
         }
+
+        if (null != postLoginHook) {
+          await postLoginHook!();
+        }
+
         StreamAuthScope.of(context).signIn(userId);
       }
     });
@@ -104,193 +124,210 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      body: Container(
-        decoration: theme.getCredentialsPageDecoration(),
-        child: Column(
-          children: <Widget>[
-            SizedBox(height: 100, child: logo),
-            if (!_loggedIn)
-              Padding(
-                padding: const EdgeInsets.only(left: 8.0),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "login",
-                    style: theme.getStyle().copyWith(
-                          color: Colors.white,
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold,
-                        ),
-                  ).tr(),
-                ),
-              ),
-            if (!_loggedIn)
-              Padding(
-                padding: const EdgeInsets.only(left: 8.0, top: 4),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "welcomeBack",
-                    style: theme
-                        .getStyle()
-                        .copyWith(color: Colors.white, fontSize: 18),
-                  ).tr(),
-                ),
-              ),
-            divider(height: _loggedIn ? 200 : 8),
-            if (_loggedIn)
-              Align(
-                  alignment: Alignment.center,
-                  child: SizedBox(
-                      width: 100,
-                      height: 100,
-                      child: CircularProgressIndicator(
-                        color: theme.getSecondaryColor(),
-                      ))),
-            if (!_loggedIn)
-              Padding(
-                padding:
-                    const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0),
-                child: Container(
-                  width: double.infinity,
-                  decoration: theme.getCredentialsContentDecoration(),
-                  child: Padding(
-                    padding: EdgeInsets.all(30),
-                    child: Column(
-                      children: <Widget>[
-                        SizedBox(height: 30),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                            boxShadow: [
-                              BoxShadow(
-                                color: theme.getSecondaryColor(),
-                                blurRadius: 20,
-                                offset: Offset(0, 10),
+      backgroundColor: Colors.white,
+      body: SizedBox(
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            Container(
+              width: smallScreen ? null : credScreenWidth,
+              //height: MediaQuery.of(context).size.height,
+              decoration: theme.getCredentialsPageDecoration(),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  SizedBox(height: 100, child: logo),
+                  if (!_loggedIn)
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20.0),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "login",
+                          style: theme.getStyle().copyWith(
+                                color: theme.getPrimaryColor(),
+                                fontSize: 30,
+                                fontWeight: FontWeight.bold,
                               ),
-                            ],
-                          ),
+                        ).tr(),
+                      ),
+                    ),
+                  if (!_loggedIn)
+                    Padding(
+                      padding: const EdgeInsets.only(left: 20.0, top: 4),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          "welcomeBack",
+                          style: theme.getStyle().copyWith(
+                              color: theme.getPrimaryColor(), fontSize: 18),
+                        ).tr(),
+                      ),
+                    ),
+                  divider(height: _loggedIn ? 200 : 8),
+                  if (_loggedIn)
+                    Align(
+                        alignment: Alignment.center,
+                        child: SizedBox(
+                            width: 100,
+                            height: 100,
+                            child: CircularProgressIndicator(
+                              color: theme.getSecondaryColor(),
+                            ))),
+                  if (!_loggedIn)
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          left: 8.0, right: 8.0, bottom: 8.0),
+                      child: Container(
+                        width: double.infinity,
+                        decoration: theme.getCredentialsContentDecoration(),
+                        child: Padding(
+                          padding: EdgeInsets.all(30),
                           child: Column(
                             children: <Widget>[
-                              EmailField(
-                                controller: _userController,
-                                onChanged: (value) async {
-                                  String password =
-                                      await TwinHelper.getStoredPassword(
-                                          _userController.text.trim());
-                                  setState(() {
-                                    _hasEmail = true;
-                                    if (password.isNotEmpty) {
-                                      _passwordController.text = password;
-                                    }
-                                  });
-                                },
-                              ),
-                              PasswordField(
-                                onSubmitted: (!_hasEmail || !_hasPassword)
-                                    ? null
-                                    : (value) {
-                                        _doLogin();
+                              SizedBox(height: 30),
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(10),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: theme.getSecondaryColor(),
+                                      blurRadius: 20,
+                                      offset: Offset(0, 10),
+                                    ),
+                                  ],
+                                ),
+                                child: Column(
+                                  children: <Widget>[
+                                    EmailField(
+                                      controller: _userController,
+                                      onChanged: (value) async {
+                                        String password =
+                                            await TwinHelper.getStoredPassword(
+                                                _userController.text.trim());
+                                        setState(() {
+                                          _hasEmail = true;
+                                          if (password.isNotEmpty) {
+                                            _passwordController.text = password;
+                                          }
+                                        });
                                       },
-                                controller: _passwordController,
-                                onChanged: (value) {
-                                  setState(() {
-                                    _hasPassword = _passwordController.text
-                                        .trim()
-                                        .isNotEmpty;
-                                  });
-                                },
+                                    ),
+                                    PasswordField(
+                                      onSubmitted: (!_hasEmail || !_hasPassword)
+                                          ? null
+                                          : (value) {
+                                              _doLogin();
+                                            },
+                                      controller: _passwordController,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _hasPassword = _passwordController
+                                              .text
+                                              .trim()
+                                              .isNotEmpty;
+                                        });
+                                      },
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 20),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            InkWell(
-                              onTap: () {
-                                setState(() {
-                                  _rememberMe = !_rememberMe;
-                                });
-                              },
-                              child: Row(
+                              SizedBox(height: 20),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Checkbox(
-                                    value: _rememberMe,
-                                    onChanged: (value) {
+                                  InkWell(
+                                    onTap: () {
                                       setState(() {
-                                        _rememberMe = value!;
+                                        _rememberMe = !_rememberMe;
                                       });
                                     },
+                                    child: Row(
+                                      children: [
+                                        Checkbox(
+                                          value: _rememberMe,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              _rememberMe = value!;
+                                            });
+                                          },
+                                        ),
+                                        Text(
+                                          'rememberMe',
+                                          style: theme
+                                              .getStyle()
+                                              .copyWith(fontSize: 14),
+                                        ).tr(),
+                                      ],
+                                    ),
                                   ),
-                                  Text(
-                                    'rememberMe',
-                                    style:
-                                        theme.getStyle().copyWith(fontSize: 14),
-                                  ).tr(),
+                                  BusyIndicator(),
+                                  PrimaryTextButton(
+                                    labelKey: 'forgotPassword',
+                                    onPressed: () {
+                                      context.push(Routes.forgot);
+                                    },
+                                  ),
                                 ],
                               ),
-                            ),
-                            BusyIndicator(),
-                            PrimaryTextButton(
-                              labelKey: 'forgotPassword',
-                              onPressed: () {
-                                context.push(Routes.forgot);
-                              },
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 30),
-                        PrimaryButton(
-                          labelKey: 'login',
-                          minimumSize: Size(400, 50),
-                          onPressed: (!_hasEmail || !_hasPassword)
-                              ? null
-                              : () {
-                                  _doLogin();
-                                },
-                        ),
-                        const SizedBox(height: 10),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              "noAccountYet",
-                              style: theme.getStyle().copyWith(),
-                            ).tr(),
-                            PrimaryTextButton(
-                              labelKey: 'signUp',
-                              onPressed: () {
-                                GoRouter.of(context).push(Routes.signup);
-                              },
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 50),
-                        Align(
-                          alignment: Alignment.bottomRight,
-                          child: Wrap(
-                            spacing: 10,
-                            crossAxisAlignment: WrapCrossAlignment.center,
-                            children: [
-                              Text(
-                                "Powered By",
-                                style: theme.getStyle().copyWith(
-                                      color: Colors.black,
-                                      fontSize: 16,
-                                    ),
+                              SizedBox(height: 30),
+                              PrimaryButton(
+                                labelKey: 'login',
+                                minimumSize: Size(400, 50),
+                                onPressed: (!_hasEmail || !_hasPassword)
+                                    ? null
+                                    : () {
+                                        _doLogin();
+                                      },
                               ),
-                              poweredBy,
+                              const SizedBox(height: 10),
+                              if (_canSignUp)
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "noAccountYet",
+                                      style: theme.getStyle().copyWith(),
+                                    ).tr(),
+                                    PrimaryTextButton(
+                                      labelKey: 'signUp',
+                                      onPressed: () {
+                                        GoRouter.of(context)
+                                            .push(Routes.signup);
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              SizedBox(height: 50),
+                              Align(
+                                alignment: Alignment.bottomRight,
+                                child: Wrap(
+                                  spacing: 10,
+                                  crossAxisAlignment: WrapCrossAlignment.center,
+                                  children: [
+                                    Text(
+                                      "Powered By",
+                                      style: theme.getStyle().copyWith(
+                                            color: Colors.black,
+                                            fontSize: 16,
+                                          ),
+                                    ),
+                                    poweredBy,
+                                  ],
+                                ),
+                              ),
                             ],
                           ),
                         ),
-                      ],
+                      ),
                     ),
-                  ),
-                ),
+                ],
               ),
+            ),
           ],
         ),
       ),

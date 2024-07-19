@@ -12,6 +12,8 @@ import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/pages/admin/clients.dart';
 import 'package:twin_app/pages/admin/users.dart';
 import 'package:twin_app/router.dart';
+import 'package:twin_app/widgets/client_snippet.dart';
+import 'package:twin_app/widgets/notifications.dart';
 import 'package:twin_app/widgets/page_conditions.dart';
 import 'package:twin_app/widgets/profile_info_screen.dart';
 import 'package:twin_commons/core/base_state.dart';
@@ -25,6 +27,7 @@ import 'package:uuid/uuid.dart';
 const List<Locale> locales = [Locale("en", "US"), Locale("ta", "IN")];
 
 enum TwinAppMenu {
+  myNotifications,
   myEvents,
   myProfile,
   myConditions,
@@ -43,7 +46,7 @@ List<BottomMenuItem> _adminBottomMenus({
         icon: Icon(Icons.person, size: 30),
         label: 'Users',
       ),
-    if (clients)
+    if (clients && TwinnedSession.instance.isAdmin())
       const BottomMenuItem(
         id: TwinAppMenu.adminClients,
         icon: Icon(Icons.group, size: 30),
@@ -144,7 +147,16 @@ class _TwinAppState extends State<TwinApp> {
 
   @override
   Widget build(BuildContext context) {
-    buildLandingPages(context);
+    List<Widget>? pages;
+
+    if (null != buildLandingPages) {
+      pages = buildLandingPages!(context);
+    }
+
+    if (null != pages) {
+      landingPages.clear();
+      landingPages.addAll(pages);
+    }
 
     if (kIsWeb) {
       smallScreen = false;
@@ -182,6 +194,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
   tapi.TwinUser? user;
   int _selectedClient = -1;
   bool firstTime = true;
+  late StreamAuth auth;
   GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   @override
@@ -299,6 +312,10 @@ class HomeScreenState extends BaseState<HomeScreen> {
 
     if (id is TwinAppMenu) {
       switch (id) {
+        case TwinAppMenu.myNotifications:
+          selectedMenuTitle = 'My Notifications';
+          body = AlarmsNotificationsGrid();
+          break;
         case TwinAppMenu.myEvents:
           selectedMenuTitle = 'My Events';
           body = ProfileInfoScreen(
@@ -370,11 +387,34 @@ class HomeScreenState extends BaseState<HomeScreen> {
       );
     }
 
-    final StreamAuth auth = StreamAuthScope.of(context);
+    auth = StreamAuthScope.of(context);
 
     _initMenus();
 
     if (null != user) {
+      _sideMenus.add(ListTile(
+        leading: Icon(
+          Icons.notification_add,
+          color: selectedMenu == TwinAppMenu.myNotifications
+              ? Colors.white
+              : theme.getPrimaryColor(),
+        ),
+        title: Text(
+          'My Notifications',
+          style: theme.getStyle().copyWith(
+              color: selectedMenu == TwinAppMenu.myNotifications
+                  ? Colors.white
+                  : null,
+              fontWeight: selectedMenu == TwinAppMenu.myNotifications
+                  ? FontWeight.bold
+                  : null),
+        ),
+        selected: selectedMenu == TwinAppMenu.myNotifications,
+        selectedTileColor: theme.getIntermediateColor(),
+        onTap: () {
+          showScreen(TwinAppMenu.myNotifications);
+        },
+      ));
       _sideMenus.add(ListTile(
         leading: Icon(
           Icons.event_available,
@@ -396,7 +436,6 @@ class HomeScreenState extends BaseState<HomeScreen> {
           showScreen(TwinAppMenu.myEvents);
         },
       ));
-
       _sideMenus.add(ListTile(
         leading: Icon(
           Icons.person,
@@ -420,72 +459,75 @@ class HomeScreenState extends BaseState<HomeScreen> {
         },
       ));
 
-      _sideMenus.add(ExpansionTile(
-        title: Text(
-          'Admin',
-          style: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
-        ),
-        leading: Icon(
-          Icons.shield,
-          color: theme.getPrimaryColor(),
-        ),
-        initiallyExpanded: (selectedMenu == TwinAppMenu.adminUsers ||
-            selectedMenu == TwinAppMenu.adminClients),
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 16.0),
-            child: ListTile(
-              leading: Icon(
-                Icons.person,
-                color: selectedMenu == TwinAppMenu.adminUsers
-                    ? Colors.white
-                    : theme.getPrimaryColor(),
-              ),
-              title: Text(
-                'Users',
-                style: theme.getStyle().copyWith(
-                    color: selectedMenu == TwinAppMenu.adminUsers
-                        ? Colors.white
-                        : null,
-                    fontWeight: selectedMenu == TwinAppMenu.adminUsers
-                        ? FontWeight.bold
-                        : null),
-              ),
-              selected: selectedMenu == TwinAppMenu.adminUsers,
-              selectedTileColor: theme.getIntermediateColor(),
-              onTap: () {
-                showScreen(TwinAppMenu.adminUsers);
-              },
-            ),
+      if (TwinnedSession.instance.isAdmin() ||
+          TwinnedSession.instance.isClientAdmin())
+        _sideMenus.add(ExpansionTile(
+          title: Text(
+            'Admin',
+            style: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
           ),
-          Padding(
-            padding: const EdgeInsets.only(left: 16.0),
-            child: ListTile(
-              leading: Icon(
-                Icons.group,
-                color: selectedMenu == TwinAppMenu.adminClients
-                    ? Colors.white
-                    : theme.getPrimaryColor(),
+          leading: Icon(
+            Icons.shield,
+            color: theme.getPrimaryColor(),
+          ),
+          initiallyExpanded: (selectedMenu == TwinAppMenu.adminUsers ||
+              selectedMenu == TwinAppMenu.adminClients),
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 16.0),
+              child: ListTile(
+                leading: Icon(
+                  Icons.person,
+                  color: selectedMenu == TwinAppMenu.adminUsers
+                      ? Colors.white
+                      : theme.getPrimaryColor(),
+                ),
+                title: Text(
+                  'Users',
+                  style: theme.getStyle().copyWith(
+                      color: selectedMenu == TwinAppMenu.adminUsers
+                          ? Colors.white
+                          : null,
+                      fontWeight: selectedMenu == TwinAppMenu.adminUsers
+                          ? FontWeight.bold
+                          : null),
+                ),
+                selected: selectedMenu == TwinAppMenu.adminUsers,
+                selectedTileColor: theme.getIntermediateColor(),
+                onTap: () {
+                  showScreen(TwinAppMenu.adminUsers);
+                },
               ),
-              title: Text(
-                'Clients',
-                style: theme.getStyle().copyWith(
+            ),
+            if (TwinnedSession.instance.isAdmin())
+              Padding(
+                padding: const EdgeInsets.only(left: 16.0),
+                child: ListTile(
+                  leading: Icon(
+                    Icons.group,
                     color: selectedMenu == TwinAppMenu.adminClients
                         ? Colors.white
-                        : null,
-                    fontWeight: selectedMenu == TwinAppMenu.adminClients
-                        ? FontWeight.bold
-                        : null),
+                        : theme.getPrimaryColor(),
+                  ),
+                  title: Text(
+                    'Clients',
+                    style: theme.getStyle().copyWith(
+                        color: selectedMenu == TwinAppMenu.adminClients
+                            ? Colors.white
+                            : null,
+                        fontWeight: selectedMenu == TwinAppMenu.adminClients
+                            ? FontWeight.bold
+                            : null),
+                  ),
+                  selected: selectedMenu == TwinAppMenu.adminClients,
+                  selectedTileColor: theme.getIntermediateColor(),
+                  onTap: () {
+                    showScreen(TwinAppMenu.adminClients);
+                  },
+                ),
               ),
-              selected: selectedMenu == TwinAppMenu.adminClients,
-              selectedTileColor: theme.getIntermediateColor(),
-              onTap: () {
-                showScreen(TwinAppMenu.adminClients);
-              },
-            ),
-          ),
-        ],
-      ));
+          ],
+        ));
 
       _sideMenus.add(ExpansionTile(
         title: Text(
@@ -542,6 +584,9 @@ class HomeScreenState extends BaseState<HomeScreen> {
           setState(() {
             user = null;
           });
+          _selectedClient = -1;
+          selectedMenu = homeMenu;
+          selectedMenuTitle = '';
           auth.signOut();
         },
       ));
@@ -583,6 +628,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
         ],
       ),
       drawer: Drawer(
+        key: Key(Uuid().v4()),
         elevation: 5,
         semanticLabel: 'Main menu',
         child: Column(
@@ -597,23 +643,54 @@ class HomeScreenState extends BaseState<HomeScreen> {
                 ),
                 child: Row(
                   children: [
-                    Text(
-                      _selectedClient == -1
-                          ? appTitle
-                          : '${_clients[_selectedClient].name}',
-                      style: theme.getStyle().copyWith(
-                          color: Colors.white,
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    if (_selectedClient >= 0 &&
-                        null != _clients[_selectedClient].icon &&
-                        _clients[_selectedClient].icon!.isNotEmpty)
-                      SizedBox(
-                          width: 185,
-                          height: 100,
-                          child: TwinImageHelper.getDomainImage(
-                              _clients[_selectedClient].icon!)),
+                    if (_selectedClient == -1)
+                      Text(
+                        appTitle,
+                        style: theme.getStyle().copyWith(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    if (_selectedClient != -1)
+                      Wrap(
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        spacing: 5,
+                        children: [
+                          if (null != _clients[_selectedClient].icon &&
+                              _clients[_selectedClient].icon!.isNotEmpty)
+                            SizedBox(
+                                //width: 280,
+                                height: 64,
+                                child: TwinImageHelper.getDomainImage(
+                                    _clients[_selectedClient].icon!)),
+                          SizedBox(
+                            width: 160,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  '${_clients[_selectedClient].name}',
+                                  style: theme.getStyle().copyWith(
+                                      overflow: TextOverflow.ellipsis,
+                                      color: Colors.white,
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                if (TwinnedSession.instance.isClientAdmin())
+                                  IconButton(
+                                      onPressed: () {
+                                        _editClient(
+                                            client: _clients[_selectedClient]);
+                                      },
+                                      icon: Icon(
+                                        Icons.edit,
+                                        color: Colors.white,
+                                      )),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                   ],
                 ),
               ),
@@ -658,15 +735,28 @@ class HomeScreenState extends BaseState<HomeScreen> {
     return widget;
   }
 
+  Future _load() async {
+    if (loading) return;
+    loading = true;
+
+    _clients.clear();
+
+    await execute(() async {
+      user = await TwinnedSession.instance.getUser();
+      var clients = await TwinnedSession.instance.getClients();
+      _clients.addAll(clients);
+      if (_clients.isNotEmpty) {
+        _selectedClient = 0;
+      }
+    });
+
+    loading = false;
+    refresh();
+  }
+
   @override
   void setup() async {
-    user = await TwinnedSession.instance.getUser();
-    var clients = await TwinnedSession.instance.getClients();
-    _clients.addAll(clients);
-    if (_clients.isNotEmpty) {
-      _selectedClient = 0;
-    }
-    refresh();
+    _load();
   }
 
   Future _openDrawer() async {
@@ -674,6 +764,22 @@ class HomeScreenState extends BaseState<HomeScreen> {
     await Future.delayed(Duration.zero);
     _scaffoldKey.currentState!.openDrawer();
     firstTime = false;
+  }
+
+  void _editClient({required tapi.Client client}) async {
+    closeDrawer();
+    ValueNotifier<tapi.Client> valueNotifier = ValueNotifier(client);
+    valueNotifier.addListener(() {
+      auth.signOut();
+    });
+    await super.alertDialog(
+        title: 'Update ${client.name}',
+        body: ClientSnippet(
+          client: client,
+          changeNotifier: valueNotifier,
+        ),
+        width: 750,
+        height: MediaQuery.of(context).size.height - 150);
   }
 }
 

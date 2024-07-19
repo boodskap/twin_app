@@ -12,7 +12,8 @@ import 'package:uuid/uuid.dart';
 
 class ClientSnippet extends StatefulWidget {
   final twinned.Client? client;
-  const ClientSnippet({super.key, this.client});
+  final ValueNotifier<twinned.Client>? changeNotifier;
+  const ClientSnippet({super.key, this.client, this.changeNotifier});
 
   @override
   State<ClientSnippet> createState() => _ClientSnippetState();
@@ -300,6 +301,9 @@ class _ClientSnippetState extends BaseState<ClientSnippet> {
           if (!silent) {
             _close();
             alert('Success', 'Client ${_client.name} updated successfully');
+          }
+          if (null != widget.changeNotifier) {
+            widget.changeNotifier!.value = uRes.body!.entity!;
           }
         }
       }

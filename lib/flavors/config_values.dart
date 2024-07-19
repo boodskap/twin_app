@@ -19,6 +19,8 @@ class ConfigValues {
   final String emailSubject;
   final String activationTemplate;
   final String resetPswdTemplate;
+  final bool loadLandingPages;
+  final bool signUpAsClient;
 
   const ConfigValues({
     required this.showLogs,
@@ -33,6 +35,8 @@ class ConfigValues {
     required this.emailSubject,
     required this.activationTemplate,
     required this.resetPswdTemplate,
+    required this.loadLandingPages,
+    this.signUpAsClient = false,
   });
 
   static ConfigValues fromEnvironment() {
@@ -50,6 +54,11 @@ class ConfigValues {
     String emailSubject = dotenv.env["EMAIL_SUBJECT"]!;
     String activationTemplate = dotenv.env["ACTIVATION_TEMPLATE"]!;
     String resetPswdTemplate = dotenv.env["RESET_PSWD_TEMPLATE"]!;
+    bool loadLandingPages = bool.parse(
+        dotenv.env['LOAD_LANDING_PAGES'] ?? 'true',
+        caseSensitive: false);
+    bool signUpAsClient = bool.parse(dotenv.env['SIGNUP_AS_CLIENT'] ?? 'false',
+        caseSensitive: false);
 
     debugPrint(
         'N_DKEY: $noCodeDomainKey, T_DKEY $twinDomainKey, T_CID: $twinClientId');
@@ -67,6 +76,8 @@ class ConfigValues {
       emailSubject: emailSubject,
       activationTemplate: activationTemplate,
       resetPswdTemplate: resetPswdTemplate,
+      loadLandingPages: loadLandingPages,
+      signUpAsClient: signUpAsClient,
     );
   }
 }
