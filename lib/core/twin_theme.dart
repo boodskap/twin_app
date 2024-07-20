@@ -35,7 +35,7 @@ class TwinTheme {
     return BoxDecoration(
       gradient: LinearGradient(
         colors: colors,
-        stops: [0, 0.5, 0.75, 1],
+        stops: [0.08, 0.5, 0.75, 1],
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
       ),
@@ -56,19 +56,19 @@ class TwinTheme {
 
 final List<TwinTheme> themes = [
   TwinTheme(name: 'Aqua', fontFamily: 'Roboto Condensed', colors: [
-    Color(0xffD0EEEC),
-    Color(0xff14aaa2),
-    Color(0xff1b8a9d),
-    Color(0xff1d6095),
+    Color(0xFFFFFFFF),
+    Color(0xFF90E0EF),
+    Color(0xFF00B4D8),
+    Color(0xFF0077B6),
   ]),
   TwinTheme(name: 'Pinky', fontFamily: 'Open Sans', colors: [
-    Color(0xffF6A5A2),
+    Color(0xFFFFFFFF),
     Color(0xffF6878F),
     Color(0xffEE6E7D),
     Color(0xffE0475D),
   ]),
   TwinTheme(name: 'Ocean', fontFamily: 'Roboto', colors: [
-    Color(0xffD1D08B),
+    Color(0xFFFFFFFF),
     Color(0xffD1DA2E),
     Color(0xff9ABC38),
     Color(0xff175A50),

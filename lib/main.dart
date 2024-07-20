@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:twin_app/core/session_variables.dart' as session;
-import 'package:flutter_native_splash/flutter_native_splash.dart';
+//import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:twin_app/core/twin_helper.dart';
 import 'package:twin_commons/core/twinned_session.dart';
 import 'package:verification_api/api/verification.swagger.dart' as vapi;
@@ -14,7 +14,9 @@ import 'flavors/flavor_config.dart';
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
 
-  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  if (!kIsWeb) {
+    //FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+  }
 
   start(
     appTitle: 'My Twin App',

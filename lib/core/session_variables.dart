@@ -11,7 +11,7 @@ typedef BuildLandingPages = List<Widget>? Function(BuildContext context);
 typedef PostLoginHook = Future Function();
 typedef PostSignUpHook = Future Function(vapi.VerificationRes res);
 
-TwinTheme theme = themes[2];
+TwinTheme theme = themes[0];
 
 final Image logo = Image.asset(
   "assets/images/icon.png",
@@ -19,9 +19,10 @@ final Image logo = Image.asset(
   fit: BoxFit.contain,
 );
 
-final Image poweredBy = Image.asset(
-  "assets/images/poweredby.png",
+final Image poweredBy = Image.network(
+  "https://static.boodskap.io/logos/logo.png",
   width: 150,
+  fit: BoxFit.contain,
 );
 
 final Map<String, dynamic> localVariables = <String, dynamic>{};
