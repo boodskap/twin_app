@@ -308,6 +308,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
     closeDrawer();
 
     pageBottomMenus.clear();
+    bottomMenuIndex = 0;
     selectedMenu = id;
 
     if (id is TwinAppMenu) {
