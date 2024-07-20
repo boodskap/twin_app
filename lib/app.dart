@@ -18,8 +18,8 @@ import 'package:twin_app/widgets/page_conditions.dart';
 import 'package:twin_app/widgets/profile_info_screen.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/twin_image_helper.dart';
-import '/foundation/logger/logger.dart';
-import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:twin_app/foundation/logger/logger.dart';
+//import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:twin_commons/core/twinned_session.dart';
 import 'package:twinned_api/twinned_api.dart' as tapi;
 import 'package:uuid/uuid.dart';
@@ -142,7 +142,9 @@ class _TwinAppState extends State<TwinApp> {
     // the splash screen is displayed.  Remove the following example because
     // delaying the user experience is a bad design practice!
     // ignore_for_file: avoid_print
-    FlutterNativeSplash.remove();
+    if (!kIsWeb) {
+      //FlutterNativeSplash.remove();
+    }
   }
 
   @override
