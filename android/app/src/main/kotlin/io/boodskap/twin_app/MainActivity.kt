@@ -1,4 +1,4 @@
-package digital.twinned.twin_app
+package io.boodskap.twin_app
 
 import io.flutter.embedding.android.FlutterActivity
 

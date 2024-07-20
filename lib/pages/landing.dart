@@ -34,6 +34,9 @@ class _LandingPageState extends BaseState<LandingPage> {
     if (loading) return;
     loading = true;
 
+    if (config.twinDomainKey == null || config.twinDomainKey!.trim().isEmpty)
+      return;
+
     await execute(() async {
       var res = await TwinnedSession.instance.twin
           .getTwinSysInfo(domainKey: config.twinDomainKey);
