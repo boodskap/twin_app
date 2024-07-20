@@ -60,9 +60,15 @@ void start({
 
   debugPrint('ENV FILE: $envFile');
 
-  await dotenv.load(
-    fileName: envFile,
-  );
+  if (kIsWeb) {
+    await dotenv.load(
+      fileName: envFile,
+    );
+  } else {
+    await dotenv.load(
+      fileName: 'assets/$envFile',
+    );
+  }
 
   FlavorConfig.initialize(flavorString: session.flavor);
 
