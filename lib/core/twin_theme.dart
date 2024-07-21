@@ -28,7 +28,8 @@ class TwinTheme {
   }
 
   TextStyle getStyle() {
-    return GoogleFonts.getFont(fontFamily);
+    return GoogleFonts.getFont(fontFamily)
+        .copyWith(overflow: TextOverflow.ellipsis);
   }
 
   Decoration getCredentialsPageDecoration() {

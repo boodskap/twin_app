@@ -26,6 +26,8 @@ dependencies:
   pinput: ^4.0.0
   flutter_displaymode: ^0.6.0
   get_it: ^7.2.0
+  flutter_native_splash: ^2.4.1
+  font_awesome_flutter: ^10.7.0
   #flutter_native_splash: ^2.4.0
 
 dev_dependencies:
