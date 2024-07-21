@@ -252,21 +252,18 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
         child: DefaultTabController(
           length: 3,
           child: Scaffold(
+            backgroundColor: Colors.white,
             appBar: AppBar(
-              backgroundColor: const Color(0xFFACD0EC),
-              title: Text(
-                'Profile',
-                style: theme.getStyle().copyWith(fontSize: 20),
-              ),
+              backgroundColor: Colors.white,
               bottom: TabBar(
                 labelColor: const Color(0xFF245f96),
                 unselectedLabelColor: const Color(0xFF245f96),
                 labelStyle: theme.getStyle().copyWith(
-                      fontSize: 18.0,
+                      fontSize: smallScreen ? 14 : 18.0,
                       fontWeight: FontWeight.bold,
                     ),
                 unselectedLabelStyle: theme.getStyle().copyWith(
-                      fontSize: 18.0,
+                      fontSize: smallScreen ? 14 : 18.0,
                       fontWeight: FontWeight.bold,
                     ),
                 controller: _tabController,
@@ -404,109 +401,60 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
                           ],
                         ),
                       ),
-                      divider(height: 10),
-                      Expanded(
-                        flex: 25,
-                        child: Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(8),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.2),
-                                spreadRadius: 2,
-                                blurRadius: 10,
-                                offset: const Offset(0, 3),
-                              ),
-                            ],
-                          ),
-                          child: Card(
-                            color: Colors.transparent,
-                            elevation: 0,
-                            child: Row(
-                              children: [
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Padding(
-                                          padding: EdgeInsets.all(8.0),
-                                          child: Text(
-                                            "Roles ",
-                                            style: theme.getStyle().copyWith(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                        ),
-                                        Wrap(
-                                          spacing: 8.0,
-                                          children: roleNames.map((role) {
-                                            return Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Chip(
-                                                label: Text(
-                                                  role,
-                                                  style: theme.getStyle(),
-                                                ),
-                                                backgroundColor:
-                                                    Colors.grey[300],
-                                              ),
-                                            );
-                                          }).toList(),
-                                        ),
-                                      ],
-                                    ),
-                                    Row(
-                                      children: [
-                                        Padding(
-                                          padding: EdgeInsets.all(8.0),
-                                          child: Text("Clients ",
-                                              style: theme.getStyle().copyWith(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold)),
-                                        ),
-                                        Wrap(
-                                          spacing: 8.0,
-                                          children: clients.map((name) {
-                                            return Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Chip(
-                                                label: Text(
-                                                  name,
-                                                  style: theme.getStyle(),
-                                                ),
-                                                backgroundColor:
-                                                    Colors.grey[300],
-                                              ),
-                                            );
-                                          }).toList(),
-                                        ),
-                                      ],
-                                    )
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
                     ],
                   ),
                 ),
-                const Padding(
+                Padding(
                   padding: EdgeInsets.all(8.0),
                   child: Center(
-                    child: ChangePasswordSnippet(),
+                    child: Column(
+                      children: [
+                        CircleAvatar(
+                          radius: 35,
+                          child: Text(
+                            initials,
+                            style: theme.getStyle().copyWith(fontSize: 24),
+                          ),
+                        ),
+                        divider(),
+                        const SizedBox(height: 8),
+                        Text(
+                          _nameController.text,
+                          style: theme.getStyle().copyWith(
+                              fontSize: 14, fontWeight: FontWeight.bold),
+                        ),
+                        divider(
+                          height: 15,
+                        ),
+                        ChangePasswordSnippet(),
+                      ],
+                    ),
                   ),
                 ),
-                const Padding(
+                Padding(
                   padding: EdgeInsets.all(8.0),
-                  child: Center(child: SubscriptionsPage()),
+                  child: Column(
+                    children: [
+                      CircleAvatar(
+                        radius: 35,
+                        child: Text(
+                          initials,
+                          style: theme.getStyle().copyWith(fontSize: 24),
+                        ),
+                      ),
+                      divider(),
+                      const SizedBox(height: 8),
+                      Text(
+                        _nameController.text,
+                        style: theme.getStyle().copyWith(
+                            fontSize: 14, fontWeight: FontWeight.bold),
+                      ),
+                      divider(
+                        height: 15,
+                      ),
+                      Center(child: SubscriptionsPage()),
+                    ],
+                  ),
                 ),
               ],
             ),

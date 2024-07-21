@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:twin_app/app.dart';
 import 'package:twin_app/core/twin_theme.dart';
 import 'package:twin_app/flavors/config_values.dart';
+import 'package:twin_app/router.dart';
 import 'package:verification_api/api/verification.swagger.dart' as vapi;
 import 'package:twinned_api/api/twinned.swagger.dart' as tapi;
 
-typedef OnMenuSelected = Widget Function(dynamic id);
-typedef IsMenuVisible = bool Function(dynamic id);
+typedef OnMenuSelected = Widget Function(BuildContext context);
+typedef IsMenuVisible = bool Function();
 typedef BuildLandingPages = List<Widget>? Function(BuildContext context);
 typedef PostLoginHook = Future Function();
 typedef PostSignUpHook = Future Function(vapi.VerificationRes res);
@@ -37,17 +38,13 @@ double credScreenWidth = 450;
 final String defaultFont = 'Open Sans';
 final List<TwinMenuItem> menuItems = [];
 String appTitle = 'My Digital Twin App';
-final Map<dynamic, List<BottomMenuItem>> bottomMenus =
-    <dynamic, List<BottomMenuItem>>{};
 final List<BottomMenuItem> pageBottomMenus = [];
-late OnMenuSelected onMenuSelected;
-late IsMenuVisible isMenuVisible;
 BuildLandingPages? buildLandingPages;
 dynamic homeMenu = 'HOME';
 dynamic selectedMenu = homeMenu;
 String selectedMenuTitle = '';
 int bottomMenuIndex = 0;
-String flavor = "dev";
+String flavor = "prod";
 bool setDrawerOpen = false;
 PostLoginHook? postLoginHook;
 PostSignUpHook? postSignUpHook;
@@ -56,18 +53,28 @@ class TwinMenuItem {
   TwinMenuItem({
     required this.id,
     required this.text,
+    required this.isMenuVisible,
+    required this.onMenuSelected,
     this.badgeCount,
     this.icon,
     this.iconImage,
-    required this.onPressed,
-    this.subItems,
+    this.subItems = const [],
+    this.bottomMenus = const [],
   });
 
   final dynamic id;
   final String text;
+  final List<TwinMenuItem> subItems;
+  final List<BottomMenuItem> bottomMenus;
+  final IsMenuVisible isMenuVisible;
+  final OnMenuSelected onMenuSelected;
   int? badgeCount;
   IconData? icon;
   ImageProvider? iconImage;
-  final Function onPressed;
-  List<TwinMenuItem>? subItems;
+
+  void onPressed() {
+    if (bottomMenus.isEmpty) {
+      application.currentState!.showScreen(id);
+    }
+  }
 }

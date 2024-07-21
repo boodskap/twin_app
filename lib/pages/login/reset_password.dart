@@ -95,7 +95,7 @@ class _ResetPasswordMobilePageState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: true,
+      resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
       body: SizedBox(
         width: MediaQuery.of(context).size.width,

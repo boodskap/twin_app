@@ -223,127 +223,151 @@ class _SubscriptionsPageState extends BaseState<SubscriptionsPage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Padding(
-            padding: const EdgeInsets.all(0.0),
-            child: Padding(
-              padding: const EdgeInsets.only(left: 60.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            er.event!.name.toString(),
-                            style: theme.getStyle().copyWith(
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 18,
-                                ),
+            padding: const EdgeInsets.only(left: 10.0),
+            child: Column(
+              children: [
+                if (smallScreen)
+                  Align(
+                    alignment: Alignment.topLeft,
+                    child: Text(
+                      er.event!.name.toString(),
+                      style: theme.getStyle().copyWith(
+                            fontWeight: FontWeight.w500,
+                            fontSize: smallScreen ? 14 : 18,
                           ),
-                        ),
-                        Text('Email', style: theme.getStyle()),
-                        const SizedBox(width: 10),
-                        Checkbox(
-                          value: email,
-                          onChanged: (value) {
-                            setState(() {
-                              email = value!;
-                            });
-
-                            bool isNotEmpty = email || sms || voice;
-
-                            if (isNotEmpty) {
-                              _upsertEventRegistration(
-                                'email',
-                                email,
-                                er.eventRegistration!.id,
-                                er.event!.id,
-                                er.eventRegistration!,
-                              );
-                            } else {
-                              _removeEventRegistration(
-                                  er.eventRegistration!.id);
-                            }
-                          },
-                        ),
-                      ],
                     ),
                   ),
-                  Expanded(
-                    flex: 1,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'SMS',
-                          style: theme.getStyle(),
+                Row(
+                  children: [
+                    if (!smallScreen)
+                      Expanded(
+                        flex: 2,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                er.event!.name.toString(),
+                                style: theme.getStyle().copyWith(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: smallScreen ? 14 : 18,
+                                    ),
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 10),
-                        Checkbox(
-                          value: sms,
-                          onChanged: (value) {
-                            setState(() {
-                              sms = value!;
-                            });
+                      ),
+                    Expanded(
+                      flex: 1,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Email',
+                            style: theme.getStyle(),
+                          ),
+                          const SizedBox(width: 10),
+                          Checkbox(
+                            value: email,
+                            onChanged: (value) {
+                              setState(() {
+                                email = value!;
+                              });
 
-                            bool isNotEmpty = email || sms || voice;
+                              bool isNotEmpty = email || sms || voice;
 
-                            if (isNotEmpty) {
-                              _upsertEventRegistration(
-                                'sms',
-                                sms,
-                                er.eventRegistration!.id,
-                                er.event!.id,
-                                er.eventRegistration!,
-                              );
-                            } else {
-                              _removeEventRegistration(
-                                  er.eventRegistration!.id);
-                            }
-                          },
-                        ),
-                      ],
+                              if (isNotEmpty) {
+                                _upsertEventRegistration(
+                                  'email',
+                                  email,
+                                  er.eventRegistration!.id,
+                                  er.event!.id,
+                                  er.eventRegistration!,
+                                );
+                              } else {
+                                _removeEventRegistration(
+                                    er.eventRegistration!.id);
+                              }
+                            },
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Voice',
-                          style: theme.getStyle(),
-                        ),
-                        const SizedBox(width: 10),
-                        Checkbox(
-                          value: voice,
-                          onChanged: (value) {
-                            setState(() {
-                              voice = value!;
-                            });
+                    Expanded(
+                      flex: 1,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'SMS',
+                            style: theme.getStyle(),
+                          ),
+                          const SizedBox(width: 10),
+                          Checkbox(
+                            value: sms,
+                            onChanged: (value) {
+                              setState(() {
+                                sms = value!;
+                              });
 
-                            bool isNotEmpty = email || sms || voice;
+                              bool isNotEmpty = email || sms || voice;
 
-                            if (isNotEmpty) {
-                              _upsertEventRegistration(
-                                'voice',
-                                voice,
-                                er.eventRegistration!.id,
-                                er.event!.id,
-                                er.eventRegistration!,
-                              );
-                            } else {
-                              _removeEventRegistration(
-                                  er.eventRegistration!.id);
-                            }
-                          },
-                        ),
-                      ],
+                              if (isNotEmpty) {
+                                _upsertEventRegistration(
+                                  'sms',
+                                  sms,
+                                  er.eventRegistration!.id,
+                                  er.event!.id,
+                                  er.eventRegistration!,
+                                );
+                              } else {
+                                _removeEventRegistration(
+                                    er.eventRegistration!.id);
+                              }
+                            },
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
+                    Expanded(
+                      flex: 1,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Voice',
+                            style: theme.getStyle(),
+                          ),
+                          const SizedBox(width: 10),
+                          Checkbox(
+                            value: voice,
+                            onChanged: (value) {
+                              setState(() {
+                                voice = value!;
+                              });
+
+                              bool isNotEmpty = email || sms || voice;
+
+                              if (isNotEmpty) {
+                                _upsertEventRegistration(
+                                  'voice',
+                                  voice,
+                                  er.eventRegistration!.id,
+                                  er.event!.id,
+                                  er.eventRegistration!,
+                                );
+                              } else {
+                                _removeEventRegistration(
+                                    er.eventRegistration!.id);
+                              }
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
           const Divider(color: Colors.grey, thickness: 0.5, height: 0)
