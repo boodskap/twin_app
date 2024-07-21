@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:io' show Platform;
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
@@ -11,6 +11,7 @@ import 'package:twin_app/auth.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/pages/admin/clients.dart';
 import 'package:twin_app/pages/admin/users.dart';
+import 'package:twin_app/pages/dashboard.dart';
 import 'package:twin_app/router.dart';
 import 'package:twin_app/widgets/client_snippet.dart';
 import 'package:twin_app/widgets/notifications.dart';
@@ -19,7 +20,7 @@ import 'package:twin_app/widgets/profile_info_screen.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/twin_image_helper.dart';
 import 'package:twin_app/foundation/logger/logger.dart';
-//import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:twin_commons/core/twinned_session.dart';
 import 'package:twinned_api/twinned_api.dart' as tapi;
 import 'package:uuid/uuid.dart';
@@ -27,6 +28,7 @@ import 'package:uuid/uuid.dart';
 const List<Locale> locales = [Locale("en", "US"), Locale("ta", "IN")];
 
 enum TwinAppMenu {
+  dashboard,
   myNotifications,
   myEvents,
   myProfile,
@@ -143,7 +145,7 @@ class _TwinAppState extends State<TwinApp> {
     // delaying the user experience is a bad design practice!
     // ignore_for_file: avoid_print
     if (!kIsWeb) {
-      //FlutterNativeSplash.remove();
+      FlutterNativeSplash.remove();
     }
   }
 
@@ -160,15 +162,13 @@ class _TwinAppState extends State<TwinApp> {
       landingPages.addAll(pages);
     }
 
-    if (kIsWeb) {
+    if (!kIsWeb &&
+        (Platform.isAndroid ||
+            Platform.isIOS ||
+            MediaQuery.of(context).size.width <= 800)) {
+      smallScreen = true;
+    } else {
       smallScreen = false;
-    }
-    // if (!smallScreen) {
-    //   smallScreen = Platform.isAndroid || Platform.isIOS;
-    // }
-    //
-    if (!smallScreen) {
-      smallScreen = MediaQuery.of(context).size.width <= 800;
     }
 
     return MaterialApp.router(
@@ -206,7 +206,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
   }
 
   ListTile? _createMenuItem(TwinMenuItem cci) {
-    if (!isMenuVisible(cci.id)) {
+    if (!cci.isMenuVisible()) {
       return null;
     }
 
@@ -238,7 +238,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
   }
 
   ExpansionTile? _createMenu(TwinMenuItem item, int index) {
-    if (!isMenuVisible(item.id)) {
+    if (!item.isMenuVisible()) {
       return null;
     }
 
@@ -306,6 +306,15 @@ class HomeScreenState extends BaseState<HomeScreen> {
     }
   }
 
+  TwinMenuItem? _findMenuItem(List<TwinMenuItem> items, dynamic id) {
+    for (TwinMenuItem mi in items) {
+      if (mi.id == id) return mi;
+      if (mi.subItems.isNotEmpty) {
+        return _findMenuItem(mi.subItems, id);
+      }
+    }
+  }
+
   void showScreen(dynamic id) {
     closeDrawer();
 
@@ -315,6 +324,10 @@ class HomeScreenState extends BaseState<HomeScreen> {
 
     if (id is TwinAppMenu) {
       switch (id) {
+        case TwinAppMenu.dashboard:
+          selectedMenuTitle = 'Dashboard';
+          body = Dashboard();
+          break;
         case TwinAppMenu.myNotifications:
           selectedMenuTitle = 'My Notifications';
           body = AlarmsNotificationsGrid();
@@ -351,8 +364,9 @@ class HomeScreenState extends BaseState<HomeScreen> {
           break;
       }
     } else {
-      body = onMenuSelected(id);
-      pageBottomMenus.addAll(bottomMenus[id] ?? []);
+      TwinMenuItem mi = _findMenuItem(menuItems, id)!;
+      body = mi.onMenuSelected(context);
+      pageBottomMenus.addAll(mi.bottomMenus);
       bottomMenuIndex = 0;
       for (int i = 0; i < pageBottomMenus.length; i++) {
         if (pageBottomMenus[i].id == id) {
@@ -462,8 +476,8 @@ class HomeScreenState extends BaseState<HomeScreen> {
         },
       ));
 
-      if (TwinnedSession.instance.isAdmin() ||
-          TwinnedSession.instance.isClientAdmin())
+      if (!smallScreen && TwinnedSession.instance.isAdmin() ||
+          TwinnedSession.instance.isClientAdmin()) {
         _sideMenus.add(ExpansionTile(
           title: Text(
             'Admin',
@@ -532,48 +546,48 @@ class HomeScreenState extends BaseState<HomeScreen> {
           ],
         ));
 
-      _sideMenus.add(ExpansionTile(
-        title: Text(
-          'Components',
-          style: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
-        ),
-        leading: Icon(
-          Icons.account_tree,
-          color: theme.getPrimaryColor(),
-        ),
-        initiallyExpanded: (selectedMenu == TwinAppMenu.myConditions),
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 16.0),
-            child: ListTile(
-              leading: Icon(
-                Icons.alarm_on,
-                color: selectedMenu == TwinAppMenu.myConditions
-                    ? Colors.white
-                    : theme.getPrimaryColor(),
+        _sideMenus.add(ExpansionTile(
+          title: Text(
+            'Components',
+            style: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
+          ),
+          leading: Icon(
+            Icons.account_tree,
+            color: theme.getPrimaryColor(),
+          ),
+          initiallyExpanded: (selectedMenu == TwinAppMenu.myConditions),
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 16.0),
+              child: ListTile(
+                leading: Icon(
+                  Icons.alarm_on,
+                  color: selectedMenu == TwinAppMenu.myConditions
+                      ? Colors.white
+                      : theme.getPrimaryColor(),
+                ),
+                title: Text(
+                  'Condition Rules',
+                  style: theme.getStyle().copyWith(
+                      color: selectedMenu == TwinAppMenu.myConditions
+                          ? Colors.white
+                          : null,
+                      fontWeight: selectedMenu == TwinAppMenu.myConditions
+                          ? FontWeight.bold
+                          : null),
+                ),
+                selected: selectedMenu == TwinAppMenu.myConditions,
+                selectedTileColor: theme.getIntermediateColor(),
+                onTap: () {
+                  showScreen(TwinAppMenu.myConditions);
+                },
               ),
-              title: Text(
-                'Condition Rules',
-                style: theme.getStyle().copyWith(
-                    color: selectedMenu == TwinAppMenu.myConditions
-                        ? Colors.white
-                        : null,
-                    fontWeight: selectedMenu == TwinAppMenu.myConditions
-                        ? FontWeight.bold
-                        : null),
-              ),
-              selected: selectedMenu == TwinAppMenu.myConditions,
-              selectedTileColor: theme.getIntermediateColor(),
-              onTap: () {
-                showScreen(TwinAppMenu.myConditions);
-              },
-            ),
-          )
-        ],
-      ));
+            )
+          ],
+        ));
 
-      _sideMenus.add(Divider());
-
+        _sideMenus.add(Divider());
+      }
       _sideMenus.add(ListTile(
         leading: Icon(
           Icons.logout,

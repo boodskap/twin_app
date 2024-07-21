@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:twin_app/core/session_variables.dart' as session;
-//import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:twin_app/core/twin_helper.dart';
 import 'package:twin_commons/core/twinned_session.dart';
 import 'package:verification_api/api/verification.swagger.dart' as vapi;
@@ -15,19 +15,13 @@ void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
 
   if (!kIsWeb) {
-    //FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+    FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   }
 
   start(
     appTitle: 'My Twin App',
-    menuItems: [],
-    bottomMenus: {},
     homeMenu: 'HOME',
     homeMenuTitle: 'Home',
-    onMenuSelected: (id) => Placeholder(),
-    isMenuVisible: (id) => false,
-    buildLandingPages: (_) {},
-    setDrawerOpen: false,
   );
 }
 
@@ -35,21 +29,15 @@ void start({
   required String appTitle,
   required dynamic homeMenu,
   required String homeMenuTitle,
-  required List<session.TwinMenuItem> menuItems,
-  required Map<dynamic, List<BottomMenuItem>> bottomMenus,
-  required session.OnMenuSelected onMenuSelected,
-  required session.IsMenuVisible isMenuVisible,
+  List<session.TwinMenuItem> menuItems = const [],
   session.BuildLandingPages? buildLandingPages,
-  bool setDrawerOpen = true,
+  bool setDrawerOpen = false,
   session.PostLoginHook? postLoginHook,
   session.PostSignUpHook? postSignUpHook = _createDefaultClient,
 }) async {
   session.appTitle = appTitle;
   session.selectedMenuTitle = homeMenuTitle;
   session.menuItems.addAll(menuItems);
-  session.bottomMenus.addAll(bottomMenus);
-  session.onMenuSelected = onMenuSelected;
-  session.isMenuVisible = isMenuVisible;
   session.homeMenu = homeMenu;
   session.buildLandingPages = buildLandingPages;
   session.setDrawerOpen = setDrawerOpen;
