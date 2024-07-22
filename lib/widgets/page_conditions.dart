@@ -246,13 +246,8 @@ class _MyConditionsState extends BaseState<MyConditions> {
         TextEditingController(text: c.leftValue);
     TextEditingController rightValueController =
         TextEditingController(text: c.rightValue);
-    // String valuesString = values?.join(', ') ?? '';
-    List<String> valuesList = values ?? [];
-
-    // TextEditingController valuesController =
-    //     TextEditingController(text: valuesString);
     TextEditingController valuesController = TextEditingController(
-      text: values?.join('\n') ?? '', // Join values with new lines
+      text: values?.join('\n') ?? '',
     );
 
     bool showLeftRightValues = conditionsList.any((condition) {
@@ -407,6 +402,20 @@ class _MyConditionsState extends BaseState<MyConditions> {
                       controller: valueController,
                       readOnlyVal: true,
                       textAlign: TextAlign.center,
+                      labelTextStyle: theme.getStyle().copyWith(
+                            color: Colors.green,
+                            fontWeight: FontWeight.bold,
+                          ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Colors.red,
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Colors.red,
+                        ),
+                      ),
                     ),
                   ),
                 if (showLeftRightValues)
@@ -420,6 +429,20 @@ class _MyConditionsState extends BaseState<MyConditions> {
                           controller: leftValueController,
                           readOnlyVal: true,
                           textAlign: TextAlign.center,
+                          labelTextStyle: theme.getStyle().copyWith(
+                                color: Colors.green,
+                                fontWeight: FontWeight.bold,
+                              ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.red,
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.red,
+                            ),
+                          ),
                         ),
                       ),
                       SizedBox(
@@ -429,6 +452,20 @@ class _MyConditionsState extends BaseState<MyConditions> {
                           controller: rightValueController,
                           readOnlyVal: true,
                           textAlign: TextAlign.center,
+                          labelTextStyle: theme.getStyle().copyWith(
+                                color: Colors.green,
+                                fontWeight: FontWeight.bold,
+                              ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.red,
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.red,
+                            ),
+                          ),
                         ),
                       ),
                     ],
@@ -584,9 +621,9 @@ class _MyConditionsState extends BaseState<MyConditions> {
                   ],
                 ),
                 divider(height: 20),
-                SizedBox(
-                  width: 200,
-                  child: SingleChildScrollView(
+                Expanded(
+                  child: SizedBox(
+                    width: 200,
                     child: LabelTextField(
                       controller: valuesController,
                       readOnlyVal: true,
@@ -596,6 +633,20 @@ class _MyConditionsState extends BaseState<MyConditions> {
                             fontSize: 16,
                           ),
                       label: 'Values',
+                      labelTextStyle: theme.getStyle().copyWith(
+                            color: Colors.green,
+                            fontWeight: FontWeight.bold,
+                          ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Colors.red,
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Colors.red,
+                        ),
+                      ),
                       maxLines: null,
                     ),
                   ),
@@ -606,7 +657,6 @@ class _MyConditionsState extends BaseState<MyConditions> {
         ),
       );
     }
-
     return Container();
   }
 }
