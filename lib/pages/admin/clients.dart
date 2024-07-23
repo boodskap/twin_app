@@ -31,6 +31,8 @@ class _ClientsState extends BaseState<Clients> {
     fontWeight: FontWeight.bold,
   );
 
+  int totalCount=0;
+
   Widget _buildCard(tapi.Client entity) {
     return SizedBox(
         width: 350,
@@ -106,47 +108,63 @@ class _ClientsState extends BaseState<Clients> {
       child: Column(
         children: [
           divider(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const BusyIndicator(),
-              divider(horizontal: true),
-              IconButton(
-                  onPressed: () {
-                    _search = '*';
-                    _load();
-                  },
-                  icon: const Icon(Icons.refresh)),
-              divider(horizontal: true),
-              PrimaryButton(
-                labelKey: 'New Client',
-                leading: const Icon(
-                  Icons.add,
-                  color: Colors.white,
-                ),
-                onPressed: () {
-                  _addEditClientDialog();
-                },
+                Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Text(
+                "Total Cients  :  $totalCount",
+                style: theme.getStyle().copyWith(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    color: const Color(
+                      0xFF000000,
+                    )),
               ),
-              divider(horizontal: true),
-              SizedBox(
-                width: 250,
-                height: 30,
-                child: SearchBar(
-                  onChanged: (value) {
-                    setState(() {
-                      _search = value.trim();
-                    });
-                    if (_search.isEmpty) {
-                      _search = '*';
-                    }
-                    _load();
-                  },
-                  hintText: "Search Clients",
-                ),
-              ),
-              divider(
-                horizontal: true,
+            ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  const BusyIndicator(),
+                  divider(horizontal: true),
+                  IconButton(
+                      onPressed: () {
+                        _search = '*';
+                        _load();
+                      },
+                      icon: const Icon(Icons.refresh)),
+                  divider(horizontal: true),
+                  PrimaryButton(
+                    labelKey: 'New Client',
+                    leading: const Icon(
+                      Icons.add,
+                      color: Colors.white,
+                    ),
+                    onPressed: () {
+                      _addEditClientDialog();
+                    },
+                  ),
+                  divider(horizontal: true),
+                  SizedBox(
+                    width: 250,
+                    height: 30,
+                    child: SearchBar(
+                      onChanged: (value) {
+                        setState(() {
+                          _search = value.trim();
+                        });
+                        if (_search.isEmpty) {
+                          _search = '*';
+                        }
+                        _load();
+                      },
+                      hintText: "Search Clients",
+                    ),
+                  ),
+                  divider(
+                    horizontal: true,
+                  ),
+                ],
               ),
             ],
           ),
@@ -268,6 +286,7 @@ class _ClientsState extends BaseState<Clients> {
           apikey: TwinnedSession.instance.authToken,
           body: tapi.SearchReq(search: _search, page: 0, size: 25));
       if (validateResponse(res)) {
+        totalCount=res.body!.total;
         for (tapi.Client pp in res.body!.values!) {
           refresh(sync: () {
             _cards.add(_buildCard(pp));
