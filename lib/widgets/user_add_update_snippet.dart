@@ -1,4 +1,5 @@
-import 'package:flutter/Material.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:twin_app/widgets/commons/secondary_button.dart';
 import 'package:twin_app/core/session_variables.dart';
@@ -7,6 +8,7 @@ import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/widgets/common/label_text_field.dart';
 import 'package:twin_commons/core/twin_image_helper.dart';
 import 'package:twin_commons/core/twinned_session.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
 
 var userDefaultImage = Center(
   child: Image.asset(
@@ -29,6 +31,7 @@ class _UserAddUpdateSnippetState extends BaseState<UserAddUpdateSnippet> {
   TextEditingController nameController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   TextEditingController emailController = TextEditingController();
+  bool _isPhoneValid = true;
   twinned.TwinUserInfo _twinUserInfo = const twinned.TwinUserInfo(
     name: '',
     email: '',
@@ -65,6 +68,7 @@ class _UserAddUpdateSnippetState extends BaseState<UserAddUpdateSnippet> {
     emailController.text = _twinUserInfo.email ?? '';
     nameController.addListener(_onNameChanged);
     emailController.addListener(_onNameChanged);
+    phoneController.addListener(_onNameChanged);
   }
 
   @override
@@ -116,14 +120,39 @@ class _UserAddUpdateSnippetState extends BaseState<UserAddUpdateSnippet> {
                       divider(height: 15),
                       SizedBox(
                         width: MediaQuery.of(context).size.width / 2.5,
-                        child: LabelTextField(
-                          label: 'Phone',
-                          style: theme.getStyle(),
+                        child: IntlPhoneField(
                           controller: phoneController,
-                          focusedBorder: OutlineInputBorder(
-                            borderSide:
-                                BorderSide(color: theme.getPrimaryColor()),
+                          keyboardType: TextInputType.phone,
+                          initialCountryCode: 'IN',
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                          ],
+                          decoration: InputDecoration(
+                            labelText: 'Enter Phone Number',
+                            counterText: "",
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(4.0),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(4.0),
+                              borderSide: BorderSide(
+                                color: theme.getPrimaryColor(),
+                              ),
+                            ),
                           ),
+                          validator: (phone) {
+                            if (phone == null || phone.number.isEmpty) {
+                              return 'Enter a valid phone number';
+                            }
+                            return null;
+                          },
+                          onChanged: (phone) {
+                            setState(() {
+                              _isPhoneValid = phone.completeNumber.isNotEmpty &&
+                                  phone.completeNumber.length >= 10 &&
+                                  phone.isValidNumber();
+                            });
+                          },
                         ),
                       ),
                       divider(height: 15),
@@ -213,6 +242,7 @@ class _UserAddUpdateSnippetState extends BaseState<UserAddUpdateSnippet> {
   void dispose() {
     nameController.removeListener(_onNameChanged);
     emailController.removeListener(_onNameChanged);
+    phoneController.removeListener(_onNameChanged);
     nameController.dispose();
     phoneController.dispose();
     emailController.dispose();
@@ -232,7 +262,8 @@ class _UserAddUpdateSnippetState extends BaseState<UserAddUpdateSnippet> {
     return text.isNotEmpty &&
         text.length >= 3 &&
         email.isNotEmpty &&
-        emailRegex.hasMatch(email);
+        emailRegex.hasMatch(email) &&
+        _isPhoneValid;
   }
 
   void _close() {
