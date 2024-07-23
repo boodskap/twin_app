@@ -639,6 +639,18 @@ class HomeScreenState extends BaseState<HomeScreen> {
               });
             },
           ),
+          IconButton(
+            icon: Icon(Icons.logout),
+            onPressed: () {
+              setState(() {
+                user = null;
+              });
+              _selectedClient = -1;
+              selectedMenu = homeMenu;
+              selectedMenuTitle = '';
+              auth.signOut();
+            },
+          ),
           SizedBox(
             width: 10,
           ),
