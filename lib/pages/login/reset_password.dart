@@ -52,6 +52,7 @@ class _ResetPasswordMobilePageState
     extends BaseState<_ResetPasswordMobilePage> {
   final TextEditingController _newPassController = TextEditingController();
   final TextEditingController _confPassController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void setup() {
@@ -59,36 +60,41 @@ class _ResetPasswordMobilePageState
   }
 
   Future<void> _doResetPassword() async {
-    String userId = localVariables['userId'] ?? '';
-    String pinToken = localVariables['pinToken'] ?? '';
-    String pin = localVariables['pin'] ?? '';
+    if (_formKey.currentState!.validate()) {
+      String newPassword = _newPassController.text.trim();
+      String confirmPassword = _confPassController.text.trim();
 
-    if (userId.isEmpty || pinToken.isEmpty || pin.isEmpty) {
-      alert("Failure", "Missing required information for password reset.");
-      return;
-    }
+      String userId = localVariables['userId'] ?? '';
+      String pinToken = localVariables['pinToken'] ?? '';
+      String pin = localVariables['pin'] ?? '';
 
-    try {
-      final vapi.ResetPassword body = vapi.ResetPassword(
-        userId: userId,
-        pinToken: pinToken,
-        pin: pin,
-        password: _confPassController.text,
-      );
-      var res = await config.verification
-          .resetPassword(body: body, dkey: config.twinDomainKey);
-      if (validateResponse(res)) {
-        localVariables.clear();
-        alert("Success", "Password Changed Successfully");
-
-        if ((widget.signUp ?? false) && null != postSignUpHook) {
-          await postSignUpHook!(res.body!);
-        }
-
-        context.push(Routes.login, extra: {'signUp': widget.signUp ?? false});
+      if (userId.isEmpty || pinToken.isEmpty || pin.isEmpty) {
+        alert("Failure", "Missing required information for password reset.");
+        return;
       }
-    } catch (e) {
-      alert("", "Error: $e");
+
+      try {
+        final vapi.ResetPassword body = vapi.ResetPassword(
+          userId: userId,
+          pinToken: pinToken,
+          pin: pin,
+          password: confirmPassword,
+        );
+        var res = await config.verification
+            .resetPassword(body: body, dkey: config.twinDomainKey);
+        if (validateResponse(res)) {
+          localVariables.clear();
+          alert("Success", "Password Changed Successfully");
+
+          if ((widget.signUp ?? false) && null != postSignUpHook) {
+            await postSignUpHook!(res.body!);
+          }
+
+          context.push(Routes.login, extra: {'signUp': widget.signUp ?? false});
+        }
+      } catch (e) {
+        alert("Error", "Error: $e");
+      }
     }
   }
 
@@ -135,26 +141,29 @@ class _ResetPasswordMobilePageState
                       decoration: theme.getCredentialsContentDecoration(),
                       child: Padding(
                         padding: EdgeInsets.all(30),
-                        child: Column(
-                          children: <Widget>[
-                            SizedBox(height: 50),
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(10),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Color.fromRGBO(225, 95, 27, .3),
-                                    blurRadius: 20,
-                                    offset: Offset(0, 10),
-                                  ),
-                                ],
-                              ),
-                              child: Column(
-                                children: <Widget>[
-                                  PasswordField(
-                                    controller: _newPassController,
-                                    // onChanged: (value) {
+                        child: Form(
+                          key: _formKey,
+                          child: Column(
+                            children: <Widget>[
+                              SizedBox(height: 50),
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(10),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Color.fromRGBO(225, 95, 27, .3),
+                                      blurRadius: 20,
+                                      offset: Offset(0, 10),
+                                    ),
+                                  ],
+                                ),
+                                child: Column(
+                                  children: <Widget>[
+                                    PasswordField(
+                                      hintKey: 'New Password',
+                                      controller: _newPassController,
+                                      // onChanged: (value) {
                                     //   setState(() {
                                     //     if (value == null || value.isEmpty) {
                                     //       return;
@@ -162,19 +171,20 @@ class _ResetPasswordMobilePageState
                                     //     return null;
                                     //   });
                                     // },
-                                  ),
-                                  PasswordField(
-                                    onSubmitted: (value) {
-                                      if (_newPassController.text ==
-                                          _confPassController.text) {
-                                        _doResetPassword();
-                                      } else {
-                                        alert("", "Password Mismatch");
-                                      }
-                                    },
-                                    hintKey: 'confirmPassword',
-                                    controller: _confPassController,
-                                    // onChanged: (value) {
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return 'Please enter a new password.';
+                                        }
+                                        if (value.length < 4) {
+                                          return 'Password must be at least 4 characters long.';
+                                        }
+                                        return null;
+                                      },
+                                    ),
+                                    PasswordField(
+                                      hintKey: 'confirmPassword',
+                                      controller: _confPassController,
+                                      // onChanged: (value) {
                                     //   setState(() {
                                     //     if (_newPassController.text ==
                                     //         _confPassController.text) {
@@ -184,61 +194,65 @@ class _ResetPasswordMobilePageState
                                     //     }
                                     //   });
                                     // },
-                                  ),
-                                ],
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return 'Please confirm your password.';
+                                        }
+                                        if (value.length < 4) {
+                                          return 'Confirm password must be at least 4 characters long.';
+                                        }
+                                        if (value != _newPassController.text) {
+                                          return 'Passwords do not match.';
+                                        }
+                                        return null;
+                                      },
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                            SizedBox(height: 70),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                SecondaryButton(
-                                  labelKey: 'cancel',
-                                  minimumSize: Size(125, 50),
-                                  onPressed: () {
-                                    context.pop();
-                                  },
-                                ),
-                                const BusyIndicator(),
-                                PrimaryButton(
-                                  labelKey: 'continue',
-                                  minimumSize: Size(200, 50),
-                                  onPressed: () {
-                                    // if (_newPassController.text ==
-                                    //     _confPassController.text) {
-                                    //   _doResetPassword();
-                                    // } else {
-                                    //   alert("", "Password Mismatch");
-                                    // }
-                                    if (_newPassController.text ==
-                                        _confPassController.text) {
-                                      _doResetPassword();
-                                    } else {
-                                      alert("", "Password Mismatch");
-                                    }
-                                  },
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 50),
-                            Align(
-                              alignment: Alignment.bottomRight,
-                              child: Wrap(
-                                spacing: 10,
-                                crossAxisAlignment: WrapCrossAlignment.center,
+                              SizedBox(height: 70),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
-                                    "Powered By",
-                                    style: theme.getStyle().copyWith(
-                                          color: Colors.black,
-                                          fontSize: 14,
-                                        ),
+                                  SecondaryButton(
+                                    labelKey: 'cancel',
+                                    minimumSize: Size(125, 50),
+                                    onPressed: () {
+                                      context.pop();
+                                    },
                                   ),
-                                  poweredBy,
+                                  const BusyIndicator(),
+                                  PrimaryButton(
+                                    labelKey: 'continue',
+                                    minimumSize: Size(200, 50),
+                                    onPressed: () {
+                                      if (_formKey.currentState!.validate()) {
+                                        _doResetPassword();
+                                      }
+                                    },
+                                  ),
                                 ],
                               ),
-                            ),
-                          ],
+                              SizedBox(height: 50),
+                              Align(
+                                alignment: Alignment.bottomRight,
+                                child: Wrap(
+                                  spacing: 10,
+                                  crossAxisAlignment: WrapCrossAlignment.center,
+                                  children: [
+                                    Text(
+                                      "Powered By",
+                                      style: theme.getStyle().copyWith(
+                                            color: Colors.black,
+                                            fontSize: 14,
+                                          ),
+                                    ),
+                                    poweredBy,
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
