@@ -254,7 +254,7 @@ class _UsersState extends BaseState<Users> {
       content: Text(
         "Deleting a User can not be undone.\nYou will loose all of the user data, history, etc.\n\nAre you sure you want to delete?",
         style: theme.getStyle().copyWith(
-              color: Colors.red,
+              color: Colors.black,
               fontSize: 14,
               fontWeight: FontWeight.bold,
             ),
