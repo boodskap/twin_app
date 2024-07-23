@@ -94,6 +94,10 @@ class _UserAddUpdateSnippetState extends BaseState<UserAddUpdateSnippet> {
                           label: 'Name',
                           style: theme.getStyle(),
                           controller: nameController,
+                          focusedBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: theme.getPrimaryColor()),
+                          ),
                         ),
                       ),
                       divider(height: 15),
@@ -103,6 +107,10 @@ class _UserAddUpdateSnippetState extends BaseState<UserAddUpdateSnippet> {
                           label: 'Email',
                           style: theme.getStyle(),
                           controller: emailController,
+                          focusedBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: theme.getPrimaryColor()),
+                          ),
                         ),
                       ),
                       divider(height: 15),
@@ -112,6 +120,10 @@ class _UserAddUpdateSnippetState extends BaseState<UserAddUpdateSnippet> {
                           label: 'Phone',
                           style: theme.getStyle(),
                           controller: phoneController,
+                          focusedBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: theme.getPrimaryColor()),
+                          ),
                         ),
                       ),
                       divider(height: 15),
