@@ -11,7 +11,7 @@ import 'package:twin_app/auth.dart';
 import 'package:twin_app/pages/admin/clients.dart';
 import 'package:twin_app/pages/admin/users.dart';
 import 'package:twin_app/pages/dashboard.dart';
-import 'package:twin_app/pages/twin/components/components.dart';
+import 'package:twin_app/pages/twin/components.dart';
 import 'package:twin_app/router.dart';
 import 'package:twin_app/widgets/client_snippet.dart';
 import 'package:twin_app/widgets/notifications.dart';
@@ -35,7 +35,6 @@ enum TwinAppMenu {
   twin,
   admin,
   twinComponents,
-  twinInfrastructure,
   twinNoCodeBuilder,
   twinBranding,
   adminUsers,
@@ -739,11 +738,6 @@ class HomeScreenState extends BaseState<HomeScreen> {
         id: TwinAppMenu.twinComponents,
         icon: Icon(Icons.menu, size: 30),
         label: 'Comps',
-      ),
-      const BottomMenuItem(
-        id: TwinAppMenu.twinInfrastructure,
-        icon: Icon(Icons.menu, size: 30),
-        label: 'Infra',
       ),
       const BottomMenuItem(
         id: TwinAppMenu.twinNoCodeBuilder,
