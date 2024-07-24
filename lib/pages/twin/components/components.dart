@@ -8,6 +8,7 @@ import 'package:twin_app/pages/twin/components/device_library.dart';
 import 'package:twin_app/pages/twin/components/installation_database.dart';
 import 'package:twin_app/pages/twin/components/visual_alarms.dart';
 import 'package:twin_app/pages/twin/components/visual_displays.dart';
+import 'package:twin_commons/util/nocode_utils.dart';
 
 class Components extends StatefulWidget {
   const Components({super.key});
@@ -23,7 +24,7 @@ class _ComponentsState extends State<Components> {
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height / 2;
     Color openColor = theme.getPrimaryColor();
-    Color closedColor = openColor.withOpacity(0.5);
+    Color closedColor = Colors.black45;
 
     return Column(
       children: [

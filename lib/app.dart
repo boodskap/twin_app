@@ -570,7 +570,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
         assetImage: 'images/twin.png',
         subItems: _twinSubMenuItems,
         isMenuVisible: () {
-          return kIsWeb && session.isAdmin();
+          return !session.smallScreen && session.isAdmin();
         },
         onMenuSelected: (ctx) {
           return SizedBox.shrink();
@@ -583,7 +583,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
         expanded: false,
         subItems: _adminSubMenuItems,
         isMenuVisible: () {
-          return kIsWeb && session.isAdmin();
+          return !session.smallScreen && session.isAdmin();
         },
         onMenuSelected: (ctx) {
           return SizedBox.shrink();
