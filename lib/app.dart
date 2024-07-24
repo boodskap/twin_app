@@ -35,7 +35,6 @@ enum TwinAppMenu {
   twin,
   admin,
   twinComponents,
-  twinInfrastructure,
   twinNoCodeBuilder,
   twinBranding,
   adminUsers,
@@ -739,11 +738,6 @@ class HomeScreenState extends BaseState<HomeScreen> {
         id: TwinAppMenu.twinComponents,
         icon: Icon(Icons.menu, size: 30),
         label: 'Comps',
-      ),
-      const BottomMenuItem(
-        id: TwinAppMenu.twinInfrastructure,
-        icon: Icon(Icons.menu, size: 30),
-        label: 'Infra',
       ),
       const BottomMenuItem(
         id: TwinAppMenu.twinNoCodeBuilder,

@@ -5,19 +5,25 @@ import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:twin_commons/core/twin_image_helper.dart';
 import 'package:twin_commons/core/twinned_session.dart';
+import 'package:twinned_widgets/core/premise_dropdown.dart';
+import 'package:twinned_widgets/core/facility_dropdown.dart';
+import 'package:twinned_widgets/core/floor_dropdown.dart';
 import 'package:twinned_api/twinned_api.dart' as tapi;
 
-class Premises extends StatefulWidget {
-  const Premises({super.key});
+class Assets extends StatefulWidget {
+  const Assets({super.key});
 
   @override
-  State<Premises> createState() => _PremisesState();
+  State<Assets> createState() => _AssetsState();
 }
 
-class _PremisesState extends BaseState<Premises> {
-  final List<tapi.Premise> _entities = [];
+class _AssetsState extends BaseState<Assets> {
+  final List<tapi.Asset> _entities = [];
   final List<Widget> _cards = [];
   String _search = '';
+  tapi.Premise? _selectedPremise;
+  tapi.Facility? _selectedFacility;
+  tapi.Floor? _selectedFloor;
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +38,44 @@ class _PremisesState extends BaseState<Premises> {
                   _load();
                 },
                 icon: Icon(Icons.refresh)),
+            divider(horizontal: true),
+            SizedBox(
+              width: 250,
+              child: PremiseDropdown(
+                  selectedItem: _selectedPremise?.id,
+                  onPremiseSelected: (e) {
+                    setState(() {
+                      _selectedPremise = e;
+                    });
+                    _load();
+                  }),
+            ),
+            divider(horizontal: true),
+            SizedBox(
+              width: 250,
+              child: FacilityDropdown(
+                  selectedItem: _selectedFacility?.id,
+                  selectedPremise: _selectedPremise?.id,
+                  onFacilitySelected: (e) {
+                    setState(() {
+                      _selectedFacility = e;
+                    });
+                    _load();
+                  }),
+            ),
+            SizedBox(
+              width: 250,
+              child: FloorDropdown(
+                  selectedItem: _selectedFloor?.id,
+                  selectedPremise: _selectedPremise?.id,
+                  selectedFacility: _selectedFacility?.id,
+                  onFloorSelected: (e) {
+                    setState(() {
+                      _selectedFloor = e;
+                    });
+                    _load();
+                  }),
+            ),
             divider(horizontal: true),
             PrimaryButton(
               labelKey: 'Create New',
@@ -49,7 +93,7 @@ class _PremisesState extends BaseState<Premises> {
                 width: 250,
                 child: SearchBar(
                   leading: Icon(Icons.search),
-                  hintText: 'Search device library',
+                  hintText: 'Search assets',
                   onChanged: (val) {
                     _search = val.trim();
                     _load();
@@ -73,7 +117,7 @@ class _PremisesState extends BaseState<Premises> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                'No premises found',
+                'No asset found',
                 style: theme.getStyle(),
               ),
             ],
@@ -90,7 +134,7 @@ class _PremisesState extends BaseState<Premises> {
     );
   }
 
-  Widget _buildCard(tapi.Premise e) {
+  Widget _buildCard(tapi.Asset e) {
     double width = MediaQuery.of(context).size.width / 8;
     return SizedBox(
       width: width,
@@ -150,9 +194,9 @@ class _PremisesState extends BaseState<Premises> {
 
   Future _create() async {}
 
-  Future _edit(tapi.Premise e) async {}
+  Future _edit(tapi.Asset e) async {}
 
-  Future _delete(tapi.Premise e) async {}
+  Future _delete(tapi.Asset e) async {}
 
   Future _load() async {
     if (loading) return;
@@ -162,15 +206,44 @@ class _PremisesState extends BaseState<Premises> {
     _cards.clear();
 
     await execute(() async {
-      var sRes = await TwinnedSession.instance.twin.searchPremises(
+      var sRes = await TwinnedSession.instance.twin.queryEqlAsset(
           apikey: TwinnedSession.instance.authToken,
-          body: tapi.SearchReq(search: _search, page: 0, size: 25));
+          body: tapi.EqlSearch(
+              source: [],
+              page: 0,
+              size: 50,
+              mustConditions: [
+                {
+                  "query_string": {
+                    "query": '*$_search*',
+                    "fields": ["name", "description", "tags"]
+                  }
+                },
+                if (null != _selectedPremise)
+                  {
+                    "match_phrase": {
+                      "premiseId": _selectedPremise!.id,
+                    }
+                  },
+                if (null != _selectedFacility)
+                  {
+                    "match_phrase": {
+                      "facilityId": _selectedFacility!.id,
+                    }
+                  },
+                if (null != _selectedFloor)
+                  {
+                    "match_phrase": {
+                      "floorId": _selectedFloor!.id,
+                    }
+                  },
+              ]));
 
       if (validateResponse(sRes)) {
         _entities.addAll(sRes.body?.values ?? []);
       }
 
-      for (tapi.Premise e in _entities) {
+      for (tapi.Asset e in _entities) {
         _cards.add(_buildCard(e));
       }
     });
