@@ -73,10 +73,32 @@ class _SignUpMobilePageState extends BaseState<_SignUpMobilePage> {
       );
       var res = await config.verification
           .registerUser(dkey: config.twinDomainKey, body: body);
+
+      loading = false;
+
       if (validateResponse(res)) {
         localVariables['userId'] = email;
         localVariables['pinToken'] = res.body!.pinToken;
-        _showOtpPage(res.body!);
+
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('OTP Sent'),
+              content: Text('A 6 digit OTP has been sent to your email.\nPlease check it.'),
+              actions: <Widget>[
+                PrimaryButton(
+                    minimumSize: Size(20, 20),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      _showOtpPage(res.body!);
+                    },
+                    labelKey: 'OK'),
+              ],
+            );
+          },
+        );
       }
     });
     loading = false;
