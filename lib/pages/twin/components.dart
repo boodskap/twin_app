@@ -5,10 +5,11 @@ import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/pages/twin/components/asset_library.dart';
 import 'package:twin_app/pages/twin/components/condition_rules.dart';
 import 'package:twin_app/pages/twin/components/device_library.dart';
+import 'package:twin_app/pages/twin/components/events.dart';
 import 'package:twin_app/pages/twin/components/installation_database.dart';
+import 'package:twin_app/pages/twin/components/preprocessors.dart';
 import 'package:twin_app/pages/twin/components/visual_alarms.dart';
 import 'package:twin_app/pages/twin/components/visual_displays.dart';
-import 'package:twin_commons/util/nocode_utils.dart';
 
 class Components extends StatefulWidget {
   const Components({super.key});
@@ -22,7 +23,7 @@ class _ComponentsState extends State<Components> {
 
   @override
   Widget build(BuildContext context) {
-    double height = MediaQuery.of(context).size.height / 2;
+    double height = MediaQuery.of(context).size.width / 8 + 100;
     Color openColor = theme.getPrimaryColor();
     Color closedColor = Colors.black45;
 
@@ -57,8 +58,7 @@ class _ComponentsState extends State<Components> {
                             style: theme.getStyle().copyWith(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white)),
-                        content:
-                            SizedBox(height: height, child: DeviceLibrary())),
+                        content: DeviceLibrary()),
                     AccordionSection(
                         isOpen: false,
                         headerBackgroundColorOpened: openColor,
@@ -86,8 +86,7 @@ class _ComponentsState extends State<Components> {
                             style: theme.getStyle().copyWith(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white)),
-                        content:
-                            SizedBox(height: height, child: AssetLibrary())),
+                        content: AssetLibrary()),
                     AccordionSection(
                         isOpen: false,
                         headerBackgroundColorOpened: openColor,
@@ -101,8 +100,7 @@ class _ComponentsState extends State<Components> {
                             style: theme.getStyle().copyWith(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white)),
-                        content:
-                            SizedBox(height: height, child: ConditionRules())),
+                        content: ConditionRules()),
                     AccordionSection(
                         isOpen: false,
                         headerBackgroundColorOpened: openColor,
@@ -146,8 +144,7 @@ class _ComponentsState extends State<Components> {
                             style: theme.getStyle().copyWith(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white)),
-                        content:
-                            SizedBox(height: height, child: Placeholder())),
+                        content: SizedBox(height: height, child: Events())),
                     AccordionSection(
                         isOpen: false,
                         headerBackgroundColorOpened: openColor,
@@ -162,7 +159,7 @@ class _ComponentsState extends State<Components> {
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white)),
                         content:
-                            SizedBox(height: height, child: Placeholder())),
+                            SizedBox(height: height, child: Preprocessors())),
                     AccordionSection(
                         isOpen: false,
                         headerBackgroundColorOpened: openColor,

@@ -11,7 +11,7 @@ import 'package:twin_app/auth.dart';
 import 'package:twin_app/pages/admin/clients.dart';
 import 'package:twin_app/pages/admin/users.dart';
 import 'package:twin_app/pages/dashboard.dart';
-import 'package:twin_app/pages/twin/components/components.dart';
+import 'package:twin_app/pages/twin/components.dart';
 import 'package:twin_app/router.dart';
 import 'package:twin_app/widgets/client_snippet.dart';
 import 'package:twin_app/widgets/notifications.dart';
