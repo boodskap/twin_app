@@ -8,12 +8,13 @@ import 'package:twin_app/widgets/commons/password_field.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:twin_app/widgets/commons/primary_text_button.dart';
 import 'package:twin_commons/core/base_state.dart';
-import 'package:twin_app/core/session_variables.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:go_router/go_router.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:twin_commons/core/twinned_session.dart';
 import 'package:verification_api/api/verification.swagger.dart' as vapi;
+import 'package:nocode_api/api/nocode.swagger.dart' as nocode;
+import 'package:twin_app/core/session_variables.dart' as session;
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -25,11 +26,12 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
-    if (smallScreen || landingPages.isEmpty) return _LoginMobilePage();
+    if (session.smallScreen || session.landingPages.isEmpty)
+      return _LoginMobilePage();
     return Row(
       children: [
         Expanded(flex: 1, child: LandingPage()),
-        SizedBox(width: credScreenWidth, child: _LoginMobilePage()),
+        SizedBox(width: session.credScreenWidth, child: _LoginMobilePage()),
       ],
     );
   }
@@ -66,14 +68,18 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
         _hasPassword = true;
       }
 
-      var uRes = await TwinnedSession.instance.twin
-          .getUsageByDomainKey(domainKey: config.twinDomainKey);
-      if (validateResponse(uRes)) {
-        var usage = uRes.body!.entity!;
-        if (config.signUpAsClient) {
-          _canSignUp = usage.availableClients > usage.usedClients;
-        } else {
-          _canSignUp = usage.availableUsers > usage.usedUsers;
+      if (!session.config.isTwinApp()) {
+        _canSignUp = true;
+      } else {
+        var uRes = await TwinnedSession.instance.twin
+            .getUsageByDomainKey(domainKey: session.config.twinDomainKey);
+        if (validateResponse(uRes)) {
+          var usage = uRes.body!.entity!;
+          if (session.config.signUpAsClient) {
+            _canSignUp = usage.availableClients > usage.usedClients;
+          } else {
+            _canSignUp = usage.availableUsers > usage.usedUsers;
+          }
         }
       }
     });
@@ -85,35 +91,71 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
     if (loading) return false;
     loading = true;
 
+    session.orgs.clear();
+    session.selectedOrg = 0;
+
     await execute(() async {
       String userId = _userController.text.trim();
       String password = _passwordController.text.trim();
-      var lRes = await config.verification.loginUser(
-          dkey: config.twinDomainKey,
+      String domainKey = session.config.isTwinApp()
+          ? session.config.twinDomainKey!
+          : session.config.noCodeDomainKey;
+      bool loggedIn = false;
+
+      var lRes = await session.config.verification.loginUser(
+          dkey: domainKey,
           body: vapi.Login(userId: userId, password: password));
+
       if (validateResponse(lRes)) {
-        setState(() {
-          _loggedIn = true;
-        });
         bool debug = TwinnedSession.instance.debug;
         String host = TwinnedSession.instance.host;
-        String domainKey = TwinnedSession.instance.domainKey;
-        String noCodeAuthToken = TwinnedSession.instance.noCodeAuthToken;
-        TwinnedSession.instance.init(
-            debug: debug,
-            host: host,
-            authToken: lRes.body!.authToken ?? '',
-            domainKey: domainKey,
-            noCodeAuthToken: noCodeAuthToken);
+
+        if (session.config.isTwinApp()) {
+          TwinnedSession.instance.init(
+              debug: debug,
+              host: host,
+              authToken: lRes.body!.authToken ?? '',
+              domainKey: domainKey,
+              noCodeAuthToken: '');
+          loggedIn = true;
+        } else {
+          debugPrint('*** NOCODE LOGIN ***');
+          var pRes = await TwinnedSession.instance.nocode
+              .getAppProfile(token: lRes.body!.authToken);
+
+          if (validateResponse(pRes)) {
+            session.profile = pRes.body!.profile!;
+
+            for (nocode.OrgTeam ot in (pRes.body!.orgTeams ?? [])) {
+              session.orgs.add(ot.organization!);
+            }
+
+            TwinnedSession.instance.init(
+                debug: debug,
+                host: host,
+                authToken: session.orgs.first.settings?.twinApiKey ?? '',
+                domainKey: domainKey,
+                noCodeAuthToken: lRes.body!.authToken ?? '');
+
+            loggedIn = true;
+          }
+        }
+
         if (_rememberMe) {
           TwinHelper.addStoredPassword(userId, password);
         }
 
-        if (null != postLoginHook) {
-          await postLoginHook!();
-        }
+        if (loggedIn) {
+          setState(() {
+            _loggedIn = true;
+          });
 
-        StreamAuthScope.of(context).signIn(userId);
+          if (null != session.postLoginHook) {
+            await session.postLoginHook!();
+          }
+
+          StreamAuthScope.of(context).signIn(userId);
+        }
       }
     });
 
@@ -132,13 +174,13 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
           alignment: Alignment.center,
           children: [
             Container(
-              width: smallScreen ? null : credScreenWidth,
+              width: session.smallScreen ? null : session.credScreenWidth,
               //height: MediaQuery.of(context).size.height,
-              decoration: theme.getCredentialsPageDecoration(),
+              decoration: session.theme.getCredentialsPageDecoration(),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  SizedBox(height: 100, child: logo),
+                  SizedBox(height: 100, child: session.logo),
                   if (!_loggedIn)
                     Padding(
                       padding: const EdgeInsets.only(left: 20.0),
@@ -146,8 +188,8 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
                         alignment: Alignment.centerLeft,
                         child: Text(
                           "login",
-                          style: theme.getStyle().copyWith(
-                                color: theme.getPrimaryColor(),
+                          style: session.theme.getStyle().copyWith(
+                                color: session.theme.getPrimaryColor(),
                                 fontSize: 30,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -161,8 +203,9 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
                         alignment: Alignment.centerLeft,
                         child: Text(
                           "welcomeBack",
-                          style: theme.getStyle().copyWith(
-                              color: theme.getPrimaryColor(), fontSize: 18),
+                          style: session.theme.getStyle().copyWith(
+                              color: session.theme.getPrimaryColor(),
+                              fontSize: 18),
                         ).tr(),
                       ),
                     ),
@@ -174,7 +217,7 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
                             width: 100,
                             height: 100,
                             child: CircularProgressIndicator(
-                              color: theme.getSecondaryColor(),
+                              color: session.theme.getSecondaryColor(),
                             ))),
                   if (!_loggedIn)
                     Padding(
@@ -182,7 +225,8 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
                           left: 8.0, right: 8.0, bottom: 8.0),
                       child: Container(
                         width: double.infinity,
-                        decoration: theme.getCredentialsContentDecoration(),
+                        decoration:
+                            session.theme.getCredentialsContentDecoration(),
                         child: Padding(
                           padding: EdgeInsets.all(30),
                           child: Column(
@@ -194,7 +238,7 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
                                   borderRadius: BorderRadius.circular(10),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: theme.getSecondaryColor(),
+                                      color: session.theme.getSecondaryColor(),
                                       blurRadius: 20,
                                       offset: Offset(0, 10),
                                     ),
@@ -258,7 +302,7 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
                                         ),
                                         Text(
                                           'rememberMe',
-                                          style: theme
+                                          style: session.theme
                                               .getStyle()
                                               .copyWith(fontSize: 14),
                                         ).tr(),
@@ -291,7 +335,8 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
                                   children: [
                                     Text(
                                       "noAccountYet",
-                                      style: theme.getStyle().copyWith(),
+                                      style:
+                                          session.theme.getStyle().copyWith(),
                                     ).tr(),
                                     PrimaryTextButton(
                                       labelKey: 'signUp',
@@ -311,12 +356,12 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
                                   children: [
                                     Text(
                                       "Powered By",
-                                      style: theme.getStyle().copyWith(
+                                      style: session.theme.getStyle().copyWith(
                                             color: Colors.black,
                                             fontSize: 16,
                                           ),
                                     ),
-                                    poweredBy,
+                                    session.poweredBy,
                                   ],
                                 ),
                               ),
