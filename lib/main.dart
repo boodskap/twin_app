@@ -18,10 +18,12 @@ void main() async {
     FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   }
 
+  session.flavor = 'jegan';
+
   start(
     appTitle: 'My Twin App',
-    homeMenu: 'HOME',
-    homeMenuTitle: 'Home',
+    homeMenu: TwinAppMenu.dashboard,
+    homeMenuTitle: 'Dashboard',
   );
 }
 
@@ -39,6 +41,7 @@ void start({
   session.selectedMenuTitle = homeMenuTitle;
   session.menuItems.addAll(menuItems);
   session.homeMenu = homeMenu;
+  session.selectedMenu = homeMenu;
   session.buildLandingPages = buildLandingPages;
   session.setDrawerOpen = setDrawerOpen;
   session.postLoginHook = postLoginHook;
@@ -48,15 +51,9 @@ void start({
 
   debugPrint('ENV FILE: $envFile');
 
-  if (kIsWeb) {
-    await dotenv.load(
-      fileName: envFile,
-    );
-  } else {
-    await dotenv.load(
-      fileName: 'assets/$envFile',
-    );
-  }
+  await dotenv.load(
+    fileName: 'assets/$envFile',
+  );
 
   FlavorConfig.initialize(flavorString: session.flavor);
 

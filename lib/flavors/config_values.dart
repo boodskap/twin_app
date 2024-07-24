@@ -38,6 +38,10 @@ class ConfigValues {
     this.signUpAsClient = false,
   });
 
+  bool isTwinApp() {
+    return (null != twinDomainKey && twinDomainKey!.trim().isNotEmpty);
+  }
+
   static ConfigValues fromEnvironment() {
     String apiHost = dotenv.env['API_HOST'] ?? 'unknown.boodskap.io';
     var twinned =

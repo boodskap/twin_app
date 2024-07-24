@@ -8,22 +8,22 @@ import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:twin_app/auth.dart';
-import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/pages/admin/clients.dart';
 import 'package:twin_app/pages/admin/users.dart';
 import 'package:twin_app/pages/dashboard.dart';
+import 'package:twin_app/pages/twin/components/components.dart';
 import 'package:twin_app/router.dart';
 import 'package:twin_app/widgets/client_snippet.dart';
 import 'package:twin_app/widgets/notifications.dart';
-import 'package:twin_app/widgets/page_conditions.dart';
 import 'package:twin_app/widgets/profile_info_screen.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/twin_image_helper.dart';
 import 'package:twin_app/foundation/logger/logger.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:twin_commons/core/twinned_session.dart';
-import 'package:twinned_api/twinned_api.dart' as tapi;
 import 'package:uuid/uuid.dart';
+import 'package:twinned_api/twinned_api.dart' as tapi;
+import 'package:twin_app/core/session_variables.dart' as session;
 
 const List<Locale> locales = [Locale("en", "US"), Locale("ta", "IN")];
 
@@ -32,41 +32,15 @@ enum TwinAppMenu {
   myNotifications,
   myEvents,
   myProfile,
-  myConditions,
+  twin,
+  admin,
+  twinComponents,
+  twinInfrastructure,
+  twinNoCodeBuilder,
+  twinBranding,
   adminUsers,
   adminClients,
-}
-
-List<BottomMenuItem> _adminBottomMenus({
-  bool users = true,
-  bool clients = true,
-}) {
-  return [
-    if (users)
-      const BottomMenuItem(
-        id: TwinAppMenu.adminUsers,
-        icon: Icon(Icons.person, size: 30),
-        label: 'Users',
-      ),
-    if (clients && TwinnedSession.instance.isAdmin())
-      const BottomMenuItem(
-        id: TwinAppMenu.adminClients,
-        icon: Icon(Icons.group, size: 30),
-        label: 'Clients',
-      ),
-  ];
-}
-
-bool _isAppMenuVisible(TwinAppMenu id) {
-  switch (id) {
-    case TwinAppMenu.adminUsers:
-      return (TwinnedSession.instance.isAdmin() ||
-          TwinnedSession.instance.isClientAdmin());
-    case TwinAppMenu.adminClients:
-      return (TwinnedSession.instance.isAdmin());
-    default:
-      return true;
-  }
+  adminRoles,
 }
 
 void startApp() async {
@@ -153,22 +127,22 @@ class _TwinAppState extends State<TwinApp> {
   Widget build(BuildContext context) {
     List<Widget>? pages;
 
-    if (null != buildLandingPages) {
-      pages = buildLandingPages!(context);
+    if (null != session.buildLandingPages) {
+      pages = session.buildLandingPages!(context);
     }
 
     if (null != pages) {
-      landingPages.clear();
-      landingPages.addAll(pages);
+      session.landingPages.clear();
+      session.landingPages.addAll(pages);
     }
 
     if (!kIsWeb &&
         (Platform.isAndroid ||
             Platform.isIOS ||
             MediaQuery.of(context).size.width <= 800)) {
-      smallScreen = true;
+      session.smallScreen = true;
     } else {
-      smallScreen = false;
+      session.smallScreen = false;
     }
 
     return MaterialApp.router(
@@ -190,6 +164,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class HomeScreenState extends BaseState<HomeScreen> {
+  final List<session.TwinMenuItem> menuItems = [];
   final List<Widget> _sideMenus = [];
   final List<tapi.Client> _clients = [];
   Widget? body;
@@ -202,49 +177,58 @@ class HomeScreenState extends BaseState<HomeScreen> {
   @override
   initState() {
     super.initState();
-    showScreen(selectedMenu);
+    menuItems.addAll(_menuItems);
+    menuItems.addAll(session.menuItems);
+    showScreen(session.selectedMenu);
   }
 
-  ListTile? _createMenuItem(TwinMenuItem cci) {
+  ListTile? _createMenuItem(session.TwinMenuItem cci) {
     if (!cci.isMenuVisible()) {
       return null;
     }
 
     return ListTile(
       onTap: () {
-        cci.onPressed();
         setState(() {
-          selectedMenu = cci.id;
-          selectedMenuTitle = cci.text;
+          session.selectedMenu = cci.id;
+          session.selectedMenuTitle = cci.text;
         });
+        cci.onPressed();
       },
-      selected: selectedMenu == cci.id,
-      selectedTileColor: theme.getIntermediateColor(),
+      selected: session.selectedMenu == cci.id,
+      selectedTileColor: session.theme.getIntermediateColor(),
       leading: (null == cci.icon)
-          ? null
+          ? (null != cci.assetImage
+              ? Image.asset(
+                  cci.assetImage!,
+                  width: 32,
+                  height: 32,
+                )
+              : null)
           : Icon(
               cci.icon,
-              color: selectedMenu == cci.id
+              color: session.selectedMenu == cci.id
                   ? Colors.white
-                  : theme.getPrimaryColor(),
+                  : session.theme.getPrimaryColor(),
             ),
       title: Text(
         cci.text,
-        style: theme.getStyle().copyWith(
-            color: selectedMenu == cci.id ? Colors.white : null,
-            fontWeight: selectedMenu == cci.id ? FontWeight.bold : null),
+        style: session.theme.getStyle().copyWith(
+            color: session.selectedMenu == cci.id ? Colors.white : null,
+            fontWeight:
+                session.selectedMenu == cci.id ? FontWeight.bold : null),
       ),
     );
   }
 
-  ExpansionTile? _createMenu(TwinMenuItem item, int index) {
+  ExpansionTile? _createMenu(session.TwinMenuItem item, int index) {
     if (!item.isMenuVisible()) {
       return null;
     }
 
     List<Widget> children = [];
-    for (TwinMenuItem cci in item.subItems!) {
-      if (null != cci.subItems && cci.subItems!.isNotEmpty) {
+    for (session.TwinMenuItem cci in item.subItems) {
+      if (cci.subItems.isNotEmpty) {
         children.add(Padding(
           padding: EdgeInsets.only(left: 8.0 * index.toDouble()),
           child: _createMenu(cci, ++index),
@@ -257,7 +241,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
       }
     }
     return ExpansionTile(
-      initiallyExpanded: true,
+      initiallyExpanded: item.expanded,
       title: Wrap(
         spacing: 5.0,
         crossAxisAlignment: WrapCrossAlignment.center,
@@ -265,14 +249,20 @@ class HomeScreenState extends BaseState<HomeScreen> {
           if (null != item.icon)
             Icon(
               item.icon!,
-              color: selectedMenu == item.id
+              color: session.selectedMenu == item.id
                   ? Colors.white
-                  : theme.getPrimaryColor(),
+                  : session.theme.getPrimaryColor(),
+            ),
+          if (null != item.assetImage)
+            Image.asset(
+              item.assetImage!,
+              width: 24,
+              height: 24,
             ),
           Text(
             item.text,
-            style: theme.getStyle().copyWith(
-                color: selectedMenu == item.id ? Colors.white : null,
+            style: session.theme.getStyle().copyWith(
+                color: session.selectedMenu == item.id ? Colors.white : null,
                 fontWeight: FontWeight.bold),
           ),
         ],
@@ -284,8 +274,8 @@ class HomeScreenState extends BaseState<HomeScreen> {
   void _initMenus() {
     _sideMenus.clear();
     if (null == user) return;
-    for (TwinMenuItem ci in menuItems) {
-      if (null != ci.subItems && ci.subItems!.isNotEmpty) {
+    for (session.TwinMenuItem ci in menuItems) {
+      if (ci.subItems.isNotEmpty) {
         var m = _createMenu(ci, 1);
         if (null != m) {
           _sideMenus.add(m);
@@ -306,76 +296,18 @@ class HomeScreenState extends BaseState<HomeScreen> {
     }
   }
 
-  TwinMenuItem? _findMenuItem(List<TwinMenuItem> items, dynamic id) {
-    for (TwinMenuItem mi in items) {
+  session.TwinMenuItem? _findMenuItem(
+      List<session.TwinMenuItem> items, dynamic id) {
+    for (session.TwinMenuItem mi in items) {
       if (mi.id == id) return mi;
       if (mi.subItems.isNotEmpty) {
-        return _findMenuItem(mi.subItems, id);
-      }
-    }
-  }
-
-  void showScreen(dynamic id) {
-    closeDrawer();
-
-    pageBottomMenus.clear();
-    bottomMenuIndex = 0;
-    selectedMenu = id;
-
-    if (id is TwinAppMenu) {
-      switch (id) {
-        case TwinAppMenu.dashboard:
-          selectedMenuTitle = 'Dashboard';
-          body = Dashboard();
-          break;
-        case TwinAppMenu.myNotifications:
-          selectedMenuTitle = 'My Notifications';
-          body = AlarmsNotificationsGrid();
-          break;
-        case TwinAppMenu.myEvents:
-          selectedMenuTitle = 'My Events';
-          body = ProfileInfoScreen(
-            key: Key(Uuid().v4()),
-            selectedTab: 2,
-          );
-          break;
-        case TwinAppMenu.myProfile:
-          selectedMenuTitle = 'My Profile';
-          body = ProfileInfoScreen(
-            key: Key(Uuid().v4()),
-            selectedTab: 0,
-          );
-          break;
-        case TwinAppMenu.myConditions:
-          selectedMenuTitle = 'Condition Rules';
-          body = MyConditions(
-            key: Key(Uuid().v4()),
-          );
-          break;
-        case TwinAppMenu.adminUsers:
-          selectedMenuTitle = 'Users';
-          body = const Users();
-          pageBottomMenus.addAll(_adminBottomMenus());
-          break;
-        case TwinAppMenu.adminClients:
-          selectedMenuTitle = 'Clients';
-          body = const Clients();
-          pageBottomMenus.addAll(_adminBottomMenus());
-          break;
-      }
-    } else {
-      TwinMenuItem mi = _findMenuItem(menuItems, id)!;
-      body = mi.onMenuSelected(context);
-      pageBottomMenus.addAll(mi.bottomMenus);
-      bottomMenuIndex = 0;
-      for (int i = 0; i < pageBottomMenus.length; i++) {
-        if (pageBottomMenus[i].id == id) {
-          bottomMenuIndex = i;
-          break;
+        session.TwinMenuItem? item = _findMenuItem(mi.subItems, id);
+        if (null != item) {
+          return item;
         }
       }
     }
-    setState(() {});
+    return null;
   }
 
   @override
@@ -396,7 +328,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
                   width: 100,
                   height: 100,
                   child: CircularProgressIndicator(
-                    color: theme.getPrimaryColor(),
+                    color: session.theme.getPrimaryColor(),
                   )),
             ],
           ),
@@ -409,226 +341,50 @@ class HomeScreenState extends BaseState<HomeScreen> {
     _initMenus();
 
     if (null != user) {
-      _sideMenus.add(ListTile(
-        leading: Icon(
-          Icons.notification_add,
-          color: selectedMenu == TwinAppMenu.myNotifications
-              ? Colors.white
-              : theme.getPrimaryColor(),
-        ),
-        title: Text(
-          'My Notifications',
-          style: theme.getStyle().copyWith(
-              color: selectedMenu == TwinAppMenu.myNotifications
-                  ? Colors.white
-                  : null,
-              fontWeight: selectedMenu == TwinAppMenu.myNotifications
-                  ? FontWeight.bold
-                  : null),
-        ),
-        selected: selectedMenu == TwinAppMenu.myNotifications,
-        selectedTileColor: theme.getIntermediateColor(),
-        onTap: () {
-          showScreen(TwinAppMenu.myNotifications);
-        },
-      ));
-      _sideMenus.add(ListTile(
-        leading: Icon(
-          Icons.event_available,
-          color: selectedMenu == TwinAppMenu.myEvents
-              ? Colors.white
-              : theme.getPrimaryColor(),
-        ),
-        title: Text(
-          'My Events',
-          style: theme.getStyle().copyWith(
-              color: selectedMenu == TwinAppMenu.myEvents ? Colors.white : null,
-              fontWeight: selectedMenu == TwinAppMenu.myEvents
-                  ? FontWeight.bold
-                  : null),
-        ),
-        selected: selectedMenu == TwinAppMenu.myEvents,
-        selectedTileColor: theme.getIntermediateColor(),
-        onTap: () {
-          showScreen(TwinAppMenu.myEvents);
-        },
-      ));
-      _sideMenus.add(ListTile(
-        leading: Icon(
-          Icons.person,
-          color: selectedMenu == TwinAppMenu.myProfile
-              ? Colors.white
-              : theme.getPrimaryColor(),
-        ),
-        title: Text(
-          'My Profile',
-          style: theme.getStyle().copyWith(
-              color:
-                  selectedMenu == TwinAppMenu.myProfile ? Colors.white : null,
-              fontWeight: selectedMenu == TwinAppMenu.myProfile
-                  ? FontWeight.bold
-                  : null),
-        ),
-        selected: selectedMenu == TwinAppMenu.myProfile,
-        selectedTileColor: theme.getIntermediateColor(),
-        onTap: () {
-          showScreen(TwinAppMenu.myProfile);
-        },
-      ));
-
-      if (!smallScreen && TwinnedSession.instance.isAdmin() ||
-          TwinnedSession.instance.isClientAdmin()) {
-        _sideMenus.add(ExpansionTile(
-          title: Text(
-            'Admin',
-            style: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
-          ),
-          leading: Icon(
-            Icons.shield,
-            color: theme.getPrimaryColor(),
-          ),
-          initiallyExpanded: (selectedMenu == TwinAppMenu.adminUsers ||
-              selectedMenu == TwinAppMenu.adminClients),
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 16.0),
-              child: ListTile(
-                leading: Icon(
-                  Icons.person,
-                  color: selectedMenu == TwinAppMenu.adminUsers
-                      ? Colors.white
-                      : theme.getPrimaryColor(),
-                ),
-                title: Text(
-                  'Users',
-                  style: theme.getStyle().copyWith(
-                      color: selectedMenu == TwinAppMenu.adminUsers
-                          ? Colors.white
-                          : null,
-                      fontWeight: selectedMenu == TwinAppMenu.adminUsers
-                          ? FontWeight.bold
-                          : null),
-                ),
-                selected: selectedMenu == TwinAppMenu.adminUsers,
-                selectedTileColor: theme.getIntermediateColor(),
-                onTap: () {
-                  showScreen(TwinAppMenu.adminUsers);
-                },
-              ),
-            ),
-            if (TwinnedSession.instance.isAdmin())
-              Padding(
-                padding: const EdgeInsets.only(left: 16.0),
-                child: ListTile(
-                  leading: Icon(
-                    Icons.group,
-                    color: selectedMenu == TwinAppMenu.adminClients
-                        ? Colors.white
-                        : theme.getPrimaryColor(),
-                  ),
-                  title: Text(
-                    'Clients',
-                    style: theme.getStyle().copyWith(
-                        color: selectedMenu == TwinAppMenu.adminClients
-                            ? Colors.white
-                            : null,
-                        fontWeight: selectedMenu == TwinAppMenu.adminClients
-                            ? FontWeight.bold
-                            : null),
-                  ),
-                  selected: selectedMenu == TwinAppMenu.adminClients,
-                  selectedTileColor: theme.getIntermediateColor(),
-                  onTap: () {
-                    showScreen(TwinAppMenu.adminClients);
-                  },
-                ),
-              ),
-          ],
-        ));
-
-        _sideMenus.add(ExpansionTile(
-          title: Text(
-            'Components',
-            style: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
-          ),
-          leading: Icon(
-            Icons.account_tree,
-            color: theme.getPrimaryColor(),
-          ),
-          initiallyExpanded: (selectedMenu == TwinAppMenu.myConditions),
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 16.0),
-              child: ListTile(
-                leading: Icon(
-                  Icons.alarm_on,
-                  color: selectedMenu == TwinAppMenu.myConditions
-                      ? Colors.white
-                      : theme.getPrimaryColor(),
-                ),
-                title: Text(
-                  'Condition Rules',
-                  style: theme.getStyle().copyWith(
-                      color: selectedMenu == TwinAppMenu.myConditions
-                          ? Colors.white
-                          : null,
-                      fontWeight: selectedMenu == TwinAppMenu.myConditions
-                          ? FontWeight.bold
-                          : null),
-                ),
-                selected: selectedMenu == TwinAppMenu.myConditions,
-                selectedTileColor: theme.getIntermediateColor(),
-                onTap: () {
-                  showScreen(TwinAppMenu.myConditions);
-                },
-              ),
-            )
-          ],
-        ));
-
-        _sideMenus.add(Divider());
-      }
+      _sideMenus.add(Divider());
       _sideMenus.add(ListTile(
         leading: Icon(
           Icons.logout,
-          color: theme.getPrimaryColor(),
+          color: session.theme.getPrimaryColor(),
         ),
         title: Text(
           'Sign Out',
-          style: theme.getStyle(),
+          style: session.theme.getStyle(),
         ),
         onTap: () {
           setState(() {
             user = null;
           });
           _selectedClient = -1;
-          selectedMenu = homeMenu;
-          selectedMenuTitle = '';
+          session.selectedMenu = session.homeMenu;
+          session.selectedMenuTitle = '';
           auth.signOut();
         },
       ));
-
-      _sideMenus.add(Divider(
-        color: theme.getPrimaryColor(),
-      ));
     }
+
+    _sideMenus.add(Divider(
+      color: session.theme.getPrimaryColor(),
+    ));
+
+    debugPrint('BUILDING with ${session.pageBottomMenus.length} bottom menus');
 
     Widget widget = Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
         centerTitle: true,
         title: Text(
-          '$selectedMenuTitle',
-          style: theme.getStyle().copyWith(
+          '${session.selectedMenuTitle}',
+          style: session.theme.getStyle().copyWith(
               color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
         ),
-        backgroundColor: theme.getPrimaryColor(),
+        backgroundColor: session.theme.getPrimaryColor(),
         elevation: 5,
         iconTheme: IconThemeData(color: Colors.white),
         actions: [
           Text(
             user!.name,
-            style: theme.getStyle().copyWith(color: Colors.white),
+            style: session.theme.getStyle().copyWith(color: Colors.white),
           ),
           IconButton(
             icon: Icon(Icons.person),
@@ -646,8 +402,8 @@ class HomeScreenState extends BaseState<HomeScreen> {
                 user = null;
               });
               _selectedClient = -1;
-              selectedMenu = homeMenu;
-              selectedMenuTitle = '';
+              session.selectedMenu = session.homeMenu;
+              session.selectedMenuTitle = '';
               auth.signOut();
             },
           ),
@@ -668,14 +424,14 @@ class HomeScreenState extends BaseState<HomeScreen> {
               child: DrawerHeader(
                 margin: const EdgeInsets.only(bottom: 0.0),
                 decoration: BoxDecoration(
-                  color: theme.getPrimaryColor(),
+                  color: session.theme.getPrimaryColor(),
                 ),
                 child: Row(
                   children: [
                     if (_selectedClient == -1)
                       Text(
-                        appTitle,
-                        style: theme.getStyle().copyWith(
+                        session.appTitle,
+                        style: session.theme.getStyle().copyWith(
                             color: Colors.white,
                             fontSize: 22,
                             fontWeight: FontWeight.bold),
@@ -699,7 +455,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
                               children: [
                                 Text(
                                   '${_clients[_selectedClient].name}',
-                                  style: theme.getStyle().copyWith(
+                                  style: session.theme.getStyle().copyWith(
                                       overflow: TextOverflow.ellipsis,
                                       color: Colors.white,
                                       fontSize: 22,
@@ -735,33 +491,283 @@ class HomeScreenState extends BaseState<HomeScreen> {
             //..._sideMenus,
             Expanded(
               flex: 10,
-              child: SizedBox(width: 200, child: logo),
+              child: SizedBox(width: 200, child: session.logo),
             ),
           ],
         ),
       ),
-      bottomNavigationBar: (pageBottomMenus.isNotEmpty)
+      body: body,
+      bottomNavigationBar: (session.pageBottomMenus.isNotEmpty)
           ? CurvedNavigationBar(
               height: 50,
-              backgroundColor: theme.getPrimaryColor(),
-              buttonBackgroundColor: theme.getSecondaryColor(),
+              backgroundColor: session.theme.getPrimaryColor(),
+              buttonBackgroundColor: session.theme.getSecondaryColor(),
               //color: theme.getSecondaryColor(),
-              items: pageBottomMenus,
-              index: bottomMenuIndex,
+              items: session.pageBottomMenus,
+              index: session.bottomMenuIndex,
               onTap: (index) {
-                selectedMenuTitle = pageBottomMenus[index].label;
-                showScreen(pageBottomMenus[index].id);
+                session.selectedMenuTitle =
+                    session.pageBottomMenus[index].label;
+                showScreen(session.pageBottomMenus[index].id);
               },
             )
           : null,
-      body: body,
     );
 
-    if (setDrawerOpen) {
+    if (session.setDrawerOpen) {
       _openDrawer();
     }
 
     return widget;
+  }
+
+  void showScreen(dynamic id) {
+    closeDrawer();
+
+    session.pageBottomMenus.clear();
+    session.bottomMenuIndex = 0;
+    session.selectedMenu = id;
+
+    debugPrint('MENU: $id');
+    session.TwinMenuItem? mi = _findMenuItem(menuItems, id);
+    if (null != mi) {
+      body = mi.onMenuSelected(context);
+      session.pageBottomMenus.addAll(mi.bottomMenus);
+      session.bottomMenuIndex = 0;
+      for (int i = 0; i < session.pageBottomMenus.length; i++) {
+        if (session.pageBottomMenus[i].id == id) {
+          session.bottomMenuIndex = i;
+          break;
+        }
+      }
+      if (null == body) {
+        debugPrint('MENU: $id returned empty body');
+      }
+    } else {
+      debugPrint('*** MENU: $id not found ***');
+    }
+
+    setState(() {});
+  }
+
+  List<session.TwinMenuItem> get _menuItems {
+    return [
+      session.TwinMenuItem(
+        text: 'Dashboard',
+        id: TwinAppMenu.dashboard,
+        icon: Icons.dashboard,
+        isMenuVisible: () {
+          return true;
+        },
+        onMenuSelected: (ctx) {
+          return const Dashboard();
+        },
+      ),
+      session.TwinMenuItem(
+        text: 'Digital Twin',
+        id: TwinAppMenu.twin,
+        expanded: true,
+        assetImage: 'images/twin.png',
+        subItems: _twinSubMenuItems,
+        isMenuVisible: () {
+          return session.isAdmin();
+        },
+        onMenuSelected: (ctx) {
+          return SizedBox.shrink();
+        },
+      ),
+      session.TwinMenuItem(
+        text: 'Admin',
+        id: TwinAppMenu.admin,
+        icon: Icons.shield,
+        expanded: false,
+        subItems: _adminSubMenuItems,
+        isMenuVisible: () {
+          return session.isAdmin();
+        },
+        onMenuSelected: (ctx) {
+          return SizedBox.shrink();
+        },
+      ),
+      session.TwinMenuItem(
+        text: 'My Notifications',
+        id: TwinAppMenu.myNotifications,
+        icon: Icons.notification_add,
+        isMenuVisible: () {
+          return null != user;
+        },
+        onMenuSelected: (ctx) {
+          return AlarmsNotificationsGrid();
+        },
+      ),
+      session.TwinMenuItem(
+        text: 'My Events',
+        id: TwinAppMenu.myEvents,
+        icon: Icons.event_available,
+        isMenuVisible: () {
+          return null != user;
+        },
+        onMenuSelected: (ctx) {
+          return ProfileInfoScreen(
+            key: Key(Uuid().v4()),
+            selectedTab: 2,
+          );
+        },
+      ),
+      session.TwinMenuItem(
+        text: 'My Profile',
+        id: TwinAppMenu.myProfile,
+        icon: Icons.person,
+        isMenuVisible: () {
+          return null != user;
+        },
+        onMenuSelected: (ctx) {
+          return ProfileInfoScreen(
+            key: Key(Uuid().v4()),
+            selectedTab: 0,
+          );
+        },
+      ),
+    ];
+  }
+
+  List<session.TwinMenuItem> get _twinSubMenuItems {
+    return [
+      session.TwinMenuItem(
+        id: TwinAppMenu.twinComponents,
+        text: 'Components',
+        icon: Icons.menu,
+        bottomMenus: _twinBottomMenus(),
+        isMenuVisible: () {
+          return true;
+        },
+        onMenuSelected: (BuildContext context) {
+          return const Components();
+        },
+      ),
+      session.TwinMenuItem(
+        id: TwinAppMenu.twinInfrastructure,
+        text: 'Infrastructure',
+        icon: Icons.menu,
+        bottomMenus: _twinBottomMenus(),
+        isMenuVisible: () {
+          return true;
+        },
+        onMenuSelected: (BuildContext context) {
+          return const Placeholder();
+        },
+      ),
+      session.TwinMenuItem(
+        id: TwinAppMenu.twinNoCodeBuilder,
+        text: 'NoCode Builder',
+        icon: Icons.menu,
+        bottomMenus: _twinBottomMenus(),
+        isMenuVisible: () {
+          return true;
+        },
+        onMenuSelected: (BuildContext context) {
+          return const Placeholder();
+        },
+      ),
+      session.TwinMenuItem(
+        id: TwinAppMenu.twinBranding,
+        text: 'Branding',
+        icon: Icons.menu,
+        bottomMenus: _twinBottomMenus(),
+        isMenuVisible: () {
+          return true;
+        },
+        onMenuSelected: (BuildContext context) {
+          return const Placeholder();
+        },
+      ),
+    ];
+  }
+
+  List<session.TwinMenuItem> get _adminSubMenuItems {
+    return [
+      session.TwinMenuItem(
+        id: TwinAppMenu.adminUsers,
+        text: 'Users',
+        icon: Icons.group,
+        bottomMenus: _adminBottomMenus(),
+        isMenuVisible: () {
+          return session.isAdmin();
+        },
+        onMenuSelected: (BuildContext context) {
+          return const Users();
+        },
+      ),
+      session.TwinMenuItem(
+        id: TwinAppMenu.adminClients,
+        text: 'Clients',
+        icon: Icons.perm_contact_cal_outlined,
+        bottomMenus: _adminBottomMenus(),
+        isMenuVisible: () {
+          return session.isAdmin();
+        },
+        onMenuSelected: (BuildContext context) {
+          return const Clients();
+        },
+      ),
+      session.TwinMenuItem(
+        id: TwinAppMenu.adminRoles,
+        text: 'Roles',
+        icon: Icons.key,
+        bottomMenus: _adminBottomMenus(),
+        isMenuVisible: () {
+          return session.isAdmin();
+        },
+        onMenuSelected: (BuildContext context) {
+          return const Placeholder();
+        },
+      ),
+    ];
+  }
+
+  List<BottomMenuItem> _adminBottomMenus() {
+    return [
+      const BottomMenuItem(
+        id: TwinAppMenu.adminUsers,
+        icon: Icon(Icons.person, size: 30),
+        label: 'Users',
+      ),
+      const BottomMenuItem(
+        id: TwinAppMenu.adminClients,
+        icon: Icon(Icons.group, size: 30),
+        label: 'Clients',
+      ),
+      const BottomMenuItem(
+        id: TwinAppMenu.adminRoles,
+        icon: Icon(Icons.key, size: 30),
+        label: 'Roles',
+      ),
+    ];
+  }
+
+  List<BottomMenuItem> _twinBottomMenus() {
+    return [
+      const BottomMenuItem(
+        id: TwinAppMenu.twinComponents,
+        icon: Icon(Icons.menu, size: 30),
+        label: 'Comps',
+      ),
+      const BottomMenuItem(
+        id: TwinAppMenu.twinInfrastructure,
+        icon: Icon(Icons.menu, size: 30),
+        label: 'Infra',
+      ),
+      const BottomMenuItem(
+        id: TwinAppMenu.twinNoCodeBuilder,
+        icon: Icon(Icons.menu, size: 30),
+        label: 'Builder',
+      ),
+      const BottomMenuItem(
+        id: TwinAppMenu.twinBranding,
+        icon: Icon(Icons.menu, size: 30),
+        label: 'Branding',
+      ),
+    ];
   }
 
   Future _load() async {
@@ -826,7 +832,7 @@ class BottomMenuItem extends StatelessWidget {
         icon,
         Text(
           label,
-          style: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
+          style: session.theme.getStyle().copyWith(fontWeight: FontWeight.bold),
         ),
       ],
     );

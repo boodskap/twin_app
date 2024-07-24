@@ -32,6 +32,7 @@ dependencies:
   flutter_widget_from_html: ^0.15.1
   intl_phone_field: ^3.2.0
   #flutter_native_splash: ^2.4.0
+  accordion: ^2.6.0
 
 dev_dependencies:
   flutter_test:
@@ -46,9 +47,9 @@ flutter:
     - assets/google_fonts/
     - assets/translations/
     - assets/images/
+    - assets/.env
+    - assets/.env.dev
+    - assets/.env.qa
+    - assets/.env.test
     - assets/
-    - .env
-    - .env.dev
-    - .env.qa
-    - .env.test
     - default.conf
