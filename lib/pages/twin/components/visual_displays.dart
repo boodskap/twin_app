@@ -3,21 +3,22 @@ import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
-import 'package:twin_commons/core/twin_image_helper.dart';
 import 'package:twin_commons/core/twinned_session.dart';
+import 'package:twinned_widgets/core/device_model_dropdown.dart';
 import 'package:twinned_api/twinned_api.dart' as tapi;
 
-class AssetLibrary extends StatefulWidget {
-  const AssetLibrary({super.key});
+class VisualDisplays extends StatefulWidget {
+  const VisualDisplays({super.key});
 
   @override
-  State<AssetLibrary> createState() => _AssetLibraryState();
+  State<VisualDisplays> createState() => _VisualDisplaysState();
 }
 
-class _AssetLibraryState extends BaseState<AssetLibrary> {
-  final List<tapi.AssetModel> _entities = [];
+class _VisualDisplaysState extends BaseState<VisualDisplays> {
+  final List<tapi.Display> _entities = [];
   final List<Widget> _cards = [];
   String _search = '';
+  tapi.DeviceModel? _selectedDeviceModel;
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +33,18 @@ class _AssetLibraryState extends BaseState<AssetLibrary> {
                   _load();
                 },
                 icon: Icon(Icons.refresh)),
+            divider(horizontal: true),
+            SizedBox(
+              width: 250,
+              child: DeviceModelDropdown(
+                  selectedItem: _selectedDeviceModel?.id,
+                  onDeviceModelSelected: (e) {
+                    setState(() {
+                      _selectedDeviceModel = e;
+                    });
+                    _load();
+                  }),
+            ),
             divider(horizontal: true),
             PrimaryButton(
               labelKey: 'Create New',
@@ -49,7 +62,7 @@ class _AssetLibraryState extends BaseState<AssetLibrary> {
                 width: 250,
                 child: SearchBar(
                   leading: Icon(Icons.search),
-                  hintText: 'Search asset library',
+                  hintText: 'Search installation database',
                   onChanged: (val) {
                     _search = val.trim();
                     _load();
@@ -69,28 +82,32 @@ class _AssetLibraryState extends BaseState<AssetLibrary> {
             ],
           ),
         if (!loading && _cards.isEmpty)
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'No asset library found',
-                style: theme.getStyle(),
-              ),
-            ],
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'No visual displays found',
+                  style: theme.getStyle(),
+                ),
+              ],
+            ),
           ),
         if (!loading && _cards.isNotEmpty)
-          SingleChildScrollView(
-            child: Wrap(
-              spacing: 8,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: _cards,
-            ),
+          Column(
+            children: [
+              Wrap(
+                spacing: 8,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: _cards,
+              ),
+            ],
           ),
       ],
     );
   }
 
-  Widget _buildCard(tapi.AssetModel e) {
+  Widget _buildCard(tapi.Display e) {
     double width = MediaQuery.of(context).size.width / 8;
     return SizedBox(
       width: width,
@@ -136,12 +153,6 @@ class _AssetLibraryState extends BaseState<AssetLibrary> {
                 ),
               ),
             ),
-            if (null != e.images && e.images!.isNotEmpty)
-              Align(
-                alignment: Alignment.center,
-                child: TwinImageHelper.getImage(e.domainKey, e.images!.first,
-                    width: width / 2, height: width / 2),
-              )
           ],
         ),
       ),
@@ -150,9 +161,9 @@ class _AssetLibraryState extends BaseState<AssetLibrary> {
 
   Future _create() async {}
 
-  Future _edit(tapi.AssetModel e) async {}
+  Future _edit(tapi.Display e) async {}
 
-  Future _delete(tapi.AssetModel e) async {}
+  Future _delete(tapi.Display e) async {}
 
   Future _load() async {
     if (loading) return;
@@ -162,15 +173,32 @@ class _AssetLibraryState extends BaseState<AssetLibrary> {
     _cards.clear();
 
     await execute(() async {
-      var sRes = await TwinnedSession.instance.twin.searchAssetModels(
+      var sRes = await TwinnedSession.instance.twin.queryEqlDisplay(
           apikey: TwinnedSession.instance.authToken,
-          body: tapi.SearchReq(search: _search, page: 0, size: 25));
+          body: tapi.EqlSearch(
+              source: [],
+              page: 0,
+              size: 50,
+              mustConditions: [
+                {
+                  "query_string": {
+                    "query": '*$_search*',
+                    "fields": ["name", "description", "tags"]
+                  }
+                },
+                if (null != _selectedDeviceModel)
+                  {
+                    "match_phrase": {
+                      "modelId": _selectedDeviceModel!.id,
+                    }
+                  }
+              ]));
 
       if (validateResponse(sRes)) {
         _entities.addAll(sRes.body?.values ?? []);
       }
 
-      for (tapi.AssetModel e in _entities) {
+      for (tapi.Display e in _entities) {
         _cards.add(_buildCard(e));
       }
     });

@@ -570,7 +570,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
         assetImage: 'images/twin.png',
         subItems: _twinSubMenuItems,
         isMenuVisible: () {
-          return session.isAdmin();
+          return kIsWeb && session.isAdmin();
         },
         onMenuSelected: (ctx) {
           return SizedBox.shrink();
@@ -583,7 +583,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
         expanded: false,
         subItems: _adminSubMenuItems,
         isMenuVisible: () {
-          return session.isAdmin();
+          return kIsWeb && session.isAdmin();
         },
         onMenuSelected: (ctx) {
           return SizedBox.shrink();
@@ -643,18 +643,6 @@ class HomeScreenState extends BaseState<HomeScreen> {
         },
         onMenuSelected: (BuildContext context) {
           return const Components();
-        },
-      ),
-      session.TwinMenuItem(
-        id: TwinAppMenu.twinInfrastructure,
-        text: 'Infrastructure',
-        icon: Icons.menu,
-        bottomMenus: _twinBottomMenus(),
-        isMenuVisible: () {
-          return true;
-        },
-        onMenuSelected: (BuildContext context) {
-          return const Placeholder();
         },
       ),
       session.TwinMenuItem(

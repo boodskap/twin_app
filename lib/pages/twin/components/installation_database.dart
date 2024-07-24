@@ -5,6 +5,7 @@ import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:twin_commons/core/twin_image_helper.dart';
 import 'package:twin_commons/core/twinned_session.dart';
+import 'package:twinned_widgets/core/device_model_dropdown.dart';
 import 'package:twinned_api/twinned_api.dart' as tapi;
 
 class InstallationDatabase extends StatefulWidget {
@@ -18,6 +19,7 @@ class _InstallationDatabaseState extends BaseState<InstallationDatabase> {
   final List<tapi.Device> _entities = [];
   final List<Widget> _cards = [];
   String _search = '';
+  tapi.DeviceModel? _selectedDeviceModel;
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +34,18 @@ class _InstallationDatabaseState extends BaseState<InstallationDatabase> {
                   _load();
                 },
                 icon: Icon(Icons.refresh)),
+            divider(horizontal: true),
+            SizedBox(
+              width: 250,
+              child: DeviceModelDropdown(
+                  selectedItem: _selectedDeviceModel?.id,
+                  onDeviceModelSelected: (e) {
+                    setState(() {
+                      _selectedDeviceModel = e;
+                    });
+                    _load();
+                  }),
+            ),
             divider(horizontal: true),
             PrimaryButton(
               labelKey: 'Create New',
@@ -73,7 +87,7 @@ class _InstallationDatabaseState extends BaseState<InstallationDatabase> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                'No device library found',
+                'No installations found',
                 style: theme.getStyle(),
               ),
             ],
@@ -164,9 +178,26 @@ class _InstallationDatabaseState extends BaseState<InstallationDatabase> {
     _cards.clear();
 
     await execute(() async {
-      var sRes = await TwinnedSession.instance.twin.searchDevices(
+      var sRes = await TwinnedSession.instance.twin.queryEqlDevice(
           apikey: TwinnedSession.instance.authToken,
-          body: tapi.SearchReq(search: '*$_search*', page: 0, size: 50));
+          body: tapi.EqlSearch(
+              source: [],
+              page: 0,
+              size: 50,
+              mustConditions: [
+                {
+                  "query_string": {
+                    "query": '*$_search*',
+                    "fields": ["name", "description", "tags"]
+                  }
+                },
+                if (null != _selectedDeviceModel)
+                  {
+                    "match_phrase": {
+                      "modelId": _selectedDeviceModel!.id,
+                    }
+                  }
+              ]));
 
       if (validateResponse(sRes)) {
         _entities.addAll(sRes.body?.values ?? []);

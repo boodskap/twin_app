@@ -10,9 +10,9 @@ dependencies:
   flutter:
     sdk: flutter
 
-  twin_commons:
+  twinned_widgets:
       git:
-        url: https://github.com/boodskap/twin_commons.git
+        url: https://github.com/boodskap/twinned_widgets.git
         ref: main
   #    path:
   #      twin_commons
