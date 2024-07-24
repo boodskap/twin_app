@@ -1,4 +1,6 @@
 import 'package:flutter/Material.dart';
+import 'package:flutter/services.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:twin_app/widgets/commons/secondary_button.dart';
@@ -25,6 +27,7 @@ class _ClientSnippetState extends BaseState<ClientSnippet> {
   TextEditingController addressController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   TextEditingController emailController = TextEditingController();
+  bool _isPhoneValid = true;
   twinned.ClientInfo _client = const twinned.ClientInfo(
       name: '',
       address: '',
@@ -33,6 +36,8 @@ class _ClientSnippetState extends BaseState<ClientSnippet> {
       email: '',
       icon: '',
       description: '');
+
+  // bool _isPhoneValid=true;
 
   @override
   void initState() {
@@ -56,6 +61,8 @@ class _ClientSnippetState extends BaseState<ClientSnippet> {
     phoneController.text = _client.phone ?? '';
     emailController.text = _client.email ?? '';
     nameController.addListener(_onNameChanged);
+    emailController.addListener(_onNameChanged);
+    phoneController.addListener(_onNameChanged);
   }
 
   @override
@@ -82,7 +89,12 @@ class _ClientSnippetState extends BaseState<ClientSnippet> {
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: LabelTextField(
                           label: 'Name',
+                          style: theme.getStyle(),
                           controller: nameController,
+                          focusedBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: theme.getPrimaryColor()),
+                          ),
                         ),
                       ),
                       const SizedBox(
@@ -92,7 +104,12 @@ class _ClientSnippetState extends BaseState<ClientSnippet> {
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: LabelTextField(
                           label: 'Description',
+                          style: theme.getStyle(),
                           controller: descController,
+                          focusedBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: theme.getPrimaryColor()),
+                          ),
                         ),
                       ),
                       const SizedBox(
@@ -102,7 +119,12 @@ class _ClientSnippetState extends BaseState<ClientSnippet> {
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: LabelTextField(
                           label: 'Address',
+                          style: theme.getStyle(),
                           controller: addressController,
+                          focusedBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: theme.getPrimaryColor()),
+                          ),
                           maxLines: 5,
                         ),
                       ),
@@ -112,8 +134,13 @@ class _ClientSnippetState extends BaseState<ClientSnippet> {
                       SizedBox(
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: LabelTextField(
-                          label: 'Phone',
-                          controller: phoneController,
+                          label: 'Email',
+                          style: theme.getStyle(),
+                          controller: emailController,
+                          focusedBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: theme.getPrimaryColor()),
+                          ),
                         ),
                       ),
                       const SizedBox(
@@ -121,9 +148,39 @@ class _ClientSnippetState extends BaseState<ClientSnippet> {
                       ),
                       SizedBox(
                         width: MediaQuery.of(context).size.width / 2.5,
-                        child: LabelTextField(
-                          label: 'Email',
-                          controller: emailController,
+                        child: IntlPhoneField(
+                          controller: phoneController,
+                          keyboardType: TextInputType.phone,
+                          initialCountryCode: 'IN',
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                          ],
+                          decoration: InputDecoration(
+                            labelText: 'Enter Phone Number',
+                            counterText: "",
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(4.0),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(4.0),
+                              borderSide: BorderSide(
+                                color: theme.getPrimaryColor(),
+                              ),
+                            ),
+                          ),
+                          validator: (phone) {
+                            if (phone == null || phone.number.isEmpty) {
+                              return 'Enter a valid phone number';
+                            }
+                            return null;
+                          },
+                          onChanged: (phone) {
+                            setState(() {
+                              _isPhoneValid = phone.completeNumber.isNotEmpty &&
+                                  phone.completeNumber.length >= 10 &&
+                                  phone.isValidNumber();
+                            });
+                          },
                         ),
                       ),
                       const SizedBox(
@@ -132,80 +189,86 @@ class _ClientSnippetState extends BaseState<ClientSnippet> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          Container(
-                            height: 300,
-                            width: 300,
-                            decoration: BoxDecoration(
-                              border:
-                                  Border.all(color: Colors.black, width: 1.0),
-                            ),
-                            child: Stack(
-                              children: [
-                                Align(
-                                  alignment: Alignment.topRight,
-                                  child: Tooltip(
-                                    message: "Upload Image",
-                                    child: IconButton(
-                                      icon: const Icon(Icons.upload),
-                                      onPressed: () {
-                                        _uploadImage();
-                                      },
+                          Expanded(
+                            child: Container(
+                              height: 300,
+                              width: 300,
+                              decoration: BoxDecoration(
+                                border:
+                                    Border.all(color: Colors.black, width: 1.0),
+                              ),
+                              child: Stack(
+                                children: [
+                                  Align(
+                                    alignment: Alignment.topRight,
+                                    child: Tooltip(
+                                      message: "Upload Image",
+                                      child: IconButton(
+                                        icon: const Icon(Icons.upload),
+                                        onPressed: () {
+                                          _uploadImage();
+                                        },
+                                      ),
                                     ),
                                   ),
-                                ),
-                                if (_client.icon!.isEmpty)
-                                  Align(
-                                      alignment: Alignment.center,
-                                      child: Text(
-                                        'Upload client image',
-                                        style: theme.getStyle(),
-                                      )),
-                                if (_client.icon!.isNotEmpty)
-                                  Align(
-                                      alignment: Alignment.center,
-                                      child: SizedBox(
-                                          width: 250,
-                                          height: 250,
-                                          child: TwinImageHelper.getDomainImage(
-                                              _client.icon!))),
-                              ],
+                                  if (_client.icon!.isEmpty)
+                                    Align(
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          'Upload client image',
+                                          style: theme.getStyle(),
+                                        )),
+                                  if (_client.icon!.isNotEmpty)
+                                    Align(
+                                        alignment: Alignment.center,
+                                        child: SizedBox(
+                                            width: 250,
+                                            height: 250,
+                                            child:
+                                                TwinImageHelper.getDomainImage(
+                                                    _client.icon!))),
+                                ],
+                              ),
                             ),
                           ),
-                          Container(
-                            height: 300,
-                            width: 300,
-                            decoration: BoxDecoration(
-                              border:
-                                  Border.all(color: Colors.black, width: 1.0),
-                            ),
-                            child: Stack(
-                              children: [
-                                _client.location != null
-                                    ? OSMLocationPicker(
-                                        key: Key(const Uuid().v4()),
-                                        viewMode: true,
-                                        longitude:
-                                            _client?.location?.coordinates[0],
-                                        latitude:
-                                            _client?.location?.coordinates[1],
-                                        onPicked: (_) {},
-                                      )
-                                    : const Center(
-                                        child: Text('No location selected')),
-                                Align(
-                                  alignment: Alignment.topRight,
-                                  child: Tooltip(
-                                    message: "Select Location",
-                                    child: IconButton(
-                                      icon:
-                                          const Icon(Icons.location_on_rounded),
-                                      onPressed: () {
-                                        _showLocationDialog(context);
-                                      },
+                          divider(horizontal: true),
+                          Expanded(
+                            child: Container(
+                              height: 300,
+                              width: 300,
+                              decoration: BoxDecoration(
+                                border:
+                                    Border.all(color: Colors.black, width: 1.0),
+                              ),
+                              child: Stack(
+                                children: [
+                                  _client.location != null
+                                      ? OSMLocationPicker(
+                                          key: Key(const Uuid().v4()),
+                                          viewMode: true,
+                                          longitude:
+                                              _client.location?.coordinates[0],
+                                          latitude:
+                                              _client.location?.coordinates[1],
+                                          onPicked: (_) {},
+                                        )
+                                      : const Center(
+                                          child: Text('No location selected')),
+                                  Align(
+                                    alignment: Alignment.topRight,
+                                    child: Tooltip(
+                                      message: "Select Location",
+                                      child: IconButton(
+                                        icon: const Icon(
+                                            Icons.location_on_rounded),
+                                        onPressed: () {
+                                          _showLocationDialog(context);
+                                        },
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         ],
@@ -251,6 +314,8 @@ class _ClientSnippetState extends BaseState<ClientSnippet> {
   @override
   void dispose() {
     nameController.removeListener(_onNameChanged);
+    emailController.removeListener(_onNameChanged);
+    phoneController.removeListener(_onNameChanged);
     nameController.dispose();
     descController.dispose();
     addressController.dispose();
@@ -265,7 +330,14 @@ class _ClientSnippetState extends BaseState<ClientSnippet> {
 
   bool _canCreateOrUpdate() {
     final text = nameController.text.trim();
-    return text.isNotEmpty && text.length >= 3;
+    final email = emailController.text;
+    final emailRegex = RegExp(
+      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+    );
+    return text.isNotEmpty &&
+        text.length >= 3 &&
+        email.isNotEmpty &&
+        emailRegex.hasMatch(email);
   }
 
   void _close() {
@@ -323,7 +395,7 @@ class _ClientSnippetState extends BaseState<ClientSnippet> {
       var uRes = await TwinImageHelper.uploadDomainImage();
       if (null != uRes && null != uRes.entity) {
         imageUploaded = true;
-        _client = _client.copyWith(icon: uRes!.entity!.id);
+        _client = _client.copyWith(icon: uRes.entity!.id);
       }
     });
 
@@ -363,7 +435,5 @@ class _ClientSnippetState extends BaseState<ClientSnippet> {
   }
 
   @override
-  void setup() {
-    // TODO: implement setup
-  }
+  void setup() {}
 }

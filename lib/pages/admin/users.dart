@@ -29,6 +29,7 @@ class _UsersState extends BaseState<Users> {
   final List<Widget> _cards = [];
   final List<tapi.TwinUser> _twinUsers = [];
   String _searchQuery = '*';
+  int totalCount = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -36,46 +37,63 @@ class _UsersState extends BaseState<Users> {
       children: [
         divider(),
         Row(
-          mainAxisAlignment: MainAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const BusyIndicator(),
-            divider(horizontal: true),
-            Tooltip(
-              message: 'Refresh',
-              child: IconButton(
-                onPressed: () => _load,
-                icon: const Icon(Icons.refresh),
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Text(
+                "Total Users  :  $totalCount",
+                style: theme.getStyle().copyWith(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    color: const Color(
+                      0xFF000000,
+                    )),
               ),
             ),
-            divider(horizontal: true),
-           PrimaryButton(
-              minimumSize: const Size(130, 40),
-              leading: const Icon(
-                Icons.add,
-                color: Colors.white,
-              ),
-              labelKey: 'Add User',
-              onPressed: _addUpdateUserDialog,
-            ),
-            divider(horizontal: true),
-            SizedBox(
-              width: 250,
-              height: 40,
-              child: SearchBar(
-                hintText: "Search User",
-                leading: const Icon(Icons.search),
-                textStyle: WidgetStatePropertyAll(theme.getStyle()),
-                hintStyle: WidgetStatePropertyAll(theme.getStyle()),
-                onChanged: (value) {
-                  setState(() {
-                    _searchQuery = '*${value.trim()}*';
-                  });
-                  _load();
-                },
-              ),
-            ),
-            divider(
-              horizontal: true,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                const BusyIndicator(),
+                divider(horizontal: true),
+                Tooltip(
+                  message: 'Refresh',
+                  child: IconButton(
+                    onPressed: () => _load,
+                    icon: const Icon(Icons.refresh),
+                  ),
+                ),
+                divider(horizontal: true),
+                PrimaryButton(
+                  minimumSize: const Size(130, 40),
+                  leading: const Icon(
+                    Icons.add,
+                    color: Colors.white,
+                  ),
+                  labelKey: 'Add User',
+                  onPressed: _addUpdateUserDialog,
+                ),
+                divider(horizontal: true),
+                SizedBox(
+                  width: 250,
+                  height: 40,
+                  child: SearchBar(
+                    hintText: "Search User",
+                    leading: const Icon(Icons.search),
+                    textStyle: WidgetStatePropertyAll(theme.getStyle()),
+                    hintStyle: WidgetStatePropertyAll(theme.getStyle()),
+                    onChanged: (value) {
+                      setState(() {
+                        _searchQuery = '*${value.trim()}*';
+                      });
+                      _load();
+                    },
+                  ),
+                ),
+                divider(
+                  horizontal: true,
+                ),
+              ],
             ),
           ],
         ),
@@ -254,7 +272,7 @@ class _UsersState extends BaseState<Users> {
       content: Text(
         "Deleting a User can not be undone.\nYou will loose all of the user data, history, etc.\n\nAre you sure you want to delete?",
         style: theme.getStyle().copyWith(
-              color: Colors.red,
+              color: Colors.black,
               fontSize: 14,
               fontWeight: FontWeight.bold,
             ),
@@ -289,7 +307,8 @@ class _UsersState extends BaseState<Users> {
           refresh(
             sync: () {
               _twinUsers.removeAt(index);
-              _cards.removeAt(index);
+              // _cards.removeAt(index);
+              totalCount = _twinUsers.length;
             },
           );
         }
@@ -327,6 +346,7 @@ class _UsersState extends BaseState<Users> {
         );
         // debugPrint(qres.body!.values.toString());
         if (validateResponse(qres)) {
+          totalCount = qres.body!.total;
           refresh(
             sync: () {
               _twinUsers.addAll(qres.body!.values!);

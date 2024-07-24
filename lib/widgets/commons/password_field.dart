@@ -7,13 +7,16 @@ class PasswordField extends StatefulWidget {
   final ValueChanged<String>? onChanged;
   final ValueChanged<String>? onSubmitted;
   final String hintKey;
+  final String? Function(String?)? validator;
 
-  const PasswordField(
-      {super.key,
-      this.controller,
-      this.hintKey = 'password',
-      this.onChanged,
-      this.onSubmitted});
+  const PasswordField({
+    super.key,
+    this.controller,
+    this.hintKey = 'password',
+    this.onChanged,
+    this.onSubmitted,
+    this.validator,
+  });
 
   @override
   State<PasswordField> createState() => _PasswordFieldState();
@@ -33,8 +36,8 @@ class _PasswordFieldState extends State<PasswordField> {
           ),
         ),
       ),
-      child: TextField(
-        onSubmitted: widget.onSubmitted,
+      child: TextFormField(
+        onFieldSubmitted: widget.onSubmitted,
         controller: widget.controller,
         onChanged: widget.onChanged,
         obscureText: _isObscure,
@@ -53,6 +56,7 @@ class _PasswordFieldState extends State<PasswordField> {
             },
           ),
         ),
+        validator: widget.validator,
       ),
     );
   }

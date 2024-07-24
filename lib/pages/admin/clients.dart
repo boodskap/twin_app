@@ -19,17 +19,9 @@ class Clients extends StatefulWidget {
 class _ClientsState extends BaseState<Clients> {
   String _search = '*';
   final List<Widget> _cards = [];
+  final List<tapi.Client> _clientList = [];
 
-  static const TextStyle _warnTextStyle = TextStyle(
-    color: Colors.red,
-    fontSize: 20,
-    fontWeight: FontWeight.bold,
-  );
-  static const TextStyle _labelPopupTextStyle = TextStyle(
-    color: Colors.black,
-    fontSize: 14,
-    fontWeight: FontWeight.bold,
-  );
+  int totalCount = 0;
 
   Widget _buildCard(tapi.Client entity) {
     return SizedBox(
@@ -50,9 +42,11 @@ class _ClientsState extends BaseState<Clients> {
                       Center(
                         child: Text(
                           entity.name,
-                          style: theme
-                              .getStyle()
-                              .copyWith(fontWeight: FontWeight.bold),
+                          style: theme.getStyle().copyWith(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       divider(),
@@ -80,14 +74,17 @@ class _ClientsState extends BaseState<Clients> {
                         children: [
                           IconButton(
                               onPressed: () {
-                                _confirmAndDeleteClient(client: entity);
-                              },
-                              icon: const Icon(Icons.delete)),
-                          IconButton(
-                              onPressed: () {
                                 _addEditClientDialog(client: entity);
                               },
                               icon: const Icon(Icons.edit)),
+                          IconButton(
+                              onPressed: () {
+                                _confirmAndDeleteClient(context, entity.id);
+                              },
+                              icon: const Icon(
+                                Icons.delete_forever,
+                                color: Color(0xFFF44336),
+                              )),
                         ],
                       ),
                     ),
@@ -107,46 +104,70 @@ class _ClientsState extends BaseState<Clients> {
         children: [
           divider(),
           Row(
-            mainAxisAlignment: MainAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const BusyIndicator(),
-              divider(horizontal: true),
-              IconButton(
-                  onPressed: () {
-                    _search = '*';
-                    _load();
-                  },
-                  icon: const Icon(Icons.refresh)),
-              divider(horizontal: true),
-              PrimaryButton(
-                labelKey: 'New Client',
-                leading: const Icon(
-                  Icons.add,
-                  color: Colors.white,
-                ),
-                onPressed: () {
-                  _addEditClientDialog();
-                },
-              ),
-              divider(horizontal: true),
-              SizedBox(
-                width: 250,
-                height: 30,
-                child: SearchBar(
-                  onChanged: (value) {
-                    setState(() {
-                      _search = value.trim();
-                    });
-                    if (_search.isEmpty) {
-                      _search = '*';
-                    }
-                    _load();
-                  },
-                  hintText: "Search Clients",
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Text(
+                  "Total Cients  :  $totalCount",
+                  style: theme.getStyle().copyWith(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                      color: const Color(
+                        0xFF000000,
+                      )),
                 ),
               ),
-              divider(
-                horizontal: true,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  const BusyIndicator(),
+                  divider(horizontal: true),
+                  Tooltip(
+                    message: "Refresh",
+                    child: IconButton(
+                        onPressed: () {
+                          _search = '*';
+                          _load();
+                        },
+                        icon: const Icon(Icons.refresh)),
+                  ),
+                  divider(horizontal: true),
+                  PrimaryButton(
+                    minimumSize: Size(130, 40),
+                    labelKey: 'New Client',
+                    leading: const Icon(
+                      Icons.add,
+                      color: Colors.white,
+                    ),
+                    onPressed: () {
+                      _addEditClientDialog();
+                    },
+                  ),
+                  divider(horizontal: true),
+                  SizedBox(
+                    width: 250,
+                    height: 40,
+                    child: SearchBar(
+                      onChanged: (value) {
+                        setState(() {
+                          _search = value.trim();
+                        });
+                        if (_search.isEmpty) {
+                          _search = '*';
+                        }
+                        _load();
+                      },
+                      hintText: "Search Clients",
+                      leading: const Icon(Icons.search),
+                      textStyle: WidgetStatePropertyAll(theme.getStyle()),
+                      hintStyle: WidgetStatePropertyAll(theme.getStyle()),
+                    ),
+                  ),
+                  divider(
+                    horizontal: true,
+                  ),
+                ],
               ),
             ],
           ),
@@ -159,17 +180,20 @@ class _ClientsState extends BaseState<Clients> {
             ),
           if (_cards.isEmpty && !loading)
             Center(
-              child: Text(
-                'No clients found',
-                style: theme.getStyle(),
-              ),
+              child: Text('No clients found',
+                  style: theme.getStyle().copyWith(
+                      color: Colors.red,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold)),
             ),
           if (_cards.isNotEmpty)
-            SingleChildScrollView(
-              child: Wrap(
-                spacing: 10,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: _cards,
+            Expanded(
+              child: SingleChildScrollView(
+                child: Wrap(
+                  spacing: 10,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: _cards,
+                ),
               ),
             ),
         ],
@@ -188,7 +212,7 @@ class _ClientsState extends BaseState<Clients> {
     _load();
   }
 
-  void _confirmAndDeleteClient({required tapi.Client client}) {
+  void _confirmAndDeleteClient(BuildContext context, String id) {
     Widget cancelButton = SecondaryButton(
         labelKey: 'Cancel',
         onPressed: () {
@@ -201,17 +225,26 @@ class _ClientsState extends BaseState<Clients> {
         ),
         labelKey: 'Delete',
         onPressed: () {
-          _deleteClient(client);
+          _removeEntity(id);
+          Navigator.pop(context);
         });
 
     AlertDialog alert = AlertDialog(
-      title: const Text(
+      title: Text(
         "WARNING",
-        style: _warnTextStyle,
+        style: theme.getStyle().copyWith(
+              color: Colors.red,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
       ),
-      content: const Text(
+      content: Text(
         "Deleting a Client can not be undone.\nYou will loose all of the client data, history, etc.\n\nAre you sure you want to delete?",
-        style: _labelPopupTextStyle,
+        style: theme.getStyle().copyWith(
+              color: Colors.black,
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+            ),
         maxLines: 10,
       ),
       actions: [
@@ -228,31 +261,30 @@ class _ClientsState extends BaseState<Clients> {
     );
   }
 
-  void _close() {
-    Navigator.pop(context);
-  }
-
-  Future _deleteClient(tapi.Client client) async {
+  void _removeEntity(String id) async {
     if (loading) return;
     loading = true;
-
-    bool deleted = false;
-
-    execute(() async {
-      var res = await TwinnedSession.instance.twin.deleteClient(
-          apikey: TwinnedSession.instance.authToken, clientId: client.id);
-      if (validateResponse(res)) {
-        deleted = true;
-        _close();
-        alert('Success', 'Client ${client.name} deleted successfully');
-      }
-    });
+    await execute(
+      () async {
+        int index = _clientList.indexWhere((element) => element.id == id);
+        var res = await TwinnedSession.instance.twin.deleteClient(
+          apikey: TwinnedSession.instance.authToken,
+          clientId: id,
+        );
+        if (validateResponse(res)) {
+          refresh(
+            sync: () {
+              _clientList.removeAt(index);
+              _cards.removeAt(index);
+              totalCount = _clientList.length;
+            },
+          );
+        }
+      },
+    );
 
     loading = false;
-
-    if (deleted) {
-      _load();
-    }
+    refresh();
   }
 
   Future _load() async {
@@ -261,6 +293,7 @@ class _ClientsState extends BaseState<Clients> {
 
     refresh(sync: () {
       _cards.clear();
+      _clientList.clear();
     });
 
     execute(() async {
@@ -268,9 +301,11 @@ class _ClientsState extends BaseState<Clients> {
           apikey: TwinnedSession.instance.authToken,
           body: tapi.SearchReq(search: _search, page: 0, size: 25));
       if (validateResponse(res)) {
-        for (tapi.Client pp in res.body!.values!) {
+        totalCount = res.body!.total;
+        for (tapi.Client client in res.body!.values!) {
           refresh(sync: () {
-            _cards.add(_buildCard(pp));
+            _clientList.add(client);
+            _cards.add(_buildCard(client));
           });
         }
       }

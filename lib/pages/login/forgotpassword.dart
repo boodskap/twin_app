@@ -84,16 +84,48 @@ class _ForgotPasswordMobilePageState
         localVariables['userId'] = userEmail;
         localVariables['pinToken'] = res.body!.pinToken;
 
-        _showForgotOtpPage();
+        showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('OTP Sent'),
+              content: Text(
+                'Reset Password OTP has been sent to your email.\nPlease check it.',
+              ),
+              actions: <Widget>[
+                PrimaryButton(
+                    minimumSize: Size(20, 20),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      _showForgotOtpPage();
+                    },
+                    labelKey: 'OK'),
+              ],
+            );
+          },
+        );
       }
-
-      if (res.body!.ok) {
-        // _showForgotOtpPage(
-        //   res.body!.user!.email ?? '',
-        //   body.pinToken,
-        // );
-      }
-    } catch (e) {}
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Error'),
+            content: Text(
+                'An error occurred while processing your request. Please try again.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
   @override

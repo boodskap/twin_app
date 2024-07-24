@@ -3,8 +3,10 @@ import 'package:twin_app/app.dart';
 import 'package:twin_app/core/twin_theme.dart';
 import 'package:twin_app/flavors/config_values.dart';
 import 'package:twin_app/router.dart';
+import 'package:twin_commons/core/twinned_session.dart';
 import 'package:verification_api/api/verification.swagger.dart' as vapi;
-import 'package:twinned_api/api/twinned.swagger.dart' as tapi;
+import 'package:twinned_api/api/twinned.swagger.dart' as twin;
+import 'package:nocode_api/api/nocode.swagger.dart' as nocode;
 
 typedef OnMenuSelected = Widget Function(BuildContext context);
 typedef IsMenuVisible = bool Function();
@@ -30,7 +32,7 @@ final Map<String, dynamic> localVariables = <String, dynamic>{};
 final List<vapi.PlatformSession> sessions = [];
 final List<Widget> landingPages = [];
 late ConfigValues config;
-tapi.TwinSysInfo? twinSysInfo;
+twin.TwinSysInfo? twinSysInfo;
 vapi.PlatformSession? session;
 bool smallScreen = true;
 double credScreenWidth = 450;
@@ -39,25 +41,43 @@ final String defaultFont = 'Open Sans';
 final List<TwinMenuItem> menuItems = [];
 String appTitle = 'My Digital Twin App';
 final List<BottomMenuItem> pageBottomMenus = [];
+int bottomMenuIndex = 0;
 BuildLandingPages? buildLandingPages;
 dynamic homeMenu = 'HOME';
-dynamic selectedMenu = homeMenu;
+dynamic selectedMenu = 'DASHBOARD';
 String selectedMenuTitle = '';
-int bottomMenuIndex = 0;
 String flavor = "prod";
 bool setDrawerOpen = false;
 PostLoginHook? postLoginHook;
 PostSignUpHook? postSignUpHook;
+nocode.Profile? profile;
+int selectedOrg = 0;
+final List<nocode.Organization> orgs = [];
+
+bool isAdmin() {
+  if (null != profile) return true;
+  if (TwinnedSession.instance.isAdmin()) return true;
+  return false;
+}
+
+bool isClient() {
+  return TwinnedSession.instance.isClient();
+}
+
+bool isClientAdmin() {
+  return TwinnedSession.instance.isClientAdmin();
+}
 
 class TwinMenuItem {
   TwinMenuItem({
     required this.id,
     required this.text,
-    required this.isMenuVisible,
     required this.onMenuSelected,
+    required this.isMenuVisible,
+    this.expanded = true,
     this.badgeCount,
     this.icon,
-    this.iconImage,
+    this.assetImage,
     this.subItems = const [],
     this.bottomMenus = const [],
   });
@@ -68,13 +88,12 @@ class TwinMenuItem {
   final List<BottomMenuItem> bottomMenus;
   final IsMenuVisible isMenuVisible;
   final OnMenuSelected onMenuSelected;
+  final bool expanded;
   int? badgeCount;
   IconData? icon;
-  ImageProvider? iconImage;
+  String? assetImage;
 
   void onPressed() {
-    if (bottomMenus.isEmpty) {
-      application.currentState!.showScreen(id);
-    }
+    application.currentState!.showScreen(id);
   }
 }
