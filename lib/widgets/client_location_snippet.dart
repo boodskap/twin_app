@@ -117,8 +117,8 @@ class _ClientLocationSnippetState extends BaseState<ClientLocationSnippet> {
                       SizedBox(
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: LabelTextField(
-                          label: 'Phone',
-                          controller: phoneController,
+                          label: 'Email',
+                          controller: emailController,
                         ),
                       ),
                       const SizedBox(
@@ -127,8 +127,8 @@ class _ClientLocationSnippetState extends BaseState<ClientLocationSnippet> {
                       SizedBox(
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: LabelTextField(
-                          label: 'Email',
-                          controller: emailController,
+                          label: 'Phone',
+                          controller: phoneController,
                         ),
                       ),
                       const SizedBox(
