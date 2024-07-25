@@ -629,27 +629,23 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
             ),
           ),
           actions: [
-            Row(
-              children: [
-                PrimaryButton(
-                  labelKey: "Save",
-                  onPressed: _nameController.text.isNotEmpty
-                      ? () {
-                          if (_formKey.currentState!.validate()) {
-                            setState(() {
-                              _emailController.text = _emailController.text;
-                              _nameController.text = _nameController.text;
-                              _addressController.text = _addressController.text;
-                              _phoneController.text = _phoneController.text;
-                              _descController.text = _descController.text;
-                            });
-                            updateProfile();
-                            Navigator.of(context).pop();
-                          }
-                        }
-                      : null,
-                ),
-              ],
+            PrimaryButton(
+              labelKey: "Save",
+              onPressed: _nameController.text.isNotEmpty
+                  ? () {
+                      if (_formKey.currentState!.validate()) {
+                        setState(() {
+                          _emailController.text = _emailController.text;
+                          _nameController.text = _nameController.text;
+                          _addressController.text = _addressController.text;
+                          _phoneController.text = _phoneController.text;
+                          _descController.text = _descController.text;
+                        });
+                        updateProfile();
+                        Navigator.of(context).pop();
+                      }
+                    }
+                  : null,
             ),
           ],
         );
