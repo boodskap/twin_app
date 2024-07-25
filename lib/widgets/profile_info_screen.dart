@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:twin_app/widgets/change_password_alert_snippet.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:twin_app/widgets/subscription_snippet.dart';
@@ -22,6 +24,7 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
   String twinUserId = "";
   String fullName = '';
   String initials = '';
+  final _formKey = GlobalKey<FormState>();
 
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
@@ -29,15 +32,13 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _descController = TextEditingController();
 
-  bool _isEmailExpanded = false;
-  bool _isNameExpanded = false;
-  bool _isAddressExpanded = false;
-  bool _isPhoneExpanded = false;
-  bool _isDescExpanded = false;
   List<String> roles = [];
   List<String> roleNames = [];
   List<String> clientIds = [];
   List<String> clients = [];
+  void _onNameChanged() {
+    setState(() {});
+  }
 
   @override
   void initState() {
@@ -46,202 +47,14 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
         Image.asset('assets/images/ldashboard_banner.png', fit: BoxFit.fill);
     _tabController =
         TabController(length: 3, vsync: this, initialIndex: widget.selectedTab);
+    _nameController.addListener(_onNameChanged);
   }
 
-  Future<void> load() async {
-    try {
-      var response = await TwinnedSession.instance.twin
-          .getMyProfile(apikey: TwinnedSession.instance.authToken);
-      var res = response.body!.entity!;
+  @override
+  void dispose() {
+    _nameController.removeListener(_onNameChanged);
 
-      if (validateResponse(response)) {
-        setState(() {
-          fullName = res.name;
-          initials = getInitials(fullName);
-          _emailController.text = res.email;
-          _nameController.text = res.name;
-          _addressController.text = res.address ?? '';
-          _phoneController.text = res.phone ?? '';
-          _descController.text = res.description ?? '';
-          twinUserId = res.id;
-          roles = res.roles ?? [];
-          clientIds = res.clientIds ?? [];
-        });
-      }
-
-      var clientResponse = await TwinnedSession.instance.twin.getClients(
-        apikey: TwinnedSession.instance.authToken,
-        body: GetReq(
-          ids: clientIds,
-        ),
-      );
-      if (validateResponse(clientResponse)) {
-        setState(() {
-          clients = clientResponse.body!.values
-                  ?.map((client) => client.name)
-                  .toList() ??
-              [];
-        });
-      }
-      var roleResponse = await TwinnedSession.instance.twin.getRoles(
-        apikey: TwinnedSession.instance.authToken,
-        body: GetReq(
-          ids: roles,
-        ),
-      );
-      if (validateResponse(roleResponse)) {
-        setState(() {
-          roleNames =
-              roleResponse.body!.values?.map((role) => role.name).toList() ??
-                  [];
-        });
-      }
-    } catch (e) {}
-  }
-
-  String getInitials(String fullName) {
-    String firstLetter = fullName.isNotEmpty ? fullName[0].toUpperCase() : '';
-    int spaceIndex = fullName.indexOf(' ');
-    if (spaceIndex != -1) {
-      String secondLetter = fullName[spaceIndex + 1].toUpperCase();
-      return '$firstLetter$secondLetter';
-    }
-    return firstLetter;
-  }
-
-  Future<void> updateProfile() async {
-    busy();
-    try {
-      var res = await TwinnedSession.instance.twin.updateTwinUser(
-        twinUserId: twinUserId,
-        apikey: TwinnedSession.instance.authToken,
-        body: TwinUserInfo(
-          email: _emailController.text,
-          name: _nameController.text,
-          address: _addressController.text,
-          phone: _phoneController.text,
-          description: _descController.text,
-        ),
-      );
-      if (res.body!.ok) {
-        alert('', 'Profile saved successfully!');
-      } else {
-        alert("Profile not Updated", res.body!.msg!);
-      }
-    } catch (e) {
-      alert('Error', e.toString());
-    }
-    busy(busy: false);
-  }
-
-  Future<void> _editPersonalDetails(BuildContext context) async {
-    final controllers = {
-      'Email': _emailController,
-      'Name': _nameController,
-      'Address': _addressController,
-      'Phone': _phoneController,
-      'Description': _descController,
-    };
-
-    await showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Edit Personal Details',
-                style: theme.getStyle().copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-              ),
-              InkWell(
-                onTap: () => Navigator.pop(context),
-                child: const Icon(Icons.close_outlined,
-                    color: Color(0xff754893), size: 24),
-              ),
-            ],
-          ),
-          content: SingleChildScrollView(
-            child: SizedBox(
-              height: 300,
-              width: 400,
-              child: Column(
-                mainAxisSize: MainAxisSize.max,
-                children: controllers.entries.map((entry) {
-                  String label = entry.key;
-                  TextEditingController controller = entry.value;
-                  IconData icon = Icons.label;
-                  if (label == 'Email') {
-                    icon = Icons.email_outlined;
-                  } else if (label == 'Name') {
-                    icon = Icons.person_2_outlined;
-                  } else if (label == 'Address') {
-                    icon = Icons.home_outlined;
-                  } else if (label == 'Phone') {
-                    icon = Icons.phone_android_outlined;
-                  } else if (label == 'Description') {
-                    icon = Icons.description;
-                  }
-
-                  return Row(
-                    children: [
-                      Expanded(flex: 10, child: Icon(icon)),
-                      Expanded(
-                        flex: 90,
-                        child: TextField(
-                          style: theme.getStyle(),
-                          controller: controller,
-                          readOnly: label == 'Email',
-                          decoration: InputDecoration(
-                              labelText: label, labelStyle: theme.getStyle()),
-                        ),
-                      ),
-                    ],
-                  );
-                }).toList(),
-              ),
-            ),
-          ),
-          actions: [
-            PrimaryButton(
-              labelKey: "Save",
-              onPressed: () {
-                setState(() {
-                  _emailController.text = _emailController.text;
-                  _nameController.text = _nameController.text;
-                  _addressController.text = _addressController.text;
-                  _phoneController.text = _phoneController.text;
-                  _descController.text = _descController.text;
-                });
-                updateProfile();
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget buildPersonalDetail(String title, TextEditingController controller,
-      bool isExpanded, Function(bool) onExpansionChanged) {
-    return ExpansionTile(
-      trailing: isExpanded
-          ? const Icon(Icons.expand_less)
-          : const Icon(Icons.chevron_right),
-      initiallyExpanded: true,
-      onExpansionChanged: onExpansionChanged,
-      title: Text(title, style: theme.getStyle()),
-      childrenPadding: const EdgeInsets.symmetric(horizontal: 20),
-      expandedAlignment: Alignment.centerLeft,
-      shape: const Border(bottom: BorderSide.none),
-      children: [
-        Text(controller.text, style: theme.getStyle()),
-      ],
-    );
+    super.dispose();
   }
 
   @override
@@ -358,40 +171,134 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
                                   child: SingleChildScrollView(
                                     child: Column(
                                       children: [
-                                        buildPersonalDetail('Email',
-                                            _emailController, _isEmailExpanded,
-                                            (bool isExpanded) {
-                                          setState(() =>
-                                              _isEmailExpanded = isExpanded);
-                                        }),
-                                        buildPersonalDetail(
-                                            'Name',
-                                            _nameController,
-                                            _isNameExpanded, (bool isExpanded) {
-                                          setState(() =>
-                                              _isNameExpanded = isExpanded);
-                                        }),
-                                        buildPersonalDetail(
-                                            'Address',
-                                            _addressController,
-                                            _isAddressExpanded,
-                                            (bool isExpanded) {
-                                          setState(() =>
-                                              _isAddressExpanded = isExpanded);
-                                        }),
-                                        buildPersonalDetail('Phone',
-                                            _phoneController, _isPhoneExpanded,
-                                            (bool isExpanded) {
-                                          setState(() =>
-                                              _isPhoneExpanded = isExpanded);
-                                        }),
-                                        buildPersonalDetail(
-                                            'Description',
-                                            _descController,
-                                            _isDescExpanded, (bool isExpanded) {
-                                          setState(() =>
-                                              _isDescExpanded = isExpanded);
-                                        }),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Expanded(
+                                                child: Text(
+                                              "Email",
+                                              style: theme.getStyle().copyWith(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 16),
+                                            )),
+                                            Expanded(
+                                                child: Text(
+                                              _emailController.text,
+                                              style: theme.getStyle().copyWith(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 16),
+                                            )),
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          height: 20,
+                                        ),
+                                        // Divider(),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Expanded(
+                                              child: Text(
+                                                "name",
+                                                style: theme
+                                                    .getStyle()
+                                                    .copyWith(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 16),
+                                              ),
+                                            ),
+                                            Expanded(
+                                                child: Text(
+                                              _nameController.text,
+                                              style: theme.getStyle().copyWith(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 16),
+                                            )),
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          height: 20,
+                                        ),
+
+                                        // Divider(),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Expanded(
+                                                child: Text(
+                                              "Address",
+                                              style: theme.getStyle().copyWith(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 16),
+                                            )),
+                                            Expanded(
+                                                child: Text(
+                                              _addressController.text,
+                                              style: theme.getStyle().copyWith(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 16),
+                                            )),
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          height: 20,
+                                        ),
+
+                                        // Divider(),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Expanded(
+                                                child: Text(
+                                              "Phone",
+                                              style: theme.getStyle().copyWith(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 16),
+                                            )),
+                                            Expanded(
+                                                child: Text(
+                                              _phoneController.text,
+                                              style: theme.getStyle().copyWith(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 16),
+                                            )),
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          height: 20,
+                                        ),
+
+                                        // Divider(),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Expanded(
+                                                child: Text(
+                                              "Description",
+                                              style: theme.getStyle().copyWith(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 16),
+                                            )),
+                                            Expanded(
+                                                child: Text(
+                                              _descController.text,
+                                              style: theme.getStyle().copyWith(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 16),
+                                            )),
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          height: 20,
+                                        ),
+
+                                        // Divider(),
                                       ],
                                     ),
                                   ),
@@ -461,6 +368,292 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
           ),
         ),
       ),
+    );
+  }
+
+  Future<void> load() async {
+    if (loading) return;
+    loading = true;
+    await execute(() async {
+      var response = await TwinnedSession.instance.twin
+          .getMyProfile(apikey: TwinnedSession.instance.authToken);
+      var res = response.body!.entity!;
+
+      if (validateResponse(response)) {
+        refresh(sync: () {
+          fullName = res.name;
+          initials = getInitials(fullName);
+          _emailController.text = res.email;
+          _nameController.text = res.name;
+          _addressController.text = res.address ?? '';
+          _phoneController.text = res.phone ?? '';
+          _descController.text = res.description ?? '';
+          twinUserId = res.id;
+          roles = res.roles ?? [];
+          clientIds = res.clientIds ?? [];
+        });
+      }
+    });
+    loading = false;
+    refresh();
+  }
+
+  String getInitials(String fullName) {
+    String firstLetter = fullName.isNotEmpty ? fullName[0].toUpperCase() : '';
+    int spaceIndex = fullName.indexOf(' ');
+    if (spaceIndex != -1) {
+      String secondLetter = fullName[spaceIndex + 1].toUpperCase();
+      return '$firstLetter$secondLetter';
+    }
+    return firstLetter;
+  }
+
+  Future<void> updateProfile() async {
+    busy();
+    try {
+      var res = await TwinnedSession.instance.twin.updateTwinUser(
+        twinUserId: twinUserId,
+        apikey: TwinnedSession.instance.authToken,
+        body: TwinUserInfo(
+          email: _emailController.text,
+          name: _nameController.text,
+          address: _addressController.text,
+          phone: _phoneController.text,
+          description: _descController.text,
+        ),
+      );
+      if (res.body!.ok) {
+        alert('', 'Profile saved successfully!');
+      } else {
+        alert("Profile not Updated", res.body!.msg!);
+      }
+    } catch (e) {
+      alert('Error', e.toString());
+    }
+    busy(busy: false);
+  }
+
+  Future<void> _editPersonalDetails(BuildContext context) async {
+    // Save initial values
+    final initialValues = {
+      'Email': _emailController.text,
+      'Name': _nameController.text,
+      'Address': _addressController.text,
+      'Phone': _phoneController.text,
+      'Description': _descController.text,
+    };
+
+    final controllers = {
+      'Email': _emailController,
+      'Name': _nameController,
+      'Address': _addressController,
+      'Phone': _phoneController,
+      'Description': _descController,
+    };
+
+    await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Edit Personal Details',
+                style: theme.getStyle().copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+              InkWell(
+                onTap: () {
+                  Navigator.pop(context);
+
+                  _emailController.text = initialValues['Email']!;
+                  _nameController.text = initialValues['Name']!;
+                  _addressController.text = initialValues['Address']!;
+                  _phoneController.text = initialValues['Phone']!;
+                  _descController.text = initialValues['Description']!;
+                },
+                child: const Icon(Icons.close_outlined,
+                    color: Color(0xff754893), size: 24),
+              ),
+            ],
+          ),
+          content: Form(
+            key: _formKey,
+            child: SingleChildScrollView(
+              child: SizedBox(
+                height: 400,
+                width: 600,
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  children: controllers.entries.map((entry) {
+                    String label = entry.key;
+                    TextEditingController controller = entry.value;
+                    IconData icon = Icons.label;
+                    Widget field;
+
+                    if (label == 'Email') {
+                      icon = Icons.email_outlined;
+                      field = Column(
+                        children: [
+                          TextField(
+                            style: theme.getStyle(),
+                            controller: controller,
+                            readOnly: true,
+                            decoration: InputDecoration(
+                              labelText: label,
+                              labelStyle: theme.getStyle(),
+                            ),
+                          ),
+                          divider(height: 20),
+                        ],
+                      );
+                    } else if (label == 'Name') {
+                      icon = Icons.person_2_outlined;
+                      field = Column(
+                        children: [
+                          TextFormField(
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Name cannot be empty.';
+                              } else if (value.length <= 4) {
+                                return 'Name should be greater than 4 characters.';
+                              }
+                              return null;
+                            },
+                            style: theme.getStyle(),
+                            controller: controller,
+                            decoration: InputDecoration(
+                              labelText: label,
+                              labelStyle: theme.getStyle(),
+                            ),
+                          ),
+                          divider(height: 20),
+                        ],
+                      );
+                    } else if (label == 'Address') {
+                      icon = Icons.home_outlined;
+                      field = Column(
+                        children: [
+                          TextField(
+                            style: theme.getStyle(),
+                            controller: controller,
+                            decoration: InputDecoration(
+                              labelText: label,
+                              labelStyle: theme.getStyle(),
+                            ),
+                          ),
+                          divider(height: 20),
+                        ],
+                      );
+                    } else if (label == 'Phone') {
+                      icon = Icons.phone_android_outlined;
+                      field = Column(
+                        children: [
+                          IntlPhoneField(
+                            controller: controller,
+                            keyboardType: TextInputType.phone,
+                            initialCountryCode: 'IN',
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                            ],
+                            decoration: InputDecoration(
+                              labelText: 'Enter Phone Number',
+                              counterText: "",
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(4.0),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(4.0),
+                                borderSide: BorderSide(
+                                  color: theme.getPrimaryColor(),
+                                ),
+                              ),
+                              labelStyle: theme.getStyle(),
+                            ),
+                            validator: (phone) {
+                              if (phone == null || phone.number.isEmpty) {
+                                return 'Enter a valid phone number';
+                              }
+                              return null;
+                            },
+                          ),
+                          divider(height: 20),
+                        ],
+                      );
+                    } else if (label == 'Description') {
+                      icon = Icons.description;
+                      field = Column(
+                        children: [
+                          TextField(
+                            style: theme.getStyle(),
+                            controller: controller,
+                            decoration: InputDecoration(
+                              labelText: label,
+                              labelStyle: theme.getStyle(),
+                            ),
+                          ),
+                          divider(height: 20),
+                        ],
+                      );
+                    } else {
+                      field = Column(
+                        children: [
+                          TextField(
+                            style: theme.getStyle(),
+                            controller: controller,
+                            decoration: InputDecoration(
+                              labelText: label,
+                              labelStyle: theme.getStyle(),
+                            ),
+                          ),
+                          divider(height: 20),
+                        ],
+                      );
+                    }
+
+                    return Row(
+                      children: [
+                        Expanded(flex: 10, child: Icon(icon)),
+                        Expanded(
+                          flex: 90,
+                          child: field,
+                        ),
+                      ],
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
+          ),
+          actions: [
+            Row(
+              children: [
+                PrimaryButton(
+                  labelKey: "Save",
+                  onPressed: _nameController.text.isNotEmpty
+                      ? () {
+                          if (_formKey.currentState!.validate()) {
+                            setState(() {
+                              _emailController.text = _emailController.text;
+                              _nameController.text = _nameController.text;
+                              _addressController.text = _addressController.text;
+                              _phoneController.text = _phoneController.text;
+                              _descController.text = _descController.text;
+                            });
+                            updateProfile();
+                            Navigator.of(context).pop();
+                          }
+                        }
+                      : null,
+                ),
+              ],
+            ),
+          ],
+        );
+      },
     );
   }
 
