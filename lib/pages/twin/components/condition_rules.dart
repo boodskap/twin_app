@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
+import 'package:twin_app/widgets/commons/secondary_button.dart';
+import 'package:twin_app/widgets/create_edit_condition_snippet.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:twin_commons/core/twinned_session.dart';
@@ -140,7 +142,7 @@ class _ConditionRulesState extends BaseState<ConditionRules> {
                             Icon(Icons.edit, color: theme.getPrimaryColor())),
                     InkWell(
                       onTap: () {
-                        _delete(e);
+                        _confirmDeletionDialog(context, e);
                       },
                       child: Icon(
                         Icons.delete,
@@ -157,11 +159,98 @@ class _ConditionRulesState extends BaseState<ConditionRules> {
     );
   }
 
-  Future _create() async {}
+  Future _create() async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Container(
+            height: MediaQuery.of(context).size.height - 150,
+            width: MediaQuery.of(context).size.width - 200,
+            child: CreateEditConditionSnippet(),
+          ),
+        );
+      },
+    );
+  }
 
   Future _edit(tapi.Condition e) async {}
 
-  Future _delete(tapi.Condition e) async {}
+  Future _confirmDeletionDialog(
+      BuildContext context, tapi.Condition condition) {
+    Widget cancelButton = SecondaryButton(
+      labelKey: 'Cancel',
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
+    Widget continueButton = PrimaryButton(
+      leading: const Icon(
+        Icons.delete_forever,
+        color: Colors.white,
+      ),
+      labelKey: 'Delete',
+      onPressed: () {
+        Navigator.pop(context);
+        _delete(condition);
+      },
+    );
+
+    AlertDialog alert = AlertDialog(
+      title: Text(
+        "WARNING",
+        style: theme.getStyle().copyWith(
+              color: Colors.red,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+      ),
+      content: Text(
+        "Deleting a Condition Rule can not be undone.\nYou will lose all of the Condition Rule data, history, etc.\n\nAre you sure you want to delete?",
+        style: theme.getStyle().copyWith(
+              color: Colors.red,
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+            ),
+        maxLines: 10,
+      ),
+      actions: [
+        cancelButton,
+        continueButton,
+      ],
+    );
+
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
+  Future _delete(tapi.Condition e) async {
+    if (loading) return;
+    loading = true;
+
+    await execute(() async {
+      int index = _entities.indexWhere((element) => element.id == e.id);
+      var res = await TwinnedSession.instance.twin.deleteCondition(
+        apikey: TwinnedSession.instance.authToken,
+        conditionId: e.id,
+      );
+
+      if (validateResponse(res)) {
+        _entities.removeAt(index);
+      }
+      refresh();
+    });
+
+    loading = false;
+    refresh();
+  }
 
   Future _load() async {
     if (loading) return;

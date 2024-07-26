@@ -4,9 +4,15 @@ import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:twin_app/widgets/commons/secondary_button.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/widgets/common/label_text_field.dart';
+import 'package:twinned_api/twinned_api.dart' as tapi;
+import 'package:twinned_widgets/core/device_model_dropdown.dart';
+import 'package:chopper/chopper.dart' as chopper;
+import 'package:twin_commons/core/twinned_session.dart';
 
 class CreateEditConditionSnippet extends StatefulWidget {
-  const CreateEditConditionSnippet({super.key});
+  tapi.Condition? condition;
+  tapi.DeviceModel? selectedModel;
+  CreateEditConditionSnippet({super.key, this.condition, this.selectedModel});
 
   @override
   State<CreateEditConditionSnippet> createState() =>
@@ -19,48 +25,225 @@ class _CreateEditConditionSnippetState
   late PageController _pageViewController;
   late TabController _tabController;
   int _currentPageIndex = 0;
-  List<String> deviceModelList = <String>[
-    'Genset',
-    'Tank Monitor',
-    'AC',
-    'Chiller',
-    'Boiler'
-  ];
-  late String deviceModelValue;
-  List<String> operatorsList = <String>[
-    '==',
-    '>',
-    '>=',
-    '<',
-    '<=',
-    '!=',
-    'BETWEEN',
-    'NOT BETWEEN',
-    'CONTAINS',
-    'NOT CONTAINS',
-  ];
-  late String operatorValue;
-  List<String> paramList = <String>[
-    'rpm',
-    'fuel',
-    'temperature',
-    'pressure',
-    'power_level',
-  ];
-  late String paramValue;
+  tapi.DeviceModel? _selectedDeviceModel;
+
+  final List<tapi.Parameter> _parameters = [];
+  final List<tapi.DeviceModel> _models = [];
+  final List<DropdownMenuItem<tapi.Parameter>> _parameterItems = [];
+  final List<DropdownMenuItem<tapi.ConditionCondition>> _conditionItems = [];
+  tapi.DeviceModel? _selectedModel;
+  tapi.Parameter? _selectedParameter;
+  tapi.ConditionCondition? _selectedCondition;
+  bool _showValue = false;
+  bool _showLRValues = false;
+  bool _showNDValues = false;
+  bool _showTValues = false;
+
   TextEditingController _valueController = TextEditingController();
   TextEditingController _nameController = TextEditingController();
   TextEditingController _leftValueController = TextEditingController();
   TextEditingController _rightValueController = TextEditingController();
+  TextEditingController _valuesController = TextEditingController();
+  TextEditingController _tagsController = TextEditingController();
+  TextEditingController _descController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _pageViewController = PageController();
     _tabController = TabController(length: 3, vsync: this);
-    deviceModelValue = deviceModelList.first;
-    operatorValue = operatorsList.first;
-    paramValue = paramList.first;
+
+    for (var con in tapi.ConditionCondition.values) {}
+
+    _conditionItems.add(DropdownMenuItem<tapi.ConditionCondition>(
+        value: tapi.ConditionCondition.lt,
+        child: Center(
+          child: Text(
+            '<',
+            style: theme.getStyle(),
+            textAlign: TextAlign.center,
+          ),
+        )));
+    _conditionItems.add(DropdownMenuItem<tapi.ConditionCondition>(
+        value: tapi.ConditionCondition.lte,
+        child: Center(
+          child: Text(
+            '<=',
+            style: theme.getStyle(),
+            textAlign: TextAlign.center,
+          ),
+        )));
+    _conditionItems.add(DropdownMenuItem<tapi.ConditionCondition>(
+        value: tapi.ConditionCondition.gt,
+        child: Center(
+          child: Text(
+            '>',
+            style: theme.getStyle(),
+            textAlign: TextAlign.center,
+          ),
+        )));
+    _conditionItems.add(DropdownMenuItem<tapi.ConditionCondition>(
+        value: tapi.ConditionCondition.gte,
+        child: Center(
+          child: Text(
+            '>=',
+            style: theme.getStyle(),
+            textAlign: TextAlign.center,
+          ),
+        )));
+    _conditionItems.add(DropdownMenuItem<tapi.ConditionCondition>(
+        value: tapi.ConditionCondition.eq,
+        child: Center(
+          child: Text(
+            '==',
+            style: theme.getStyle(),
+            textAlign: TextAlign.center,
+          ),
+        )));
+    _conditionItems.add(DropdownMenuItem<tapi.ConditionCondition>(
+        value: tapi.ConditionCondition.neq,
+        child: Center(
+          child: Text(
+            '!=',
+            style: theme.getStyle(),
+            textAlign: TextAlign.center,
+          ),
+        )));
+    _conditionItems.add(DropdownMenuItem<tapi.ConditionCondition>(
+        value: tapi.ConditionCondition.between,
+        child: Center(
+          child: Text(
+            'BETWEEN',
+            style: theme.getStyle(),
+            textAlign: TextAlign.center,
+          ),
+        )));
+    _conditionItems.add(DropdownMenuItem<tapi.ConditionCondition>(
+        value: tapi.ConditionCondition.nbetween,
+        child: Center(
+          child: Text(
+            'NOT BETWEEN',
+            style: theme.getStyle(),
+            textAlign: TextAlign.center,
+          ),
+        )));
+    _conditionItems.add(DropdownMenuItem<tapi.ConditionCondition>(
+        value: tapi.ConditionCondition.contains,
+        child: Center(
+          child: Text(
+            'CONTAINS',
+            style: theme.getStyle(),
+            textAlign: TextAlign.center,
+          ),
+        )));
+    _conditionItems.add(DropdownMenuItem<tapi.ConditionCondition>(
+        value: tapi.ConditionCondition.ncontains,
+        child: Center(
+          child: Text(
+            'NOT CONTAINS',
+            style: theme.getStyle(),
+            textAlign: TextAlign.center,
+          ),
+        )));
+    _selectedCondition = tapi.ConditionCondition.eq;
+
+    setup();
+  }
+
+  Future<void> _loadModels() async {
+    _selectedParameter = null;
+    _selectedCondition = null;
+    _parameters.clear();
+    _parameterItems.clear();
+    _conditionItems.clear();
+
+    if (_selectedDeviceModel != null) {
+      _models.add(_selectedDeviceModel!);
+
+      if (_models.isNotEmpty) {
+        _selectedModel = _models.first;
+
+        if (_selectedModel != null) {
+          _parameters.addAll(_selectedModel!.parameters);
+
+          if (_parameters.isNotEmpty) {
+            _selectedParameter = _parameters.first;
+          }
+
+          for (var param in _parameters) {
+            _parameterItems.add(
+              DropdownMenuItem<tapi.Parameter>(
+                value: param,
+                child: Center(
+                  child: Text(
+                    param.name,
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+            );
+          }
+
+          _conditionItems
+              .addAll(tapi.ConditionCondition.values.map((condition) {
+            return DropdownMenuItem<tapi.ConditionCondition>(
+              value: condition,
+              child: Text(condition.name),
+            );
+          }).toList());
+        }
+      }
+    }
+
+    setState(() {});
+  }
+
+  @override
+  void setup() async {
+    await _loadModels();
+
+    if (null != widget.condition) {
+      tapi.Condition e = widget.condition!;
+      _nameController.text = e.name;
+      _descController.text = e.description ?? '';
+      _tagsController.text = null != e.tags ? e.tags!.join(' ') : '';
+
+      _selectedCondition = e.condition;
+
+      _valueController.text = e.$value ?? '';
+      _leftValueController.text = e.leftValue ?? '';
+      _rightValueController.text = e.rightValue ?? '';
+      _valuesController.text = (null != e.values ? e.values!.join('\n') : '');
+      debugPrint('Selected conditionn$_selectedCondition');
+      switch (_selectedCondition!) {
+        case tapi.ConditionCondition.between:
+        case tapi.ConditionCondition.nbetween:
+          _showLRValues = true;
+          break;
+        case tapi.ConditionCondition.contains:
+        case tapi.ConditionCondition.ncontains:
+          if (_selectedParameter!.parameterType ==
+              tapi.ParameterParameterType.text) {
+            _showTValues = true;
+          } else {
+            _showNDValues = true;
+          }
+          break;
+        case tapi.ConditionCondition.lt:
+        case tapi.ConditionCondition.lte:
+        case tapi.ConditionCondition.gt:
+        case tapi.ConditionCondition.gte:
+        case tapi.ConditionCondition.eq:
+        case tapi.ConditionCondition.neq:
+        default:
+          _showValue = true;
+          break;
+      }
+    } else {
+      _showValue = true;
+      _selectedCondition = tapi.ConditionCondition.eq;
+    }
+    setState(() {});
   }
 
   @override
@@ -70,6 +253,201 @@ class _CreateEditConditionSnippetState
     _tabController.dispose();
     _valueController.dispose();
     _nameController.dispose();
+  }
+
+  bool isBlank(String text) {
+    return text.isEmpty;
+  }
+
+  bool isBoolean(String text) {
+    return (text == 'true' || text == 'false');
+  }
+
+  bool _validateParameter(String data, String field) {
+    if (isBlank(data)) {
+      alert('Invalid Value', "$field can't be empty");
+      return false;
+    }
+
+    switch (_selectedParameter!.parameterType) {
+      case tapi.ParameterParameterType.yesno:
+        if (!isBoolean(data)) {
+          alert('Invalid Value', '$field ($data) should be true or false');
+          return false;
+        }
+        break;
+      case tapi.ParameterParameterType.numeric:
+        if (int.tryParse(data) == null) {
+          alert('Invalid Value', '$field ($data) should be a valid number');
+          return false;
+        }
+        break;
+      case tapi.ParameterParameterType.floating:
+        if (double.tryParse(data) == null) {
+          alert('Invalid Value', '$field ($data) should be a valid decimal');
+          return false;
+        }
+        break;
+      default:
+        break;
+    }
+    return true;
+  }
+
+  Future _save({bool shouldPop = false}) async {
+    busy();
+    try {
+      if (isBlank(_nameController.text)) {
+        alert('Missing Value', "Name can't be empty");
+        return;
+      }
+      switch (_selectedCondition!) {
+        case tapi.ConditionCondition.between:
+        case tapi.ConditionCondition.nbetween:
+          if (!_validateParameter(_leftValueController.text, 'Left Value'))
+            return;
+          if (!_validateParameter(_rightValueController.text, 'Right Value')) {
+            return;
+          }
+          break;
+        case tapi.ConditionCondition.contains:
+        case tapi.ConditionCondition.ncontains:
+          if (isBlank(_valuesController.text)) {
+            alert('Invalid Value', "Values can't be empty");
+            return;
+          }
+          var values = _valuesController.text.split('\n');
+          for (var value in values) {
+            value = value.trim();
+            if (value.isEmpty) continue;
+            if (!_validateParameter(value, 'Values')) return;
+          }
+          break;
+        case tapi.ConditionCondition.lt:
+        case tapi.ConditionCondition.lte:
+        case tapi.ConditionCondition.gt:
+        case tapi.ConditionCondition.gte:
+        case tapi.ConditionCondition.eq:
+        case tapi.ConditionCondition.neq:
+        default:
+          if (!_validateParameter(_valueController.text, 'Value')) return;
+          break;
+      }
+
+      String value = _valueController.text;
+      String lValue = _leftValueController.text;
+      String rValue = _rightValueController.text;
+      List<String> values = [];
+
+      var cValues = _valuesController.text.split('\n');
+      for (var value in cValues) {
+        value = value.trim();
+        if (value.isEmpty) continue;
+        values.add(value);
+      }
+
+      values = values.toSet().toList();
+
+      chopper.Response<tapi.ConditionEntityRes> res;
+
+      if (null == widget.condition) {
+        res = await TwinnedSession.instance.twin.createCondition(
+            apikey: TwinnedSession.instance.authToken,
+            body: tapi.ConditionInfo(
+              name: _nameController.text,
+              modelId: _selectedModel!.id,
+              field: _selectedParameter!.name,
+              condition: tapi.ConditionInfoCondition.values
+                  .byName(_selectedCondition!.name),
+              tags: _tagsController.text.split(' '),
+              description: _descController.text,
+              $value: value,
+              leftValue: lValue,
+              rightValue: rValue,
+              values: values,
+            ));
+      } else {
+        res = await TwinnedSession.instance.twin.updateCondition(
+            apikey: TwinnedSession.instance.authToken,
+            conditionId: widget.condition!.id,
+            body: tapi.ConditionInfo(
+              name: _nameController.text,
+              modelId: _selectedModel!.id,
+              field: _selectedParameter!.name,
+              condition: tapi.ConditionInfoCondition.values
+                  .byName(_selectedCondition!.name),
+              tags: _tagsController.text.split(' '),
+              description: _descController.text,
+              $value: value,
+              leftValue: lValue,
+              rightValue: rValue,
+              values: values,
+              icon: widget.condition!.icon,
+            ));
+      }
+      if (validateResponse(res)) {
+        setState(() {
+          widget.condition = res.body!.entity;
+        });
+        await alert('', 'Condition ${_nameController.text} saved successfully');
+        if (shouldPop) {
+          _cancel();
+        }
+      }
+    } catch (e, s) {
+      debugPrint('$e\n$s');
+    } finally {
+      busy(busy: false);
+    }
+  }
+
+  void _cancel() {
+    Navigator.pop(context);
+  }
+
+  void _changeParameter(tapi.Parameter? parameter) {
+    _selectedParameter = parameter;
+    _valueController.text = '';
+    _leftValueController.text = '';
+    _rightValueController.text = '';
+    _valuesController.text = '';
+    _changeCondition(tapi.ConditionCondition.eq);
+  }
+
+  void _changeCondition(tapi.ConditionCondition? condition) {
+    _showValue = false;
+    _showLRValues = false;
+    _showNDValues = false;
+    _showTValues = false;
+
+    _selectedCondition = condition;
+
+    switch (condition!) {
+      case tapi.ConditionCondition.between:
+      case tapi.ConditionCondition.nbetween:
+        _showLRValues = true;
+        break;
+      case tapi.ConditionCondition.contains:
+      case tapi.ConditionCondition.ncontains:
+        if (_selectedParameter!.parameterType ==
+            tapi.ParameterParameterType.text) {
+          _showTValues = true;
+        } else {
+          _showNDValues = true;
+        }
+        break;
+      case tapi.ConditionCondition.lt:
+      case tapi.ConditionCondition.lte:
+      case tapi.ConditionCondition.gt:
+      case tapi.ConditionCondition.gte:
+      case tapi.ConditionCondition.eq:
+      case tapi.ConditionCondition.neq:
+      default:
+        _showValue = true;
+        break;
+    }
+
+    setState(() {});
   }
 
   @override
@@ -103,6 +481,8 @@ class _CreateEditConditionSnippetState
               tabController: _tabController,
               currentPageIndex: _currentPageIndex,
               onUpdateCurrentPageIndex: _updateCurrentPageIndex,
+              onSave: _save,
+              onCancel: _cancel,
             ),
             const SizedBox(
               height: 10,
@@ -132,17 +512,16 @@ class _CreateEditConditionSnippetState
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: DropdownMenu<String>(
-              initialSelection: deviceModelList.first,
-              onSelected: (String? value) {
-                setState(() {
-                  deviceModelValue = value!;
-                });
-              },
-              dropdownMenuEntries: deviceModelList
-                  .map<DropdownMenuEntry<String>>((String value) {
-                return DropdownMenuEntry<String>(value: value, label: value);
-              }).toList(),
+            child: SizedBox(
+              width: 250,
+              child: DeviceModelDropdown(
+                  selectedItem: _selectedDeviceModel?.id,
+                  onDeviceModelSelected: (dm) {
+                    setState(() {
+                      _selectedDeviceModel = dm;
+                    });
+                    _loadModels();
+                  }),
             ),
           ),
         ],
@@ -168,17 +547,17 @@ class _CreateEditConditionSnippetState
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: DropdownMenu<String>(
-              initialSelection: paramList.first,
-              onSelected: (String? value) {
-                setState(() {
-                  paramValue = value!;
-                });
-              },
-              dropdownMenuEntries:
-                  paramList.map<DropdownMenuEntry<String>>((String value) {
-                return DropdownMenuEntry<String>(value: value, label: value);
-              }).toList(),
+            child: SizedBox(
+              width: 250,
+              child: DropdownButton<tapi.Parameter>(
+                items: _parameterItems,
+                value: _selectedParameter,
+                onChanged: (tapi.Parameter? value) {
+                  setState(() {
+                    _changeParameter(value);
+                  });
+                },
+              ),
             ),
           ),
           const SizedBox(
@@ -186,17 +565,23 @@ class _CreateEditConditionSnippetState
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: DropdownMenu<String>(
-              initialSelection: operatorsList.first,
-              onSelected: (String? value) {
-                setState(() {
-                  operatorValue = value!;
-                });
-              },
-              dropdownMenuEntries:
-                  operatorsList.map<DropdownMenuEntry<String>>((String value) {
-                return DropdownMenuEntry<String>(value: value, label: value);
-              }).toList(),
+            child: SizedBox(
+              width: 400,
+              child: Center(
+                child: DropdownButton<tapi.ConditionCondition>(
+                  iconSize: 0.0,
+                  isDense: false,
+                  isExpanded: true,
+                  alignment: AlignmentDirectional.center,
+                  items: _conditionItems,
+                  value: _selectedCondition,
+                  onChanged: (tapi.ConditionCondition? value) {
+                    setState(() {
+                      _changeCondition(value);
+                    });
+                  },
+                ),
+              ),
             ),
           ),
           const SizedBox(
@@ -213,10 +598,7 @@ class _CreateEditConditionSnippetState
           const SizedBox(
             height: 15,
           ),
-          if (!(operatorValue == 'BETWEEN' ||
-              operatorValue == 'NOT BETWEEN' ||
-              operatorValue == 'CONTAINS' ||
-              operatorValue == 'NOT CONTAINS'))
+          if (_showValue)
             SizedBox(
               width: 150,
               child: LabelTextField(
@@ -224,13 +606,9 @@ class _CreateEditConditionSnippetState
                 controller: _valueController,
               ),
             ),
-          if (operatorValue == 'BETWEEN' ||
-              operatorValue == 'NOT BETWEEN' ||
-              operatorValue == 'CONTAINS' ||
-              operatorValue == 'NOT CONTAINS')
+          if (_showLRValues)
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 SizedBox(
                   width: 200,
@@ -247,6 +625,22 @@ class _CreateEditConditionSnippetState
                   ),
                 ),
               ],
+            ),
+          if (_showTValues || _showNDValues)
+            Expanded(
+              child: SizedBox(
+                width: 200,
+                child: LabelTextField(
+                  controller: _valuesController,
+                  textAlign: TextAlign.center,
+                  style: theme.getStyle().copyWith(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                  label: 'Values',
+                  maxLines: 5,
+                ),
+              ),
             ),
           const SizedBox(
             height: 50,
@@ -313,11 +707,6 @@ class _CreateEditConditionSnippetState
       curve: Curves.easeInOut,
     );
   }
-
-  @override
-  void setup() {
-    // TODO: implement setup
-  }
 }
 
 class PageIndicator extends StatelessWidget {
@@ -326,11 +715,15 @@ class PageIndicator extends StatelessWidget {
     required this.tabController,
     required this.currentPageIndex,
     required this.onUpdateCurrentPageIndex,
+    required this.onSave,
+    required this.onCancel,
   });
 
   final int currentPageIndex;
   final TabController tabController;
   final void Function(int) onUpdateCurrentPageIndex;
+  final Future<void> Function({bool shouldPop}) onSave;
+  final VoidCallback onCancel;
 
   @override
   Widget build(BuildContext context) {
@@ -346,7 +739,7 @@ class PageIndicator extends StatelessWidget {
         children: <Widget>[
           SecondaryButton(
             labelKey: 'Cancel',
-            onPressed: _cancel,
+            onPressed: () => onCancel(),
           ),
           if (currentPageIndex > 0)
             SecondaryButton(
@@ -361,7 +754,7 @@ class PageIndicator extends StatelessWidget {
           if (currentPageIndex == 2)
             PrimaryButton(
               labelKey: 'Save',
-              onPressed: _save,
+              onPressed: () => onSave(shouldPop: true),
             ),
         ],
       ),
@@ -374,13 +767,5 @@ class PageIndicator extends StatelessWidget {
 
   void _nextPage() {
     onUpdateCurrentPageIndex(currentPageIndex + 1);
-  }
-
-  void _cancel() {
-    // Implement cancel logic
-  }
-
-  void _save() {
-    // Implement save logic
   }
 }
