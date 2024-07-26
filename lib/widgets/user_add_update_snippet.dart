@@ -43,6 +43,8 @@ class _UserAddUpdateSnippetState extends BaseState<UserAddUpdateSnippet> {
     clientIds: [],
     description: '',
   );
+  String fullNumber = "";
+  String countryCode = "";
 
   @override
   void initState() {
@@ -64,11 +66,20 @@ class _UserAddUpdateSnippetState extends BaseState<UserAddUpdateSnippet> {
     }
 
     nameController.text = _twinUserInfo.name;
-    phoneController.text = _twinUserInfo.phone ?? '';
     emailController.text = _twinUserInfo.email ?? '';
     nameController.addListener(_onNameChanged);
     emailController.addListener(_onNameChanged);
     phoneController.addListener(_onNameChanged);
+    String? input = _twinUserInfo.phone;
+    List<String> splitString = input!.split('/');
+
+    if (splitString.length > 2) {
+      countryCode = splitString[0];
+      phoneController.text = splitString[2];
+    } else {
+      countryCode = "IN";
+      phoneController.text = _twinUserInfo.phone!;
+    }
   }
 
   @override
@@ -123,7 +134,7 @@ class _UserAddUpdateSnippetState extends BaseState<UserAddUpdateSnippet> {
                         child: IntlPhoneField(
                           controller: phoneController,
                           keyboardType: TextInputType.phone,
-                          initialCountryCode: 'IN',
+                          initialCountryCode: countryCode,
                           inputFormatters: [
                             FilteringTextInputFormatter.digitsOnly,
                           ],
@@ -148,6 +159,8 @@ class _UserAddUpdateSnippetState extends BaseState<UserAddUpdateSnippet> {
                           },
                           onChanged: (phone) {
                             setState(() {
+                              fullNumber =
+                                  "${phone.countryISOCode}/${phone.countryCode}/${phone.number}";
                               _isPhoneValid = phone.completeNumber.isNotEmpty &&
                                   phone.completeNumber.length >= 10 &&
                                   phone.isValidNumber();
@@ -277,7 +290,7 @@ class _UserAddUpdateSnippetState extends BaseState<UserAddUpdateSnippet> {
     _twinUserInfo = _twinUserInfo.copyWith(
       name: nameController.text.trim(),
       email: emailController.text.trim(),
-      phone: phoneController.text.trim(),
+      phone: fullNumber.trim(),
     );
 
     await execute(() async {
