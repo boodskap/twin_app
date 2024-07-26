@@ -176,8 +176,8 @@ class HomeScreenState extends BaseState<HomeScreen> {
   @override
   initState() {
     super.initState();
-    menuItems.addAll(_menuItems);
     menuItems.addAll(session.menuItems);
+    menuItems.addAll(_menuItems);
     showScreen(session.selectedMenu);
   }
 
