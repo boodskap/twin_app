@@ -36,6 +36,10 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
   List<String> roleNames = [];
   List<String> clientIds = [];
   List<String> clients = [];
+  String fullNumber = "";
+  String countryCode = "";
+
+  bool _isPhoneValid = true;
   void _onNameChanged() {
     setState(() {});
   }
@@ -48,6 +52,16 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
     _tabController =
         TabController(length: 3, vsync: this, initialIndex: widget.selectedTab);
     _nameController.addListener(_onNameChanged);
+    String? input = _phoneController.text;
+
+    List<String> splitString = input!.split('/');
+
+    if (splitString.length > 1) {
+      countryCode = splitString[0];
+      _phoneController.text = splitString[1];
+    } else {
+      countryCode = "IN";
+    }
   }
 
   @override
@@ -59,6 +73,20 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
 
   @override
   Widget build(BuildContext context) {
+    String fullnum = "";
+    String? input = _phoneController.text;
+    List<String> splitString = input!.split('/');
+
+    if (splitString.length > 2) {
+      countryCode = splitString[0];
+      _phoneController.text = splitString[2];
+      fullnum = splitString[1]+splitString[2];
+    } else {
+      countryCode = "IN";
+      _phoneController.text = _phoneController.text;
+      fullnum = _phoneController.text;
+    }
+
     return Center(
       child: SizedBox(
         width: 900,
@@ -262,7 +290,7 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
                                             )),
                                             Expanded(
                                                 child: Text(
-                                              _phoneController.text,
+                                              fullnum,
                                               style: theme.getStyle().copyWith(
                                                   fontWeight: FontWeight.bold,
                                                   fontSize: 16),
@@ -434,7 +462,6 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
   }
 
   Future<void> _editPersonalDetails(BuildContext context) async {
-    // Save initial values
     final initialValues = {
       'Email': _emailController.text,
       'Name': _nameController.text,
@@ -555,7 +582,7 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
                           IntlPhoneField(
                             controller: controller,
                             keyboardType: TextInputType.phone,
-                            initialCountryCode: 'IN',
+                            initialCountryCode: countryCode,
                             inputFormatters: [
                               FilteringTextInputFormatter.digitsOnly,
                             ],
@@ -578,6 +605,16 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
                                 return 'Enter a valid phone number';
                               }
                               return null;
+                            },
+                            onChanged: (phone) {
+                              setState(() {
+                                fullNumber =
+                                    "${phone.countryISOCode}/${phone.countryCode}/${phone.number}";
+                                _isPhoneValid =
+                                    phone.completeNumber.isNotEmpty &&
+                                        phone.completeNumber.length >= 10 &&
+                                        phone.isValidNumber();
+                              });
                             },
                           ),
                           divider(height: 20),
@@ -638,7 +675,7 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
                           _emailController.text = _emailController.text;
                           _nameController.text = _nameController.text;
                           _addressController.text = _addressController.text;
-                          _phoneController.text = _phoneController.text;
+                          _phoneController.text = fullNumber.trim();
                           _descController.text = _descController.text;
                         });
                         updateProfile();
