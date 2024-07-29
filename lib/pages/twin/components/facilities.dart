@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:twin_app/core/session_variables.dart';
-import 'package:twin_app/pages/twin/components/widget/facilities_content.dart';
+import 'package:twin_app/pages/twin/components/widgets/facilities_content_page.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:twin_app/widgets/commons/secondary_button.dart';
 import 'package:twin_commons/core/base_state.dart';
@@ -59,9 +59,11 @@ class _FacilitiesState extends BaseState<Facilities> {
                 Icons.add,
                 color: Colors.white,
               ),
-              onPressed: () {
-                _create();
-              },
+              onPressed: (_selectedPremise != null)
+                  ? () {
+                      _create();
+                    }
+                  : null,
             ),
             divider(horizontal: true),
             SizedBox(
@@ -142,24 +144,24 @@ class _FacilitiesState extends BaseState<Facilities> {
                     children: [
                       InkWell(
                           onTap: () {
-                            // _edit(e);
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => FacilitiesContentPage(
-                                  facility: e,
-                                  key: Key(
-                                    Uuid().v4(),
-                                  ),
-                                ),
-                              ),
-                            );
+                            _edit(e);
+                            // Navigator.push(
+                            //   context,
+                            //   MaterialPageRoute(
+                            //     builder: (context) => FacilitiesContentPage(
+                            //       facility: e,
+                            //       key: Key(
+                            //         Uuid().v4(),
+                            //       ),
+                            //     ),
+                            //   ),
+                            // );
                           },
                           child:
                               Icon(Icons.edit, color: theme.getPrimaryColor())),
                       InkWell(
                         onTap: () {
-                          confirmDeletion(context, e);
+                          _delete(e);
                         },
                         child: Icon(
                           Icons.delete,
@@ -184,6 +186,8 @@ class _FacilitiesState extends BaseState<Facilities> {
   }
 
   Future _create() async {
+    if (loading) return;
+    loading = true;
     await _getBasicInfo(context, 'New Facility',
         onPressed: (name, desc, t) async {
       List<String> tags = [];
@@ -199,13 +203,15 @@ class _FacilitiesState extends BaseState<Facilities> {
               tags: tags,
               roles: _selectedPremise!.roles));
       if (validateResponse(mRes)) {
-        await _openFacility(mRes.body!.entity!);
-        alert('Success', 'Facility created successfully');
+        await _edit(mRes.body!.entity!);
+        alert('Success', 'Facility ${name} created successfully');
       }
     });
+    loading = false;
+    refresh();
   }
 
-  Future _openFacility(tapi.Facility e) async {
+  Future _edit(tapi.Facility e) async {
     await Navigator.push(
       context,
       MaterialPageRoute(
@@ -294,72 +300,98 @@ class _FacilitiesState extends BaseState<Facilities> {
         });
   }
 
-  confirmDeletion(BuildContext context, tapi.Facility e) {
-    // set up the buttons
-    Widget cancelButton = SecondaryButton(
-      labelKey: 'Cancel',
-      onPressed: () => Navigator.pop(context),
-    );
-    Widget deleteButton = PrimaryButton(
-      labelKey: 'Delete',
-      onPressed: () {
-        Navigator.pop(context);
-        _removeEntity(e);
-      },
-    );
-
-    AlertDialog alert = AlertDialog(
-      title: Text(
-        "WARNING",
-        style: theme.getStyle().copyWith(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.red,
-            ),
-      ),
-      content: Text(
-        "Deleting a Facility can not be undone.\nYou will loose all of the Facility data, history, etc.\n\nAre you sure you want to delete?",
-        style: theme.getStyle().copyWith(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
-        maxLines: 10,
-      ),
-      actions: [
-        cancelButton,
-        deleteButton,
-      ],
-    );
-
-    // show the dialog
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
-      },
-    );
+  Future _delete(tapi.Facility e) async {
+    if (loading) return;
+    loading = true;
+    await confirm(
+        title: 'Warning',
+        message:
+            'Deleting is unrecoverable\nIt may also delete all the related models and components\n\nDo you want to proceed?',
+        titleStyle: const TextStyle(color: Colors.red),
+        messageStyle: const TextStyle(fontWeight: FontWeight.bold),
+        onPressed: () async {
+          await execute(() async {
+            int index = _entities.indexWhere((element) => element.id == e.id);
+            var res = await TwinnedSession.instance.twin.deleteFacility(
+                apikey: TwinnedSession.instance.authToken, facilityId: e.id);
+            if (validateResponse(res)) {
+              await _load();
+              _entities.removeAt(index);
+              _cards.removeAt(index);
+              alert('Success', 'Facility ${e.name} deleted!');
+            }
+          });
+        });
+    loading = false;
+    refresh();
   }
 
-  void _removeEntity(tapi.Facility e) async {
-    busy();
-    try {
-      int index = _entities.indexWhere((element) => element.id == e.id);
+  // confirmDeletion(BuildContext context, tapi.Facility e) {
+  //   // set up the buttons
+  //   Widget cancelButton = SecondaryButton(
+  //     labelKey: 'Cancel',
+  //     onPressed: () => Navigator.pop(context),
+  //   );
+  //   Widget deleteButton = PrimaryButton(
+  //     labelKey: 'Delete',
+  //     onPressed: () {
+  //       Navigator.pop(context);
+  //       _removeEntity(e);
+  //     },
+  //   );
 
-      var res = await TwinnedSession.instance.twin.deleteFacility(
-          apikey: TwinnedSession.instance.authToken, facilityId: e.id);
+  //   AlertDialog alert = AlertDialog(
+  //     title: Text(
+  //       "WARNING",
+  //       style: theme.getStyle().copyWith(
+  //             fontSize: 20,
+  //             fontWeight: FontWeight.bold,
+  //             color: Colors.red,
+  //           ),
+  //     ),
+  //     content: Text(
+  //       "Deleting a Facility can not be undone.\nYou will loose all of the Facility data, history, etc.\n\nAre you sure you want to delete?",
+  //       style: theme.getStyle().copyWith(
+  //             fontSize: 14,
+  //             fontWeight: FontWeight.bold,
+  //             color: Colors.black,
+  //           ),
+  //       maxLines: 10,
+  //     ),
+  //     actions: [
+  //       cancelButton,
+  //       deleteButton,
+  //     ],
+  //   );
 
-      if (validateResponse(res)) {
-        _entities.removeAt(index);
-        _cards.removeAt(index);
-        alert('Success', 'Facility ${e.name} deleted!');
-      }
-      refresh();
-    } catch (e, s) {
-      debugPrint('$e\n$s');
-    }
-    busy(busy: false);
-  }
+  //   // show the dialog
+  //   showDialog(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return alert;
+  //     },
+  //   );
+  // }
+
+  // void _removeEntity(tapi.Facility e) async {
+  //   if (loading) return;
+  //   loading = true;
+
+  //   execute(sync)
+  //     int index = _entities.indexWhere((element) => element.id == e.id);
+
+  //     var res = await TwinnedSession.instance.twin.deleteFacility(
+  //         apikey: TwinnedSession.instance.authToken, facilityId: e.id);
+
+  //     if (validateResponse(res)) {
+  // _entities.removeAt(index);
+  // _cards.removeAt(index);
+  // alert('Success', 'Facility ${e.name} deleted!');
+  //     }
+  //     refresh();
+
+  //   busy(busy: false);
+  // }
 
   Future _load() async {
     if (loading) return;
