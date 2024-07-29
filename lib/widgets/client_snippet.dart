@@ -28,6 +28,8 @@ class _ClientSnippetState extends BaseState<ClientSnippet> {
   TextEditingController phoneController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   bool _isPhoneValid = true;
+  String fullNumber = "";
+  String countryCode = "";
   twinned.ClientInfo _client = const twinned.ClientInfo(
       name: '',
       address: '',
@@ -58,11 +60,21 @@ class _ClientSnippetState extends BaseState<ClientSnippet> {
     nameController.text = _client.name;
     descController.text = _client.description ?? '';
     addressController.text = _client.address ?? '';
-    phoneController.text = _client.phone ?? '';
+
     emailController.text = _client.email ?? '';
     nameController.addListener(_onNameChanged);
     emailController.addListener(_onNameChanged);
     phoneController.addListener(_onNameChanged);
+    String? input = _client.phone;
+    List<String> splitString = input!.split('/');
+
+       if (splitString.length > 1) {
+      countryCode = splitString[0];
+      phoneController.text = splitString[1];
+    } else {
+      countryCode = "IN";
+      phoneController.text=_client.phone!;
+    }
   }
 
   @override
@@ -151,7 +163,7 @@ class _ClientSnippetState extends BaseState<ClientSnippet> {
                         child: IntlPhoneField(
                           controller: phoneController,
                           keyboardType: TextInputType.phone,
-                          initialCountryCode: 'IN',
+                          initialCountryCode: countryCode,
                           inputFormatters: [
                             FilteringTextInputFormatter.digitsOnly,
                           ],
@@ -174,8 +186,12 @@ class _ClientSnippetState extends BaseState<ClientSnippet> {
                             }
                             return null;
                           },
-                          onChanged: (phone) {
+                          onChanged: (phone)
+                           {
                             setState(() {
+                               fullNumber =
+                                  "${phone.countryISOCode}/${phone.number}";
+                             
                               _isPhoneValid = phone.completeNumber.isNotEmpty &&
                                   phone.completeNumber.length >= 10 &&
                                   phone.isValidNumber();
@@ -353,7 +369,7 @@ class _ClientSnippetState extends BaseState<ClientSnippet> {
       description: descController.text.trim(),
       address: addressController.text.trim(),
       email: emailController.text.trim(),
-      phone: phoneController.text.trim(),
+      phone: fullNumber.trim(),
     );
 
     await execute(() async {
