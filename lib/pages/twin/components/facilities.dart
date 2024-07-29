@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:twin_app/core/session_variables.dart';
+import 'package:twin_app/pages/twin/components/widget/facilities_content.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
+import 'package:twin_app/widgets/commons/secondary_button.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:twin_commons/core/twin_image_helper.dart';
 import 'package:twin_commons/core/twinned_session.dart';
 import 'package:twinned_widgets/core/premise_dropdown.dart';
 import 'package:twinned_api/twinned_api.dart' as tapi;
+import 'package:uuid/uuid.dart';
+
+typedef BasicInfoCallback = void Function(
+    String name, String? description, String? tags);
 
 class Facilities extends StatefulWidget {
   const Facilities({super.key});
@@ -63,7 +69,7 @@ class _FacilitiesState extends BaseState<Facilities> {
                 width: 250,
                 child: SearchBar(
                   leading: Icon(Icons.search),
-                  hintText: 'Search device library',
+                  hintText: 'Search Facilities',
                   onChanged: (val) {
                     _search = val.trim();
                     _load();
@@ -109,64 +115,251 @@ class _FacilitiesState extends BaseState<Facilities> {
     return SizedBox(
       width: width,
       height: width,
-      child: Card(
-        elevation: 8,
-        color: Colors.white,
-        child: Stack(
-          children: [
-            Align(
-              alignment: Alignment.topLeft,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  e.name,
-                  style: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
-            Align(
-              alignment: Alignment.topRight,
-              child: Padding(
-                padding: const EdgeInsets.only(right: 8.0, top: 8.0),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    InkWell(
-                        onTap: () {
-                          _edit(e);
-                        },
-                        child:
-                            Icon(Icons.edit, color: theme.getPrimaryColor())),
-                    InkWell(
-                      onTap: () {
-                        _delete(e);
-                      },
-                      child: Icon(
-                        Icons.delete,
-                        color: theme.getPrimaryColor(),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            if (null != e.images && e.images!.isNotEmpty)
+      child: Tooltip(
+        message: '${e.name}\n${e.description ?? ""}',
+        child: Card(
+          elevation: 8,
+          color: Colors.white,
+          child: Stack(
+            children: [
               Align(
-                alignment: Alignment.center,
-                child: TwinImageHelper.getImage(e.domainKey, e.images!.first,
-                    width: width / 2, height: width / 2),
-              )
-          ],
+                alignment: Alignment.topLeft,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    e.name,
+                    style:
+                        theme.getStyle().copyWith(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+              Align(
+                alignment: Alignment.topRight,
+                child: Padding(
+                  padding: EdgeInsets.only(right: 8.0, top: 8.0),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      InkWell(
+                          onTap: () {
+                            // _edit(e);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => FacilitiesContentPage(
+                                  facility: e,
+                                  key: Key(
+                                    Uuid().v4(),
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                          child:
+                              Icon(Icons.edit, color: theme.getPrimaryColor())),
+                      InkWell(
+                        onTap: () {
+                          confirmDeletion(context, e);
+                        },
+                        child: Icon(
+                          Icons.delete,
+                          color: theme.getPrimaryColor(),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              if (null != e.images && e.images!.isNotEmpty)
+                Align(
+                  alignment: Alignment.center,
+                  child: TwinImageHelper.getImage(e.domainKey, e.images!.first,
+                      width: width / 2, height: width / 2),
+                )
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Future _create() async {}
+  Future _create() async {
+    await _getBasicInfo(context, 'New Facility',
+        onPressed: (name, desc, t) async {
+      List<String> tags = [];
+      if (null != t) {
+        tags = t.trim().split(' ');
+      }
+      var mRes = await TwinnedSession.instance.twin.createFacility(
+          apikey: TwinnedSession.instance.authToken,
+          body: tapi.FacilityInfo(
+              premiseId: _selectedPremise!.id,
+              name: name,
+              description: desc,
+              tags: tags,
+              roles: _selectedPremise!.roles));
+      if (validateResponse(mRes)) {
+        await _openFacility(mRes.body!.entity!);
+        alert('Success', 'Facility created successfully');
+      }
+    });
+  }
 
-  Future _edit(tapi.Facility e) async {}
+  Future _openFacility(tapi.Facility e) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => FacilitiesContentPage(
+          facility: e,
+          key: Key(
+            Uuid().v4(),
+          ),
+        ),
+      ),
+    );
+    await _load();
+  }
 
-  Future _delete(tapi.Facility e) async {}
+  Future<void> _getBasicInfo(BuildContext context, String title,
+      {required BasicInfoCallback onPressed}) async {
+    String? nameText = '';
+    String? descText = '';
+    String? tagsText = '';
+    return showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return AlertDialog(
+            title: Text(title),
+            content: SizedBox(
+              width: 500,
+              height: 150,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextField(
+                    onChanged: (value) {
+                      setState(() {
+                        nameText = value;
+                      });
+                    },
+                    decoration: const InputDecoration(hintText: 'Name'),
+                  ),
+                  TextField(
+                    onChanged: (value) {
+                      setState(() {
+                        descText = value;
+                      });
+                    },
+                    decoration: const InputDecoration(hintText: 'Description'),
+                  ),
+                  TextField(
+                    onChanged: (value) {
+                      setState(() {
+                        tagsText = value;
+                      });
+                    },
+                    decoration: const InputDecoration(
+                        hintText: 'Tags (space separated)'),
+                  ),
+                ],
+              ),
+            ),
+            actions: <Widget>[
+              SecondaryButton(
+                labelKey: 'Cancel',
+                onPressed: () {
+                  setState(() {
+                    Navigator.pop(context);
+                  });
+                },
+              ),
+              PrimaryButton(
+                labelKey: 'Ok',
+                onPressed: () {
+                  if (nameText!.length < 3) {
+                    alert('Invalid',
+                        'Name is required and should be minimum 3 characters');
+                    return;
+                  }
+                  setState(() {
+                    onPressed(nameText!, descText, tagsText);
+                    Navigator.pop(context);
+                  });
+                },
+              ),
+            ],
+          );
+        });
+  }
+
+  confirmDeletion(BuildContext context, tapi.Facility e) {
+    // set up the buttons
+    Widget cancelButton = SecondaryButton(
+      labelKey: 'Cancel',
+      onPressed: () => Navigator.pop(context),
+    );
+    Widget deleteButton = PrimaryButton(
+      labelKey: 'Delete',
+      onPressed: () {
+        Navigator.pop(context);
+        _removeEntity(e);
+      },
+    );
+
+    AlertDialog alert = AlertDialog(
+      title: Text(
+        "WARNING",
+        style: theme.getStyle().copyWith(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.red,
+            ),
+      ),
+      content: Text(
+        "Deleting a Facility can not be undone.\nYou will loose all of the Facility data, history, etc.\n\nAre you sure you want to delete?",
+        style: theme.getStyle().copyWith(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+        maxLines: 10,
+      ),
+      actions: [
+        cancelButton,
+        deleteButton,
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
+  void _removeEntity(tapi.Facility e) async {
+    busy();
+    try {
+      int index = _entities.indexWhere((element) => element.id == e.id);
+
+      var res = await TwinnedSession.instance.twin.deleteFacility(
+          apikey: TwinnedSession.instance.authToken, facilityId: e.id);
+
+      if (validateResponse(res)) {
+        _entities.removeAt(index);
+        _cards.removeAt(index);
+        alert('Success', 'Facility ${e.name} deleted!');
+      }
+      refresh();
+    } catch (e, s) {
+      debugPrint('$e\n$s');
+    }
+    busy(busy: false);
+  }
 
   Future _load() async {
     if (loading) return;
