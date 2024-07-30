@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:twin_app/core/session_variables.dart';
+import 'package:twin_app/pages/twin/components/facilities.dart';
+import 'package:twin_app/pages/twin/components/widgets/visual_alarms_content_page.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
+import 'package:twin_app/widgets/commons/secondary_button.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:twin_commons/core/twinned_session.dart';
 import 'package:twinned_widgets/core/device_model_dropdown.dart';
 import 'package:twinned_api/twinned_api.dart' as tapi;
+import 'package:uuid/uuid.dart';
 
 class VisualAlarms extends StatefulWidget {
   const VisualAlarms({super.key});
@@ -159,9 +163,121 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
     );
   }
 
-  Future _create() async {}
+  Future<void> _getBasicInfo(BuildContext context, String title,
+      {required BasicInfoCallback onPressed}) async {
+    String? nameText = '';
+    String? descText = '';
+    String? tagsText = '';
+    return showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return AlertDialog(
+            title: Text(title),
+            content: SizedBox(
+              width: 500,
+              height: 150,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextField(
+                    onChanged: (value) {
+                      setState(() {
+                        nameText = value;
+                      });
+                    },
+                    decoration: const InputDecoration(hintText: 'Name'),
+                  ),
+                  TextField(
+                    onChanged: (value) {
+                      setState(() {
+                        descText = value;
+                      });
+                    },
+                    decoration: const InputDecoration(hintText: 'Description'),
+                  ),
+                  TextField(
+                    onChanged: (value) {
+                      setState(() {
+                        tagsText = value;
+                      });
+                    },
+                    decoration: const InputDecoration(
+                        hintText: 'Tags (space separated)'),
+                  ),
+                ],
+              ),
+            ),
+            actions: <Widget>[
+              SecondaryButton(
+                labelKey: 'Cancel',
+                onPressed: () {
+                  setState(() {
+                    Navigator.pop(context);
+                  });
+                },
+              ),
+              PrimaryButton(
+                labelKey: 'Ok',
+                onPressed: () {
+                  if (nameText!.length < 3) {
+                    alert('Invalid',
+                        'Name is required and should be minimum 3 characters');
+                    return;
+                  }
+                  setState(() {
+                    onPressed(nameText!, descText, tagsText);
+                    Navigator.pop(context);
+                  });
+                },
+              ),
+            ],
+          );
+        });
+  }
 
-  Future _edit(tapi.Alarm e) async {}
+  Future _create() async {
+    if (loading) return;
+    loading = true;
+    await _getBasicInfo(context, 'New Alarm', onPressed: (name, desc, t) async {
+      List<String> tags = [];
+      if (null != t) {
+        tags = t.trim().split(' ');
+      }
+      var mRes = await TwinnedSession.instance.twin.createAlarm(
+          apikey: TwinnedSession.instance.authToken,
+          body: tapi.AlarmInfo(
+            modelId: _selectedDeviceModel!.id,
+            name: name,
+            description: desc,
+            tags: tags,
+            state: -1,
+            conditions: [],
+          ));
+      if (validateResponse(mRes)) {
+        await _edit(mRes.body!.entity!);
+        // await _edit(mRes.body!.entity!);
+        alert('Success', 'Alarm ${name} created successfully');
+      }
+    });
+    loading = false;
+    refresh();
+  }
+
+  Future _edit(tapi.Alarm e) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => VisualAlarmsContentPage(
+          key: Key(const Uuid().v4()),
+          model: _selectedDeviceModel!,
+          alarm: e,
+        ),
+      ),
+    );
+    await _load();
+  }
 
   Future _delete(tapi.Alarm e) async {}
 
