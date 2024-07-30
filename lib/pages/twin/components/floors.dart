@@ -119,6 +119,7 @@ class _FloorsState extends BaseState<Floors> {
           ),
         if (!loading && _cards.isNotEmpty)
           SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
             child: Wrap(
               spacing: 8,
               crossAxisAlignment: WrapCrossAlignment.center,
