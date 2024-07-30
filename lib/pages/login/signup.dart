@@ -86,7 +86,8 @@ class _SignUpMobilePageState extends BaseState<_SignUpMobilePage> {
           builder: (BuildContext context) {
             return AlertDialog(
               title: Text('OTP Sent'),
-              content: Text('A 6 digit OTP has been sent to your email.\nPlease check it.'),
+              content: Text(
+                  'A 6 digit OTP has been sent to your email.\nPlease check it.'),
               actions: <Widget>[
                 PrimaryButton(
                     minimumSize: Size(20, 20),
@@ -318,9 +319,9 @@ class _SignUpMobilePageState extends BaseState<_SignUpMobilePage> {
                                   Text(
                                     "Powered By",
                                     style: theme.getStyle().copyWith(
-                                          color: Colors.black,
-                                          fontSize: 16,
-                                        ),
+                                        color: Colors.black,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold),
                                   ),
                                   poweredBy,
                                 ],

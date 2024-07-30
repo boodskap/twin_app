@@ -24,7 +24,7 @@ final Image logo = Image.asset(
 
 final Image poweredBy = Image.network(
   "https://static.boodskap.io/logos/logo.png",
-  width: 150,
+  width: 100,
   fit: BoxFit.contain,
 );
 
