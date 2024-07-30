@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
+import 'package:twin_app/widgets/commons/secondary_button.dart';
+import 'package:twin_app/widgets/create_edit_condition_snippet.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:twin_commons/core/twinned_session.dart';
 import 'package:twinned_widgets/core/device_model_dropdown.dart';
 import 'package:twinned_api/twinned_api.dart' as tapi;
+import 'package:twin_commons/widgets/common/label_text_field.dart';
 
 class ConditionRules extends StatefulWidget {
   const ConditionRules({super.key});
@@ -19,6 +22,8 @@ class _ConditionRulesState extends BaseState<ConditionRules> {
   final List<Widget> _cards = [];
   String _search = '';
   tapi.DeviceModel? _selectedDeviceModel;
+  Set<String> _selectedModel = {};
+  Map<String, String> _modelNames = {};
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +67,7 @@ class _ConditionRulesState extends BaseState<ConditionRules> {
                 width: 250,
                 child: SearchBar(
                   leading: Icon(Icons.search),
-                  hintText: 'Search installation database',
+                  hintText: 'Search Conditions',
                   onChanged: (val) {
                     _search = val.trim();
                     _load();
@@ -105,7 +110,44 @@ class _ConditionRulesState extends BaseState<ConditionRules> {
     );
   }
 
+  String getConditionDisplayText(tapi.ConditionCondition condition) {
+    switch (condition) {
+      case tapi.ConditionCondition.lt:
+        return '<';
+      case tapi.ConditionCondition.lte:
+        return '<=';
+      case tapi.ConditionCondition.gt:
+        return '>';
+      case tapi.ConditionCondition.gte:
+        return '>=';
+      case tapi.ConditionCondition.eq:
+        return '=';
+      case tapi.ConditionCondition.neq:
+        return '!=';
+      case tapi.ConditionCondition.between:
+        return 'BETWEEN';
+      case tapi.ConditionCondition.nbetween:
+        return 'NOT BETWEEN';
+      case tapi.ConditionCondition.contains:
+        return 'CONTAINS';
+      case tapi.ConditionCondition.ncontains:
+        return 'NOT CONTAINS';
+      default:
+        return '';
+    }
+  }
+
   Widget _buildCard(tapi.Condition e) {
+    TextEditingController leftValueController =
+        TextEditingController(text: e.leftValue);
+    TextEditingController rightValueController =
+        TextEditingController(text: e.rightValue);
+    TextEditingController valueController =
+        TextEditingController(text: e.$value);
+    TextEditingController valuesController = TextEditingController(
+      text: e.values?.join('\n') ?? '',
+    );
+
     double width = MediaQuery.of(context).size.width / 8;
     return SizedBox(
       width: width,
@@ -121,35 +163,221 @@ class _ConditionRulesState extends BaseState<ConditionRules> {
                 padding: const EdgeInsets.all(8.0),
                 child: Text(
                   e.name,
-                  style: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
+                  style: theme.getStyle().copyWith(
+                        fontWeight: FontWeight.bold,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                 ),
               ),
             ),
-            Align(
-              alignment: Alignment.topRight,
-              child: Padding(
-                padding: const EdgeInsets.only(right: 8.0, top: 8.0),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    InkWell(
-                        onTap: () {
-                          _edit(e);
-                        },
-                        child:
-                            Icon(Icons.edit, color: theme.getPrimaryColor())),
-                    InkWell(
-                      onTap: () {
-                        _delete(e);
-                      },
-                      child: Icon(
-                        Icons.delete,
-                        color: theme.getPrimaryColor(),
-                      ),
+            Column(
+              children: [
+                Align(
+                  alignment: Alignment.topRight,
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 8.0, top: 8.0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        InkWell(
+                            onTap: () {
+                              _edit(e);
+                            },
+                            child: Icon(Icons.edit,
+                                color: theme.getPrimaryColor())),
+                        InkWell(
+                          onTap: () {
+                            _confirmDeletionDialog(context, e);
+                          },
+                          child: Icon(
+                            Icons.delete,
+                            color: theme.getPrimaryColor(),
+                          ),
+                        ),
+                      ],
                     ),
+                  ),
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'IN',
+                          style: theme.getStyle().copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                        ),
+                        divider(
+                          horizontal: true,
+                          height: 2,
+                        ),
+                        Text(
+                          _modelNames[e.modelId] ?? '--',
+                          style: theme.getStyle().copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                        ),
+                      ],
+                    ),
+                    divider(
+                      height: 2,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'IF',
+                          style: theme.getStyle().copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.red,
+                              ),
+                        ),
+                        divider(
+                          horizontal: true,
+                          height: 4,
+                        ),
+                        Text(
+                          e.field,
+                          style: theme.getStyle().copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                        ),
+                      ],
+                    ),
+                    Text(
+                      getConditionDisplayText(e.condition),
+                      style: theme.getStyle().copyWith(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                    ),
+                    divider(
+                      height: 2,
+                    ),
+                    if (e.condition == tapi.ConditionCondition.lt ||
+                        e.condition == tapi.ConditionCondition.lte ||
+                        e.condition == tapi.ConditionCondition.gt ||
+                        e.condition == tapi.ConditionCondition.gte ||
+                        e.condition == tapi.ConditionCondition.eq ||
+                        e.condition == tapi.ConditionCondition.neq)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: LabelTextField(
+                          label: 'Value',
+                          controller: valueController,
+                          readOnlyVal: true,
+                          textAlign: TextAlign.center,
+                          labelTextStyle: theme.getStyle().copyWith(
+                                color: Colors.green,
+                                fontWeight: FontWeight.bold,
+                              ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.red,
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Colors.red,
+                            ),
+                          ),
+                        ),
+                      ),
+                    if (e.condition == tapi.ConditionCondition.between ||
+                        e.condition == tapi.ConditionCondition.nbetween)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          SizedBox(
+                            width: 80,
+                            child: LabelTextField(
+                              label: 'Left Value',
+                              controller: leftValueController,
+                              readOnlyVal: true,
+                              textAlign: TextAlign.center,
+                              labelTextStyle: theme.getStyle().copyWith(
+                                    color: Colors.green,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Colors.red,
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Colors.red,
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            width: 80,
+                            child: LabelTextField(
+                              label: 'Right Value',
+                              controller: rightValueController,
+                              readOnlyVal: true,
+                              textAlign: TextAlign.center,
+                              labelTextStyle: theme.getStyle().copyWith(
+                                    color: Colors.green,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Colors.red,
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Colors.red,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    if (e.condition == tapi.ConditionCondition.contains ||
+                        e.condition == tapi.ConditionCondition.ncontains)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Expanded(
+                          child: SizedBox(
+                            height: 65,
+                            child: LabelTextField(
+                              controller: valuesController,
+                              readOnlyVal: true,
+                              textAlign: TextAlign.center,
+                              style: theme.getStyle().copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                              label: 'Values',
+                              labelTextStyle: theme.getStyle().copyWith(
+                                    color: Colors.green,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Colors.red,
+                                ),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Colors.red,
+                                ),
+                              ),
+                              maxLines: null,
+                            ),
+                          ),
+                        ),
+                      ),
                   ],
                 ),
-              ),
+              ],
             ),
           ],
         ),
@@ -157,11 +385,130 @@ class _ConditionRulesState extends BaseState<ConditionRules> {
     );
   }
 
-  Future _create() async {}
+  Future _getDeviceModel() async {
+    await execute(() async {
+      for (var modelId in _selectedModel) {
+        var mRes = await TwinnedSession.instance.twin.getDeviceModel(
+          apikey: TwinnedSession.instance.authToken,
+          modelId: modelId,
+        );
+        if (mRes.body != null) {
+          refresh(sync: () {
+            _modelNames[modelId] = mRes.body!.entity!.name;
+          });
+        } else {}
+      }
+    });
 
-  Future _edit(tapi.Condition e) async {}
+    loading = false;
+    refresh();
+  }
 
-  Future _delete(tapi.Condition e) async {}
+  Future _create() async {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Container(
+            height: MediaQuery.of(context).size.height - 150,
+            width: MediaQuery.of(context).size.width - 200,
+            child: CreateEditConditionSnippet(),
+          ),
+        );
+      },
+    );
+  }
+
+  // Future _edit(tapi.Condition e) async {}
+  void _edit(tapi.Condition condition) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+          child: CreateEditConditionSnippet(condition: condition),
+        );
+      },
+    );
+  }
+
+  Future _confirmDeletionDialog(
+      BuildContext context, tapi.Condition condition) {
+    Widget cancelButton = SecondaryButton(
+      labelKey: 'Cancel',
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
+    Widget continueButton = PrimaryButton(
+      leading: const Icon(
+        Icons.delete_forever,
+        color: Colors.white,
+      ),
+      labelKey: 'Delete',
+      onPressed: () {
+        Navigator.pop(context);
+        _delete(condition);
+      },
+    );
+
+    AlertDialog alert = AlertDialog(
+      title: Text(
+        "WARNING",
+        style: theme.getStyle().copyWith(
+              color: Colors.red,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+      ),
+      content: Text(
+        "Deleting a Condition Rule can not be undone.\nYou will lose all of the Condition Rule data, history, etc.\n\nAre you sure you want to delete?",
+        style: theme.getStyle().copyWith(
+              color: Colors.red,
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+            ),
+        maxLines: 10,
+      ),
+      actions: [
+        cancelButton,
+        continueButton,
+      ],
+    );
+
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
+  Future _delete(tapi.Condition e) async {
+    if (loading) return;
+    loading = true;
+
+    await execute(() async {
+      int index = _entities.indexWhere((element) => element.id == e.id);
+      var res = await TwinnedSession.instance.twin.deleteCondition(
+        apikey: TwinnedSession.instance.authToken,
+        conditionId: e.id,
+      );
+
+      if (validateResponse(res)) {
+        _entities.removeAt(index);
+      }
+      refresh();
+    });
+
+    loading = false;
+    refresh();
+  }
 
   Future _load() async {
     if (loading) return;
@@ -194,6 +541,8 @@ class _ConditionRulesState extends BaseState<ConditionRules> {
 
       if (validateResponse(sRes)) {
         _entities.addAll(sRes.body?.values ?? []);
+        _selectedModel.addAll(_entities.map((condition) => condition.modelId));
+        await _getDeviceModel();
       }
 
       for (tapi.Condition e in _entities) {
