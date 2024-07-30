@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/pages/twin/components/widgets/floor_content_page.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
+import 'package:twin_app/widgets/commons/secondary_button.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:twin_commons/core/twin_image_helper.dart';
 import 'package:twin_commons/core/twinned_session.dart';
-import 'package:twinned_widgets/core/premise_dropdown.dart';
-import 'package:twinned_widgets/core/facility_dropdown.dart';
 import 'package:twinned_api/twinned_api.dart' as tapi;
+import 'package:twinned_widgets/core/facility_dropdown.dart';
+import 'package:twinned_widgets/core/premise_dropdown.dart';
 import 'package:twinned_widgets/core/top_bar.dart';
 import 'package:uuid/uuid.dart';
 
@@ -161,7 +162,7 @@ class _FloorsState extends BaseState<Floors> {
                       onTap: () {
                         _edit(e);
                       },
-                      child: Icon(Icons.edit, color: theme.getPrimaryColor()),
+                      child: Icon(Icons.edit, color: primaryColor),
                     ),
                     InkWell(
                       onTap: () {
@@ -169,7 +170,7 @@ class _FloorsState extends BaseState<Floors> {
                       },
                       child: Icon(
                         Icons.delete,
-                        color: theme.getPrimaryColor(),
+                        color: Colors.red,
                       ),
                     ),
                   ],
@@ -217,66 +218,56 @@ class _FloorsState extends BaseState<Floors> {
                   onChanged: (value) {
                     nameText = value;
                   },
-                  decoration: const InputDecoration(hintText: 'Name'),
+                  style: theme.getStyle(),
+                  decoration: InputDecoration(
+                    hintText: 'Name',
+                    hintStyle: theme.getStyle(),
+                  ),
                 ),
                 TextField(
                   onChanged: (value) {
                     descText = value;
                   },
-                  decoration: const InputDecoration(hintText: 'Description'),
+                  style: theme.getStyle(),
+                  decoration: InputDecoration(
+                    hintText: 'Description',
+                    hintStyle: theme.getStyle(),
+                  ),
                 ),
                 TextField(
                   onChanged: (value) {
                     tagsText = value;
                   },
-                  decoration: const InputDecoration(
+                  style: theme.getStyle(),
+                  decoration: InputDecoration(
                     hintText: 'Tags (space separated)',
+                    hintStyle: theme.getStyle(),
                   ),
                 ),
               ],
             ),
           ),
           actions: <Widget>[
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: primaryColor,
-                shape: RoundedRectangleBorder(
-                  side: const BorderSide(color: primaryColor),
-                  borderRadius: BorderRadius.circular(3),
-                ),
-              ),
+            SecondaryButton(
+              labelKey: "Cancel",
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: Text(
-                "Cancel",
-              ),
             ),
-            SizedBox(
-              width: 80,
-              child: ElevatedButton(
-                onPressed: () {
-                  if (nameText!.length < 3) {
-                    alert(
-                      'Invalid',
-                      'Name is required and should be minimum 3 characters',
-                    );
-                    return;
-                  }
-                  onPressed(nameText!, descText!, tagsText);
-                  Navigator.pop(context);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
-                  shape: RoundedRectangleBorder(
-                    side: const BorderSide(color: Colors.orange),
-                    borderRadius: BorderRadius.circular(3),
-                  ),
-                ),
-                child: Text(
-                  'OK',
-                ),
-              ),
+            divider(horizontal: true),
+            PrimaryButton(
+              labelKey: "OK",
+              onPressed: () {
+                if (nameText!.length < 3) {
+                  alert(
+                    'Invalid',
+                    'Name is required and should be minimum 3 characters',
+                  );
+                  return;
+                }
+                onPressed(nameText!, descText!, tagsText);
+                Navigator.pop(context);
+              },
             ),
           ],
         );
@@ -285,6 +276,8 @@ class _FloorsState extends BaseState<Floors> {
   }
 
   Future _create() async {
+    if (loading) return;
+    loading = true;
     await _getBasicInfo(
       context,
       'New Floor',
@@ -307,23 +300,12 @@ class _FloorsState extends BaseState<Floors> {
           ),
         );
         if (validateResponse(mRes)) {
-          await _openFloor(mRes.body!.entity!);
+          await _edit(mRes.body!.entity!);
+          alert("Floor${mRes.body!.entity!.name}", "Saved Successfully!");
         }
       },
     );
-  }
-
-  Future _openFloor(tapi.Floor e) async {
-    await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => FloorContentPage(
-          key: Key(const Uuid().v4()),
-          floor: e,
-        ),
-      ),
-    );
-    await _load();
+    loading = false;
     refresh();
   }
 
@@ -352,10 +334,14 @@ class _FloorsState extends BaseState<Floors> {
         messageStyle: const TextStyle(fontWeight: FontWeight.bold),
         onPressed: () async {
           await execute(() async {
+            int index = _entities.indexWhere((element) => element.id == e.id);
             var res = await TwinnedSession.instance.twin.deleteFloor(
                 apikey: TwinnedSession.instance.authToken, floorId: e.id);
             if (validateResponse(res)) {
               await _load();
+              _entities.removeAt(index);
+              _cards.removeAt(index);
+              alert("Success", "Floor ${e.name} Deleted Successfully!");
             }
           });
         });
