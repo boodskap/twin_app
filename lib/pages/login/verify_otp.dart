@@ -208,9 +208,9 @@ class _VerifyOtpMobilePageState extends BaseState<_VerifyOtpMobilePage> {
                                   Text(
                                     "Powered By",
                                     style: theme.getStyle().copyWith(
-                                          color: Colors.black,
-                                          fontSize: 16,
-                                        ),
+                                        color: Colors.black,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold),
                                   ),
                                   poweredBy,
                                   const SizedBox(

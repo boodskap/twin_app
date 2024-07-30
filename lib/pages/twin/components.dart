@@ -2,6 +2,8 @@ import 'package:flutter/Material.dart';
 import 'package:accordion/accordion.dart';
 import 'package:accordion/controllers.dart';
 import 'package:twin_app/core/session_variables.dart';
+import 'package:twin_app/pages/twin/components/asset_filters.dart';
+import 'package:twin_app/pages/twin/components/asset_groups.dart';
 import 'package:twin_app/pages/twin/components/asset_library.dart';
 import 'package:twin_app/pages/twin/components/assets.dart';
 import 'package:twin_app/pages/twin/components/condition_rules.dart';
@@ -12,6 +14,7 @@ import 'package:twin_app/pages/twin/components/floors.dart';
 import 'package:twin_app/pages/twin/components/installation_database.dart';
 import 'package:twin_app/pages/twin/components/premises.dart';
 import 'package:twin_app/pages/twin/components/preprocessors.dart';
+import 'package:twin_app/pages/twin/components/report.dart';
 import 'package:twin_app/pages/twin/components/scrapping_tables.dart';
 import 'package:twin_app/pages/twin/components/visual_alarms.dart';
 import 'package:twin_app/pages/twin/components/visual_displays.dart';
@@ -72,7 +75,7 @@ class _ComponentsState extends BaseState<Components> {
                           style: theme.getStyle().copyWith(
                               fontWeight: FontWeight.bold,
                               color: Colors.white)),
-                      content: DeviceLibrary()),
+                      content: SingleChildScrollView(child: DeviceLibrary())),
                   AccordionSection(
                       isOpen: false,
                       headerBackgroundColorOpened: openColor,
@@ -86,7 +89,8 @@ class _ComponentsState extends BaseState<Components> {
                           style: theme.getStyle().copyWith(
                               fontWeight: FontWeight.bold,
                               color: Colors.white)),
-                      content: InstallationDatabase()),
+                      content:
+                          SingleChildScrollView(child: InstallationDatabase())),
                   AccordionSection(
                       isOpen: true,
                       headerBackgroundColorOpened: openColor,
@@ -100,7 +104,7 @@ class _ComponentsState extends BaseState<Components> {
                           style: theme.getStyle().copyWith(
                               fontWeight: FontWeight.bold,
                               color: Colors.white)),
-                      content: AssetLibrary()),
+                      content: SingleChildScrollView(child: AssetLibrary())),
                   AccordionSection(
                       isOpen: false,
                       headerBackgroundColorOpened: openColor,
@@ -114,7 +118,7 @@ class _ComponentsState extends BaseState<Components> {
                           style: theme.getStyle().copyWith(
                               fontWeight: FontWeight.bold,
                               color: Colors.white)),
-                      content: ConditionRules()),
+                      content: SingleChildScrollView(child: ConditionRules())),
                   AccordionSection(
                       isOpen: false,
                       headerBackgroundColorOpened: openColor,
@@ -157,7 +161,7 @@ class _ComponentsState extends BaseState<Components> {
                           style: theme.getStyle().copyWith(
                               fontWeight: FontWeight.bold,
                               color: Colors.white)),
-                      content: SizedBox(height: height, child: Events())),
+                      content: SizedBox(height: height, child: Placeholder())),
                   AccordionSection(
                       isOpen: false,
                       headerBackgroundColorOpened: openColor,
@@ -171,8 +175,10 @@ class _ComponentsState extends BaseState<Components> {
                           style: theme.getStyle().copyWith(
                               fontWeight: FontWeight.bold,
                               color: Colors.white)),
-                      content:
-                          SizedBox(height: height, child: Preprocessors())),
+                      content: SizedBox(
+                          height: height,
+                          child:
+                              SingleChildScrollView(child: Preprocessors()))),
                   AccordionSection(
                       isOpen: false,
                       headerBackgroundColorOpened: openColor,
@@ -186,8 +192,10 @@ class _ComponentsState extends BaseState<Components> {
                           style: theme.getStyle().copyWith(
                               fontWeight: FontWeight.bold,
                               color: Colors.white)),
-                      content:
-                          SizedBox(height: height, child: ScrappingTables())),
+                      content: SizedBox(
+                          height: height,
+                          child:
+                              SingleChildScrollView(child: ScrappingTables()))),
                   AccordionSection(
                       isOpen: false,
                       headerBackgroundColorOpened: openColor,
@@ -201,7 +209,9 @@ class _ComponentsState extends BaseState<Components> {
                           style: theme.getStyle().copyWith(
                               fontWeight: FontWeight.bold,
                               color: Colors.white)),
-                      content: SizedBox(height: height, child: Premises())),
+                      content: SizedBox(
+                          height: height,
+                          child: SingleChildScrollView(child: Premises()))),
                   AccordionSection(
                       isOpen: false,
                       headerBackgroundColorOpened: openColor,
@@ -215,7 +225,9 @@ class _ComponentsState extends BaseState<Components> {
                           style: theme.getStyle().copyWith(
                               fontWeight: FontWeight.bold,
                               color: Colors.white)),
-                      content: SizedBox(height: height, child: Facilities())),
+                      content: SizedBox(
+                          height: height,
+                          child: SingleChildScrollView(child: Facilities()))),
                   AccordionSection(
                       isOpen: false,
                       headerBackgroundColorOpened: openColor,
@@ -229,7 +241,9 @@ class _ComponentsState extends BaseState<Components> {
                           style: theme.getStyle().copyWith(
                               fontWeight: FontWeight.bold,
                               color: Colors.white)),
-                      content: SizedBox(height: height, child: Floors())),
+                      content: SizedBox(
+                          height: height,
+                          child: SingleChildScrollView(child: Floors()))),
                   AccordionSection(
                       isOpen: false,
                       headerBackgroundColorOpened: openColor,
@@ -243,7 +257,9 @@ class _ComponentsState extends BaseState<Components> {
                           style: theme.getStyle().copyWith(
                               fontWeight: FontWeight.bold,
                               color: Colors.white)),
-                      content: SizedBox(height: height, child: Assets())),
+                      content: SizedBox(
+                          height: height,
+                          child: SingleChildScrollView(child: Assets()))),
                   AccordionSection(
                       isOpen: false,
                       headerBackgroundColorOpened: openColor,
@@ -257,7 +273,8 @@ class _ComponentsState extends BaseState<Components> {
                           style: theme.getStyle().copyWith(
                               fontWeight: FontWeight.bold,
                               color: Colors.white)),
-                      content: SizedBox(height: height, child: Placeholder())),
+                      content:
+                          SizedBox(height: height, child: AssetGroupList())),
                   AccordionSection(
                       isOpen: false,
                       headerBackgroundColorOpened: openColor,
@@ -271,7 +288,8 @@ class _ComponentsState extends BaseState<Components> {
                           style: theme.getStyle().copyWith(
                               fontWeight: FontWeight.bold,
                               color: Colors.white)),
-                      content: SizedBox(height: height, child: Placeholder())),
+                      content:
+                          SizedBox(height: height, child: AssetFilterList())),
                   AccordionSection(
                       isOpen: false,
                       headerBackgroundColorOpened: openColor,
@@ -285,7 +303,8 @@ class _ComponentsState extends BaseState<Components> {
                           style: theme.getStyle().copyWith(
                               fontWeight: FontWeight.bold,
                               color: Colors.white)),
-                      content: SizedBox(height: height, child: Placeholder())),
+                      content:
+                          SizedBox(height: height, child: AssetReportList())),
                 ],
               );
             }),
