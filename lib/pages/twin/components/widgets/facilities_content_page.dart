@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:twin_app/pages/twin/components/widgets/client_infratsructure_widget.dart';
 import 'package:twin_app/pages/twin/components/widgets/roles_infrastructure_widget.dart';
+import 'package:twin_app/widgets/commons/primary_button.dart';
+import 'package:twin_app/widgets/commons/secondary_button.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/util/osm_location_picker.dart';
 import 'package:twinned_api/api/twinned.swagger.dart';
@@ -11,6 +13,7 @@ import 'package:twin_commons/widgets/common/label_text_field.dart';
 import 'package:twin_commons/core/twinned_session.dart';
 import 'package:twinned_widgets/core/top_bar.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
+import 'package:twin_app/core/session_variables.dart';
 
 class FacilitiesContentPage extends StatefulWidget {
   final Facility? facility;
@@ -25,7 +28,6 @@ class FacilitiesContentPage extends StatefulWidget {
 }
 
 class _FacilitiesContentPageState extends BaseState<FacilitiesContentPage> {
-  static const TextStyle _style = TextStyle(fontSize: 20);
 
   static const Widget _missingImage = Icon(
     Icons.question_mark,
@@ -112,7 +114,7 @@ class _FacilitiesContentPageState extends BaseState<FacilitiesContentPage> {
     });
 
     loading = false;
-    setState(() {});
+    refresh();
   }
 
   Future _upload() async {
@@ -135,9 +137,13 @@ class _FacilitiesContentPageState extends BaseState<FacilitiesContentPage> {
   }
 
   Future _delete() async {
+    if (loading) return;
+    loading = true;
     await confirm(
         title: 'Are you sure?',
         message: 'you want to delete this image?',
+        titleStyle: theme.getStyle().copyWith(color: Colors.red),
+        messageStyle: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
         onPressed: () async {
           await execute(() async {
             var res = await TwinnedSession.instance.twin.deleteImage(
@@ -154,6 +160,8 @@ class _FacilitiesContentPageState extends BaseState<FacilitiesContentPage> {
             }
           });
         });
+    loading = false;
+    refresh();
   }
 
   Future<void> _pickLocation() async {
@@ -227,17 +235,17 @@ class _FacilitiesContentPageState extends BaseState<FacilitiesContentPage> {
                       children: [
                         Text(
                           e.name,
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: theme.getStyle().copyWith(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                         Text(
                           e.description ?? "",
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: theme.getStyle().copyWith(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                       ],
                     ),
@@ -319,6 +327,8 @@ class _FacilitiesContentPageState extends BaseState<FacilitiesContentPage> {
               Expanded(
                 flex: 1,
                 child: LabelTextField(
+                  labelTextStyle: theme.getStyle(),
+                  style: theme.getStyle(),
                   label: 'Premise Name',
                   controller: _name,
                 ),
@@ -327,6 +337,8 @@ class _FacilitiesContentPageState extends BaseState<FacilitiesContentPage> {
               Expanded(
                 flex: 1,
                 child: LabelTextField(
+                  labelTextStyle: theme.getStyle(),
+                  style: theme.getStyle(),
                   label: 'Description',
                   controller: _desc,
                 ),
@@ -335,6 +347,8 @@ class _FacilitiesContentPageState extends BaseState<FacilitiesContentPage> {
               Expanded(
                 flex: 1,
                 child: LabelTextField(
+                  labelTextStyle: theme.getStyle(),
+                  style: theme.getStyle(),
                   label: 'Tags',
                   controller: _tags,
                 ),
@@ -343,7 +357,10 @@ class _FacilitiesContentPageState extends BaseState<FacilitiesContentPage> {
               Expanded(
                 flex: 1,
                 child: LabelTextField(
+                  labelTextStyle: theme.getStyle(),
+                  style: theme.getStyle(),
                   suffixIcon: Tooltip(
+                    textStyle: theme.getStyle().copyWith(color: Colors.white),
                     message: 'Pick a Location',
                     preferBelow: false,
                     child: InkWell(
@@ -420,12 +437,16 @@ class _FacilitiesContentPageState extends BaseState<FacilitiesContentPage> {
                                         alignment: Alignment.topRight,
                                         child: Text(
                                           "${widget.facility!.name} - Floors",
-                                          style: _style,
+                                          style: theme.getStyle(),
                                         ),
                                       ),
                                       Row(
                                         children: [
                                           Tooltip(
+                                              textStyle: theme
+                                                  .getStyle()
+                                                  .copyWith(
+                                                      color: Colors.white),
                                               message: "Roles",
                                               child: RolesInfrastructeWidget(
                                                 currentRoles: rolesSelected,
@@ -440,6 +461,10 @@ class _FacilitiesContentPageState extends BaseState<FacilitiesContentPage> {
                                               )),
                                           divider(horizontal: true),
                                           Tooltip(
+                                              textStyle: theme
+                                                  .getStyle()
+                                                  .copyWith(
+                                                      color: Colors.white),
                                               message: "Clients",
                                               child: ClientInfrastructeWidget(
                                                 currentClients: clientsSelected,
@@ -460,6 +485,12 @@ class _FacilitiesContentPageState extends BaseState<FacilitiesContentPage> {
                                                   .size
                                                   .width,
                                               child: SearchBar(
+                                                  textStyle:
+                                                      WidgetStatePropertyAll(
+                                                          theme.getStyle()),
+                                                  hintStyle:
+                                                      WidgetStatePropertyAll(
+                                                          theme.getStyle()),
                                                   leading:
                                                       const Icon(Icons.search),
                                                   onChanged: (value) async {
@@ -491,35 +522,18 @@ class _FacilitiesContentPageState extends BaseState<FacilitiesContentPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              ElevatedButton(
+              SecondaryButton(
+                labelKey: "Close",
                 onPressed: () {
                   _close();
                 },
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size(140, 40),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(3),
-                  ),
-                ),
-                child: Text(
-                  'Close',
-                ),
               ),
               divider(horizontal: true),
-              ElevatedButton(
+              PrimaryButton(
+                labelKey: "Save",
                 onPressed: () async {
                   await _save();
                 },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
-                  minimumSize: const Size(140, 40),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(3),
-                  ),
-                ),
-                child: Text(
-                  'Save',
-                ),
               ),
               divider(horizontal: true),
             ],
