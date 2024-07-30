@@ -71,6 +71,8 @@ class _FacilitiesState extends BaseState<Facilities> {
                 width: 250,
                 child: SearchBar(
                   leading: Icon(Icons.search),
+                  textStyle: WidgetStatePropertyAll(theme.getStyle()),
+                  hintStyle: WidgetStatePropertyAll(theme.getStyle()),
                   hintText: 'Search Facilities',
                   onChanged: (val) {
                     _search = val.trim();
@@ -118,6 +120,7 @@ class _FacilitiesState extends BaseState<Facilities> {
       width: width,
       height: width,
       child: Tooltip(
+        textStyle: theme.getStyle().copyWith(color: Colors.white),
         message: '${e.name}\n${e.description ?? ""}',
         child: Card(
           elevation: 8,
@@ -145,17 +148,6 @@ class _FacilitiesState extends BaseState<Facilities> {
                       InkWell(
                           onTap: () {
                             _edit(e);
-                            // Navigator.push(
-                            //   context,
-                            //   MaterialPageRoute(
-                            //     builder: (context) => FacilitiesContentPage(
-                            //       facility: e,
-                            //       key: Key(
-                            //         Uuid().v4(),
-                            //       ),
-                            //     ),
-                            //   ),
-                            // );
                           },
                           child:
                               Icon(Icons.edit, color: theme.getPrimaryColor())),
@@ -204,7 +196,7 @@ class _FacilitiesState extends BaseState<Facilities> {
               roles: _selectedPremise!.roles));
       if (validateResponse(mRes)) {
         await _edit(mRes.body!.entity!);
-        alert('Success', 'Facility ${name} created successfully');
+        alert('Success', 'Facility ${name} created successfully!');
       }
     });
     loading = false;
@@ -245,29 +237,40 @@ class _FacilitiesState extends BaseState<Facilities> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   TextField(
+                    style: theme.getStyle(),
                     onChanged: (value) {
                       setState(() {
                         nameText = value;
                       });
                     },
-                    decoration: const InputDecoration(hintText: 'Name'),
+                    decoration: InputDecoration(
+                      hintText: 'Name',
+                      hintStyle: theme.getStyle(),
+                    ),
                   ),
                   TextField(
+                    style: theme.getStyle(),
                     onChanged: (value) {
                       setState(() {
                         descText = value;
                       });
                     },
-                    decoration: const InputDecoration(hintText: 'Description'),
+                    decoration: InputDecoration(
+                      hintText: 'Description',
+                      hintStyle: theme.getStyle(),
+                    ),
                   ),
                   TextField(
+                    style: theme.getStyle(),
                     onChanged: (value) {
                       setState(() {
                         tagsText = value;
                       });
                     },
-                    decoration: const InputDecoration(
-                        hintText: 'Tags (space separated)'),
+                    decoration: InputDecoration(
+                      hintText: 'Tags (space separated)',
+                      hintStyle: theme.getStyle(),
+                    ),
                   ),
                 ],
               ),
@@ -307,8 +310,8 @@ class _FacilitiesState extends BaseState<Facilities> {
         title: 'Warning',
         message:
             'Deleting is unrecoverable\nIt may also delete all the related models and components\n\nDo you want to proceed?',
-        titleStyle: const TextStyle(color: Colors.red),
-        messageStyle: const TextStyle(fontWeight: FontWeight.bold),
+        titleStyle: theme.getStyle().copyWith(color: Colors.red),
+        messageStyle: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
         onPressed: () async {
           await execute(() async {
             int index = _entities.indexWhere((element) => element.id == e.id);
@@ -325,73 +328,6 @@ class _FacilitiesState extends BaseState<Facilities> {
     loading = false;
     refresh();
   }
-
-  // confirmDeletion(BuildContext context, tapi.Facility e) {
-  //   // set up the buttons
-  //   Widget cancelButton = SecondaryButton(
-  //     labelKey: 'Cancel',
-  //     onPressed: () => Navigator.pop(context),
-  //   );
-  //   Widget deleteButton = PrimaryButton(
-  //     labelKey: 'Delete',
-  //     onPressed: () {
-  //       Navigator.pop(context);
-  //       _removeEntity(e);
-  //     },
-  //   );
-
-  //   AlertDialog alert = AlertDialog(
-  //     title: Text(
-  //       "WARNING",
-  //       style: theme.getStyle().copyWith(
-  //             fontSize: 20,
-  //             fontWeight: FontWeight.bold,
-  //             color: Colors.red,
-  //           ),
-  //     ),
-  //     content: Text(
-  //       "Deleting a Facility can not be undone.\nYou will loose all of the Facility data, history, etc.\n\nAre you sure you want to delete?",
-  //       style: theme.getStyle().copyWith(
-  //             fontSize: 14,
-  //             fontWeight: FontWeight.bold,
-  //             color: Colors.black,
-  //           ),
-  //       maxLines: 10,
-  //     ),
-  //     actions: [
-  //       cancelButton,
-  //       deleteButton,
-  //     ],
-  //   );
-
-  //   // show the dialog
-  //   showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return alert;
-  //     },
-  //   );
-  // }
-
-  // void _removeEntity(tapi.Facility e) async {
-  //   if (loading) return;
-  //   loading = true;
-
-  //   execute(sync)
-  //     int index = _entities.indexWhere((element) => element.id == e.id);
-
-  //     var res = await TwinnedSession.instance.twin.deleteFacility(
-  //         apikey: TwinnedSession.instance.authToken, facilityId: e.id);
-
-  //     if (validateResponse(res)) {
-  // _entities.removeAt(index);
-  // _cards.removeAt(index);
-  // alert('Success', 'Facility ${e.name} deleted!');
-  //     }
-  //     refresh();
-
-  //   busy(busy: false);
-  // }
 
   Future _load() async {
     if (loading) return;
