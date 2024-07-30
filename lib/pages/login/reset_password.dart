@@ -164,13 +164,13 @@ class _ResetPasswordMobilePageState
                                       hintKey: 'New Password',
                                       controller: _newPassController,
                                       // onChanged: (value) {
-                                    //   setState(() {
-                                    //     if (value == null || value.isEmpty) {
-                                    //       return;
-                                    //     }
-                                    //     return null;
-                                    //   });
-                                    // },
+                                      //   setState(() {
+                                      //     if (value == null || value.isEmpty) {
+                                      //       return;
+                                      //     }
+                                      //     return null;
+                                      //   });
+                                      // },
                                       validator: (value) {
                                         if (value == null || value.isEmpty) {
                                           return 'Please enter a new password.';
@@ -185,15 +185,15 @@ class _ResetPasswordMobilePageState
                                       hintKey: 'confirmPassword',
                                       controller: _confPassController,
                                       // onChanged: (value) {
-                                    //   setState(() {
-                                    //     if (_newPassController.text ==
-                                    //         _confPassController.text) {
-                                    //       _doResetPassword();
-                                    //     } else {
-                                    //       alert("", "Password Mismatch");
-                                    //     }
-                                    //   });
-                                    // },
+                                      //   setState(() {
+                                      //     if (_newPassController.text ==
+                                      //         _confPassController.text) {
+                                      //       _doResetPassword();
+                                      //     } else {
+                                      //       alert("", "Password Mismatch");
+                                      //     }
+                                      //   });
+                                      // },
                                       validator: (value) {
                                         if (value == null || value.isEmpty) {
                                           return 'Please confirm your password.';
@@ -212,7 +212,8 @@ class _ResetPasswordMobilePageState
                               ),
                               SizedBox(height: 70),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   SecondaryButton(
                                     labelKey: 'cancel',
@@ -243,9 +244,9 @@ class _ResetPasswordMobilePageState
                                     Text(
                                       "Powered By",
                                       style: theme.getStyle().copyWith(
-                                            color: Colors.black,
-                                            fontSize: 14,
-                                          ),
+                                          color: Colors.black,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold),
                                     ),
                                     poweredBy,
                                   ],
