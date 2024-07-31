@@ -252,9 +252,9 @@ class _ForgotPasswordMobilePageState
                                   Text(
                                     "Powered By",
                                     style: theme.getStyle().copyWith(
-                                          color: Colors.black,
-                                          fontSize: 16,
-                                        ),
+                                        color: Colors.black,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold),
                                   ),
                                   poweredBy,
                                 ],

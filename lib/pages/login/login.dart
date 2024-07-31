@@ -357,9 +357,9 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
                                     Text(
                                       "Powered By",
                                       style: session.theme.getStyle().copyWith(
-                                            color: Colors.black,
-                                            fontSize: 16,
-                                          ),
+                                          color: Colors.black,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold),
                                     ),
                                     session.poweredBy,
                                   ],
