@@ -102,52 +102,55 @@ class _PreprocessorsState extends BaseState<Preprocessors> {
     return SizedBox(
       width: width,
       height: width,
-      child: Tooltip(
-        textStyle: theme.getStyle().copyWith(color: Colors.white),
-        message: '${e.name}\n${e.description ?? ""}',
-        child: Card(
-          elevation: 8,
-          color: Colors.white,
-          child: Stack(
-            children: [
-              Align(
-                alignment: Alignment.topLeft,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    e.name,
-                    style:
-                        theme.getStyle().copyWith(fontWeight: FontWeight.bold),
+      child: InkWell(
+        onDoubleTap: () => _edit(e),
+        child: Tooltip(
+          textStyle: theme.getStyle().copyWith(color: Colors.white),
+          message: '${e.name}\n${e.description ?? ""}',
+          child: Card(
+            elevation: 8,
+            color: Colors.white,
+            child: Stack(
+              children: [
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      e.name,
+                      style:
+                          theme.getStyle().copyWith(fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ),
-              ),
-              Align(
-                alignment: Alignment.topRight,
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 8.0, top: 8.0),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      InkWell(
+                Align(
+                  alignment: Alignment.topRight,
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 8.0, top: 8.0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        InkWell(
+                            onTap: () {
+                              _edit(e);
+                            },
+                            child:
+                                Icon(Icons.edit, color: theme.getPrimaryColor())),
+                        InkWell(
                           onTap: () {
-                            _edit(e);
+                            _delete(e);
                           },
-                          child:
-                              Icon(Icons.edit, color: theme.getPrimaryColor())),
-                      InkWell(
-                        onTap: () {
-                          _delete(e);
-                        },
-                        child: Icon(
-                          Icons.delete,
-                          color: theme.getPrimaryColor(),
+                          child: Icon(
+                            Icons.delete,
+                            color: theme.getPrimaryColor(),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

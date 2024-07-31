@@ -172,6 +172,8 @@ class _FacilitiesContentPageState extends BaseState<FacilitiesContentPage> {
           content: SizedBox(
             width: 1000,
             child: OSMLocationPicker(
+              longitude: _pickedLocation?.coordinates[0],
+              latitude: _pickedLocation?.coordinates[1],
               onPicked: (pickedData) {
                 setState(() {
                   _pickedLocation = GeoLocation(
@@ -329,7 +331,7 @@ class _FacilitiesContentPageState extends BaseState<FacilitiesContentPage> {
                 child: LabelTextField(
                   labelTextStyle: theme.getStyle(),
                   style: theme.getStyle(),
-                  label: 'Premise Name',
+                  label: 'Facility Name',
                   controller: _name,
                 ),
               ),
