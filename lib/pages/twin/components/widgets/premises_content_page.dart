@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/pages/twin/components/widgets/client_infratsructure_widget.dart';
 import 'package:twin_app/pages/twin/components/widgets/roles_infrastructure_widget.dart';
+import 'package:twin_app/widgets/commons/primary_button.dart';
+import 'package:twin_app/widgets/commons/secondary_button.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/twin_image_helper.dart';
 import 'package:twinned_api/api/twinned.swagger.dart' as tapi;
@@ -259,35 +261,18 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              ElevatedButton(
+              SecondaryButton(
+                labelKey: 'Close',
                 onPressed: () {
                   _close();
                 },
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size(140, 40),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(3),
-                  ),
-                ),
-                child: Text(
-                  'Close',
-                ),
               ),
               divider(horizontal: true),
-              ElevatedButton(
+              PrimaryButton(
+                labelKey: 'Save',
                 onPressed: () async {
                   await _save();
                 },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
-                  minimumSize: const Size(140, 40),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(3),
-                  ),
-                ),
-                child: Text(
-                  'Save',
-                ),
               ),
               divider(horizontal: true),
             ],
@@ -306,6 +291,8 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
           content: SizedBox(
             width: 1000,
             child: OSMLocationPicker(
+              longitude: _pickedLocation?.coordinates[0],
+              latitude: _pickedLocation?.coordinates[1],
               onPicked: (pickedData) {
                 setState(() {
                   _pickedLocation = tapi.GeoLocation(

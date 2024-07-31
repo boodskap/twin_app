@@ -149,237 +149,242 @@ class _ConditionRulesState extends BaseState<ConditionRules> {
     );
 
     double width = MediaQuery.of(context).size.width / 8;
-    return SizedBox(
-      width: width,
-      height: width,
-      child: Card(
-        elevation: 8,
-        color: Colors.white,
-        child: Stack(
-          children: [
-            Align(
-              alignment: Alignment.topLeft,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  e.name,
-                  style: theme.getStyle().copyWith(
-                        fontWeight: FontWeight.bold,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                ),
-              ),
-            ),
-            Column(
-              children: [
-                Align(
-                  alignment: Alignment.topRight,
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 8.0, top: 8.0),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        InkWell(
-                            onTap: () {
-                              _edit(e);
-                            },
-                            child: Icon(Icons.edit,
-                                color: theme.getPrimaryColor())),
-                        InkWell(
-                          onTap: () {
-                            _confirmDeletionDialog(context, e);
-                          },
-                          child: Icon(
-                            Icons.delete,
-                            color: theme.getPrimaryColor(),
-                          ),
+    return InkWell(
+      onDoubleTap: () {
+        _edit(e);
+      },
+      child: SizedBox(
+        width: width,
+        height: width,
+        child: Card(
+          elevation: 8,
+          color: Colors.white,
+          child: Stack(
+            children: [
+              Align(
+                alignment: Alignment.topLeft,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    e.name,
+                    style: theme.getStyle().copyWith(
+                          fontWeight: FontWeight.bold,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                      ],
-                    ),
                   ),
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'IN',
-                          style: theme.getStyle().copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
-                        ),
-                        divider(
-                          horizontal: true,
-                          height: 2,
-                        ),
-                        Text(
-                          _modelNames[e.modelId] ?? '--',
-                          style: theme.getStyle().copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
-                        ),
-                      ],
-                    ),
-                    divider(
-                      height: 2,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'IF',
-                          style: theme.getStyle().copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.red,
-                              ),
-                        ),
-                        divider(
-                          horizontal: true,
-                          height: 4,
-                        ),
-                        Text(
-                          e.field,
-                          style: theme.getStyle().copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
-                        ),
-                      ],
-                    ),
-                    Text(
-                      getConditionDisplayText(e.condition),
-                      style: theme.getStyle().copyWith(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                          ),
-                    ),
-                    divider(
-                      height: 2,
-                    ),
-                    if (e.condition == tapi.ConditionCondition.lt ||
-                        e.condition == tapi.ConditionCondition.lte ||
-                        e.condition == tapi.ConditionCondition.gt ||
-                        e.condition == tapi.ConditionCondition.gte ||
-                        e.condition == tapi.ConditionCondition.eq ||
-                        e.condition == tapi.ConditionCondition.neq)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: LabelTextField(
-                          label: 'Value',
-                          controller: valueController,
-                          readOnlyVal: true,
-                          textAlign: TextAlign.center,
-                          labelTextStyle: theme.getStyle().copyWith(
-                                color: Colors.green,
-                                fontWeight: FontWeight.bold,
-                              ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Colors.red,
-                            ),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Colors.red,
-                            ),
-                          ),
-                        ),
-                      ),
-                    if (e.condition == tapi.ConditionCondition.between ||
-                        e.condition == tapi.ConditionCondition.nbetween)
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              ),
+              Column(
+                children: [
+                  Align(
+                    alignment: Alignment.topRight,
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 8.0, top: 8.0),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          SizedBox(
-                            width: 80,
-                            child: LabelTextField(
-                              label: 'Left Value',
-                              controller: leftValueController,
-                              readOnlyVal: true,
-                              textAlign: TextAlign.center,
-                              labelTextStyle: theme.getStyle().copyWith(
-                                    color: Colors.green,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Colors.red,
-                                ),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Colors.red,
-                                ),
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                            width: 80,
-                            child: LabelTextField(
-                              label: 'Right Value',
-                              controller: rightValueController,
-                              readOnlyVal: true,
-                              textAlign: TextAlign.center,
-                              labelTextStyle: theme.getStyle().copyWith(
-                                    color: Colors.green,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Colors.red,
-                                ),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Colors.red,
-                                ),
-                              ),
+                          InkWell(
+                              onTap: () {
+                                _edit(e);
+                              },
+                              child: Icon(Icons.edit,
+                                  color: theme.getPrimaryColor())),
+                          InkWell(
+                            onTap: () {
+                              _confirmDeletionDialog(context, e);
+                            },
+                            child: Icon(
+                              Icons.delete,
+                              color: theme.getPrimaryColor(),
                             ),
                           ),
                         ],
                       ),
-                    if (e.condition == tapi.ConditionCondition.contains ||
-                        e.condition == tapi.ConditionCondition.ncontains)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Expanded(
-                          child: SizedBox(
-                            height: 65,
-                            child: LabelTextField(
-                              controller: valuesController,
-                              readOnlyVal: true,
-                              textAlign: TextAlign.center,
-                              style: theme.getStyle().copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                  ),
-                              label: 'Values',
-                              labelTextStyle: theme.getStyle().copyWith(
-                                    color: Colors.green,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
+                    ),
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'IN',
+                            style: theme.getStyle().copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                          ),
+                          divider(
+                            horizontal: true,
+                            height: 2,
+                          ),
+                          Text(
+                            _modelNames[e.modelId] ?? '--',
+                            style: theme.getStyle().copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                          ),
+                        ],
+                      ),
+                      divider(
+                        height: 2,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'IF',
+                            style: theme.getStyle().copyWith(
+                                  fontWeight: FontWeight.bold,
                                   color: Colors.red,
                                 ),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Colors.red,
+                          ),
+                          divider(
+                            horizontal: true,
+                            height: 4,
+                          ),
+                          Text(
+                            e.field,
+                            style: theme.getStyle().copyWith(
+                                  fontWeight: FontWeight.bold,
                                 ),
+                          ),
+                        ],
+                      ),
+                      Text(
+                        getConditionDisplayText(e.condition),
+                        style: theme.getStyle().copyWith(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
+                      ),
+                      divider(
+                        height: 2,
+                      ),
+                      if (e.condition == tapi.ConditionCondition.lt ||
+                          e.condition == tapi.ConditionCondition.lte ||
+                          e.condition == tapi.ConditionCondition.gt ||
+                          e.condition == tapi.ConditionCondition.gte ||
+                          e.condition == tapi.ConditionCondition.eq ||
+                          e.condition == tapi.ConditionCondition.neq)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: LabelTextField(
+                            label: 'Value',
+                            controller: valueController,
+                            readOnlyVal: true,
+                            textAlign: TextAlign.center,
+                            labelTextStyle: theme.getStyle().copyWith(
+                                  color: Colors.green,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Colors.red,
                               ),
-                              maxLines: null,
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Colors.red,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                  ],
-                ),
-              ],
-            ),
-          ],
+                      if (e.condition == tapi.ConditionCondition.between ||
+                          e.condition == tapi.ConditionCondition.nbetween)
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            SizedBox(
+                              width: 80,
+                              child: LabelTextField(
+                                label: 'Left Value',
+                                controller: leftValueController,
+                                readOnlyVal: true,
+                                textAlign: TextAlign.center,
+                                labelTextStyle: theme.getStyle().copyWith(
+                                      color: Colors.green,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Colors.red,
+                                  ),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Colors.red,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              width: 80,
+                              child: LabelTextField(
+                                label: 'Right Value',
+                                controller: rightValueController,
+                                readOnlyVal: true,
+                                textAlign: TextAlign.center,
+                                labelTextStyle: theme.getStyle().copyWith(
+                                      color: Colors.green,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Colors.red,
+                                  ),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Colors.red,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      if (e.condition == tapi.ConditionCondition.contains ||
+                          e.condition == tapi.ConditionCondition.ncontains)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: Expanded(
+                            child: SizedBox(
+                              height: 65,
+                              child: LabelTextField(
+                                controller: valuesController,
+                                readOnlyVal: true,
+                                textAlign: TextAlign.center,
+                                style: theme.getStyle().copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                label: 'Values',
+                                labelTextStyle: theme.getStyle().copyWith(
+                                      color: Colors.green,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Colors.red,
+                                  ),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Colors.red,
+                                  ),
+                                ),
+                                maxLines: null,
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
