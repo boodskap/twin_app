@@ -224,7 +224,7 @@ class _GroupAssetsState extends BaseState<GroupAssets> {
                     .copyWith(fontWeight: FontWeight.bold, fontSize: 15),
               )),
           SizedBox(
-            height: 320,
+            height: 300,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: GridView.builder(
@@ -250,13 +250,13 @@ class _GroupAssetsState extends BaseState<GroupAssets> {
                   _close();
                 },
               ),
+              divider(horizontal: true),
               PrimaryButton(
                 labelKey: "Save",
                 onPressed: () async {
                   await _save();
                 },
               ),
-              divider(horizontal: true),
               divider(horizontal: true),
             ],
           ),

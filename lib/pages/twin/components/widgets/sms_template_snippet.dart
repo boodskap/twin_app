@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:twinned_api/api/twinned.swagger.dart';
+import 'package:twin_commons/core/base_state.dart';
+import 'package:twin_app/core/session_variables.dart';
 
 typedef SmsTemplateSaved = void Function(SMSTemplate? notificationTemplate);
 
@@ -14,7 +16,7 @@ class SmsTemplateSnippet extends StatefulWidget {
   State<SmsTemplateSnippet> createState() => _SmsTemplateSnippetState();
 }
 
-class _SmsTemplateSnippetState extends State<SmsTemplateSnippet> {
+class _SmsTemplateSnippetState extends BaseState<SmsTemplateSnippet> {
   final TextEditingController _messageController = TextEditingController();
   @override
   void initState() {
@@ -37,6 +39,7 @@ class _SmsTemplateSnippetState extends State<SmsTemplateSnippet> {
   Widget build(BuildContext context) {
     return Card(
       elevation: 3,
+      color: Colors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10.0),
         side: BorderSide(color: Colors.grey.shade300),
@@ -48,11 +51,12 @@ class _SmsTemplateSnippetState extends State<SmsTemplateSnippet> {
           children: [
             Text(
               'SMS Template',
-            
+              style: theme.getStyle().copyWith(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
             ),
-            const SizedBox(
-              height: 8,
-            ),
+            divider(),
             Expanded(
               child: TextFormField(
                 controller: _messageController,
@@ -62,8 +66,10 @@ class _SmsTemplateSnippetState extends State<SmsTemplateSnippet> {
                 },
                 maxLines: null,
                 expands: true,
+                style: theme.getStyle(),
                 decoration: InputDecoration(
                   labelText: 'Message',
+                  labelStyle: theme.getStyle(),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8.0),
                     borderSide: const BorderSide(color: Colors.grey),
@@ -82,4 +88,7 @@ class _SmsTemplateSnippetState extends State<SmsTemplateSnippet> {
       ),
     );
   }
+
+  @override
+  void setup() {}
 }

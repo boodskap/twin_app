@@ -10,7 +10,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:twin_app/auth.dart';
 import 'package:twin_app/pages/admin/clients.dart';
 import 'package:twin_app/pages/admin/users.dart';
+import 'package:twin_app/pages/branding.dart';
 import 'package:twin_app/pages/dashboard.dart';
+import 'package:twin_app/pages/nocode_builder.dart';
+import 'package:twin_app/pages/roles_page.dart';
 import 'package:twin_app/pages/twin/components.dart';
 import 'package:twin_app/router.dart';
 import 'package:twin_app/widgets/client_snippet.dart';
@@ -653,7 +656,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
           return true;
         },
         onMenuSelected: (BuildContext context) {
-          return const Placeholder();
+          return const NocodeBuilder();
         },
       ),
       session.TwinMenuItem(
@@ -665,7 +668,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
           return true;
         },
         onMenuSelected: (BuildContext context) {
-          return const Placeholder();
+          return const Branding();
         },
       ),
     ];
@@ -706,7 +709,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
           return session.isAdmin();
         },
         onMenuSelected: (BuildContext context) {
-          return const Placeholder();
+          return const RolesPage();
         },
       ),
     ];

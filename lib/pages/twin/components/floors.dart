@@ -135,58 +135,64 @@ class _FloorsState extends BaseState<Floors> {
     return SizedBox(
       width: width,
       height: width,
-      child: Card(
-        elevation: 8,
-        color: Colors.white,
-        child: Stack(
-          children: [
-            Align(
-              alignment: Alignment.topLeft,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  e.name,
-                  style: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
-            Align(
-              alignment: Alignment.topRight,
-              child: Padding(
-                padding: const EdgeInsets.only(right: 8.0, top: 8.0),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        _edit(e);
-                      },
-                      child: Icon(Icons.edit, color: primaryColor),
-                    ),
-                    InkWell(
-                      onTap: () {
-                        _delete(e);
-                      },
-                      child: Icon(
-                        Icons.delete,
-                        color: Colors.red,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            if (null != e.floorPlan && e.floorPlan!.isNotEmpty)
+      child: GestureDetector(
+        onDoubleTap: () {
+          _edit(e);
+        },
+        child: Card(
+          elevation: 8,
+          color: Colors.white,
+          child: Stack(
+            children: [
               Align(
-                alignment: Alignment.center,
-                child: TwinImageHelper.getImage(
-                  e.domainKey,
-                  e.floorPlan!,
-                  width: width / 2,
-                  height: width / 2,
+                alignment: Alignment.topLeft,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    e.name,
+                    style:
+                        theme.getStyle().copyWith(fontWeight: FontWeight.bold),
+                  ),
                 ),
               ),
-          ],
+              Align(
+                alignment: Alignment.topRight,
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 8.0, top: 8.0),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          _edit(e);
+                        },
+                        child: Icon(Icons.edit, color: theme.getPrimaryColor()),
+                      ),
+                      InkWell(
+                        onTap: () {
+                          _delete(e);
+                        },
+                        child: Icon(
+                          Icons.delete,
+                          color: theme.getPrimaryColor(),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              if (null != e.floorPlan && e.floorPlan!.isNotEmpty)
+                Align(
+                  alignment: Alignment.center,
+                  child: TwinImageHelper.getImage(
+                    e.domainKey,
+                    e.floorPlan!,
+                    width: width / 2,
+                    height: width / 2,
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );
