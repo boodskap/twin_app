@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:twinned_api/api/twinned.swagger.dart';
+import 'package:twin_app/core/session_variables.dart';
+import 'package:twin_commons/core/base_state.dart';
 
 typedef FcmTemplateSaved = void Function(FCMTemplate? fcmTemplate);
 
@@ -14,7 +16,7 @@ class FcmTemplateSnippet extends StatefulWidget {
   State<FcmTemplateSnippet> createState() => _FcmTemplateSnippetState();
 }
 
-class _FcmTemplateSnippetState extends State<FcmTemplateSnippet> {
+class _FcmTemplateSnippetState extends BaseState<FcmTemplateSnippet> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _contentController = TextEditingController();
 
@@ -40,6 +42,7 @@ class _FcmTemplateSnippetState extends State<FcmTemplateSnippet> {
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: Colors.white,
       elevation: 3,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10.0),
@@ -54,12 +57,16 @@ class _FcmTemplateSnippetState extends State<FcmTemplateSnippet> {
           children: [
             Text(
               'FCM Template',
-             
+              style: theme.getStyle().copyWith(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
             ),
             const SizedBox(
               height: 8,
             ),
             TextFormField(
+              style: theme.getStyle(),
               onChanged: (value) {
                 //setState(() {});
                 _validateAndFire();
@@ -67,6 +74,7 @@ class _FcmTemplateSnippetState extends State<FcmTemplateSnippet> {
               controller: _titleController,
               decoration: InputDecoration(
                 labelText: 'Title',
+                labelStyle: theme.getStyle(),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8.0),
                   borderSide: const BorderSide(color: Colors.grey),
@@ -81,9 +89,7 @@ class _FcmTemplateSnippetState extends State<FcmTemplateSnippet> {
                 ),
               ),
             ),
-            const SizedBox(
-              height: 8,
-            ),
+            divider(),
             Expanded(
               child: TextFormField(
                 maxLines: null,
@@ -93,8 +99,10 @@ class _FcmTemplateSnippetState extends State<FcmTemplateSnippet> {
                   //setState(() {});
                   _validateAndFire();
                 },
+                style: theme.getStyle(),
                 decoration: InputDecoration(
                   labelText: 'Content',
+                  labelStyle: theme.getStyle(),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8.0),
                     borderSide: const BorderSide(color: Colors.grey),
@@ -115,4 +123,7 @@ class _FcmTemplateSnippetState extends State<FcmTemplateSnippet> {
       ),
     );
   }
+
+  @override
+  void setup() {}
 }

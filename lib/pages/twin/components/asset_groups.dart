@@ -302,10 +302,7 @@ class _AssetGroupListState extends BaseState<AssetGroupList> {
                     onPressed: () async {
                       await _delete(group);
                     },
-                    icon: const Icon(
-                      Icons.delete_forever,
-                      color: Colors.red,
-                    ),
+                    icon: Icon(Icons.delete, color: theme.getPrimaryColor()),
                   ),
                 ),
                 Positioned(
@@ -314,10 +311,7 @@ class _AssetGroupListState extends BaseState<AssetGroupList> {
                     onPressed: () async {
                       await _editGroup(group);
                     },
-                    icon: const Icon(
-                      Icons.edit,
-                      color: primaryColor,
-                    ),
+                    icon: Icon(Icons.edit, color: theme.getPrimaryColor()),
                   ),
                 ),
                 Positioned(
@@ -326,9 +320,9 @@ class _AssetGroupListState extends BaseState<AssetGroupList> {
                     onPressed: () async {
                       await _upload(group);
                     },
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.upload,
-                      color: primaryColor,
+                      color: theme.getPrimaryColor(),
                     ),
                   ),
                 ),

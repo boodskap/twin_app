@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:twin_app/core/session_variables.dart';
+import 'package:twin_commons/core/base_state.dart';
 import 'package:twinned_api/api/twinned.swagger.dart';
 
 typedef EmailTemplateSaved = void Function(EmailTemplate? emailTemplate);
@@ -15,7 +17,7 @@ class EmailTemplateSnippet extends StatefulWidget {
   State<EmailTemplateSnippet> createState() => _EmailTemplateSnippetState();
 }
 
-class _EmailTemplateSnippetState extends State<EmailTemplateSnippet> {
+class _EmailTemplateSnippetState extends BaseState<EmailTemplateSnippet> {
   final TextEditingController _subjectController = TextEditingController();
   final TextEditingController _contentController = TextEditingController();
   @override
@@ -42,6 +44,7 @@ class _EmailTemplateSnippetState extends State<EmailTemplateSnippet> {
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: Colors.white,
       elevation: 3,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10.0),
@@ -54,19 +57,22 @@ class _EmailTemplateSnippetState extends State<EmailTemplateSnippet> {
           children: [
             Text(
               'Email Template',
-              
+              style: theme.getStyle().copyWith(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
             ),
-            const SizedBox(
-              height: 8,
-            ),
+            divider(),
             TextFormField(
               controller: _subjectController,
               onChanged: (value) {
                 //setState(() {});
                 _validateAndFire();
               },
+              style: theme.getStyle(),
               decoration: InputDecoration(
                 labelText: 'Subject',
+                labelStyle: theme.getStyle(),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8.0),
                   borderSide: const BorderSide(color: Colors.grey),
@@ -79,9 +85,7 @@ class _EmailTemplateSnippetState extends State<EmailTemplateSnippet> {
                     const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
               ),
             ),
-            const SizedBox(
-              height: 8,
-            ),
+            divider(),
             Expanded(
               child: TextFormField(
                 controller: _contentController,
@@ -91,8 +95,10 @@ class _EmailTemplateSnippetState extends State<EmailTemplateSnippet> {
                 },
                 maxLines: null,
                 expands: true,
+                style: theme.getStyle(),
                 decoration: InputDecoration(
                   labelText: 'Content',
+                  labelStyle: theme.getStyle(),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8.0),
                     borderSide: const BorderSide(color: Colors.grey),
@@ -110,5 +116,10 @@ class _EmailTemplateSnippetState extends State<EmailTemplateSnippet> {
         ),
       ),
     );
+  }
+
+  @override
+  void setup() {
+    // TODO: implement setup
   }
 }

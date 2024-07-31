@@ -148,7 +148,7 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
     await confirm(
         title: 'Warning',
         message:
-            'Deleting is unrecoverable\nIt may also delete all the related  and components\n\nDo you want to proceed?',
+            'Deleting is unrecoverable\nIt may also delete all the related models  and components\n\nDo you want to proceed?',
         titleStyle: theme.getStyle().copyWith(color: Colors.red),
         messageStyle: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
         onPressed: () async {
@@ -378,24 +378,41 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
                     ),
                   ),
                   Positioned(
-                      left: 8,
-                      child: IconButton(
-                          onPressed: () async {
-                            await _deleteField(group);
-                          },
-                          icon: const Icon(
-                            Icons.delete_forever,
-                            color: Colors.red,
-                          ))),
+                    left: 8,
+                    child: IconButton(
+                      onPressed: () async {
+                        await _deleteField(group);
+                      },
+                      icon: Icon(
+                        Icons.delete,
+                        color: theme.getPrimaryColor(),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    right: 45,
+                    child: IconButton(
+                      onPressed: () async {
+                        await alertDialog(
+                          title: 'Generic Filter - ${group.name}',
+                          body: FieldFilterSnippet(
+                            fieldFilter: group,
+                          ),
+                        );
+                        await _load();
+                      },
+                      icon: Icon(Icons.edit, color: theme.getPrimaryColor()),
+                    ),
+                  ),
                   Positioned(
                       right: 8,
                       child: IconButton(
                           onPressed: () async {
                             await _uploadField(group);
                           },
-                          icon: const Icon(
+                          icon: Icon(
                             Icons.upload,
-                            color: primaryColor,
+                            color: theme.getPrimaryColor(),
                           ))),
                 ],
               ),
@@ -447,25 +464,34 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
                     ),
                   ),
                   Positioned(
-                      left: 8,
-                      child: IconButton(
-                          onPressed: () async {
-                            await _delete(group);
-                          },
-                          icon: const Icon(
-                            Icons.delete_forever,
-                            color: Colors.red,
-                          ))),
+                    left: 8,
+                    child: IconButton(
+                      onPressed: () async {
+                        await _delete(group);
+                      },
+                      icon: Icon(Icons.delete, color: theme.getPrimaryColor()),
+                    ),
+                  ),
+                  Positioned(
+                    right: 45,
+                    child: IconButton(
+                      onPressed: () async {
+                        await _editGroup(group);
+                      },
+                      icon: Icon(Icons.edit, color: theme.getPrimaryColor()),
+                    ),
+                  ),
                   Positioned(
                       right: 8,
                       child: IconButton(
-                          onPressed: () async {
-                            await _upload(group);
-                          },
-                          icon: const Icon(
-                            Icons.upload,
-                            color: primaryColor,
-                          ))),
+                        onPressed: () async {
+                          await _upload(group);
+                        },
+                        icon: Icon(
+                          Icons.upload,
+                          color: theme.getPrimaryColor(),
+                        ),
+                      )),
                 ],
               ),
             ),
@@ -843,13 +869,13 @@ class _MatchGroupFilterWidgetState extends BaseState<_MatchGroupFilterWidget> {
                 ),
               ),
               Align(
-                alignment: Alignment.topRight,
-                child: IconButton(
+                  alignment: Alignment.topRight,
+                  child: IconButton(
                     onPressed: () async {
                       await _removeGroup();
                     },
-                    icon: const Icon(Icons.delete_forever)),
-              ),
+                    icon: Icon(Icons.delete, color: theme.getPrimaryColor()),
+                  )),
             ],
           ),
         ),

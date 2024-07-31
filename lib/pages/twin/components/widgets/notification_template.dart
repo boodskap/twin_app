@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:twinned_api/api/twinned.swagger.dart';
+import 'package:twin_commons/core/base_state.dart';
+import 'package:twin_app/core/session_variables.dart';
 
 typedef NotificationTemplateSaved = void Function(
     NotificationTemplate? notificationTemplate);
@@ -19,7 +21,7 @@ class NotificationTemplateSnippet extends StatefulWidget {
 }
 
 class _NotificationTemplateSnippetState
-    extends State<NotificationTemplateSnippet> {
+    extends BaseState<NotificationTemplateSnippet> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _contentController = TextEditingController();
 
@@ -46,6 +48,7 @@ class _NotificationTemplateSnippetState
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: Colors.white,
       elevation: 3,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10.0),
@@ -60,18 +63,22 @@ class _NotificationTemplateSnippetState
           children: [
             Text(
               'Notification Template',
+              style: theme.getStyle().copyWith(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
             ),
-            const SizedBox(
-              height: 8,
-            ),
+            divider(),
             TextFormField(
               controller: _titleController,
               onChanged: (value) {
                 //setState(() {});
                 _validateAndFire();
               },
+              style: theme.getStyle(),
               decoration: InputDecoration(
                 labelText: 'Title',
+                labelStyle: theme.getStyle(),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8.0),
                   borderSide: const BorderSide(color: Colors.grey),
@@ -84,9 +91,7 @@ class _NotificationTemplateSnippetState
                     const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
               ),
             ),
-            const SizedBox(
-              height: 8,
-            ),
+            divider(),
             Expanded(
               child: TextFormField(
                 controller: _contentController,
@@ -96,8 +101,10 @@ class _NotificationTemplateSnippetState
                 },
                 maxLines: null,
                 expands: true,
+                style: theme.getStyle(),
                 decoration: InputDecoration(
                   labelText: 'Content',
+                  labelStyle: theme.getStyle(),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8.0),
                     borderSide: const BorderSide(color: Colors.grey),
@@ -116,4 +123,7 @@ class _NotificationTemplateSnippetState
       ),
     );
   }
+
+  @override
+  void setup() {}
 }

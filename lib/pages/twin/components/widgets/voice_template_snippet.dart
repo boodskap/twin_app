@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:twinned_api/api/twinned.swagger.dart';
+import 'package:twin_commons/core/base_state.dart';
+import 'package:twin_app/core/session_variables.dart';
 
 typedef VoiceTemplateSaved = void Function(VoiceTemplate? voiceTemplate);
 
@@ -14,7 +16,7 @@ class VoiceTemplateSnippet extends StatefulWidget {
   State<VoiceTemplateSnippet> createState() => _VoiceTemplateSnippetState();
 }
 
-class _VoiceTemplateSnippetState extends State<VoiceTemplateSnippet> {
+class _VoiceTemplateSnippetState extends BaseState<VoiceTemplateSnippet> {
   final TextEditingController _messageController = TextEditingController();
 
   @override
@@ -37,6 +39,7 @@ class _VoiceTemplateSnippetState extends State<VoiceTemplateSnippet> {
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: Colors.white,
       elevation: 3,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10.0),
@@ -49,11 +52,12 @@ class _VoiceTemplateSnippetState extends State<VoiceTemplateSnippet> {
           children: [
             Text(
               'Voice Template',
-             
+              style: theme.getStyle().copyWith(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
             ),
-            const SizedBox(
-              height: 8,
-            ),
+            divider(),
             Expanded(
               child: TextFormField(
                 controller: _messageController,
@@ -63,8 +67,10 @@ class _VoiceTemplateSnippetState extends State<VoiceTemplateSnippet> {
                 },
                 maxLines: null,
                 expands: true,
+                style: theme.getStyle(),
                 decoration: InputDecoration(
                   labelText: 'Message',
+                  labelStyle: theme.getStyle(),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8.0),
                     borderSide: const BorderSide(color: Colors.grey),
@@ -82,5 +88,10 @@ class _VoiceTemplateSnippetState extends State<VoiceTemplateSnippet> {
         ),
       ),
     );
+  }
+
+  @override
+  void setup() {
+    // TODO: implement setup
   }
 }

@@ -1,6 +1,6 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/pages/twin/components/widgets/email_template_snippet.dart';
 import 'package:twin_app/pages/twin/components/widgets/fcm_template_snippet.dart';
 import 'package:twin_app/pages/twin/components/widgets/match_group_widget.dart';
@@ -8,42 +8,33 @@ import 'package:twin_app/pages/twin/components/widgets/notification_template.dar
 import 'package:twin_app/pages/twin/components/widgets/roles_widget.dart';
 import 'package:twin_app/pages/twin/components/widgets/sms_template_snippet.dart';
 import 'package:twin_app/pages/twin/components/widgets/voice_template_snippet.dart';
-import 'package:twin_commons/core/base_state.dart';
-import 'package:twinned_api/api/twinned.swagger.dart';
-import 'package:flutter/material.dart';
-import 'package:twin_app/core/session_variables.dart';
-import 'package:twin_app/pages/twin/components/asset_groups.dart';
-import 'package:twin_app/pages/twin/components/widgets/event_content_page.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
+import 'package:twin_app/widgets/commons/secondary_button.dart';
 import 'package:twin_commons/core/base_state.dart';
-import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:twin_commons/core/twinned_session.dart';
-import 'package:twinned_widgets/core/device_model_dropdown.dart';
-import 'package:twinned_api/twinned_api.dart' as tapi;
-import 'package:twinned_widgets/core/top_bar.dart';
-import 'package:uuid/uuid.dart';
 import 'package:twin_commons/widgets/common/label_text_field.dart';
+import 'package:twinned_api/api/twinned.swagger.dart';
+import 'package:twinned_widgets/core/top_bar.dart';
 
-class DigitalTwinEventContentpage extends StatefulWidget {
+class DigitalTwinEventContentPage extends StatefulWidget {
   final Event entity;
   final DeviceModel model;
   void valueChanged(Condition? selected) {}
 
   void onModelSelected(Condition? selected) {}
-  const DigitalTwinEventContentpage(
+  const DigitalTwinEventContentPage(
       {super.key, required this.entity, required this.model});
 
   @override
-  State<DigitalTwinEventContentpage> createState() =>
-      _DigitalTwinEventContentpageState();
+  State<DigitalTwinEventContentPage> createState() =>
+      _DigitalTwinEventContentPageState();
 }
 
-class _DigitalTwinEventContentpageState
-    extends BaseState<DigitalTwinEventContentpage> {
+class _DigitalTwinEventContentPageState
+    extends BaseState<DigitalTwinEventContentPage> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _descController = TextEditingController();
   final TextEditingController _tagsController = TextEditingController();
-  late Image _modelIcon;
   bool prequired = false;
   EmailTemplate? _emailTemplate;
   NotificationTemplate? _notificationTemplate;
@@ -54,11 +45,6 @@ class _DigitalTwinEventContentpageState
   @override
   void initState() {
     super.initState();
-
-    _modelIcon = Image.asset(
-      'images/new-devicemodel-icon.png',
-      fit: BoxFit.contain,
-    );
 
     if (widget.entity.conditions.isEmpty) {
       widget.entity.conditions.add(
@@ -141,20 +127,13 @@ class _DigitalTwinEventContentpageState
 
   @override
   Widget build(BuildContext context) {
-    const SizedBox hdivider = SizedBox(
-      width: 8,
-    );
-    const SizedBox vdivider = SizedBox(
-      height: 8,
-    );
-
     return Scaffold(
       body: Column(
         children: [
           TopBar(
-            title: 'Digital Twin - Event  - ${widget.entity.name}',
+            title: ' Event - ${widget.entity.name}',
           ),
-          vdivider,
+          divider(),
           Expanded(
             flex: 1,
             child: Container(
@@ -162,29 +141,23 @@ class _DigitalTwinEventContentpageState
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    vdivider,
+                    divider(),
                     Row(
                       children: [
-                        SizedBox(
-                          height: 32,
-                          width: 32,
-                          child: MouseRegion(
-                            cursor: SystemMouseCursors.click,
-                            child: GestureDetector(
-                                onTap: () {}, child: _modelIcon),
-                          ),
-                        ),
-                        hdivider,
+                        divider(horizontal: true),
                         Expanded(
                           flex: 20,
                           child: LabelTextField(
+                            style: theme.getStyle(),
                             suffixIcon: Tooltip(
                               message: 'Copy event id',
                               preferBelow: false,
                               child: InkWell(
                                 onTap: () {
                                   Clipboard.setData(
-                                    ClipboardData(text: widget.entity.id),
+                                    ClipboardData(
+                                      text: widget.entity.id,
+                                    ),
                                   );
                                   // OverlayWidget.showOverlay(
                                   //   context: context,
@@ -200,65 +173,52 @@ class _DigitalTwinEventContentpageState
                               ),
                             ),
                             label: 'Event Name',
+                            labelTextStyle: theme.getStyle(),
                             controller: _nameController,
                           ),
                         ),
-                        hdivider,
+                        divider(horizontal: true),
                         Expanded(
                             flex: 40,
                             child: LabelTextField(
+                              style: theme.getStyle(),
+                              labelTextStyle: theme.getStyle(),
                               label: 'Description',
                               controller: _descController,
                             )),
-                        hdivider,
+                        divider(horizontal: true),
                         Expanded(
                             flex: 40,
                             child: LabelTextField(
+                              style: theme.getStyle(),
+                              labelTextStyle: theme.getStyle(),
                               label: 'Tags',
                               controller: _tagsController,
                             )),
                       ],
                     ),
-                    vdivider,
+                    divider(),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        ElevatedButton(
-                            onPressed: () {
-                              _save(shouldPop: true);
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: primaryColor,
-                              minimumSize: const Size(140, 40),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(3),
-                              ),
-                            ),
-                            child: Text(
-                              'Save',
-                              // style: UserSession.getLabelTextStyle()
-                              //     .copyWith(color: secondaryColor),
-                            )),
-                        hdivider,
-                        ElevatedButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            style: ElevatedButton.styleFrom(
-                              // backgroundColor: secondaryColor,
-                              minimumSize: const Size(140, 40),
-                              shape: RoundedRectangleBorder(
-                                side: const BorderSide(color: primaryColor),
-                                borderRadius: BorderRadius.circular(3),
-                              ),
-                            ),
-                            child: Text(
-                              'Close',
-                            )),
+                        PrimaryButton(
+                          labelKey: "Save",
+                          onPressed: () {
+                            _save(shouldPop: true);
+                          },
+                        ),
+                        divider(horizontal: true),
+                        SecondaryButton(
+                          labelKey: "Close",
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                        divider(horizontal: true),
                       ],
                     ),
-                    vdivider,
+                    divider(),
                     SizedBox(
                       height: 450,
                       child: Row(
@@ -285,7 +245,7 @@ class _DigitalTwinEventContentpageState
                               },
                             ),
                           ),
-                          hdivider,
+                          divider(),
                           Expanded(
                             flex: 45,
                             child: SizedBox(
@@ -313,7 +273,7 @@ class _DigitalTwinEventContentpageState
                                   _smsTemplate = value;
                                 }),
                           ),
-                          hdivider,
+                          divider(horizontal: true),
                           Expanded(
                             child: VoiceTemplateSnippet(
                               voiceTemplate: widget.entity.voiceTemplate,
@@ -322,7 +282,7 @@ class _DigitalTwinEventContentpageState
                               },
                             ),
                           ),
-                          hdivider,
+                          divider(horizontal: true),
                           Expanded(
                               child: FcmTemplateSnippet(
                             fcmTemplate: widget.entity.fcmTemplate,
