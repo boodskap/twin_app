@@ -10,6 +10,7 @@ import 'package:twin_commons/core/twinned_session.dart';
 import 'package:twinned_widgets/core/device_model_dropdown.dart';
 import 'package:twinned_api/twinned_api.dart' as tapi;
 import 'package:uuid/uuid.dart';
+import 'package:twin_commons/core/twin_image_helper.dart';
 
 class VisualAlarms extends StatefulWidget {
   const VisualAlarms({super.key});
@@ -33,10 +34,11 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
           children: [
             BusyIndicator(),
             IconButton(
-                onPressed: () {
-                  _load();
-                },
-                icon: Icon(Icons.refresh)),
+              onPressed: () {
+                _load();
+              },
+              icon: Icon(Icons.refresh),
+            ),
             divider(horizontal: true),
             SizedBox(
               width: 250,
@@ -62,16 +64,17 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
             ),
             divider(horizontal: true),
             SizedBox(
-                height: 40,
-                width: 250,
-                child: SearchBar(
-                  leading: Icon(Icons.search),
-                  hintText: 'Search installation database',
-                  onChanged: (val) {
-                    _search = val.trim();
-                    _load();
-                  },
-                )),
+              height: 40,
+              width: 250,
+              child: SearchBar(
+                leading: Icon(Icons.search),
+                hintText: 'Search Alarms',
+                onChanged: (val) {
+                  _search = val.trim();
+                  _load();
+                },
+              ),
+            ),
           ],
         ),
         divider(),
@@ -113,51 +116,81 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
 
   Widget _buildCard(tapi.Alarm e) {
     double width = MediaQuery.of(context).size.width / 8;
-    return SizedBox(
-      width: width,
-      height: width,
-      child: Card(
-        elevation: 8,
-        color: Colors.white,
-        child: Stack(
-          children: [
-            Align(
-              alignment: Alignment.topLeft,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  e.name,
-                  style: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
+    Widget icon = const Icon(
+      Icons.question_mark,
+      size: 45,
+    );
+    var group = e.conditions.isNotEmpty
+        ? e.conditions.first
+        : tapi.AlarmMatchGroup(
+            matchType: tapi.AlarmMatchGroupMatchType.all,
+            conditions: [],
+            alarmState: 0);
+
+    if (e.stateIcons!.length > group.alarmState) {
+      icon = TwinImageHelper.getImage(
+          e.domainKey, e.stateIcons![group.alarmState]);
+    }
+    return InkWell(
+      onDoubleTap: () {
+        if (_selectedDeviceModel != null) {
+          _edit(e);
+        }
+      },
+      child: SizedBox(
+        width: width,
+        height: width,
+        child: Card(
+          elevation: 8,
+          color: Colors.white,
+          child: Stack(
+            children: [
+              Align(
+                alignment: Alignment.center,
+                child: Padding(
+                  padding: EdgeInsets.all(10),
+                  child: icon,
                 ),
               ),
-            ),
-            Align(
-              alignment: Alignment.topRight,
-              child: Padding(
-                padding: const EdgeInsets.only(right: 8.0, top: 8.0),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    InkWell(
+              Align(
+                alignment: Alignment.topLeft,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    e.name,
+                    style:
+                        theme.getStyle().copyWith(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+              Align(
+                alignment: Alignment.topRight,
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 8.0, top: 8.0),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      InkWell(
+                          onTap: () {
+                            _edit(e);
+                          },
+                          child:
+                              Icon(Icons.edit, color: theme.getPrimaryColor())),
+                      InkWell(
                         onTap: () {
-                          _edit(e);
+                          _confirmDeletionDialog(context, e);
                         },
-                        child:
-                            Icon(Icons.edit, color: theme.getPrimaryColor())),
-                    InkWell(
-                      onTap: () {
-                        _delete(e);
-                      },
-                      child: Icon(
-                        Icons.delete,
-                        color: theme.getPrimaryColor(),
+                        child: Icon(
+                          Icons.delete,
+                          color: theme.getPrimaryColor(),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -257,8 +290,7 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
           ));
       if (validateResponse(mRes)) {
         await _edit(mRes.body!.entity!);
-        // await _edit(mRes.body!.entity!);
-        alert('Success', 'Alarm ${name} created successfully');
+                alert('Success', 'Alarm ${name} created successfully');
       }
     });
     loading = false;
@@ -266,12 +298,15 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
   }
 
   Future _edit(tapi.Alarm e) async {
+    var res = await TwinnedSession.instance.twin.getDeviceModel(
+        modelId: e.modelId, apikey: TwinnedSession.instance.authToken);
+
     await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => VisualAlarmsContentPage(
           key: Key(const Uuid().v4()),
-          model: _selectedDeviceModel!,
+          model: res.body!.entity!,
           alarm: e,
         ),
       ),
@@ -279,7 +314,65 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
     await _load();
   }
 
-  Future _delete(tapi.Alarm e) async {}
+  _confirmDeletionDialog(BuildContext context, tapi.Alarm e) {
+    Widget cancelButton = SecondaryButton(
+      labelKey: 'Cancel',
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
+    Widget continueButton = PrimaryButton(
+      labelKey: 'Delete',
+      onPressed: () {
+        Navigator.pop(context);
+        _delete(e);
+      },
+    );
+    AlertDialog alert = AlertDialog(
+      title: Text(
+        "WARNING",
+        style: theme.getStyle(),
+      ),
+      content: Text(
+        "Deleting a Alarm can not be undone.\nYou will loose all of the premise data, history, etc.\n\nAre you sure you want to delete?",
+        style: theme.getStyle(),
+        maxLines: 10,
+      ),
+      actions: [
+        cancelButton,
+        continueButton,
+      ],
+    );
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
+  Future _delete(tapi.Alarm e) async {
+    busy();
+
+    try {
+      int index = _entities.indexWhere((element) => element.id == e.id);
+      var res = await TwinnedSession.instance.twin.deleteAlarm(
+        apikey: TwinnedSession.instance.authToken,
+        alarmId: e.id,
+      );
+
+      if (validateResponse(res)) {
+        _entities.removeAt(index);
+        _cards.removeAt(index);
+      }
+      refresh();
+    } catch (e, s) {
+      debugPrint('$e\n$s');
+    }
+    await _load();
+    busy(busy: false);
+  }
 
   Future _load() async {
     if (loading) return;
