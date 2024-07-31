@@ -171,6 +171,8 @@ class _FloorContentPageState extends BaseState<FloorContentPage> {
           content: SizedBox(
             width: 1000,
             child: OSMLocationPicker(
+              longitude: _pickedLocation!.coordinates[0],
+              latitude: _pickedLocation!.coordinates[1],
               onPicked: (pickedData) {
                 setState(() {
                   _pickedLocation = GeoLocation(
