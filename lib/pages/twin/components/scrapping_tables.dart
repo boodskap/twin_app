@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:twin_app/core/session_variables.dart';
+import 'package:twin_app/pages/twin/components/widgets/scrapping_tables_content_page.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
+import 'package:twin_app/widgets/commons/secondary_button.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:twin_commons/core/twinned_session.dart';
@@ -125,7 +127,7 @@ class _ScrappingTablesState extends BaseState<ScrappingTables> {
                             Icon(Icons.edit, color: theme.getPrimaryColor())),
                     InkWell(
                       onTap: () {
-                        _delete(e);
+                        confirmDeletion(context, e);
                       },
                       child: Icon(
                         Icons.delete,
@@ -142,11 +144,71 @@ class _ScrappingTablesState extends BaseState<ScrappingTables> {
     );
   }
 
-  Future _create() async {}
+  Future _create() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ScrappingTablesContentPage(),
+      ),
+    );
+    _load();
+  }
 
   Future _edit(tapi.ScrappingTable e) async {}
 
-  Future _delete(tapi.ScrappingTable e) async {}
+  confirmDeletion(BuildContext context, tapi.ScrappingTable e) {
+    Widget cancelButton = SecondaryButton(
+      labelKey: 'Cancel',
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
+    Widget continueButton = PrimaryButton(
+      labelKey: 'Delete',
+      onPressed: () {
+        Navigator.pop(context);
+        _delete(e);
+      },
+    );
+
+    AlertDialog alert = AlertDialog(
+      title: Text(
+        "WARNING",
+        style: theme.getStyle(),
+      ),
+      content: Text(
+        "Deleting a Scrapping Table can not be undone.\nAre you sure you want to delete?",
+        style: theme.getStyle(),
+        maxLines: 10,
+      ),
+      actions: [
+        cancelButton,
+        continueButton,
+      ],
+    );
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
+  Future _delete(tapi.ScrappingTable e) async {
+    int index = _entities.indexWhere((element) => element.id == e.id);
+
+    var res = await TwinnedSession.instance.twin.deleteScrappingTable(
+      apikey: TwinnedSession.instance.authToken,
+      scrappingTableid: e.id,
+    );
+
+    if (validateResponse(res)) {
+      _entities.removeAt(index);
+      _cards.removeAt(index);
+    }
+    refresh();
+  }
 
   Future _load() async {
     if (loading) return;
