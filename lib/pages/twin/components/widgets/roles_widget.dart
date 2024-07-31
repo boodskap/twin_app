@@ -1,5 +1,8 @@
+import 'package:flutter/Material.dart';
 import 'package:flutter/material.dart';
-import 'package:twinned_widgets/core/top_bar.dart';
+import 'package:twin_app/core/session_variables.dart';
+import 'package:twin_app/widgets/commons/primary_button.dart';
+import 'package:twin_commons/core/base_state.dart';
 
 class RolesWidget extends StatefulWidget {
   final List<String> roles;
@@ -9,12 +12,13 @@ class RolesWidget extends StatefulWidget {
   State<RolesWidget> createState() => _RolesWidgetState();
 }
 
-class _RolesWidgetState extends State<RolesWidget> {
+class _RolesWidgetState extends BaseState<RolesWidget> {
   final TextEditingController _textEditingController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: Colors.white,
       child: Container(
         height: 300,
         width: 300,
@@ -28,6 +32,9 @@ class _RolesWidgetState extends State<RolesWidget> {
               padding: const EdgeInsets.symmetric(vertical: 8),
               child: Text(
                 'Roles',
+                style: theme
+                    .getStyle()
+                    .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
               ),
             ),
             Divider(),
@@ -39,6 +46,7 @@ class _RolesWidgetState extends State<RolesWidget> {
                     child: Padding(
                       padding: const EdgeInsets.only(left: 5, top: 5),
                       child: TextFormField(
+                        style: theme.getStyle(),
                         controller: _textEditingController,
                         decoration: const InputDecoration(
                           border: InputBorder.none,
@@ -56,7 +64,8 @@ class _RolesWidgetState extends State<RolesWidget> {
                 const SizedBox(
                   width: 20,
                 ),
-                ElevatedButton(
+                PrimaryButton(
+                  labelKey: "Add",
                   onPressed: () {
                     final inputText = _textEditingController.text;
                     if (inputText.isNotEmpty) {
@@ -66,16 +75,6 @@ class _RolesWidgetState extends State<RolesWidget> {
                       });
                     }
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: primaryColor,
-                    minimumSize: const Size(140, 40),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(3),
-                    ),
-                  ),
-                  child: Text(
-                    'Add',
-                  ),
                 ),
               ],
             ),
@@ -85,14 +84,20 @@ class _RolesWidgetState extends State<RolesWidget> {
                 itemBuilder: (BuildContext context, int index) {
                   return ListTile(
                     trailing: IconButton(
-                      icon: const Icon(Icons.delete),
+                      icon: const Icon(
+                        Icons.delete,
+                        color: Colors.red,
+                      ),
                       onPressed: () {
                         setState(() {
                           widget.roles.removeAt(index);
                         });
                       },
                     ),
-                    title: Text(widget.roles[index]),
+                    title: Text(
+                      widget.roles[index],
+                      style: theme.getStyle(),
+                    ),
                   );
                 },
               ),
@@ -102,4 +107,7 @@ class _RolesWidgetState extends State<RolesWidget> {
       ),
     );
   }
+
+  @override
+  void setup() {}
 }

@@ -161,7 +161,7 @@ class _ComponentsState extends BaseState<Components> {
                           style: theme.getStyle().copyWith(
                               fontWeight: FontWeight.bold,
                               color: Colors.white)),
-                      content: SizedBox(height: height, child: Placeholder())),
+                      content: SizedBox(height: height, child: Events())),
                   AccordionSection(
                       isOpen: false,
                       headerBackgroundColorOpened: openColor,

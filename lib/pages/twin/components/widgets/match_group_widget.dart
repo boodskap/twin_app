@@ -1,36 +1,13 @@
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:twin_app/pages/twin/components/widgets/condition_model.dart';
-import 'package:twin_commons/core/base_state.dart';
-import 'package:twinned_api/api/twinned.swagger.dart' as twin;
-import 'dart:convert';
-import 'dart:convert';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:twin_commons/core/base_state.dart';
-import 'package:twinned_api/api/twinned.swagger.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:twin_app/core/session_variables.dart';
-import 'package:twin_app/pages/twin/components/asset_groups.dart';
-import 'package:twin_app/pages/twin/components/widgets/event_content_page.dart';
-import 'package:twin_app/widgets/commons/primary_button.dart';
+import 'package:twin_app/pages/twin/components/widgets/condition_model.dart';
 import 'package:twin_commons/core/base_state.dart';
-import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:twin_commons/core/twinned_session.dart';
-import 'package:twinned_widgets/core/device_model_dropdown.dart';
-import 'package:twinned_api/twinned_api.dart' as tapi;
-import 'package:twinned_widgets/core/top_bar.dart';
-import'package:uuid/uuid.dart';
-import 'package:twin_commons/widgets/common/label_text_field.dart';
-import 'package:dropdown_search/dropdown_search.dart';
-
-
+import 'package:twinned_api/api/twinned.swagger.dart' as twin;
 
 typedef OnMatchGroupSave = void Function(twin.MatchGroup group, int index);
 typedef OnMatchGroupDelete = void Function(int index);
-
-final TextStyle _style = GoogleFonts.acme(
-    color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold);
 
 class MatchGroupWidget extends StatefulWidget {
   final int index;
@@ -54,7 +31,7 @@ class MatchGroupWidget extends StatefulWidget {
 }
 
 class _MatchGroupWidgetState extends BaseState<MatchGroupWidget> {
- ConditionModel? _selectedModel;
+  ConditionModel? _selectedModel;
   final List<twin.Condition> _conditions = [];
   final List<DropdownMenuItem<twin.MatchGroupMatchType>> _matchTypeItems = [];
   twin.MatchGroupMatchType? _selectedMatchType = twin.MatchGroupMatchType.any;
@@ -103,10 +80,6 @@ class _MatchGroupWidgetState extends BaseState<MatchGroupWidget> {
 
   @override
   Widget build(BuildContext context) {
-    const SizedBox vdivider = SizedBox(
-      height: 8,
-    );
-
     return Card(
       color: Colors.transparent,
       elevation: 5,
@@ -114,8 +87,8 @@ class _MatchGroupWidgetState extends BaseState<MatchGroupWidget> {
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
             color: Colors.white,
-            border: Border.all(
-              color: Colors.black,
+            border: Border.all(color: Colors.transparent
+              // color: Colors.black,
             ),
             borderRadius: const BorderRadius.all(Radius.circular(15))),
         child: Column(
@@ -123,9 +96,11 @@ class _MatchGroupWidgetState extends BaseState<MatchGroupWidget> {
           children: [
             Text(
               widget.title,
-              style: _style,
+              style: theme
+                  .getStyle()
+                  .copyWith(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            vdivider,
+            divider(),
             Row(
               children: [
                 DropdownButton<twin.MatchGroupMatchType>(
@@ -145,11 +120,12 @@ class _MatchGroupWidgetState extends BaseState<MatchGroupWidget> {
                     },
                     asyncItems: (String filter) async {
                       List<ConditionModel> list = [];
-                      var res = await TwinnedSession.instance.twin.searchConditions(
-                          apikey: TwinnedSession.instance.authToken,
-                          modelId: widget.deviceModel.id,
-                          body: twin.SearchReq(
-                              search: filter, page: 0, size: 10000));
+                      var res = await TwinnedSession.instance.twin
+                          .searchConditions(
+                              apikey: TwinnedSession.instance.authToken,
+                              modelId: widget.deviceModel.id,
+                              body: twin.SearchReq(
+                                  search: filter, page: 0, size: 10000));
                       if (res.body!.ok) {
                         for (var condition in res.body!.values!) {
                           list.add(ConditionModel(condition: condition));
@@ -172,7 +148,7 @@ class _MatchGroupWidgetState extends BaseState<MatchGroupWidget> {
                   ),
               ],
             ),
-            vdivider,
+            divider(),
             SingleChildScrollView(
               child: SizedBox(
                 width: MediaQuery.of(context).size.width,
@@ -189,9 +165,11 @@ class _MatchGroupWidgetState extends BaseState<MatchGroupWidget> {
                             });
                             _save();
                           },
+                          labelStyle: theme.getStyle(),
                           label: Text(
                             ConditionModel.explain(_conditions[index]),
                             overflow: TextOverflow.ellipsis,
+                            style: theme.getStyle(),
                           ),
                         ),
                       );

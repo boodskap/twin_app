@@ -178,14 +178,24 @@ class _AssetReportListState extends BaseState<AssetReportList> {
                         child: Tooltip(
                           message: 'Delete this report',
                           child: IconButton(
-                              onPressed: () async {
-                                await _delete(_reports[i]);
-                              },
-                              icon: const Icon(
-                                Icons.delete_forever,
-                                color: Colors.red,
-                              )),
+                            onPressed: () async {
+                              await _delete(_reports[i]);
+                            },
+                            icon: Icon(
+                              Icons.delete,
+                              color: theme.getPrimaryColor(),
+                            ),
+                          ),
                         )),
+                    Positioned(
+                      right: 45,
+                      child: IconButton(
+                        onPressed: () async {
+                          await _edit(_reports[i]);
+                        },
+                        icon: Icon(Icons.edit, color: theme.getPrimaryColor()),
+                      ),
+                    ),
                     Positioned(
                         right: 8,
                         child: Tooltip(
@@ -194,9 +204,9 @@ class _AssetReportListState extends BaseState<AssetReportList> {
                               onPressed: () async {
                                 await _upload(_reports[i]);
                               },
-                              icon: const Icon(
+                              icon: Icon(
                                 Icons.upload,
-                                color: primaryColor,
+                                color: theme.getPrimaryColor(),
                               )),
                         )),
                   ],
@@ -449,7 +459,7 @@ class _ReportContentWidgetState extends BaseState<ReportContentWidget> {
     if (loading) return;
     loading = true;
     await execute(() async {
-      var ires = await TwinImageHelper.uploadDomainIcon();
+      // var ires = await TwinImageHelper.uploadDomainIcon();
 
       var res = await TwinnedSession.instance.twin.updateReport(
           apikey: TwinnedSession.instance.authToken,
@@ -459,7 +469,7 @@ class _ReportContentWidgetState extends BaseState<ReportContentWidget> {
               name: _name.text,
               description: _desc.text,
               tags: _tags.text.split(' '),
-              icon: ires!.entity!.id,
+              icon: widget.report.icon,
               includeAsset: includeAsset,
               includeDevice: includeDevice,
               includeFacility: includeFacility,
