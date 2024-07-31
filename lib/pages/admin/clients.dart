@@ -109,7 +109,7 @@ class _ClientsState extends BaseState<Clients> {
               Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: Text(
-                  "Total Cients  :  $totalCount",
+                  "Total Clients  :  $totalCount",
                   style: theme.getStyle().copyWith(
                       fontWeight: FontWeight.bold,
                       fontSize: 20,

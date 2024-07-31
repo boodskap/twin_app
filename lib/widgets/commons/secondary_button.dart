@@ -25,11 +25,11 @@ class _SecondaryButtonState extends State<SecondaryButton> {
         widget.labelKey,
         style: theme.getStyle().copyWith(
             color: theme.getPrimaryColor(),
-            fontSize: 14,
+            fontSize: 18,
             fontWeight: FontWeight.bold),
       ).tr(),
       style: ElevatedButton.styleFrom(
-        backgroundColor: theme.getSecondaryColor(),
+        backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(5),
           side: BorderSide(color: theme.getPrimaryColor()),
