@@ -428,7 +428,9 @@ class _ConditionRulesState extends BaseState<ConditionRules> {
   }
 
   // Future _edit(tapi.Condition e) async {}
-  void _edit(tapi.Condition condition) {
+  Future _edit(tapi.Condition e)async {
+     var res = await TwinnedSession.instance.twin.getDeviceModel(
+        modelId: e.modelId, apikey: TwinnedSession.instance.authToken);
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -436,7 +438,9 @@ class _ConditionRulesState extends BaseState<ConditionRules> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12.0),
           ),
-          child: CreateEditConditionSnippet(condition: condition),
+          child: CreateEditConditionSnippet(condition: e,
+          
+          selectedModel: res.body!.entity!,),
         );
       },
     );
