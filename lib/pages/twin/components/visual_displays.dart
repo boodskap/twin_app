@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/pages/twin/components/widgets/display_content_page.dart';
+import 'package:twin_app/pages/twin/components/widgets/display_model_snippet.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
@@ -138,7 +139,9 @@ class _VisualDisplaysState extends BaseState<VisualDisplays> {
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
                       e.name,
-                      style: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
+                      style: theme
+                          .getStyle()
+                          .copyWith(fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
@@ -153,8 +156,8 @@ class _VisualDisplaysState extends BaseState<VisualDisplays> {
                             onTap: () {
                               _edit(e);
                             },
-                            child:
-                                Icon(Icons.edit, color: theme.getPrimaryColor())),
+                            child: Icon(Icons.edit,
+                                color: theme.getPrimaryColor())),
                         InkWell(
                           onTap: () {
                             _delete(e);
@@ -168,6 +171,12 @@ class _VisualDisplaysState extends BaseState<VisualDisplays> {
                     ),
                   ),
                 ),
+                Align(
+                  alignment: Alignment.center,
+                  child: SimpleDisplaySnippet(
+                    display: e,
+                  ),
+                )
               ],
             ),
           ),
