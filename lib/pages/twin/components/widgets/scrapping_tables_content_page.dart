@@ -15,6 +15,8 @@ import 'package:twin_commons/widgets/common/label_text_field.dart';
 class ScrappingTablesContentPage extends StatefulWidget {
   tapi.ScrappingTable? model;
 
+  
+  
   ScrappingTablesContentPage({super.key, this.model});
 
   @override
@@ -27,7 +29,6 @@ class _ScrappingTablesContentPageState
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _descController = TextEditingController();
   final TextEditingController _tagsController = TextEditingController();
-  late Image _modelIcon;
   int editIndex = -1;
   final TextEditingController paramName = TextEditingController();
   final TextEditingController paramDesc = TextEditingController();
@@ -53,10 +54,6 @@ class _ScrappingTablesContentPageState
   @override
   void initState() {
     super.initState();
-    _modelIcon = Image.asset(
-      'images/setting-icon.png',
-      fit: BoxFit.contain,
-    );
     if (null != widget.model) {
       paramList.clear();
       paramList.addAll(widget.model!.attributes as Iterable<tapi.Attribute>);
@@ -338,7 +335,8 @@ class _ScrappingTablesContentPageState
                           child: MouseRegion(
                             cursor: SystemMouseCursors.click,
                             child: GestureDetector(
-                                onTap: () {}, child: _modelIcon),
+                                // onTap: () {}, child: _modelIcon,
+                                ),
                           ),
                         ),
                         divider(),
