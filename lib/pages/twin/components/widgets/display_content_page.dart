@@ -1,9 +1,8 @@
 import 'package:chopper/chopper.dart' as chopper;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:twin_app/pages/twin/components/widgets/display_state.dart';
-import 'package:twin_app/pages/twin/components/widgets/show_overlay_widget.dart';
+import 'package:twin_app/pages/twin/components/widgets/showoverlay_widget.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twinned_api/api/twinned.swagger.dart';
