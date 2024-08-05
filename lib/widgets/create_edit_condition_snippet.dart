@@ -51,6 +51,7 @@ class _CreateEditConditionSnippetState
     super.initState();
     _pageViewController = PageController();
     _tabController = TabController(length: 3, vsync: this);
+    _selectedModel = widget.selectedModel;
 
     for (var con in tapi.ConditionCondition.values) {}
 
@@ -155,7 +156,7 @@ class _CreateEditConditionSnippetState
     _conditionItems.clear();
 
     if (_selectedModel != null) {
-      // Load parameters and condition items
+
       _models.add(_selectedModel!);
 
       if (_models.isNotEmpty) {

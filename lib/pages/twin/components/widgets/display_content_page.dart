@@ -146,7 +146,7 @@ class _DisplayContentStatePageState extends BaseState<DisplayContentStatePage> {
         child: Card(
           color: Colors.transparent,
           elevation: 5,
-          child: Container(
+          child: Container(//justtt_dumb_
             height: 250,
             width: MediaQuery.of(context).size.width,
             margin: const EdgeInsets.all(5),

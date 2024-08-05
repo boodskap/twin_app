@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:twin_app/pages/twin/components/widgets/showoverlay_widget.dart';
+import 'package:twin_app/pages/twin/components/widgets/utils.dart';
 import 'package:twin_app/pages/twin/components/widgets/visual_alarm_state_page.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:twin_app/widgets/commons/secondary_button.dart';
@@ -10,9 +12,7 @@ import 'package:twinned_api/twinned_api.dart' as tapi;
 import 'package:twinned_widgets/core/top_bar.dart';
 import 'package:uuid/uuid.dart';
 import 'package:twin_commons/core/twin_image_helper.dart';
-import 'package:twin_commons/core/utils.dart';
 import 'package:twin_commons/widgets/common/label_text_field.dart';
-import 'package:twin_commons/widgets/showoverlay_widget.dart';
 
 class VisualAlarmsContentPage extends StatefulWidget {
   final tapi.DeviceModel model;
