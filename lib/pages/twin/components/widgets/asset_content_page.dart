@@ -1,6 +1,5 @@
 import 'package:flutter/Material.dart';
 import 'package:flutter/material.dart';
-import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/pages/twin/components/widgets/asset_device.dart';
 import 'package:twin_app/pages/twin/components/widgets/client_infratsructure_widget.dart';
 import 'package:twin_app/pages/twin/components/widgets/device_info_snippet.dart';
@@ -17,15 +16,16 @@ import 'package:twin_commons/widgets/common/label_text_field.dart';
 import 'package:twinned_api/api/twinned.swagger.dart';
 import 'package:twinned_widgets/core/top_bar.dart';
 import 'package:uuid/uuid.dart';
+import 'package:twin_app/core/session_variables.dart';
 
-class FacilityContentPage extends StatefulWidget {
+class AssetContentPage extends StatefulWidget {
   final InfraType type;
   final Premise? premise;
   final Facility? facility;
   final Floor? floor;
   final Asset? asset;
 
-  const FacilityContentPage(
+  const AssetContentPage(
       {super.key,
       required this.type,
       this.premise,
@@ -34,11 +34,10 @@ class FacilityContentPage extends StatefulWidget {
       this.asset});
 
   @override
-  State<FacilityContentPage> createState() => _FacilityContentPageState();
+  State<AssetContentPage> createState() => _AssetContentPageState();
 }
 
-class _FacilityContentPageState extends BaseState<FacilityContentPage> {
-
+class _AssetContentPageState extends BaseState<AssetContentPage> {
   static const Widget _missingImage = Icon(
     Icons.question_mark,
     size: 50,
@@ -333,7 +332,7 @@ class _FacilityContentPageState extends BaseState<FacilityContentPage> {
           await Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => FacilityContentPage(
+              builder: (context) => AssetContentPage(
                 key: Key(const Uuid().v4()),
                 type: InfraType.facility,
                 facility: e,
@@ -363,16 +362,16 @@ class _FacilityContentPageState extends BaseState<FacilityContentPage> {
                         Text(
                           e.name,
                           style: theme.getStyle().copyWith(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                         Text(
                           e.description ?? "",
                           style: theme.getStyle().copyWith(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                       ],
                     ),
@@ -403,7 +402,7 @@ class _FacilityContentPageState extends BaseState<FacilityContentPage> {
           await Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => FacilityContentPage(
+              builder: (context) => AssetContentPage(
                 key: Key(const Uuid().v4()),
                 type: InfraType.floor,
                 floor: e,
@@ -433,16 +432,16 @@ class _FacilityContentPageState extends BaseState<FacilityContentPage> {
                         Text(
                           e.name,
                           style: theme.getStyle().copyWith(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                         Text(
                           e.description ?? "",
                           style: theme.getStyle().copyWith(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                       ],
                     ),
@@ -474,7 +473,7 @@ class _FacilityContentPageState extends BaseState<FacilityContentPage> {
           await Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => FacilityContentPage(
+              builder: (context) => AssetContentPage(
                 key: Key(const Uuid().v4()),
                 type: InfraType.asset,
                 asset: e,
@@ -504,16 +503,16 @@ class _FacilityContentPageState extends BaseState<FacilityContentPage> {
                         Text(
                           e.name,
                           style: theme.getStyle().copyWith(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                         Text(
                           e.description ?? "",
                           style: theme.getStyle().copyWith(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                       ],
                     ),
@@ -686,7 +685,7 @@ class _FacilityContentPageState extends BaseState<FacilityContentPage> {
                 child: LabelTextField(
                   style: theme.getStyle(),
                   labelTextStyle: theme.getStyle(),
-                  label: 'Facility Name',
+                  label: 'Asset Name',
                   controller: _name,
                 ),
               ),
@@ -794,7 +793,9 @@ class _FacilityContentPageState extends BaseState<FacilityContentPage> {
                                           alignment: Alignment.topRight,
                                           child: Text(
                                             "${widget.premise!.name} - Facilities",
-                                            style: theme.getStyle().copyWith(fontSize: 20),
+                                            style: theme
+                                                .getStyle()
+                                                .copyWith(fontSize: 20),
                                           ),
                                         ),
                                       if (widget.type == InfraType.facility)
@@ -802,7 +803,9 @@ class _FacilityContentPageState extends BaseState<FacilityContentPage> {
                                           alignment: Alignment.topRight,
                                           child: Text(
                                             "${widget.facility!.name} - Floors",
-                                            style: theme.getStyle().copyWith(fontSize: 20),
+                                            style: theme
+                                                .getStyle()
+                                                .copyWith(fontSize: 20),
                                           ),
                                         ),
                                       if (widget.type == InfraType.floor)
@@ -810,7 +813,9 @@ class _FacilityContentPageState extends BaseState<FacilityContentPage> {
                                           alignment: Alignment.topRight,
                                           child: Text(
                                             "${widget.floor!.name} - Assets",
-                                            style: theme.getStyle().copyWith(fontSize: 20),
+                                            style: theme
+                                                .getStyle()
+                                                .copyWith(fontSize: 20),
                                           ),
                                         ),
                                       if (widget.type == InfraType.asset)
@@ -822,7 +827,9 @@ class _FacilityContentPageState extends BaseState<FacilityContentPage> {
                                             children: [
                                               Text(
                                                 "${widget.asset!.name} - Devices",
-                                                style: theme.getStyle().copyWith(fontSize: 20),
+                                                style: theme
+                                                    .getStyle()
+                                                    .copyWith(fontSize: 20),
                                               ),
                                               divider(horizontal: true),
                                               IconButton(
