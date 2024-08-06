@@ -255,6 +255,7 @@ class _FacilitiesState extends BaseState<Facilities> {
                     decoration: InputDecoration(
                       hintText: 'Name',
                       hintStyle: theme.getStyle(),
+                      labelStyle: theme.getStyle(),
                     ),
                   ),
                   TextField(
@@ -267,6 +268,7 @@ class _FacilitiesState extends BaseState<Facilities> {
                     decoration: InputDecoration(
                       hintText: 'Description',
                       hintStyle: theme.getStyle(),
+                       labelStyle: theme.getStyle(),
                     ),
                   ),
                   TextField(
@@ -279,6 +281,7 @@ class _FacilitiesState extends BaseState<Facilities> {
                     decoration: InputDecoration(
                       hintText: 'Tags (space separated)',
                       hintStyle: theme.getStyle(),
+                       labelStyle: theme.getStyle(),
                     ),
                   ),
                 ],

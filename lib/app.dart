@@ -450,11 +450,11 @@ class HomeScreenState extends BaseState<HomeScreen> {
                                 height: 64,
                                 child: TwinImageHelper.getDomainImage(
                                     _clients[_selectedClient].icon!)),
-                          SizedBox(
-                            width: 160,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (null == _clients[_selectedClient].icon ||
+                                  _clients[_selectedClient].icon!.isEmpty)
                                 Text(
                                   '${_clients[_selectedClient].name}',
                                   style: session.theme.getStyle().copyWith(
@@ -463,18 +463,17 @@ class HomeScreenState extends BaseState<HomeScreen> {
                                       fontSize: 22,
                                       fontWeight: FontWeight.bold),
                                 ),
-                                if (TwinnedSession.instance.isClientAdmin())
-                                  IconButton(
-                                      onPressed: () {
-                                        _editClient(
-                                            client: _clients[_selectedClient]);
-                                      },
-                                      icon: Icon(
-                                        Icons.edit,
-                                        color: Colors.white,
-                                      )),
-                              ],
-                            ),
+                              if (TwinnedSession.instance.isClientAdmin())
+                                IconButton(
+                                    onPressed: () {
+                                      _editClient(
+                                          client: _clients[_selectedClient]);
+                                    },
+                                    icon: Icon(
+                                      Icons.edit,
+                                      color: Colors.white,
+                                    )),
+                            ],
                           ),
                         ],
                       ),
