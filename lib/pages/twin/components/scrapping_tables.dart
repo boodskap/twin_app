@@ -94,89 +94,94 @@ class _ScrappingTablesState extends BaseState<ScrappingTables> {
   }
 
   Widget _buildCard(tapi.ScrappingTable e) {
-    return Accordion(
-        contentVerticalPadding: 0,
-        headerBorderColor: theme.getPrimaryColor(),
-        headerBorderColorOpened: theme.getPrimaryColor(),
-        headerBackgroundColorOpened: theme.getSecondaryColor(),
-        headerBackgroundColor: theme.getSecondaryColor(),
-        contentBackgroundColor: Colors.white,
-        contentBorderColor: theme.getPrimaryColor(),
-        headerBorderRadius: 1.2,
-        scaleWhenAnimating: true,
-        openAndCloseAnimation: true,
-        maxOpenSections: 1,
-        headerPadding:
-            const EdgeInsets.symmetric(vertical: 3.5, horizontal: 7.5),
-        children: [
-          AccordionSection(
-            headerBorderColor: theme.getPrimaryColor(),
-            headerBorderColorOpened: theme.getPrimaryColor(),
-            headerBackgroundColorOpened: theme.getPrimaryColor(),
-            isOpen: false,
-            header: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  e.name,
-                  style: theme.getStyle().copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
-                Row(
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        _edit(e);
-                      },
-                      child: Icon(
-                        Icons.edit,
-                        color: theme.getPrimaryColor(),
-                      ),
-                    ),
-                    InkWell(
-                      onTap: () {
-                        confirmDeletion(context, e);
-                      },
-                      child: Icon(
-                        Icons.delete,
-                        color: theme.getPrimaryColor(),
-                      ),
-                    ),
-                    divider(
-                      horizontal: true,
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            content: SizedBox(
-              height: 300,
-              child: CardLayoutSection(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    divider(),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Parameter Info",
-                          style: theme.getStyle().copyWith(fontSize: 24),
+    return InkWell(
+      onDoubleTap: () {
+        _edit(e);
+      },
+      child: Accordion(
+          contentVerticalPadding: 0,
+          headerBorderColor: theme.getPrimaryColor(),
+          headerBorderColorOpened: theme.getPrimaryColor(),
+          headerBackgroundColorOpened: theme.getSecondaryColor(),
+          headerBackgroundColor: theme.getSecondaryColor(),
+          contentBackgroundColor: Colors.white,
+          contentBorderColor: theme.getPrimaryColor(),
+          headerBorderRadius: 1.2,
+          scaleWhenAnimating: true,
+          openAndCloseAnimation: true,
+          maxOpenSections: 1,
+          headerPadding:
+              const EdgeInsets.symmetric(vertical: 3.5, horizontal: 7.5),
+          children: [
+            AccordionSection(
+              headerBorderColor: theme.getPrimaryColor(),
+              headerBorderColorOpened: theme.getPrimaryColor(),
+              headerBackgroundColorOpened: theme.getPrimaryColor(),
+              isOpen: false,
+              header: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    e.name,
+                    style: theme.getStyle().copyWith(
+                          fontWeight: FontWeight.bold,
                         ),
-                      ],
-                    ),
-                    divider(),
-                    ScrappingTableParametersTable(
-                      rows: _buildTableRows(e),
-                    ),
-                    divider(),
-                  ],
+                  ),
+                  Row(
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          _edit(e);
+                        },
+                        child: Icon(
+                          Icons.edit,
+                          color: theme.getPrimaryColor(),
+                        ),
+                      ),
+                      InkWell(
+                        onTap: () {
+                          confirmDeletion(context, e);
+                        },
+                        child: Icon(
+                          Icons.delete,
+                          color: theme.getPrimaryColor(),
+                        ),
+                      ),
+                      divider(
+                        horizontal: true,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              content: SizedBox(
+                height: 300,
+                child: CardLayoutSection(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      divider(),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Parameter Info",
+                            style: theme.getStyle().copyWith(fontSize: 24),
+                          ),
+                        ],
+                      ),
+                      divider(),
+                      ScrappingTableParametersTable(
+                        rows: _buildTableRows(e),
+                      ),
+                      divider(),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ]);
+          ]),
+    );
   }
 
   List<TableRow> _buildTableRows(tapi.ScrappingTable e) {

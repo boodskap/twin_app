@@ -400,7 +400,7 @@ class _PremisesState extends BaseState<Premises> {
           premise: e,
           key: Key(
             Uuid().v4(),
-          ),
+          ), type: InfraType.premise,
         ),
       ),
     );
