@@ -1,6 +1,6 @@
 import 'package:flutter/Material.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_html/flutter_html.dart';
+import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/pages/twin/components/asset_groups.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:twin_app/widgets/commons/secondary_button.dart';
@@ -12,8 +12,6 @@ import 'package:twin_commons/widgets/common/label_text_field.dart';
 import 'package:twinned_api/api/twinned.swagger.dart' as twinned;
 import 'package:twinned_api/twinned_api.dart' as tapi;
 import 'package:twinned_widgets/core/device_model_dropdown.dart';
-import 'package:twinned_widgets/core/top_bar.dart';
-import 'package:twin_app/core/session_variables.dart';
 
 class AssetReportList extends StatefulWidget {
   final double cardWidth;
@@ -95,9 +93,89 @@ class _AssetReportListState extends BaseState<AssetReportList> {
     );
   }
 
-  @override
-  void setup() async {
-    await _load();
+  Widget buildCard(twinned.Report report) {
+    Widget? image;
+    if (null != report.icon && report.icon!.isNotEmpty) {
+      image = TwinImageHelper.getImage(report.domainKey, report.icon!);
+    }
+
+    return InkWell(
+      onDoubleTap: () async {
+        await _edit(report);
+      },
+      child: Card(
+        elevation: 10,
+        child: Container(
+          color: Colors.white,
+          width: widget.cardWidth,
+          height: widget.cardHeight,
+          child: Stack(
+            children: [
+              Center(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (null != image)
+                      SizedBox(width: 48, height: 48, child: image),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        report.name,
+                        style: theme.getStyle().copyWith(fontSize: 14),
+                      ),
+                    ),
+                    Text(
+                      '${report.fields.length} fields',
+                      style: theme.getStyle().copyWith(
+                            fontSize: 10,
+                            color: Colors.blue,
+                          ),
+                    ),
+                  ],
+                ),
+              ),
+              Positioned(
+                  left: 8,
+                  child: Tooltip(
+                    message: 'Delete this report',
+                    child: IconButton(
+                      onPressed: () async {
+                        await _delete(report);
+                      },
+                      icon: Icon(
+                        Icons.delete,
+                        color: theme.getPrimaryColor(),
+                      ),
+                    ),
+                  )),
+              Positioned(
+                right: 45,
+                child: IconButton(
+                  onPressed: () async {
+                    await _edit(report);
+                  },
+                  icon: Icon(Icons.edit, color: theme.getPrimaryColor()),
+                ),
+              ),
+              Positioned(
+                  right: 8,
+                  child: Tooltip(
+                    message: 'Upload icon',
+                    child: IconButton(
+                        onPressed: () async {
+                          await _upload(report);
+                        },
+                        icon: Icon(
+                          Icons.upload,
+                          color: theme.getPrimaryColor(),
+                        )),
+                  )),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   Future _load() async {
@@ -126,100 +204,14 @@ class _AssetReportListState extends BaseState<AssetReportList> {
 
       if (validateResponse(res)) {
         _reports.addAll(res.body!.values!);
-      }
-
-      for (int i = 0; i < _reports.length; i++) {
-        Widget? image;
-        if (null != _reports[i].icon && _reports[i].icon!.isNotEmpty) {
-          image = TwinImageHelper.getImage(
-              _reports[i].domainKey, _reports[i].icon!);
+        _cards.clear();
+        for (int i = 0; i < _reports.length; i++) {
+          _cards.add(buildCard(_reports[i]));
         }
-        setState(() {
-          _cards.add(InkWell(
-            onDoubleTap: () async {
-              await _edit(_reports[i]);
-            },
-            child: Card(
-              elevation: 10,
-              child: Container(
-                color: Colors.white,
-                width: widget.cardWidth,
-                height: widget.cardHeight,
-                child: Stack(
-                  children: [
-                    Center(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          if (null != image)
-                            SizedBox(width: 48, height: 48, child: image),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              _reports[i].name,
-                              style: theme.getStyle().copyWith(
-                                    fontSize: 14,
-                                  ),
-                            ),
-                          ),
-                          Text(
-                            '${_reports[i].fields.length} fields',
-                            style: theme.getStyle().copyWith(
-                                  fontSize: 10,
-                                  color: Colors.blue,
-                                ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Positioned(
-                        left: 8,
-                        child: Tooltip(
-                          message: 'Delete this report',
-                          child: IconButton(
-                            onPressed: () async {
-                              await _delete(_reports[i]);
-                            },
-                            icon: Icon(
-                              Icons.delete,
-                              color: theme.getPrimaryColor(),
-                            ),
-                          ),
-                        )),
-                    Positioned(
-                      right: 45,
-                      child: IconButton(
-                        onPressed: () async {
-                          await _edit(_reports[i]);
-                        },
-                        icon: Icon(Icons.edit, color: theme.getPrimaryColor()),
-                      ),
-                    ),
-                    Positioned(
-                        right: 8,
-                        child: Tooltip(
-                          message: 'Upload icon',
-                          child: IconButton(
-                              onPressed: () async {
-                                await _upload(_reports[i]);
-                              },
-                              icon: Icon(
-                                Icons.upload,
-                                color: theme.getPrimaryColor(),
-                              )),
-                        )),
-                  ],
-                ),
-              ),
-            ),
-          ));
-        });
       }
     });
-    setState(() {
-      loading = false;
-    });
+    loading = false;
+    refresh();
   }
 
   Future _addNew() async {
@@ -382,7 +374,7 @@ class _AssetReportListState extends BaseState<AssetReportList> {
     await _load();
   }
 
-  Future _upload(twinned.Report report) async {
+  Future _upload(twinned.Report filter) async {
     if (loading) return;
     loading = true;
     await execute(() async {
@@ -390,32 +382,29 @@ class _AssetReportListState extends BaseState<AssetReportList> {
       if (null != res && null != res.entity) {
         var rRes = await TwinnedSession.instance.twin.updateReport(
             apikey: TwinnedSession.instance.authToken,
-            reportId: report.id,
+            reportId: filter.id,
             body: twinned.ReportInfo(
-                modelId: report.modelId,
-                name: report.name,
-                description: report.description,
-                tags: report.tags,
-                icon: res.entity!.id,
-                includeAsset: report.includeAsset,
-                includeDevice: report.includeDevice,
-                includeFacility: report.includeFacility,
-                includeFloor: report.includeFloor,
-                includePremise: report.includePremise,
-                dateFormat: report.dateFormat,
-                tz: report.tz,
-                humanDateFormat: report.humanDateFormat,
-                fields: report.fields));
+              modelId: filter.modelId,
+              name: filter.name,
+              fields: filter.fields,
+              icon: res.entity!.id,
+              tags: filter.tags,
+              description: filter.description,
+            ));
 
         if (validateResponse(rRes)) {
           await _load();
-          await alert(
-              'Report - ${rRes.body!.entity!.name}', 'Updated successfully');
+          alert('Filter ${rRes.body!.entity!.name} ', 'updated successfully');
         }
       }
     });
     loading = false;
     refresh();
+  }
+
+  @override
+  void setup() async {
+    _load();
   }
 }
 

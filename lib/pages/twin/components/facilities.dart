@@ -135,8 +135,9 @@ class _FacilitiesState extends BaseState<Facilities> {
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
                       e.name,
-                      style:
-                          theme.getStyle().copyWith(fontWeight: FontWeight.bold),
+                      style: theme
+                          .getStyle()
+                          .copyWith(fontWeight: FontWeight.bold),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
@@ -152,8 +153,8 @@ class _FacilitiesState extends BaseState<Facilities> {
                             onTap: () {
                               _edit(e);
                             },
-                            child:
-                                Icon(Icons.edit, color: theme.getPrimaryColor())),
+                            child: Icon(Icons.edit,
+                                color: theme.getPrimaryColor())),
                         InkWell(
                           onTap: () {
                             _delete(e);
@@ -170,7 +171,8 @@ class _FacilitiesState extends BaseState<Facilities> {
                 if (null != e.images && e.images!.isNotEmpty)
                   Align(
                     alignment: Alignment.center,
-                    child: TwinImageHelper.getImage(e.domainKey, e.images!.first,
+                    child: TwinImageHelper.getImage(
+                        e.domainKey, e.images!.first,
                         width: width / 2, height: width / 2),
                   )
               ],
@@ -213,11 +215,12 @@ class _FacilitiesState extends BaseState<Facilities> {
     await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => FacilitiesContentPage(
+        builder: (context) => FacilityContentPage(
           facility: res.body!.entity!,
           key: Key(
             Uuid().v4(),
           ),
+          type: InfraType.facility,
         ),
       ),
     );

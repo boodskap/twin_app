@@ -133,9 +133,7 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
     }
     return InkWell(
       onDoubleTap: () {
-        if (_selectedDeviceModel != null) {
-          _edit(e);
-        }
+        _edit(e);
       },
       child: SizedBox(
         width: width,
@@ -290,7 +288,7 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
           ));
       if (validateResponse(mRes)) {
         await _edit(mRes.body!.entity!);
-                alert('Success', 'Alarm ${name} created successfully');
+        alert('Success', 'Alarm ${name} created successfully');
       }
     });
     loading = false;

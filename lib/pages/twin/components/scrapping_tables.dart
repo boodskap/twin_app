@@ -1,5 +1,7 @@
+import 'package:accordion/accordion.dart';
 import 'package:flutter/material.dart';
 import 'package:twin_app/core/session_variables.dart';
+import 'package:twin_app/pages/twin/components/widgets/card_layout.dart';
 import 'package:twin_app/pages/twin/components/widgets/scrapping_tables_content_page.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:twin_app/widgets/commons/secondary_button.dart';
@@ -50,7 +52,7 @@ class _ScrappingTablesState extends BaseState<ScrappingTables> {
                 width: 250,
                 child: SearchBar(
                   leading: Icon(Icons.search),
-                  hintText: 'Search device library',
+                  hintText: 'Search Scrapping Table',
                   onChanged: (val) {
                     _search = val.trim();
                     _load();
@@ -82,7 +84,7 @@ class _ScrappingTablesState extends BaseState<ScrappingTables> {
         if (!loading && _cards.isNotEmpty)
           SingleChildScrollView(
             child: Wrap(
-              spacing: 8,
+              spacing: 0,
               crossAxisAlignment: WrapCrossAlignment.center,
               children: _cards,
             ),
@@ -92,56 +94,182 @@ class _ScrappingTablesState extends BaseState<ScrappingTables> {
   }
 
   Widget _buildCard(tapi.ScrappingTable e) {
-    double width = MediaQuery.of(context).size.width / 8;
-    double height = 72;
-    return SizedBox(
-      width: width,
-      height: height,
-      child: Card(
-        elevation: 8,
-        color: Colors.white,
-        child: Stack(
+    return InkWell(
+      onDoubleTap: () {
+        _edit(e);
+      },
+      child: Accordion(
+          contentVerticalPadding: 0,
+          headerBorderColor: theme.getPrimaryColor(),
+          headerBorderColorOpened: theme.getPrimaryColor(),
+          headerBackgroundColorOpened: theme.getSecondaryColor(),
+          headerBackgroundColor: theme.getSecondaryColor(),
+          contentBackgroundColor: Colors.white,
+          contentBorderColor: theme.getPrimaryColor(),
+          headerBorderRadius: 1.2,
+          scaleWhenAnimating: true,
+          openAndCloseAnimation: true,
+          maxOpenSections: 1,
+          headerPadding:
+              const EdgeInsets.symmetric(vertical: 3.5, horizontal: 7.5),
           children: [
-            Align(
-              alignment: Alignment.topLeft,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  e.name,
-                  style: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
-            Align(
-              alignment: Alignment.topRight,
-              child: Padding(
-                padding: const EdgeInsets.only(right: 8.0, top: 8.0),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    InkWell(
+            AccordionSection(
+              headerBorderColor: theme.getPrimaryColor(),
+              headerBorderColorOpened: theme.getPrimaryColor(),
+              headerBackgroundColorOpened: theme.getPrimaryColor(),
+              isOpen: false,
+              header: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    e.name,
+                    style: theme.getStyle().copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                  Row(
+                    children: [
+                      InkWell(
                         onTap: () {
                           _edit(e);
                         },
-                        child:
-                            Icon(Icons.edit, color: theme.getPrimaryColor())),
-                    InkWell(
-                      onTap: () {
-                        confirmDeletion(context, e);
-                      },
-                      child: Icon(
-                        Icons.delete,
-                        color: theme.getPrimaryColor(),
+                        child: Icon(
+                          Icons.edit,
+                          color: theme.getPrimaryColor(),
+                        ),
                       ),
-                    ),
-                  ],
+                      InkWell(
+                        onTap: () {
+                          confirmDeletion(context, e);
+                        },
+                        child: Icon(
+                          Icons.delete,
+                          color: theme.getPrimaryColor(),
+                        ),
+                      ),
+                      divider(
+                        horizontal: true,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              content: SizedBox(
+                height: 300,
+                child: CardLayoutSection(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      divider(),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Parameter Info",
+                            style: theme.getStyle().copyWith(fontSize: 24),
+                          ),
+                        ],
+                      ),
+                      divider(),
+                      ScrappingTableParametersTable(
+                        rows: _buildTableRows(e),
+                      ),
+                      divider(),
+                    ],
+                  ),
                 ),
+              ),
+            ),
+          ]),
+    );
+  }
+
+  List<TableRow> _buildTableRows(tapi.ScrappingTable e) {
+    List<TableRow> rows = [
+      TableRow(
+        children: [
+          Center(
+              child: Text(
+            'Name',
+            style: theme.getStyle().copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+          )),
+          Center(
+              child: Text(
+            'Description',
+            style: theme.getStyle().copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+          )),
+          Center(
+              child: Text(
+            'Label',
+            style: theme.getStyle().copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+          )),
+          Center(
+              child: Text(
+            'Type',
+            style: theme.getStyle().copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+          )),
+          Center(
+              child: Text(
+            'Value',
+            style: theme.getStyle().copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+          )),
+          Center(
+              child: Text(
+            'Editable',
+            style: theme.getStyle().copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+          )),
+        ],
+      ),
+    ];
+
+    for (var parameter in e.attributes) {
+      rows.add(
+        TableRow(
+          children: [
+            Align(
+              alignment: Alignment.center,
+              child: Text(parameter.name),
+            ),
+            Align(
+              alignment: Alignment.center,
+              child: Text(parameter.description ?? ''),
+            ),
+            Align(
+              alignment: Alignment.center,
+              child: Text(parameter.label ?? ''),
+            ),
+            Align(
+              alignment: Alignment.center,
+              child: Text(parameter.attributeType.name),
+            ),
+            Align(
+              alignment: Alignment.center,
+              child: Text(parameter.$value),
+            ),
+            Align(
+              alignment: Alignment.center,
+              child: Text(
+                parameter.editable.toString(),
               ),
             ),
           ],
         ),
-      ),
-    );
+      );
+    }
+
+    return rows;
   }
 
   Future _create() async {
@@ -154,7 +282,21 @@ class _ScrappingTablesState extends BaseState<ScrappingTables> {
     _load();
   }
 
-  Future _edit(tapi.ScrappingTable e) async {}
+  Future _edit(tapi.ScrappingTable e) async {
+    var res = await TwinnedSession.instance.twin.getScrappingTable(
+      scrappingTableId: e.id,
+      apikey: TwinnedSession.instance.authToken,
+    );
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ScrappingTablesContentPage(
+          model: res.body!.entity!,
+        ),
+      ),
+    );
+    _load();
+  }
 
   confirmDeletion(BuildContext context, tapi.ScrappingTable e) {
     Widget cancelButton = SecondaryButton(
@@ -238,5 +380,31 @@ class _ScrappingTablesState extends BaseState<ScrappingTables> {
   @override
   void setup() async {
     _load();
+  }
+}
+
+class ScrappingTableParametersTable extends StatelessWidget {
+  final List<TableRow> rows;
+
+  ScrappingTableParametersTable({required this.rows});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width,
+      child: Table(
+        border: TableBorder.all(),
+        defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+        columnWidths: {
+          0: FlexColumnWidth(2),
+          1: FlexColumnWidth(2),
+          2: FlexColumnWidth(2),
+          3: FlexColumnWidth(1),
+          4: FlexColumnWidth(2),
+          5: FlexColumnWidth(1),
+        },
+        children: rows,
+      ),
+    );
   }
 }
