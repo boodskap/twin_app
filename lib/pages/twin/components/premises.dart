@@ -96,57 +96,63 @@ class _PremisesState extends BaseState<Premises> {
 
   Widget _buildCard(tapi.Premise e) {
     double width = MediaQuery.of(context).size.width / 8;
-    return SizedBox(
-      width: width,
-      height: width,
-      child: Card(
-        elevation: 8,
-        color: Colors.white,
-        child: Stack(
-          children: [
-            Align(
-              alignment: Alignment.topLeft,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  e.name,
-                  style: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
-            Align(
-              alignment: Alignment.topRight,
-              child: Padding(
-                padding: const EdgeInsets.only(right: 8.0, top: 8.0),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    InkWell(
-                        onTap: () {
-                          _edit(e);
-                        },
-                        child:
-                            Icon(Icons.edit, color: theme.getPrimaryColor())),
-                    InkWell(
-                      onTap: () {
-                        _confirmDeletionDialog(context, e);
-                      },
-                      child: Icon(
-                        Icons.delete,
-                        color: theme.getPrimaryColor(),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            if (null != e.images && e.images!.isNotEmpty)
+    return InkWell(
+      onDoubleTap: () {
+        _edit(e);
+      },
+      child: SizedBox(
+        width: width,
+        height: width,
+        child: Card(
+          elevation: 8,
+          color: Colors.white,
+          child: Stack(
+            children: [
               Align(
-                alignment: Alignment.center,
-                child: TwinImageHelper.getImage(e.domainKey, e.images!.first,
-                    width: width / 2, height: width / 2),
-              )
-          ],
+                alignment: Alignment.topLeft,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    e.name,
+                    style:
+                        theme.getStyle().copyWith(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+              Align(
+                alignment: Alignment.topRight,
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 8.0, top: 8.0),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      InkWell(
+                          onTap: () {
+                            _edit(e);
+                          },
+                          child:
+                              Icon(Icons.edit, color: theme.getPrimaryColor())),
+                      InkWell(
+                        onTap: () {
+                          _confirmDeletionDialog(context, e);
+                        },
+                        child: Icon(
+                          Icons.delete,
+                          color: theme.getPrimaryColor(),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              if (null != e.images && e.images!.isNotEmpty)
+                Align(
+                  alignment: Alignment.center,
+                  child: TwinImageHelper.getImage(e.domainKey, e.images!.first,
+                      width: width / 2, height: width / 2),
+                )
+            ],
+          ),
         ),
       ),
     );
@@ -157,22 +163,11 @@ class _PremisesState extends BaseState<Premises> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          actions: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text("Cancel"),
-                ),
-              ],
-            ),
-          ],
           content: SizedBox(
             width: 1000,
             child: OSMLocationPicker(
+              // longitude: _location.location?.coordinates[0],
+              // latitude: _location.location?.coordinates[1],
               onPicked: (pickedData) {
                 setState(
                   () {},
@@ -216,9 +211,11 @@ class _PremisesState extends BaseState<Premises> {
                 children: [
                   Text(
                     'Add Premise',
-                    style: theme.getStyle(),
+                    style: theme.getStyle().copyWith(
+                          color: Colors.white,
+                        ),
                   ),
-                                    MouseRegion(
+                  MouseRegion(
                     cursor: SystemMouseCursors.click,
                     child: GestureDetector(
                       onTap: () {
@@ -403,7 +400,7 @@ class _PremisesState extends BaseState<Premises> {
           premise: e,
           key: Key(
             Uuid().v4(),
-          ),
+          ), type: InfraType.premise,
         ),
       ),
     );
@@ -430,7 +427,7 @@ class _PremisesState extends BaseState<Premises> {
         style: theme.getStyle(),
       ),
       content: Text(
-        "Deleting a Premisw can not be undone.\nYou will loose all of the premise data, history, etc.\n\nAre you sure you want to delete?",
+        "Deleting a Premise can not be undone.\nYou will loose all of the premise data, history, etc.\n\nAre you sure you want to delete?",
         style: theme.getStyle(),
         maxLines: 10,
       ),

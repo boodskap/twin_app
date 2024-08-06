@@ -1,7 +1,10 @@
 import 'package:flutter/Material.dart';
 import 'package:flutter/material.dart';
+import 'package:twin_app/pages/twin/components/widgets/asset_device.dart';
 import 'package:twin_app/pages/twin/components/widgets/client_infratsructure_widget.dart';
+import 'package:twin_app/pages/twin/components/widgets/device_info_snippet.dart';
 import 'package:twin_app/pages/twin/components/widgets/roles_infrastructure_widget.dart';
+import 'package:twin_app/pages/twin/components/widgets/utils.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:twin_app/widgets/commons/secondary_button.dart';
 import 'package:twin_commons/core/base_state.dart';
@@ -11,25 +14,30 @@ import 'package:twin_commons/core/twinned_session.dart';
 import 'package:twin_commons/util/osm_location_picker.dart';
 import 'package:twin_commons/widgets/common/label_text_field.dart';
 import 'package:twinned_api/api/twinned.swagger.dart';
-import 'package:twinned_api/twinned_api.dart' as twinned;
 import 'package:twinned_widgets/core/top_bar.dart';
 import 'package:uuid/uuid.dart';
+import 'package:twin_app/core/session_variables.dart';
 
 class FloorContentPage extends StatefulWidget {
+  final InfraType type;
+  final Premise? premise;
+  final Facility? facility;
   final Floor? floor;
+  final Asset? asset;
 
-  const FloorContentPage({
-    super.key,
-    this.floor,
-  });
+  const FloorContentPage(
+      {super.key,
+      required this.type,
+      this.premise,
+      this.facility,
+      this.floor,
+      this.asset});
 
   @override
   State<FloorContentPage> createState() => _FloorContentPageState();
 }
 
 class _FloorContentPageState extends BaseState<FloorContentPage> {
-  static const TextStyle _style = TextStyle(fontSize: 20);
-
   static const Widget _missingImage = Icon(
     Icons.question_mark,
     size: 50,
@@ -63,19 +71,62 @@ class _FloorContentPageState extends BaseState<FloorContentPage> {
 
   @override
   void initState() {
-    domainKey = widget.floor!.domainKey;
-    heading = 'Floor';
-    name = widget.floor!.name;
-    if (null != widget.floor!.floorPlan &&
-        widget.floor!.floorPlan!.isNotEmpty) {
-      imageIds.add(widget.floor!.floorPlan!);
+    switch (widget.type) {
+      case InfraType.premise:
+        domainKey = widget.premise!.domainKey;
+        heading = 'Premise';
+        name = widget.premise!.name;
+        selectedImage = 0;
+        imageIds = widget.premise!.images ?? [];
+        _name.text = widget.premise!.name;
+        _desc.text = widget.premise!.description ?? '';
+        _tags.text = (widget.premise!.tags ?? []).join(' ');
+        _pickedLocation = widget.premise!.location;
+        rolesSelected = widget.premise!.roles!;
+        clientsSelected = widget.premise!.clientIds!;
+        break;
+      case InfraType.facility:
+        domainKey = widget.facility!.domainKey;
+        heading = 'Facility';
+        name = widget.facility!.name;
+        selectedImage = 0;
+        imageIds = widget.facility!.images ?? [];
+        _name.text = widget.facility!.name;
+        _desc.text = widget.facility!.description ?? '';
+        _tags.text = (widget.facility!.tags ?? []).join(' ');
+        _pickedLocation = widget.facility!.location;
+        rolesSelected = widget.facility!.roles!;
+        clientsSelected = widget.facility!.clientIds!;
+        break;
+      case InfraType.floor:
+        domainKey = widget.floor!.domainKey;
+        heading = 'Floor';
+        name = widget.floor!.name;
+        if (null != widget.floor!.floorPlan &&
+            widget.floor!.floorPlan!.isNotEmpty) {
+          imageIds.add(widget.floor!.floorPlan!);
+        }
+        _name.text = widget.floor!.name;
+        _desc.text = widget.floor!.description ?? '';
+        _tags.text = (widget.floor!.tags ?? []).join(' ');
+        _pickedLocation = widget.floor!.location;
+        rolesSelected = widget.floor!.roles!;
+        clientsSelected = widget.floor!.clientIds!;
+        break;
+      case InfraType.asset:
+        domainKey = widget.asset!.domainKey;
+        heading = 'Asset';
+        name = widget.asset!.name;
+        selectedImage = 0;
+        imageIds = widget.asset!.images ?? [];
+        _name.text = widget.asset!.name;
+        _desc.text = widget.asset!.description ?? '';
+        _tags.text = (widget.asset!.tags ?? []).join(' ');
+        _pickedLocation = widget.asset!.location;
+        rolesSelected = widget.asset!.roles!;
+        clientsSelected = widget.asset!.clientIds!;
+        break;
     }
-    _name.text = widget.floor!.name;
-    _desc.text = widget.floor!.description ?? '';
-    _tags.text = (widget.floor!.tags ?? []).join(' ');
-    _pickedLocation = widget.floor!.location;
-    rolesSelected = widget.floor!.roles!;
-    clientsSelected = widget.floor!.clientIds!;
 
     if (null != _pickedLocation) {
       _location.text =
@@ -112,12 +163,43 @@ class _FloorContentPageState extends BaseState<FloorContentPage> {
     _devices.clear();
 
     await execute(() async {
-      var res = await TwinnedSession.instance.twin.searchAssets(
-          apikey: TwinnedSession.instance.authToken,
-          floorId: widget.floor!.id,
-          body: SearchReq(search: search, page: 0, size: 10000));
-      if (validateResponse(res)) {
-        _assets.addAll(res.body!.values!);
+      switch (widget.type) {
+        case InfraType.premise:
+          var res = await TwinnedSession.instance.twin.searchFacilities(
+              apikey: TwinnedSession.instance.authToken,
+              premiseId: widget.premise!.id,
+              body: SearchReq(search: search, page: 0, size: 10000));
+          if (validateResponse(res)) {
+            _facilities.addAll(res.body!.values!);
+          }
+          break;
+        case InfraType.facility:
+          var res = await TwinnedSession.instance.twin.searchFloors(
+              apikey: TwinnedSession.instance.authToken,
+              facilityId: widget.facility!.id,
+              body: SearchReq(search: search, page: 0, size: 10000));
+          if (validateResponse(res)) {
+            _floors.addAll(res.body!.values!);
+          }
+          break;
+        case InfraType.floor:
+          var res = await TwinnedSession.instance.twin.searchAssets(
+              apikey: TwinnedSession.instance.authToken,
+              floorId: widget.floor!.id,
+              body: SearchReq(search: search, page: 0, size: 10000));
+          if (validateResponse(res)) {
+            _assets.addAll(res.body!.values!);
+          }
+          break;
+        case InfraType.asset:
+          var res = await TwinnedSession.instance.twin.searchDevices(
+              apikey: TwinnedSession.instance.authToken,
+              assetId: widget.asset!.id,
+              body: SearchReq(search: search, page: 0, size: 10000));
+          if (validateResponse(res)) {
+            _devices.addAll(res.body!.values!);
+          }
+          break;
       }
     });
 
@@ -129,9 +211,38 @@ class _FloorContentPageState extends BaseState<FloorContentPage> {
     await execute(() async {
       ImageFileEntityRes? res;
 
-      res = await TwinImageHelper.uploadFloorImage(floorId: widget.floor!.id);
-      if (null != res) {
-        imageId = res.entity!.id;
+      switch (widget.type) {
+        case InfraType.premise:
+          res = await TwinImageHelper.uploadPremiseImage(
+              premiseId: widget.premise!.id);
+          if (null != res) {
+            imageId = res.entity!.id;
+            widget.premise!.images!.add(imageId);
+          }
+          break;
+        case InfraType.facility:
+          res = await TwinImageHelper.uploadFacilityImage(
+              facilityId: widget.facility!.id);
+          if (null != res) {
+            imageId = res.entity!.id;
+            widget.facility!.images!.add(imageId);
+          }
+          break;
+        case InfraType.floor:
+          res =
+              await TwinImageHelper.uploadFloorImage(floorId: widget.floor!.id);
+          if (null != res) {
+            imageId = res.entity!.id;
+          }
+          break;
+        case InfraType.asset:
+          res =
+              await TwinImageHelper.uploadAssetImage(assetId: widget.asset!.id);
+          if (null != res) {
+            imageId = res.entity!.id;
+            widget.asset!.images!.add(imageId);
+          }
+          break;
       }
 
       if (imageId.isNotEmpty) {
@@ -151,6 +262,19 @@ class _FloorContentPageState extends BaseState<FloorContentPage> {
             var res = await TwinnedSession.instance.twin.deleteImage(
                 apikey: TwinnedSession.instance.authToken, id: imageId);
             if (res.body!.ok) {
+              switch (widget.type) {
+                case InfraType.premise:
+                  widget.premise!.images!.remove(imageId);
+                  break;
+                case InfraType.facility:
+                  widget.facility!.images!.remove(imageId);
+                  break;
+                case InfraType.floor:
+                  break;
+                case InfraType.asset:
+                  widget.asset!.images!.remove(imageId);
+                  break;
+              }
               setState(() {
                 imageId = '';
                 infraImage = const Icon(
@@ -210,6 +334,8 @@ class _FloorContentPageState extends BaseState<FloorContentPage> {
             MaterialPageRoute(
               builder: (context) => FloorContentPage(
                 key: Key(const Uuid().v4()),
+                type: InfraType.facility,
+                facility: e,
               ),
             ),
           );
@@ -235,14 +361,14 @@ class _FloorContentPageState extends BaseState<FloorContentPage> {
                       children: [
                         Text(
                           e.name,
-                          style: const TextStyle(
+                          style: theme.getStyle().copyWith(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         Text(
                           e.description ?? "",
-                          style: const TextStyle(
+                          style: theme.getStyle().copyWith(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
@@ -278,6 +404,7 @@ class _FloorContentPageState extends BaseState<FloorContentPage> {
             MaterialPageRoute(
               builder: (context) => FloorContentPage(
                 key: Key(const Uuid().v4()),
+                type: InfraType.floor,
                 floor: e,
               ),
             ),
@@ -304,14 +431,14 @@ class _FloorContentPageState extends BaseState<FloorContentPage> {
                       children: [
                         Text(
                           e.name,
-                          style: const TextStyle(
+                          style: theme.getStyle().copyWith(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         Text(
                           e.description ?? "",
-                          style: const TextStyle(
+                          style: theme.getStyle().copyWith(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
@@ -348,6 +475,8 @@ class _FloorContentPageState extends BaseState<FloorContentPage> {
             MaterialPageRoute(
               builder: (context) => FloorContentPage(
                 key: Key(const Uuid().v4()),
+                type: InfraType.asset,
+                asset: e,
               ),
             ),
           );
@@ -373,14 +502,14 @@ class _FloorContentPageState extends BaseState<FloorContentPage> {
                       children: [
                         Text(
                           e.name,
-                          style: const TextStyle(
+                          style: theme.getStyle().copyWith(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         Text(
                           e.description ?? "",
-                          style: const TextStyle(
+                          style: theme.getStyle().copyWith(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
@@ -398,46 +527,87 @@ class _FloorContentPageState extends BaseState<FloorContentPage> {
     );
   }
 
+  Widget _buildDevice(Device e) {
+    return Card(
+      elevation: 10,
+      child: Container(
+        color: Colors.white,
+        child: DeviceInfoSnippet(
+          device: e,
+          axis: Axis.horizontal,
+        ),
+      ),
+    );
+  }
+
   void _close() {
     Navigator.pop(context);
   }
 
   Future _save() async {
-    await _saveFloor();
+    switch (widget.type) {
+      case InfraType.premise:
+        await _savePremise();
+        break;
+      case InfraType.facility:
+        await _saveFacility();
+        break;
+      case InfraType.floor:
+        await _saveFloor();
+        break;
+      case InfraType.asset:
+        await _saveAsset();
+        break;
+    }
   }
 
-  static twinned.FloorInfo floorInfo(
-    twinned.Floor e, {
-    required String? name,
-    String? description,
-    List<String>? tags,
-    List<String>? roles,
-    List<String>? clientIds,
-    String? floorPlan,
-    twinned.GeoLocation? location,
-    int? floorLevel,
-    twinned.FloorInfoFloorType? floorType,
-  }) {
-    return twinned.FloorInfo(
-      name: name ?? e.name,
-      description: description ?? e.description,
-      tags: tags ?? e.tags,
-      roles: roles ?? e.roles,
-      clientIds: clientIds ?? e.clientIds,
-      floorPlan: floorPlan ?? e.floorPlan,
-      location: location ?? e.location,
-      premiseId: e.premiseId,
-      facilityId: e.facilityId,
-      floorLevel: floorLevel ?? e.floorLevel,
-      floorType: twinned.FloorInfoFloorType.values
-          .byName(null != floorType ? floorType.name : e.floorType.name),
-      assets: e.assets,
-    );
+  Future _savePremise() async {
+    await execute(() async {
+      PremiseInfo body = Utils.premiseInfo(widget.premise!,
+          name: _name.text,
+          description: _desc.text,
+          tags: _tags.text.trim().split(' '),
+          selectedImage: selectedImage,
+          location: _pickedLocation,
+          roles: rolesSelected,
+          clientIds: clientsSelected);
+
+      var res = await TwinnedSession.instance.twin.updatePremise(
+          apikey: TwinnedSession.instance.authToken,
+          premiseId: widget.premise!.id,
+          body: body);
+
+      if (validateResponse(res)) {
+        _close();
+      }
+    });
+  }
+
+  Future _saveFacility() async {
+    await execute(() async {
+      FacilityInfo body = Utils.facilityInfo(widget.facility!,
+          name: _name.text,
+          description: _desc.text,
+          tags: _tags.text.trim().split(' '),
+          selectedImage: selectedImage,
+          location: _pickedLocation,
+          roles: rolesSelected,
+          clientIds: clientsSelected);
+
+      var res = await TwinnedSession.instance.twin.updateFacility(
+          apikey: TwinnedSession.instance.authToken,
+          facilityId: widget.facility!.id,
+          body: body);
+
+      if (validateResponse(res)) {
+        _close();
+      }
+    });
   }
 
   Future _saveFloor() async {
     await execute(() async {
-      FloorInfo body = floorInfo(widget.floor!,
+      FloorInfo body = Utils.floorInfo(widget.floor!,
           name: _name.text,
           description: _desc.text,
           tags: _tags.text.trim().split(' '),
@@ -457,6 +627,47 @@ class _FloorContentPageState extends BaseState<FloorContentPage> {
     });
   }
 
+  Future _saveAsset() async {
+    await execute(() async {
+      AssetInfo body = Utils.assetInfo(widget.asset!,
+          name: _name.text,
+          description: _desc.text,
+          tags: _tags.text.trim().split(' '),
+          selectedImage: selectedImage,
+          location: _pickedLocation,
+          roles: rolesSelected,
+          clientIds: clientsSelected);
+
+      var res = await TwinnedSession.instance.twin.updateAsset(
+          apikey: TwinnedSession.instance.authToken,
+          assetId: widget.asset!.id,
+          body: body);
+
+      if (validateResponse(res)) {
+        _close();
+      }
+    });
+  }
+
+  Future _editAsset() async {
+    await showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return AlertDialog(
+            scrollable: true,
+            content: SizedBox(
+              width: MediaQuery.of(context).size.width / 2,
+              height: 670,
+              child: AssetDevice(
+                asset: widget.asset!,
+              ),
+            ),
+          );
+        });
+    await _load();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -472,6 +683,8 @@ class _FloorContentPageState extends BaseState<FloorContentPage> {
               Expanded(
                 flex: 1,
                 child: LabelTextField(
+                  style: theme.getStyle(),
+                  labelTextStyle: theme.getStyle(),
                   label: 'Floor Name',
                   controller: _name,
                 ),
@@ -480,6 +693,8 @@ class _FloorContentPageState extends BaseState<FloorContentPage> {
               Expanded(
                 flex: 1,
                 child: LabelTextField(
+                  style: theme.getStyle(),
+                  labelTextStyle: theme.getStyle(),
                   label: 'Description',
                   controller: _desc,
                 ),
@@ -488,6 +703,8 @@ class _FloorContentPageState extends BaseState<FloorContentPage> {
               Expanded(
                 flex: 1,
                 child: LabelTextField(
+                  style: theme.getStyle(),
+                  labelTextStyle: theme.getStyle(),
                   label: 'Tags',
                   controller: _tags,
                 ),
@@ -496,6 +713,8 @@ class _FloorContentPageState extends BaseState<FloorContentPage> {
               Expanded(
                 flex: 1,
                 child: LabelTextField(
+                  style: theme.getStyle(),
+                  labelTextStyle: theme.getStyle(),
                   suffixIcon: Tooltip(
                     message: 'Pick a Location',
                     preferBelow: false,
@@ -569,13 +788,58 @@ class _FloorContentPageState extends BaseState<FloorContentPage> {
                                 child: IntrinsicHeight(
                                   child: Column(
                                     children: <Widget>[
-                                      Align(
-                                        alignment: Alignment.topRight,
-                                        child: Text(
-                                          "${widget.floor!.name} - Assets",
-                                          style: _style,
+                                      if (widget.type == InfraType.premise)
+                                        Align(
+                                          alignment: Alignment.topRight,
+                                          child: Text(
+                                            "${widget.premise!.name} - Facilities",
+                                            style: theme
+                                                .getStyle()
+                                                .copyWith(fontSize: 20),
+                                          ),
                                         ),
-                                      ),
+                                      if (widget.type == InfraType.facility)
+                                        Align(
+                                          alignment: Alignment.topRight,
+                                          child: Text(
+                                            "${widget.facility!.name} - Floors",
+                                            style: theme
+                                                .getStyle()
+                                                .copyWith(fontSize: 20),
+                                          ),
+                                        ),
+                                      if (widget.type == InfraType.floor)
+                                        Align(
+                                          alignment: Alignment.topRight,
+                                          child: Text(
+                                            "${widget.floor!.name} - Assets",
+                                            style: theme
+                                                .getStyle()
+                                                .copyWith(fontSize: 20),
+                                          ),
+                                        ),
+                                      if (widget.type == InfraType.asset)
+                                        Align(
+                                          alignment: Alignment.topRight,
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.end,
+                                            children: [
+                                              Text(
+                                                "${widget.asset!.name} - Devices",
+                                                style: theme
+                                                    .getStyle()
+                                                    .copyWith(fontSize: 20),
+                                              ),
+                                              divider(horizontal: true),
+                                              IconButton(
+                                                  onPressed: () async {
+                                                    await _editAsset();
+                                                  },
+                                                  icon: const Icon(Icons.edit)),
+                                            ],
+                                          ),
+                                        ),
                                       Row(
                                         children: [
                                           Tooltip(
@@ -624,7 +888,15 @@ class _FloorContentPageState extends BaseState<FloorContentPage> {
                                         ],
                                       ),
                                       divider(),
-                                      ..._floors.map((e) => _buildFloor(e)),
+                                      if (widget.type == InfraType.premise)
+                                        ..._facilities
+                                            .map((e) => _buildFacility(e)),
+                                      if (widget.type == InfraType.facility)
+                                        ..._floors.map((e) => _buildFloor(e)),
+                                      if (widget.type == InfraType.floor)
+                                        ..._assets.map((e) => _buildAsset(e)),
+                                      if (widget.type == InfraType.asset)
+                                        ..._devices.map((e) => _buildDevice(e)),
                                     ],
                                   ),
                                 ),
@@ -644,13 +916,17 @@ class _FloorContentPageState extends BaseState<FloorContentPage> {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               SecondaryButton(
-                labelKey: "Cancel",
+                labelKey: "Close",
                 onPressed: () {
                   _close();
                 },
               ),
               divider(horizontal: true),
               PrimaryButton(
+                leading: Icon(
+                  Icons.save,
+                  color: Colors.white,
+                ),
                 labelKey: "Save",
                 onPressed: () async {
                   await _save();
