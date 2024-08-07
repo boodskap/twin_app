@@ -338,17 +338,21 @@ class _ScrappingTablesState extends BaseState<ScrappingTables> {
   }
 
   Future _delete(tapi.ScrappingTable e) async {
-    int index = _entities.indexWhere((element) => element.id == e.id);
+    await execute(() async {
+      int index = _entities.indexWhere((element) => element.id == e.id);
 
-    var res = await TwinnedSession.instance.twin.deleteScrappingTable(
-      apikey: TwinnedSession.instance.authToken,
-      scrappingTableid: e.id,
-    );
+      var res = await TwinnedSession.instance.twin.deleteScrappingTable(
+        apikey: TwinnedSession.instance.authToken,
+        scrappingTableid: e.id,
+      );
 
-    if (validateResponse(res)) {
-      _entities.removeAt(index);
-      _cards.removeAt(index);
-    }
+      if (validateResponse(res)) {
+        await _load();
+        _entities.removeAt(index);
+        _cards.removeAt(index);
+      }
+    });
+    loading = false;
     refresh();
   }
 
