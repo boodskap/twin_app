@@ -291,34 +291,34 @@ class _PremisesState extends BaseState<Premises> {
                     ),
                   ),
                   divider(),
-                  TextFormField(
-                    readOnly: true,
-                    onChanged: (value) {
-                      location = location;
-                    },
-                    onFieldSubmitted: (value) {
-                      if (formKey.currentState!.validate()) {
-                        _addNewEntity(
-                          premiseName.text,
-                          premiseDescription.text,
-                          premiseTags.text.split(' '),
-                          location,
-                        );
-                        Navigator.of(context).pop();
-                      }
-                    },
-                    decoration: InputDecoration(
-                      labelText: 'Enter Location',
-                      errorStyle: theme.getStyle(),
-                      labelStyle: theme.getStyle(),
-                      suffixIcon: IconButton(
-                        onPressed: () {
-                          _mapDialog(context);
-                        },
-                        icon: const Icon(Icons.location_on_outlined),
-                      ),
-                    ),
-                  ),
+                  // TextFormField(
+                  //   readOnly: true,
+                  //   onChanged: (value) {
+                  //     location = location;
+                  //   },
+                  //   onFieldSubmitted: (value) {
+                  //     if (formKey.currentState!.validate()) {
+                  //       _addNewEntity(
+                  //         premiseName.text,
+                  //         premiseDescription.text,
+                  //         premiseTags.text.split(' '),
+                  //         location,
+                  //       );
+                  //       Navigator.of(context).pop();
+                  //     }
+                  //   },
+                  //   decoration: InputDecoration(
+                  //     labelText: 'Enter Location',
+                  //     errorStyle: theme.getStyle(),
+                  //     labelStyle: theme.getStyle(),
+                  //     suffixIcon: IconButton(
+                  //       onPressed: () {
+                  //         _mapDialog(context);
+                  //       },
+                  //       icon: const Icon(Icons.location_on_outlined),
+                  //     ),
+                  //   ),
+                  // ),
                   divider(),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
@@ -400,7 +400,8 @@ class _PremisesState extends BaseState<Premises> {
           premise: e,
           key: Key(
             Uuid().v4(),
-          ), type: InfraType.premise,
+          ),
+          type: InfraType.premise,
         ),
       ),
     );
@@ -446,9 +447,9 @@ class _PremisesState extends BaseState<Premises> {
   }
 
   Future _delete(tapi.Premise e) async {
-    busy();
-
-    try {
+    if (loading) return;
+    loading = true;
+    await execute(() async {
       int index = _entities.indexWhere((element) => element.id == e.id);
       var res = await TwinnedSession.instance.twin.deletePremise(
         apikey: TwinnedSession.instance.authToken,
@@ -459,12 +460,9 @@ class _PremisesState extends BaseState<Premises> {
         _entities.removeAt(index);
         _cards.removeAt(index);
       }
-      refresh();
-    } catch (e, s) {
-      debugPrint('$e\n$s');
-    }
-
-    busy(busy: false);
+    });
+    loading = false;
+    refresh();
   }
 
   Future _load() async {
