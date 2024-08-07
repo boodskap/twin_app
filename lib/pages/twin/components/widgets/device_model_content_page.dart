@@ -16,24 +16,6 @@ import 'package:twin_commons/core/twinned_session.dart';
 import 'package:twinned_widgets/core/top_bar.dart';
 import 'package:twin_commons/widgets/common/label_text_field.dart';
 
-// final TextStyle _labelPopupTextStyle = GoogleFonts.acme(
-//   color: Colors.black,
-//   fontSize: 14,
-//   fontWeight: FontWeight.bold,
-// );
-
-// final TextStyle _errorPopupTextStyle = GoogleFonts.acme(
-//   color: Colors.red,
-//   fontSize: 14,
-//   fontWeight: FontWeight.bold,
-// );
-
-// final TextStyle _warnTextStyle = GoogleFonts.acme(
-//   color: Colors.red,
-//   fontSize: 20,
-//   fontWeight: FontWeight.bold,
-// );
-
 enum PickTarget { border, background }
 
 class DeviceModelContentPage extends StatefulWidget {
@@ -47,12 +29,10 @@ class DeviceModelContentPage extends StatefulWidget {
   });
 
   @override
-  State<DeviceModelContentPage> createState() =>
-      _DeviceModelContentPageState();
+  State<DeviceModelContentPage> createState() => _DeviceModelContentPageState();
 }
 
-class _DeviceModelContentPageState
-    extends BaseState<DeviceModelContentPage> {
+class _DeviceModelContentPageState extends BaseState<DeviceModelContentPage> {
   final GlobalKey<FormState> _basicFormKey = GlobalKey<FormState>();
   final GlobalKey<FormState> _hwFormKey = GlobalKey<FormState>();
 
@@ -85,7 +65,6 @@ class _DeviceModelContentPageState
   String deviceModelName = '';
   String iconParamId = '';
   twinned.SensorWidget? sensorWidget;
-  // double iconSize = 15;
 
   final TextEditingController paramName = TextEditingController();
   final TextEditingController paramUnit = TextEditingController();
@@ -133,61 +112,91 @@ class _DeviceModelContentPageState
       Center(
         child: Text(
           'Name',
-          style: theme.getStyle().copyWith(color: Colors.black, fontSize: 16),
+          style: theme.getStyle().copyWith(
+                color: Colors.black,
+                fontSize: 16,
+              ),
         ),
       ),
       Center(
         child: Text(
           'Unit',
-          style: theme.getStyle().copyWith(color: Colors.black, fontSize: 16),
+          style: theme.getStyle().copyWith(
+                color: Colors.black,
+                fontSize: 16,
+              ),
         ),
       ),
       Center(
         child: Text(
           'Description',
-          style: theme.getStyle().copyWith(color: Colors.black, fontSize: 16),
+          style: theme.getStyle().copyWith(
+                color: Colors.black,
+                fontSize: 16,
+              ),
         ),
       ),
       Center(
         child: Text(
           'Label',
-          style: theme.getStyle().copyWith(color: Colors.black, fontSize: 16),
+          style: theme.getStyle().copyWith(
+                color: Colors.black,
+                fontSize: 16,
+              ),
         ),
       ),
       Center(
         child: Text(
           'Type',
-          style: theme.getStyle().copyWith(color: Colors.black, fontSize: 16),
+          style: theme.getStyle().copyWith(
+                color: Colors.black,
+                fontSize: 16,
+              ),
         ),
       ),
       Center(
         child: Text(
           'Default Value',
-          style: theme.getStyle().copyWith(color: Colors.black, fontSize: 16),
+          style: theme.getStyle().copyWith(
+                color: Colors.black,
+                fontSize: 16,
+              ),
         ),
       ),
       Center(
         child: Text(
           'Required',
-          style: theme.getStyle().copyWith(color: Colors.black, fontSize: 16),
+          style: theme.getStyle().copyWith(
+                color: Colors.black,
+                fontSize: 16,
+              ),
         ),
       ),
       Center(
         child: Text(
           'Enable Trend',
-          style: theme.getStyle().copyWith(color: Colors.black, fontSize: 16),
+          style: theme.getStyle().copyWith(
+                color: Colors.black,
+                fontSize: 16,
+              ),
         ),
       ),
       Center(
         child: Text(
           'Enable Time Series',
-          style: theme.getStyle().copyWith(color: Colors.black, fontSize: 16),
+          style: theme.getStyle().copyWith(
+                color: Colors.black,
+                fontSize: 16,
+              ),
         ),
       ),
       Center(
         child: Text(
           'Action',
-          style: theme.getStyle().copyWith(color: Colors.black, fontSize: 16),
+          style: theme.getStyle().copyWith(
+                color: Colors.black,
+                fontSize: 16,
+              ),
         ),
       ),
     ]));
@@ -251,13 +260,7 @@ class _DeviceModelContentPageState
               alert('Delete Prohibited', 'You need to have at least one image');
             }
           },
-          child: TwinImageHelper.getImage(
-              e.domainKey, image),
-          // child: Image.network(
-
-          //   UserSession.twinImageUrl(baseUrl(), e.domainKey, image),
-          //   fit: BoxFit.contain,
-          // ),
+          child: TwinImageHelper.getImage(e.domainKey, image),
         ));
       }
 
@@ -370,14 +373,7 @@ class _DeviceModelContentPageState
           String id = res.entity!.id;
           _imageIds.add(id);
           _imageCards.add(
-              // TwinImageHelper.getDomainImage(id),
-              TwinImageHelper.getImage(TwinnedSession.instance.domainKey, id)
-
-              //   Image.network(
-              //   UserSession.twinImageUrl(baseUrl(), widget.model!.domainKey, id),
-              //   fit: BoxFit.contain,
-              // )
-              );
+              TwinImageHelper.getImage(TwinnedSession.instance.domainKey, id));
         });
       }
     } catch (e, s) {
@@ -571,21 +567,6 @@ class _DeviceModelContentPageState
       _buildRow(p);
     }
   }
-
-  // void _buyParameters() async {
-  //   await showDialog(
-  //       context: context,
-  //       builder: (ctx) {
-  //         return AlertDialog(
-  //           content: PurchaseChangeAddonWidget(
-  //             orgId: UserSession().selectedOrganization!.id,
-  //             purchase: true,
-  //             parameters: 1,
-  //           ),
-  //         );
-  //       });
-  //   refresh();
-  // }
 
   void _buildRow(var param) {
     TableRow row = TableRow(children: [
@@ -1182,31 +1163,15 @@ class _DeviceModelContentPageState
                             selected: _preprocessor,
                           ),
                           divider(horizontal: true),
-                          // if (paramList.length <
-                          //     UserSession().orgPlan!.totalModelParametersCount!)
-                          //   Tooltip(
-                          //     message:
-                          //         'Utilized ${paramList.length} / ${UserSession().orgPlan!.totalModelParametersCount} parameters',
-
                           PrimaryButton(
                             labelKey: "Add Parameters",
                             onPressed: _addParameter,
                           ),
 
                           divider(horizontal: true),
-                          // if (paramList.length >=
-                          //     UserSession().orgPlan!.totalModelParametersCount!)
-                          //   BuyButton(
-                          //     label: 'Buy more license',
-                          //     tooltip:
-                          //         'Utilized ${paramList.length} / ${UserSession().orgPlan!.totalModelParametersCount} parameters',
-                          //     onPressed: () {
-                          //       _buyParameters();
-                          //     },
-                          //   ),
                         ],
                       ),
-                      divider(horizontal: true),
+                      divider(),
                       Expanded(
                         child: ListView(
                           scrollDirection: Axis.vertical,
@@ -1225,6 +1190,7 @@ class _DeviceModelContentPageState
                         ),
                       ),
                       divider(horizontal: true),
+                      divider(),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [

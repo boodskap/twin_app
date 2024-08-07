@@ -205,7 +205,7 @@ class _EventsState extends BaseState<Events> {
     return SizedBox(
       width: width,
       height: width,
-      child: GestureDetector(
+      child: InkWell(
         onDoubleTap: () {
           _edit(e);
         },
