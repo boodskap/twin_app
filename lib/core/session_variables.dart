@@ -8,7 +8,7 @@ import 'package:verification_api/api/verification.swagger.dart' as vapi;
 import 'package:twinned_api/api/twinned.swagger.dart' as twin;
 import 'package:nocode_api/api/nocode.swagger.dart' as nocode;
 
-typedef OnMenuSelected = Widget Function(BuildContext context);
+typedef OnMenuSelected = Future<Widget> Function(BuildContext context);
 typedef IsMenuVisible = bool Function();
 typedef BuildLandingPages = List<Widget>? Function(BuildContext context);
 typedef PostLoginHook = Future Function();
