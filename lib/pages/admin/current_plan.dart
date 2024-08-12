@@ -52,7 +52,7 @@ class _CurrentPlanState extends BaseState<CurrentPlan> {
                     MaterialPageRoute(
                       builder: (context) => Scaffold(
                         body: ChoosePlansPage(
-                          orgId: p.id,
+                          orgId: TwinnedSession.instance.noCodeAuthToken,
                         ),
                       ),
                     ),
