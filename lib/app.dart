@@ -9,9 +9,13 @@ import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:twin_app/auth.dart';
 import 'package:twin_app/pages/admin/clients.dart';
+import 'package:twin_app/pages/admin/current_plan.dart';
+import 'package:twin_app/pages/admin/invoices.dart';
+import 'package:twin_app/pages/admin/orders.dart';
 import 'package:twin_app/pages/admin/users.dart';
-import 'package:twin_app/pages/branding.dart';
+import 'package:twin_app/pages/branding/fonts_colors.dart';
 import 'package:twin_app/pages/dashboard.dart';
+import 'package:twin_app/pages/branding/landing_page.dart';
 import 'package:twin_app/pages/nocode_builder.dart';
 import 'package:twin_app/pages/roles_page.dart';
 import 'package:twin_app/pages/twin/components.dart';
@@ -40,9 +44,14 @@ enum TwinAppMenu {
   twinComponents,
   twinNoCodeBuilder,
   twinBranding,
+  adminCurrentPlan,
   adminUsers,
   adminClients,
   adminRoles,
+  adminInvoices,
+  adminOrders,
+  brandingFontsColors,
+  brandingLanding,
 }
 
 void startApp() async {
@@ -659,15 +668,17 @@ class HomeScreenState extends BaseState<HomeScreen> {
         },
       ),
       session.TwinMenuItem(
-        id: TwinAppMenu.twinBranding,
         text: 'Branding',
-        icon: Icons.menu,
+        id: TwinAppMenu.twinBranding,
+        icon: Icons.admin_panel_settings_rounded,
+        expanded: false,
+        subItems: _brandingSubMenuItems,
         bottomMenus: _twinBottomMenus(),
         isMenuVisible: () {
-          return true;
+          return !session.smallScreen && session.isAdmin();
         },
-        onMenuSelected: (BuildContext context) {
-          return const Branding();
+        onMenuSelected: (ctx) {
+          return SizedBox.shrink();
         },
       ),
     ];
@@ -675,6 +686,18 @@ class HomeScreenState extends BaseState<HomeScreen> {
 
   List<session.TwinMenuItem> get _adminSubMenuItems {
     return [
+      session.TwinMenuItem(
+        id: TwinAppMenu.adminCurrentPlan,
+        text: 'Current Plan',
+        icon: Icons.account_balance_wallet,
+        bottomMenus: _adminBottomMenus(),
+        isMenuVisible: () {
+          return session.isAdmin();
+        },
+        onMenuSelected: (BuildContext context) {
+          return const CurrentPlan();
+        },
+      ),
       session.TwinMenuItem(
         id: TwinAppMenu.adminUsers,
         text: 'Users',
@@ -709,6 +732,59 @@ class HomeScreenState extends BaseState<HomeScreen> {
         },
         onMenuSelected: (BuildContext context) {
           return const RolesPage();
+        },
+      ),
+      session.TwinMenuItem(
+        id: TwinAppMenu.adminInvoices,
+        text: 'Invoices',
+        icon: Icons.monetization_on,
+        bottomMenus: _adminBottomMenus(),
+        isMenuVisible: () {
+          return session.isAdmin();
+        },
+        onMenuSelected: (BuildContext context) {
+          return const Invoices();
+        },
+      ),
+      session.TwinMenuItem(
+        id: TwinAppMenu.adminOrders,
+        text: 'Orders',
+        icon: Icons.shopping_cart,
+        bottomMenus: _adminBottomMenus(),
+        isMenuVisible: () {
+          return session.isAdmin();
+        },
+        onMenuSelected: (BuildContext context) {
+          return const Orders();
+        },
+      ),
+    ];
+  }
+
+  List<session.TwinMenuItem> get _brandingSubMenuItems {
+    return [
+      session.TwinMenuItem(
+        id: TwinAppMenu.adminCurrentPlan,
+        text: 'Fonts & Colors',
+        icon: Icons.font_download,
+        bottomMenus: _twinBottomMenus(),
+        isMenuVisible: () {
+          return session.isAdmin();
+        },
+        onMenuSelected: (BuildContext context) {
+          return const FontsAndColors();
+        },
+      ),
+      session.TwinMenuItem(
+        id: TwinAppMenu.adminUsers,
+        text: 'Landing Page',
+        icon: Icons.pages,
+        bottomMenus: _twinBottomMenus(),
+        isMenuVisible: () {
+          return session.isAdmin();
+        },
+        onMenuSelected: (BuildContext context) {
+          return const LandingPage();
         },
       ),
     ];
