@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:twin_app/core/session_variables.dart';
-import 'package:twin_app/core/session_variables.dart';
 import 'package:accordion/accordion.dart';
 import 'package:flutter/services.dart';
 import 'package:twin_commons/widgets/common/label_text_field.dart';
