@@ -60,17 +60,17 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
                   }),
             ),
             divider(horizontal: true),
-            // if(canCreate())
-            PrimaryButton(
-              labelKey: 'Create New',
-              leading: Icon(
-                Icons.add,
-                color: Colors.white,
+            if (canCreate())
+              PrimaryButton(
+                labelKey: 'Create New',
+                leading: Icon(
+                  Icons.add,
+                  color: Colors.white,
+                ),
+                onPressed: () {
+                  _create();
+                },
               ),
-              onPressed: () {
-                _create();
-              },
-            ),
             divider(horizontal: true),
             SizedBox(
               height: 40,
@@ -146,7 +146,9 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
     }
     return InkWell(
       onDoubleTap: () {
+        if (editable) {
         _edit(e);
+      }
       },
       child: SizedBox(
         width: width,
@@ -181,21 +183,23 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      InkWell(
+                      if (editable)
+                        InkWell(
+                            onTap: () {
+                              _edit(e);
+                            },
+                            child: Icon(Icons.edit,
+                                color: theme.getPrimaryColor())),
+                      if (editable)
+                        InkWell(
                           onTap: () {
-                            _edit(e);
+                            _confirmDeletionDialog(context, e);
                           },
-                          child:
-                              Icon(Icons.edit, color: theme.getPrimaryColor())),
-                      InkWell(
-                        onTap: () {
-                          _confirmDeletionDialog(context, e);
-                        },
-                        child: Icon(
-                          Icons.delete,
-                          color: theme.getPrimaryColor(),
+                          child: Icon(
+                            Icons.delete,
+                            color: theme.getPrimaryColor(),
+                          ),
                         ),
-                      ),
                     ],
                   ),
                 ),

@@ -303,7 +303,6 @@ class _TwinSysConfigWidgetState extends BaseState<TwinSysConfigWidget> {
             divider(),
             Wrap(spacing: 5.0, children: [
               Tooltip(
-                textStyle: theme.getStyle(),
                 message:
                     'Once enabled, you can assign roles to assets, users belongs to that roles can see them',
                 child: IntrinsicWidth(
@@ -340,7 +339,6 @@ class _TwinSysConfigWidgetState extends BaseState<TwinSysConfigWidget> {
                 ),
               ),
               Tooltip(
-                textStyle: theme.getStyle(),
                 message: 'Allow users to register to your application',
                 child: IntrinsicWidth(
                   child: CheckboxListTile(
@@ -359,7 +357,6 @@ class _TwinSysConfigWidgetState extends BaseState<TwinSysConfigWidget> {
                 ),
               ),
               Tooltip(
-                textStyle: theme.getStyle(),
                 message:
                     'Use my menu group\'s first menu as default landing page',
                 child: IntrinsicWidth(
@@ -379,7 +376,6 @@ class _TwinSysConfigWidgetState extends BaseState<TwinSysConfigWidget> {
                 ),
               ),
               Tooltip(
-                textStyle: theme.getStyle(),
                 message: 'Automatically approve self registrations',
                 child: IntrinsicWidth(
                   child: CheckboxListTile(
@@ -400,7 +396,6 @@ class _TwinSysConfigWidgetState extends BaseState<TwinSysConfigWidget> {
                 ),
               ),
               Tooltip(
-                textStyle: theme.getStyle(),
                 message:
                     'Only allow users belongs to this domain to self register',
                 child: IntrinsicWidth(

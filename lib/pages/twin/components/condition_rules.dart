@@ -24,6 +24,14 @@ class _ConditionRulesState extends BaseState<ConditionRules> {
   tapi.DeviceModel? _selectedDeviceModel;
   Set<String> _selectedModel = {};
   Map<String, String> _modelNames = {};
+  bool _canEdit = false;
+  Map<String, bool> _editable = Map<String, bool>();
+
+  @override
+  void initState() {
+    super.initState();
+    _canEdit = TwinnedSession.instance.isAdmin();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,16 +59,17 @@ class _ConditionRulesState extends BaseState<ConditionRules> {
                   }),
             ),
             divider(horizontal: true),
-            PrimaryButton(
-              labelKey: 'Create New',
-              leading: Icon(
-                Icons.add,
-                color: Colors.white,
+            if (canCreate())
+              PrimaryButton(
+                labelKey: 'Create New',
+                leading: Icon(
+                  Icons.add,
+                  color: Colors.white,
+                ),
+                onPressed: () {
+                  _create();
+                },
               ),
-              onPressed: () {
-                _create();
-              },
-            ),
             divider(horizontal: true),
             SizedBox(
                 height: 40,
@@ -148,10 +157,16 @@ class _ConditionRulesState extends BaseState<ConditionRules> {
       text: e.values?.join('\n') ?? '',
     );
 
+    bool editable = _canEdit;
+    if (!editable) {
+      editable = _editable[e.id] ?? false;
+    }
     double width = MediaQuery.of(context).size.width / 8;
     return InkWell(
       onDoubleTap: () {
-        _edit(e);
+        if (editable) {
+          _edit(e);
+        }
       },
       child: SizedBox(
         width: width,
@@ -183,21 +198,23 @@ class _ConditionRulesState extends BaseState<ConditionRules> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          InkWell(
+                          if (editable)
+                            InkWell(
+                                onTap: () {
+                                  _edit(e);
+                                },
+                                child: Icon(Icons.edit,
+                                    color: theme.getPrimaryColor())),
+                          if (editable)
+                            InkWell(
                               onTap: () {
-                                _edit(e);
+                                _confirmDeletionDialog(context, e);
                               },
-                              child: Icon(Icons.edit,
-                                  color: theme.getPrimaryColor())),
-                          InkWell(
-                            onTap: () {
-                              _confirmDeletionDialog(context, e);
-                            },
-                            child: Icon(
-                              Icons.delete,
-                              color: theme.getPrimaryColor(),
+                              child: Icon(
+                                Icons.delete,
+                                color: theme.getPrimaryColor(),
+                              ),
                             ),
-                          ),
                         ],
                       ),
                     ),
@@ -427,9 +444,8 @@ class _ConditionRulesState extends BaseState<ConditionRules> {
     );
   }
 
-  // Future _edit(tapi.Condition e) async {}
-  Future _edit(tapi.Condition e)async {
-     var res = await TwinnedSession.instance.twin.getDeviceModel(
+    Future _edit(tapi.Condition e) async {
+    var res = await TwinnedSession.instance.twin.getDeviceModel(
         modelId: e.modelId, apikey: TwinnedSession.instance.authToken);
     showDialog(
       context: context,
@@ -438,9 +454,10 @@ class _ConditionRulesState extends BaseState<ConditionRules> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12.0),
           ),
-          child: CreateEditConditionSnippet(condition: e,
-          
-          selectedModel: res.body!.entity!,),
+          child: CreateEditConditionSnippet(
+            condition: e,
+            selectedModel: res.body!.entity!,
+          ),
         );
       },
     );
@@ -555,6 +572,7 @@ class _ConditionRulesState extends BaseState<ConditionRules> {
       }
 
       for (tapi.Condition e in _entities) {
+        _editable[e.id] = await super.canEdit(clientIds: e.clientIds);
         _cards.add(_buildCard(e));
       }
     });
