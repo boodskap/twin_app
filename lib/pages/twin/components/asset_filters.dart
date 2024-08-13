@@ -48,7 +48,7 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
     await execute(() async {
       var res = await TwinnedSession.instance.twin.listDataFilters(
           apikey: TwinnedSession.instance.authToken,
-          modelId: _selectedDeviceModel!.id,
+          modelId: _selectedDeviceModel?.id,
           body: const twinned.ListReq(page: 0, size: 10000));
       if (validateResponse(res)) {
         refresh(sync: () {
