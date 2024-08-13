@@ -25,7 +25,7 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
   String _search = '';
   tapi.DeviceModel? _selectedDeviceModel;
   bool _canEdit = false;
-  Map<String, bool> _editable = {} as Map<String, bool>;
+  Map<String, bool> _editable = Map<String, bool>();
 
   @override
   void initState() {
