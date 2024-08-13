@@ -24,44 +24,32 @@ import 'package:twin_commons/level/widgets/cylinder_tank.dart';
 
 enum FilterType { none, data, field, group, model }
 
-class DataGridSnippet extends StatefulWidget {
+class DataGridHistorySnippet extends StatefulWidget {
   final bool autoRefresh;
   final int autoRefreshInterval;
   final String searchHint;
-  final List<String> deviceModelIds;
-  final List<String> assetModelIds;
+  final List<String> deviceIds;
   final List<String> assetIds;
-  final List<String> premiseIds;
-  final List<String> facilityIds;
-  final List<String> floorIds;
   final VoidCallback? onGridViewSelected;
   final VoidCallback? onCardViewSelected;
   final OnAnalyticsTapped? onAnalyticsTapped;
   final OnAssetModelTapped? onAssetModelTapped;
-  final OnAssetTapped? onAssetTapped;
-  final OnDeviceTapped? onDeviceTapped;
   final OnDeviceModelTapped? onDeviceModelTapped;
   final OnPremiseTapped? onPremiseTapped;
   final OnFacilityTapped? onFacilityTapped;
   final OnFloorTapped? onFloorTapped;
 
-  const DataGridSnippet({
+  const DataGridHistorySnippet({
     super.key,
     this.autoRefresh = true,
     this.autoRefreshInterval = 60,
     this.searchHint = 'Search',
-    this.deviceModelIds = const [],
-    this.assetModelIds = const [],
+    this.deviceIds = const [],
     this.assetIds = const [],
-    this.premiseIds = const [],
-    this.facilityIds = const [],
-    this.floorIds = const [],
     this.onGridViewSelected,
     this.onCardViewSelected,
     this.onAnalyticsTapped,
     this.onAssetModelTapped,
-    this.onAssetTapped,
-    this.onDeviceTapped,
     this.onDeviceModelTapped,
     this.onPremiseTapped,
     this.onFacilityTapped,
@@ -69,10 +57,10 @@ class DataGridSnippet extends StatefulWidget {
   });
 
   @override
-  State<DataGridSnippet> createState() => DataGridSnippetState();
+  State<DataGridHistorySnippet> createState() => DataGridHistorySnippetState();
 }
 
-class DataGridSnippetState extends BaseState<DataGridSnippet> {
+class DataGridHistorySnippetState extends BaseState<DataGridHistorySnippet> {
   final List<DeviceData> _data = [];
   final Map<String, DeviceModel> _models = {};
   final Map<String, Device> _devices = {};
@@ -86,15 +74,15 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
   void initState() {
     super.initState();
     _cardView = smallScreen;
+    if (widget.autoRefresh) {
+      timer = Timer.periodic(
+          Duration(seconds: widget.autoRefreshInterval), (Timer t) => _load());
+    }
   }
 
   @override
-  void setup() {
-    load();
-    if (widget.autoRefresh) {
-      timer = Timer.periodic(
-          Duration(seconds: widget.autoRefreshInterval), (Timer t) => load());
-    }
+  void setup() async {
+    _load();
   }
 
   @override
@@ -176,7 +164,7 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
           ),
         IconButton(
             onPressed: () {
-              load();
+              _load();
             },
             icon: const Icon(Icons.refresh)),
         Padding(
@@ -191,7 +179,7 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                   setState(() {
                     _searchQuery = val.trim();
                   });
-                  load();
+                  _load();
                 },
               )),
         ),
@@ -390,10 +378,19 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(
-                    'No data',
-                    style: theme.getStyle(),
-                  ),
+                  if (loading)
+                    SizedBox(
+                      width: 48,
+                      height: 48,
+                      child: const CircularProgressIndicator(
+                        color: Colors.red,
+                      ),
+                    ),
+                  if (!loading)
+                    Text(
+                      'No data',
+                      style: theme.getStyle(),
+                    ),
                 ],
               ),
               dataRowHeight: 120,
@@ -615,22 +612,13 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                   children: [
                     Tooltip(
                       message: 'Asset',
-                      child: InkWell(
-                        onTap: (null == widget.onAssetTapped ||
-                                null == dd.assetId ||
-                                dd.assetId!.isEmpty)
-                            ? null
-                            : () async {
-                                widget.onAssetTapped!(dd.assetId!, dd);
-                              },
-                        child: Text(
-                          dd.asset ?? '-',
-                          style: theme.getStyle().copyWith(
-                              fontSize: 16,
-                              color: theme.getPrimaryColor(),
-                              overflow: TextOverflow.ellipsis,
-                              fontWeight: FontWeight.bold),
-                        ),
+                      child: Text(
+                        dd.asset ?? '-',
+                        style: theme.getStyle().copyWith(
+                            fontSize: 16,
+                            color: theme.getPrimaryColor(),
+                            overflow: TextOverflow.ellipsis,
+                            fontWeight: FontWeight.bold),
                       ),
                     ),
                     if (timeSeriesFields.isNotEmpty)
@@ -707,16 +695,9 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                     ),
                     Tooltip(
                       message: 'Device Serial#',
-                      child: InkWell(
-                        onTap: (null == widget.onDeviceTapped)
-                            ? null
-                            : () {
-                                widget.onDeviceTapped!(dd.deviceId, dd);
-                              },
-                        child: Icon(
-                          Icons.qr_code,
-                          color: theme.getPrimaryColor(),
-                        ),
+                      child: Icon(
+                        Icons.qr_code,
+                        color: theme.getPrimaryColor(),
                       ),
                     ),
                   ],
@@ -857,7 +838,7 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
     return _buildTable();
   }
 
-  Future load({String search = '*', int page = 0, int size = 1000}) async {
+  Future _load({String search = '*', int page = 0, int size = 1000}) async {
     if (loading) return;
     loading = true;
 
@@ -893,33 +874,17 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
       ];
 
       mustConditions.addAll([
-        if (widget.deviceModelIds.isNotEmpty)
+        if (widget.deviceIds.isNotEmpty)
           {
-            "terms": {'modelId': widget.deviceModelIds}
-          },
-        if (widget.assetModelIds.isNotEmpty)
-          {
-            "terms": {"assetModelId": widget.assetModelIds}
+            "terms": {'deviceId': widget.deviceIds}
           },
         if (widget.assetIds.isNotEmpty)
           {
             "terms": {"assetId": widget.assetIds}
           },
-        if (widget.premiseIds.isNotEmpty)
-          {
-            "terms": {"premiseId": widget.premiseIds}
-          },
-        if (widget.facilityIds.isNotEmpty)
-          {
-            "terms": {"facilityId": widget.facilityIds}
-          },
-        if (widget.floorIds.isNotEmpty)
-          {
-            "terms": {"floorId": widget.floorIds}
-          },
       ]);
 
-      dRes = await TwinnedSession.instance.twin.queryEqlDeviceData(
+      dRes = await TwinnedSession.instance.twin.queryEqlDeviceHistoryData(
           apikey: TwinnedSession.instance.authToken,
           body: EqlSearch(
               source: [],
@@ -935,6 +900,8 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
           if (_modelIds.contains(dd.modelId)) continue;
           _modelIds.add(dd.modelId);
         }
+
+        refresh();
 
         var mRes = await TwinnedSession.instance.twin.getDeviceModels(
             apikey: TwinnedSession.instance.authToken,
