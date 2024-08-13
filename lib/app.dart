@@ -664,7 +664,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
           return true;
         },
         onMenuSelected: (BuildContext context) {
-          return const NocodeBuilder();
+          return const NocodeBuilderPage();
         },
       ),
       session.TwinMenuItem(
