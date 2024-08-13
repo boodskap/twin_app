@@ -48,6 +48,8 @@ class _ConfigDashboardPaletteState extends BaseState<ConfigDashboardPalette> {
   Widget build(BuildContext context) {
     return FoldableCard(
       title: 'Dashboard Properties',
+      headerStyle: theme.getStyle().copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+      labelStyle: theme.getStyle().copyWith(fontSize: 18, fontWeight: FontWeight.bold),
       collapsed: collapsed,
       children: [
         Row(

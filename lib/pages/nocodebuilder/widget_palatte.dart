@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:twin_app/pages/nocodebuilder/foldable_card.dart';
 import 'package:twinned_widgets/palette_category.dart';
 import 'package:twinned_widgets/twinned_widgets.dart';
-import 'dart:html' as html;
+import 'package:twin_app/core/session_variables.dart';
+import 'package:twin_commons/core/base_state.dart';
 
 typedef OnPaletteWidgetPicked = void Function(
     String widgetId, TwinnedWidgetBuilder builder);
@@ -15,21 +16,47 @@ class WidgetPalette extends StatefulWidget {
   State<WidgetPalette> createState() => _WidgetPaletteState();
 }
 
-class _WidgetPaletteState extends State<WidgetPalette> {
-  static const labelStyle = TextStyle(
-      color: Colors.black, fontSize: 12, fontWeight: FontWeight.normal);
-
+class _WidgetPaletteState extends BaseState<WidgetPalette> {
   static bool collapsed = false;
-
   final List<Widget> _chartsAndGraphs = [];
+  final List<Tuple<String, TwinnedWidgetBuilder>> _allWidgets = [];
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
+    super.initState();
+    
+    // Fetch all widgets in the charts and graphs category
     var values = TwinnedWidgets.filterBuilders(PaletteCategory.chartsAndGraphs);
+    
+    // Store all widgets
+    _allWidgets.addAll(values);
+    
+    // Initially, display all widgets
     for (var val in values) {
       _chartsAndGraphs.add(_buildPaletteIcon(val));
     }
-    super.initState();
+    
+    // Listen to search input changes
+    _searchController.addListener(_filterWidgets);
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _filterWidgets() {
+    final query = _searchController.text.toLowerCase();
+    setState(() {
+      _chartsAndGraphs.clear();
+      for (var val in _allWidgets) {
+        if (val.value.getPaletteName().toLowerCase().contains(query)) {
+          _chartsAndGraphs.add(_buildPaletteIcon(val));
+        }
+      }
+    });
   }
 
   Widget _buildPaletteIcon(Tuple<String, TwinnedWidgetBuilder> val) {
@@ -47,15 +74,10 @@ class _WidgetPaletteState extends State<WidgetPalette> {
               spacing: 8.0,
               direction: Axis.vertical,
               children: [
-                // InkWell(
-                //     onTap: () {
-                //       html.window.open(
-                //           '$baseDocUrl/${val.key.toLowerCase()}', 'new tab');
-                //     },
-                //     child: val.value.getPaletteIcon()),
+                val.value.getPaletteIcon(),
                 Text(
                   val.value.getPaletteName(),
-                  style: const TextStyle(
+                  style: theme.getStyle().copyWith(
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
                       overflow: TextOverflow.ellipsis),
@@ -74,17 +96,30 @@ class _WidgetPaletteState extends State<WidgetPalette> {
       children: [
         FoldableCard(
           title: 'Widgets',
+          headerStyle: theme
+              .getStyle()
+              .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+          labelStyle: theme
+              .getStyle()
+              .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
           collapsed: collapsed,
           children: [
             SizedBox(
                 width: MediaQuery.of(context).size.width - 50,
                 height: 40,
-                child: const SearchBar(
-                  hintText: 'search widgets',
+                child: SearchBar(
+                  controller: _searchController,
+                  hintStyle: WidgetStatePropertyAll(theme.getStyle()),
+                  textStyle: WidgetStatePropertyAll(theme.getStyle()),
+                  hintText: 'Search widgets',
                 )),
-            const Text(
+            divider(),
+            Text(
               'Charts & Graphs',
-              style: labelStyle,
+              style: theme.getStyle().copyWith(
+                  color: Colors.black,
+                  fontSize: 14,
+                  fontWeight: FontWeight.normal),
             ),
             Wrap(
               spacing: 8.0,
@@ -100,4 +135,7 @@ class _WidgetPaletteState extends State<WidgetPalette> {
       ],
     );
   }
+
+  @override
+  void setup() {}
 }

@@ -36,8 +36,6 @@ class ConfigRowPalette extends StatefulWidget {
 }
 
 class _ConfigRowPaletteState extends BaseState<ConfigRowPalette> {
-  // static const labelStyle =
-  //     TextStyle(color: Colors.black, fontSize: 12, fontWeight: FontWeight.bold);
 
   static final InputDecorationTheme dropdownDecoration = InputDecorationTheme(
     isDense: true,
@@ -62,6 +60,8 @@ class _ConfigRowPaletteState extends BaseState<ConfigRowPalette> {
   Widget build(BuildContext context) {
     return FoldableCard(
       title: 'Row Properties',
+      headerStyle: theme.getStyle().copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+      labelStyle: theme.getStyle().copyWith(fontSize: 18, fontWeight: FontWeight.bold),
       collapsed: collapsed,
       children: [
         Row(

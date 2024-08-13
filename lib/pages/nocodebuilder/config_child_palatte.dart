@@ -14,6 +14,7 @@ import 'package:twinned_widgets/twinned_widgets.dart';
 import 'package:twinned_models/twinned_models.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_spinbox/flutter_spinbox.dart';
+import 'package:twin_app/core/session_variables.dart';
 
 typedef OnChildUpdate = void Function(
     int rowIndex, int columnIndex, ScreenChild child);
@@ -44,9 +45,6 @@ class ConfigChildPalette extends StatefulWidget {
 }
 
 class _ConfigChildPaletteState extends BaseState<ConfigChildPalette> {
-  static const labelStyle =
-      TextStyle(color: Colors.black, fontSize: 12, fontWeight: FontWeight.bold);
-
   late ScreenChild _child;
 
   @override
@@ -69,6 +67,10 @@ class _ConfigChildPaletteState extends BaseState<ConfigChildPalette> {
 
     return FoldableCard(
       title: '${builder.getPaletteName()} - Properties',
+      headerStyle:
+          theme.getStyle().copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+      labelStyle:
+          theme.getStyle().copyWith(fontSize: 18, fontWeight: FontWeight.bold),
       icon: builder.getPaletteIcon(),
       children: [
         Row(
@@ -156,9 +158,12 @@ class _ConfigChildPaletteState extends BaseState<ConfigChildPalette> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Background Color',
-              style: labelStyle,
+              style: theme.getStyle().copyWith(
+                  color: Colors.black,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold),
             ),
             IconButton(
                 onPressed: () {
@@ -177,9 +182,12 @@ class _ConfigChildPaletteState extends BaseState<ConfigChildPalette> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Widget Width',
-              style: labelStyle,
+              style: theme.getStyle().copyWith(
+                  color: Colors.black,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold),
             ),
             SizedBox(
               height: 45,
@@ -206,9 +214,12 @@ class _ConfigChildPaletteState extends BaseState<ConfigChildPalette> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Widget Height',
-              style: labelStyle,
+              style: theme.getStyle().copyWith(
+                  color: Colors.black,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold),
             ),
             SizedBox(
               height: 45,
@@ -235,9 +246,12 @@ class _ConfigChildPaletteState extends BaseState<ConfigChildPalette> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Set Expanded',
-              style: labelStyle,
+              style: theme.getStyle().copyWith(
+                  color: Colors.black,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold),
             ),
             Checkbox(
               value: _child.expanded ?? false,
@@ -257,9 +271,12 @@ class _ConfigChildPaletteState extends BaseState<ConfigChildPalette> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 'Flex',
-                style: labelStyle,
+                style: theme.getStyle().copyWith(
+                    color: Colors.black,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold),
               ),
               SizedBox(
                 height: 45,
@@ -286,9 +303,12 @@ class _ConfigChildPaletteState extends BaseState<ConfigChildPalette> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Alignment',
-              style: labelStyle,
+              style: theme.getStyle().copyWith(
+                  color: Colors.black,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold),
             ),
             DropdownButton<AlignmentConfig>(
                 value: _child.alignment ??
@@ -493,7 +513,5 @@ class _ConfigChildPaletteState extends BaseState<ConfigChildPalette> {
   }
 
   @override
-  void setup() {
-    // TODO: implement setup
-  }
+  void setup() {}
 }

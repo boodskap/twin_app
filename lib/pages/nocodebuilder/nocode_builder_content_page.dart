@@ -15,7 +15,6 @@ import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:uuid/uuid.dart';
 import 'package:twin_commons/core/twinned_session.dart';
-// import 'package:twin_app/widgets/commons/secondary_button.dart';
 import 'package:twin_app/core/session_variables.dart';
 
 class NocodeBuilderContentPage extends StatefulWidget {
@@ -106,6 +105,7 @@ class _NocodeBuilderContentPageState
                   });
                 },
               ),
+              divider(horizontal: true)
             ],
           ),
           divider(),
@@ -265,8 +265,8 @@ class _NocodeBuilderContentPageState
     super.confirm(
         title: 'Warning',
         message: 'Are you sure to delete this widget?',
-        titleStyle: theme.getStyle().copyWith(color: Colors.red),
-        messageStyle: theme.getStyle(),
+        titleStyle: theme.getStyle().copyWith(color: Colors.red,fontWeight: FontWeight.bold),
+        messageStyle: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
         onPressed: () {
           setState(() {
             selectedCol = null;
