@@ -785,7 +785,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
           return session.isAdmin();
         },
         onMenuSelected: (BuildContext context) {
-          return const DigitalLandingContentPage();
+          return const LandingContentPage();
         },
       ),
     ];
