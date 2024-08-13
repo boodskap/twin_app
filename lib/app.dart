@@ -13,6 +13,7 @@ import 'package:twin_app/pages/admin/current_plan.dart';
 import 'package:twin_app/pages/admin/invoices.dart';
 import 'package:twin_app/pages/admin/orders.dart';
 import 'package:twin_app/pages/admin/users.dart';
+import 'package:twin_app/pages/branding.dart';
 import 'package:twin_app/pages/branding/fonts_colors.dart';
 import 'package:twin_app/pages/dashboard.dart';
 import 'package:twin_app/pages/branding/landing_page.dart';
@@ -664,7 +665,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
         isMenuVisible: () {
           return true;
         },
-        onMenuSelected: (BuildContext context) {
+        onMenuSelected: (BuildContext context) async {
           return const NocodeBuilderPage();
         },
       ),
@@ -678,7 +679,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
         isMenuVisible: () {
           return !session.smallScreen && session.isAdmin();
         },
-        onMenuSelected: (ctx) {
+        onMenuSelected: (ctx) async {
           return const Branding();
         },
       ),
@@ -695,7 +696,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
         isMenuVisible: () {
           return session.isAdmin();
         },
-        onMenuSelected: (BuildContext context) {
+        onMenuSelected: (BuildContext context) async {
           return const CurrentPlan();
         },
       ),
@@ -743,7 +744,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
         isMenuVisible: () {
           return session.isAdmin();
         },
-        onMenuSelected: (BuildContext context) {
+        onMenuSelected: (BuildContext context) async {
           return const Invoices();
         },
       ),
@@ -755,7 +756,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
         isMenuVisible: () {
           return session.isAdmin();
         },
-        onMenuSelected: (BuildContext context) {
+        onMenuSelected: (BuildContext context) async {
           return const Orders();
         },
       ),
@@ -772,7 +773,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
         isMenuVisible: () {
           return session.isAdmin();
         },
-        onMenuSelected: (BuildContext context) {
+        onMenuSelected: (BuildContext context) async {
           return const FontsAndColorSettingPage();
         },
       ),
@@ -784,7 +785,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
         isMenuVisible: () {
           return session.isAdmin();
         },
-        onMenuSelected: (BuildContext context) {
+        onMenuSelected: (BuildContext context) async {
           return const DigitalLandingContentPage();
         },
       ),
