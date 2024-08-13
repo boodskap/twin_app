@@ -57,18 +57,16 @@ class _AssetReportListState extends BaseState<AssetReportList> {
                   }),
             ),
             divider(horizontal: true),
-            if (null != _selectedDeviceModel!.id)
+            if (null != _selectedDeviceModel)
               PrimaryButton(
                 leading: const Icon(
                   Icons.add_box,
                   color: Colors.white,
                 ),
                 labelKey: "Add New",
-                onPressed: (_selectedDeviceModel != null)
-                    ? () async {
-                        await _addNew();
-                      }
-                    : null,
+                onPressed: () async {
+                  await _addNew();
+                },
               ),
           ],
         ),
