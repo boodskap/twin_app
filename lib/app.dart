@@ -765,7 +765,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
   List<session.TwinMenuItem> get _brandingSubMenuItems {
     return [
       session.TwinMenuItem(
-        id: TwinAppMenu.adminCurrentPlan,
+        id: TwinAppMenu.brandingFontsColors,
         text: 'Fonts & Colors',
         icon: Icons.font_download,
         bottomMenus: _twinBottomMenus(),
@@ -777,7 +777,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
         },
       ),
       session.TwinMenuItem(
-        id: TwinAppMenu.adminUsers,
+        id: TwinAppMenu.brandingLanding,
         text: 'Landing Page',
         icon: Icons.pages,
         bottomMenus: _twinBottomMenus(),
