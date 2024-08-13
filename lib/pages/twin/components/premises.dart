@@ -22,6 +22,14 @@ class _PremisesState extends BaseState<Premises> {
   final List<tapi.Premise> _entities = [];
   final List<Widget> _cards = [];
   String _search = '';
+  bool _canEdit = false;
+  Map<String, bool> _editable = Map<String, bool>();
+
+  @override
+  void initState() {
+    super.initState();
+    _canEdit = TwinnedSession.instance.isAdmin();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,16 +45,17 @@ class _PremisesState extends BaseState<Premises> {
                 },
                 icon: Icon(Icons.refresh)),
             divider(horizontal: true),
-            PrimaryButton(
-              labelKey: 'Create New',
-              leading: Icon(
-                Icons.add,
-                color: Colors.white,
+            if (canCreate())
+              PrimaryButton(
+                labelKey: 'Create New',
+                leading: Icon(
+                  Icons.add,
+                  color: Colors.white,
+                ),
+                onPressed: () {
+                  _addPremiseDialog(context);
+                },
               ),
-              onPressed: () {
-                _addPremiseDialog(context);
-              },
-            ),
             divider(horizontal: true),
             SizedBox(
                 height: 40,
@@ -96,9 +105,15 @@ class _PremisesState extends BaseState<Premises> {
 
   Widget _buildCard(tapi.Premise e) {
     double width = MediaQuery.of(context).size.width / 8;
+    bool editable = _canEdit;
+    if (!editable) {
+      editable = _editable[e.id] ?? false;
+    }
     return InkWell(
       onDoubleTap: () {
-        _edit(e);
+        if (editable) {
+          _edit(e);
+        }
       },
       child: SizedBox(
         width: width,
@@ -126,21 +141,23 @@ class _PremisesState extends BaseState<Premises> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      InkWell(
+                      if (editable)
+                        InkWell(
+                            onTap: () {
+                              _edit(e);
+                            },
+                            child: Icon(Icons.edit,
+                                color: theme.getPrimaryColor())),
+                      if (editable)
+                        InkWell(
                           onTap: () {
-                            _edit(e);
+                            _confirmDeletionDialog(context, e);
                           },
-                          child:
-                              Icon(Icons.edit, color: theme.getPrimaryColor())),
-                      InkWell(
-                        onTap: () {
-                          _confirmDeletionDialog(context, e);
-                        },
-                        child: Icon(
-                          Icons.delete,
-                          color: theme.getPrimaryColor(),
+                          child: Icon(
+                            Icons.delete,
+                            color: theme.getPrimaryColor(),
+                          ),
                         ),
-                      ),
                     ],
                   ),
                 ),
@@ -363,33 +380,31 @@ class _PremisesState extends BaseState<Premises> {
     List<String> tags,
     tapi.GeoLocation? location,
   ) async {
-    busy();
+    List<String>? clientIds = super.isClientAdmin()
+        ? await TwinnedSession.instance.getClientIds()
+        : null;
+    if (loading) return;
+    loading = true;
+    var res = await TwinnedSession.instance.twin.createPremise(
+      apikey: TwinnedSession.instance.authToken,
+      body: tapi.PremiseInfo(
+        name: premiseName,
+        description: description,
+        location: location,
+        tags: tags,
+        clientIds: clientIds,
+      ),
+    );
 
-    try {
-      var res = await TwinnedSession.instance.twin.createPremise(
-        apikey: TwinnedSession.instance.authToken,
-        body: tapi.PremiseInfo(
-          name: premiseName,
-          description: description,
-          location: location,
-          tags: tags,
-        ),
+    if (validateResponse(res)) {
+      tapi.Premise entity = res.body!.entity!;
+      _entities.add(entity);
+      _buildCard(
+        entity,
       );
-
-      if (validateResponse(res)) {
-        tapi.Premise entity = res.body!.entity!;
-        _entities.add(entity);
-        _buildCard(
-          entity,
-        );
-      }
-
-      refresh();
-    } catch (e, s) {
-      debugPrint('$e\n$s');
     }
-
-    busy(busy: false);
+    loading = false;
+    refresh();
   }
 
   Future _edit(tapi.Premise e) async {
@@ -482,6 +497,7 @@ class _PremisesState extends BaseState<Premises> {
       }
 
       for (tapi.Premise e in _entities) {
+        _editable[e.id] = await super.canEdit(clientIds: e.clientIds);
         _cards.add(_buildCard(e));
       }
     });

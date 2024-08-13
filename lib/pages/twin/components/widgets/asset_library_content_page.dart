@@ -344,6 +344,8 @@ class _AssetLibraryContentPageState extends BaseState<AssetLibraryContentPage> {
             movable: widget.assetModel.movable,
             // selectedBanner: selectedBanner,
             allowedDeviceModels: widget.assetModel.allowedDeviceModels,
+            clientIds: widget.assetModel.clientIds,
+            roles: widget.assetModel.roles,
           ));
       if (validateResponse(res)) {
         await alert(
