@@ -1,26 +1,36 @@
 import 'package:flutter/material.dart';
-import 'package:twin_app/core/session_variables.dart';
+import 'package:twin_app/widgets/twinsys_config_widget.dart';
+import 'package:twin_commons/core/twin_image_helper.dart';
 
-class FontsAndColors extends StatefulWidget {
-  const FontsAndColors({super.key});
+class FontsAndColorSettingPage extends StatefulWidget {
+  const FontsAndColorSettingPage({super.key});
 
   @override
-  State<FontsAndColors> createState() => _FontsAndColorsState();
+  State<FontsAndColorSettingPage> createState() =>
+      _FontsAndColorSettingPageState();
 }
 
-class _FontsAndColorsState extends State<FontsAndColors> {
+class _FontsAndColorSettingPageState extends State<FontsAndColorSettingPage> {
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Center(
-          child: Text(
-            'FONTS AND COLORS',
-            style: theme.getStyle().copyWith(fontSize: 20),
+    return Scaffold(
+      body: Column(
+        children: [
+          Expanded(
+            child: TwinSysConfigWidget(
+              onBannerUpload: () async {
+                return TwinImageHelper.uploadDomainBanner();
+              },
+              onImageUpload: () async {
+                return TwinImageHelper.uploadDomainImage();
+              },
+              onIconUpload: () async {
+                return TwinImageHelper.uploadDomainIcon();
+              },
+            ),
           ),
-        )
-      ],
+        ],
+      ),
     );
   }
 }

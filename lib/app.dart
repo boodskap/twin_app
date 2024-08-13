@@ -16,6 +16,7 @@ import 'package:twin_app/pages/admin/users.dart';
 import 'package:twin_app/pages/branding/fonts_colors.dart';
 import 'package:twin_app/pages/dashboard.dart';
 import 'package:twin_app/pages/branding/landing_page.dart';
+import 'package:twin_app/pages/landing.dart';
 import 'package:twin_app/pages/nocode_builder.dart';
 import 'package:twin_app/pages/roles_page.dart';
 import 'package:twin_app/pages/twin/components.dart';
@@ -772,7 +773,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
           return session.isAdmin();
         },
         onMenuSelected: (BuildContext context) {
-          return const FontsAndColors();
+          return const FontsAndColorSettingPage();
         },
       ),
       session.TwinMenuItem(
@@ -784,7 +785,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
           return session.isAdmin();
         },
         onMenuSelected: (BuildContext context) {
-          return const LandingPage();
+          return const DigitalLandingContentPage();
         },
       ),
     ];
