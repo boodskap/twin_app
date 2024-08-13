@@ -24,6 +24,14 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
   final List<Widget> _cards = [];
   String _search = '';
   tapi.DeviceModel? _selectedDeviceModel;
+  bool _canEdit = false;
+  Map<String, bool> _editable = {} as Map<String, bool>;
+
+  @override
+  void initState() {
+    super.initState();
+    _canEdit = TwinnedSession.instance.isAdmin();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +60,7 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
                   }),
             ),
             divider(horizontal: true),
+            // if(canCreate())
             PrimaryButton(
               labelKey: 'Create New',
               leading: Icon(
@@ -116,6 +125,10 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
 
   Widget _buildCard(tapi.Alarm e) {
     double width = MediaQuery.of(context).size.width / 8;
+    bool editable = _canEdit;
+    if (!editable) {
+      editable = _editable[e.id] ?? false;
+    }
     Widget icon = const Icon(
       Icons.question_mark,
       size: 45,
@@ -269,6 +282,10 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
   }
 
   Future _create() async {
+    List<String>? clientIds = super.isClientAdmin()
+        ? await TwinnedSession.instance.getClientIds()
+        : null;
+
     if (loading) return;
     loading = true;
     await _getBasicInfo(context, 'New Alarm', onPressed: (name, desc, t) async {
@@ -285,6 +302,7 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
             tags: tags,
             state: -1,
             conditions: [],
+            clientIds: clientIds,
           ));
       if (validateResponse(mRes)) {
         await _edit(mRes.body!.entity!);
@@ -402,6 +420,7 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
       }
 
       for (tapi.Alarm e in _entities) {
+        _editable[e.id] = await super.canEdit(clientIds: e.clientIds);
         _cards.add(_buildCard(e));
       }
     });

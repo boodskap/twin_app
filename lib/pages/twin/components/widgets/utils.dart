@@ -35,7 +35,9 @@ class Utils {
         showOnlyIfMatched: e.showOnlyIfMatched,
         stateIcons: e.stateIcons,
         label: e.label,
-        description: e.description);
+        description: e.description,
+        clientIds: e.clientIds,
+        );
   }
 
   static tapi.PremiseInfo premiseInfo(tapi.Premise e,

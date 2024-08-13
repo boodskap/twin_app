@@ -19,8 +19,8 @@ class MyConditions extends StatefulWidget {
 class _MyConditionsState extends BaseState<MyConditions> {
   List<tapi.Condition> _conditionEntities = [];
   String _searchQuery = '*';
-  bool isAdmin = false;
-  bool isClientAdmin = false;
+  // bool isAdmin = false;
+  // bool isClientAdmin = false;
 
   Set<String> _selectedModel = {};
   Map<String, String> _modelNames = {};
@@ -29,8 +29,8 @@ class _MyConditionsState extends BaseState<MyConditions> {
   @override
   void initState() {
     super.initState();
-    isAdmin = TwinnedSession.instance.isAdmin();
-    isClientAdmin = TwinnedSession.instance.isClientAdmin();
+    // isAdmin = TwinnedSession.instance.isAdmin();
+    // isClientAdmin = TwinnedSession.instance.isClientAdmin();
     _load();
   }
 
@@ -52,14 +52,14 @@ class _MyConditionsState extends BaseState<MyConditions> {
               ),
             ),
             divider(horizontal: true),
-            if (isAdmin || isClientAdmin)
+            // if (isAdmin || isClientAdmin)
               PrimaryButton(
                 leading: const Icon(
                   Icons.add,
                   color: Colors.white,
                 ),
                 labelKey: 'Add New Condition',
-                onPressed: (isAdmin || isClientAdmin) ? () {} : null,
+                // onPressed: (isAdmin || isClientAdmin) ? () {} : null,
               ),
             divider(horizontal: true),
             SizedBox(
@@ -304,13 +304,13 @@ class _MyConditionsState extends BaseState<MyConditions> {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    if (isAdmin || isClientAdmin)
+                    // if (isAdmin || isClientAdmin)
                       Expanded(
                         flex: 1,
                         child: Tooltip(
                           message: "Update",
                           child: InkWell(
-                            onTap: (isAdmin || isClientAdmin) ? () {} : null,
+                            // onTap: (isAdmin || isClientAdmin) ? () {} : null,
                             child: const Icon(
                               Icons.edit,
                               color: Colors.black,
@@ -318,17 +318,17 @@ class _MyConditionsState extends BaseState<MyConditions> {
                           ),
                         ),
                       ),
-                    if (isAdmin || isClientAdmin)
+                    // if (isAdmin || isClientAdmin)
                       Expanded(
                         flex: 1,
                         child: Tooltip(
                           message: 'Delete',
                           child: InkWell(
-                            onTap: (isAdmin || isClientAdmin)
-                                ? () {
-                                    _confirmDeletionDialog(context, c.id);
-                                  }
-                                : null,
+                            // onTap: (isAdmin || isClientAdmin)
+                            //     ? () {
+                            //         _confirmDeletionDialog(context, c.id);
+                            //       }
+                            //     : null,
                             child: const Icon(
                               Icons.delete_forever,
                               color: Colors.red,
@@ -511,13 +511,13 @@ class _MyConditionsState extends BaseState<MyConditions> {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                    if (isAdmin || isClientAdmin)
+                    // if (isAdmin || isClientAdmin)
                       Expanded(
                         flex: 1,
                         child: Tooltip(
                           message: "Update",
                           child: InkWell(
-                            onTap: (isAdmin || isClientAdmin) ? () {} : null,
+                            // onTap: (isAdmin || isClientAdmin) ? () {} : null,
                             child: const Icon(
                               Icons.edit,
                               color: Colors.black,
@@ -525,17 +525,17 @@ class _MyConditionsState extends BaseState<MyConditions> {
                           ),
                         ),
                       ),
-                    if (isAdmin || isClientAdmin)
+                    // if (isAdmin || isClientAdmin)
                       Expanded(
                         flex: 1,
                         child: Tooltip(
                           message: 'Delete',
                           child: InkWell(
-                            onTap: (isAdmin || isClientAdmin)
-                                ? () {
-                                    _confirmDeletionDialog(context, c.id);
-                                  }
-                                : null,
+                            // onTap: (isAdmin || isClientAdmin)
+                            //     ? () {
+                            //         _confirmDeletionDialog(context, c.id);
+                            //       }
+                            //     : null,
                             child: const Icon(
                               Icons.delete_forever,
                               color: Colors.red,
