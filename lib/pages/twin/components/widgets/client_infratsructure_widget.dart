@@ -1,11 +1,8 @@
-import 'dart:js_interop';
-
 import 'package:flutter/material.dart';
 import 'package:twin_commons/core/twinned_session.dart';
 
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twinned_api/api/twinned.swagger.dart';
-import 'package:twin_commons/core/twinned_session.dart';
 
 class ClientInfrastructeWidget extends StatefulWidget {
   final List<String> currentClients;

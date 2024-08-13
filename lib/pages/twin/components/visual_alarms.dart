@@ -351,9 +351,7 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
   }
 
   Future _delete(tapi.Alarm e) async {
-    busy();
-
-    try {
+    await execute(() async {
       int index = _entities.indexWhere((element) => element.id == e.id);
       var res = await TwinnedSession.instance.twin.deleteAlarm(
         apikey: TwinnedSession.instance.authToken,
@@ -361,15 +359,13 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
       );
 
       if (validateResponse(res)) {
+        await _load();
         _entities.removeAt(index);
         _cards.removeAt(index);
       }
-      refresh();
-    } catch (e, s) {
-      debugPrint('$e\n$s');
-    }
-    await _load();
-    busy(busy: false);
+    });
+    loading = false;
+    refresh();
   }
 
   Future _load() async {

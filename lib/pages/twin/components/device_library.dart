@@ -102,7 +102,7 @@ class _DeviceLibraryState extends BaseState<DeviceLibrary> {
     return SizedBox(
       width: width,
       height: width,
-      child: GestureDetector(
+      child: InkWell(
         onDoubleTap: () {
           _edit(e, "");
         },
