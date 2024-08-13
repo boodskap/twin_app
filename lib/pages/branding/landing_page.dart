@@ -26,7 +26,6 @@ class _LandingContentPageState extends BaseState<LandingContentPage> {
     String? imgPath = landingPage.logoImage;
 
     Widget newCard = Tooltip(
-      textStyle: theme.getStyle(),
       message: '${landingPage.heading}',
       child: InkWell(
         onDoubleTap: () async {
