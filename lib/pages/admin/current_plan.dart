@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/widgets/buy_button.dart';
 import 'package:twin_app/widgets/choose_plans.dart';
 import 'package:twin_app/widgets/purchase_change_addon_widget.dart';
@@ -53,7 +52,7 @@ class _CurrentPlanState extends BaseState<CurrentPlan> {
                     MaterialPageRoute(
                       builder: (context) => Scaffold(
                         body: ChoosePlansPage(
-                          orgId: p.id,
+                          orgId: TwinnedSession.instance.noCodeAuthToken,
                         ),
                       ),
                     ),

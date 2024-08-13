@@ -16,6 +16,7 @@ import 'package:twin_app/pages/admin/users.dart';
 import 'package:twin_app/pages/branding/fonts_colors.dart';
 import 'package:twin_app/pages/dashboard.dart';
 import 'package:twin_app/pages/branding/landing_page.dart';
+import 'package:twin_app/pages/landing.dart';
 import 'package:twin_app/pages/nocode_builder.dart';
 import 'package:twin_app/pages/roles_page.dart';
 import 'package:twin_app/pages/twin/components.dart';
@@ -764,7 +765,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
   List<session.TwinMenuItem> get _brandingSubMenuItems {
     return [
       session.TwinMenuItem(
-        id: TwinAppMenu.adminCurrentPlan,
+        id: TwinAppMenu.brandingFontsColors,
         text: 'Fonts & Colors',
         icon: Icons.font_download,
         bottomMenus: _twinBottomMenus(),
@@ -772,11 +773,11 @@ class HomeScreenState extends BaseState<HomeScreen> {
           return session.isAdmin();
         },
         onMenuSelected: (BuildContext context) {
-          return const FontsAndColors();
+          return const FontsAndColorSettingPage();
         },
       ),
       session.TwinMenuItem(
-        id: TwinAppMenu.adminUsers,
+        id: TwinAppMenu.brandingLanding,
         text: 'Landing Page',
         icon: Icons.pages,
         bottomMenus: _twinBottomMenus(),
@@ -784,7 +785,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
           return session.isAdmin();
         },
         onMenuSelected: (BuildContext context) {
-          return const LandingPage();
+          return const DigitalLandingContentPage();
         },
       ),
     ];
