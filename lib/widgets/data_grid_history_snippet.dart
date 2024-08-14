@@ -35,6 +35,7 @@ class DataGridHistorySnippet extends StatefulWidget {
   final OnAnalyticsTapped? onAnalyticsTapped;
   final OnAssetModelTapped? onAssetModelTapped;
   final OnDeviceModelTapped? onDeviceModelTapped;
+  final OnClientTapped? onClientTapped;
   final OnPremiseTapped? onPremiseTapped;
   final OnFacilityTapped? onFacilityTapped;
   final OnFloorTapped? onFloorTapped;
@@ -51,6 +52,7 @@ class DataGridHistorySnippet extends StatefulWidget {
     this.onAnalyticsTapped,
     this.onAssetModelTapped,
     this.onDeviceModelTapped,
+    this.onClientTapped,
     this.onPremiseTapped,
     this.onFacilityTapped,
     this.onFloorTapped,
@@ -706,7 +708,7 @@ class DataGridHistorySnippetState extends BaseState<DataGridHistorySnippet> {
             ],
           )),
           DataCell(Wrap(
-            spacing: 4.0,
+            direction: Axis.vertical,
             children: [
               Text(
                 timeago.format(dT, locale: 'en'),
@@ -721,8 +723,27 @@ class DataGridHistorySnippetState extends BaseState<DataGridHistorySnippet> {
             ],
           )),
           DataCell(Wrap(
-            spacing: 4.0,
+            direction: Axis.vertical,
             children: [
+              Tooltip(
+                message: 'Client / Organization',
+                child: InkWell(
+                  onTap: (null == widget.onClientTapped ||
+                          (dd.clientIds?.isEmpty ?? true))
+                      ? null
+                      : () {
+                          widget.onClientTapped!(dd.clientIds!.first, dd);
+                        },
+                  child: Text(
+                    dd.$client ?? '',
+                    style: theme.getStyle().copyWith(
+                        color: theme.getPrimaryColor(),
+                        fontSize: 16,
+                        overflow: TextOverflow.ellipsis,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
               Tooltip(
                 message: 'Premise',
                 child: InkWell(

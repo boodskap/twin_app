@@ -11,16 +11,16 @@ import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/util/nocode_utils.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:twinned_api/api/twinned.swagger.dart';
-import 'package:timeago/timeago.dart' as timeago;
 import 'package:data_table_2/data_table_2.dart';
-import 'package:chopper/chopper.dart' as chopper;
 import 'package:uuid/uuid.dart';
 import 'package:twin_commons/core/twinned_session.dart';
 import 'package:twin_commons/widgets/default_deviceview.dart';
-import 'package:twin_commons/core/sensor_widget.dart' as sensors;
 import 'package:twin_commons/core/twin_image_helper.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:twin_commons/level/widgets/cylinder_tank.dart';
+import 'package:timeago/timeago.dart' as timeago;
+import 'package:chopper/chopper.dart' as chopper;
+import 'package:twin_commons/core/sensor_widget.dart' as sensors;
 
 enum FilterType { none, data, field, group, model }
 
@@ -34,6 +34,7 @@ class DataGridSnippet extends StatefulWidget {
   final List<String> premiseIds;
   final List<String> facilityIds;
   final List<String> floorIds;
+  final List<String> clientIds;
   final VoidCallback? onGridViewSelected;
   final VoidCallback? onCardViewSelected;
   final OnAnalyticsTapped? onAnalyticsTapped;
@@ -41,6 +42,7 @@ class DataGridSnippet extends StatefulWidget {
   final OnAssetTapped? onAssetTapped;
   final OnDeviceTapped? onDeviceTapped;
   final OnDeviceModelTapped? onDeviceModelTapped;
+  final OnClientTapped? onClientTapped;
   final OnPremiseTapped? onPremiseTapped;
   final OnFacilityTapped? onFacilityTapped;
   final OnFloorTapped? onFloorTapped;
@@ -56,6 +58,7 @@ class DataGridSnippet extends StatefulWidget {
     this.premiseIds = const [],
     this.facilityIds = const [],
     this.floorIds = const [],
+    this.clientIds = const [],
     this.onGridViewSelected,
     this.onCardViewSelected,
     this.onAnalyticsTapped,
@@ -63,6 +66,7 @@ class DataGridSnippet extends StatefulWidget {
     this.onAssetTapped,
     this.onDeviceTapped,
     this.onDeviceModelTapped,
+    this.onClientTapped,
     this.onPremiseTapped,
     this.onFacilityTapped,
     this.onFloorTapped,
@@ -725,7 +729,7 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
             ],
           )),
           DataCell(Wrap(
-            spacing: 4.0,
+            direction: Axis.vertical,
             children: [
               Text(
                 timeago.format(dT, locale: 'en'),
@@ -740,8 +744,27 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
             ],
           )),
           DataCell(Wrap(
-            spacing: 4.0,
+            direction: Axis.vertical,
             children: [
+              Tooltip(
+                message: 'Client / Organization',
+                child: InkWell(
+                  onTap: (null == widget.onClientTapped ||
+                          (dd.clientIds?.isEmpty ?? true))
+                      ? null
+                      : () {
+                          widget.onClientTapped!(dd.clientIds!.first, dd);
+                        },
+                  child: Text(
+                    dd.$client ?? '',
+                    style: theme.getStyle().copyWith(
+                        color: theme.getPrimaryColor(),
+                        fontSize: 16,
+                        overflow: TextOverflow.ellipsis,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
               Tooltip(
                 message: 'Premise',
                 child: InkWell(
@@ -752,10 +775,10 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                           widget.onPremiseTapped!(dd.premiseId!, dd);
                         },
                   child: Text(
-                    dd.premise ?? '',
+                    dd.premise ?? ' ',
                     style: theme.getStyle().copyWith(
                         color: theme.getPrimaryColor(),
-                        fontSize: 16,
+                        fontSize: 14,
                         overflow: TextOverflow.ellipsis,
                         fontWeight: FontWeight.bold),
                   ),
@@ -771,9 +794,10 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                           widget.onFacilityTapped!(dd.facilityId!, dd);
                         },
                   child: Text(
-                    dd.facility ?? '',
+                    dd.facility ?? '-',
                     style: theme.getStyle().copyWith(
                           color: theme.getPrimaryColor(),
+                          fontSize: 12,
                           overflow: TextOverflow.ellipsis,
                         ),
                   ),
@@ -792,6 +816,7 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                     dd.floor ?? '',
                     style: theme.getStyle().copyWith(
                           color: theme.getPrimaryColor(),
+                          fontSize: 12,
                           overflow: TextOverflow.ellipsis,
                         ),
                   ),
@@ -884,8 +909,8 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
               "premise",
               "facility",
               "floor",
-              "client"
-                  "description",
+              "client",
+              "description",
               "tags"
             ]
           }
@@ -917,7 +942,13 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
           {
             "terms": {"floorId": widget.floorIds}
           },
+        if (widget.clientIds.isNotEmpty)
+          {
+            "terms": {"clientIds.keyword": widget.clientIds}
+          },
       ]);
+
+      debugPrint('MUST: $mustConditions');
 
       dRes = await TwinnedSession.instance.twin.queryEqlDeviceData(
           apikey: TwinnedSession.instance.authToken,
@@ -925,7 +956,7 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
               source: [],
               mustConditions: mustConditions,
               page: 0,
-              size: 100,
+              size: 25,
               sort: {'updatedStamp': 'desc'}));
 
       if (validateResponse(dRes)) {
