@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/pages/twin/components/widgets/facilities_content_page.dart';
+import 'package:twin_app/pages/twin/components/widgets/facility_snippet.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
-import 'package:twin_app/widgets/commons/secondary_button.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:twin_commons/core/twin_image_helper.dart';
@@ -59,9 +59,12 @@ class _FacilitiesState extends BaseState<Facilities> {
                 Icons.add,
                 color: Colors.white,
               ),
+              // onPressed: () {
+              //   // _create();
+              // }
               onPressed: (_selectedPremise != null)
                   ? () {
-                      _create();
+                      _addEditFacilityDialog();
                     }
                   : null,
             ),
@@ -150,8 +153,8 @@ class _FacilitiesState extends BaseState<Facilities> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         InkWell(
-                            onTap: () {
-                              _edit(e);
+                            onTap: () async {
+                              _addEditFacilityDialog(facility: e);
                             },
                             child: Icon(Icons.edit,
                                 color: theme.getPrimaryColor())),
@@ -183,30 +186,27 @@ class _FacilitiesState extends BaseState<Facilities> {
     );
   }
 
-  Future _create() async {
-    if (loading) return;
-    loading = true;
-    await _getBasicInfo(context, 'New Facility',
-        onPressed: (name, desc, t) async {
-      List<String> tags = [];
-      if (null != t) {
-        tags = t.trim().split(' ');
-      }
-      var mRes = await TwinnedSession.instance.twin.createFacility(
-          apikey: TwinnedSession.instance.authToken,
-          body: tapi.FacilityInfo(
-              premiseId: _selectedPremise!.id,
-              name: name,
-              description: desc,
-              tags: tags,
-              roles: _selectedPremise!.roles));
-      if (validateResponse(mRes)) {
-        await _edit(mRes.body!.entity!);
-        alert('Success', 'Facility ${name} created successfully!');
-      }
-    });
-    loading = false;
-    refresh();
+  void _addEditFacilityDialog({tapi.Facility? facility}) async {
+    var res;
+    if (facility != null) {
+      res = await TwinnedSession.instance.twin.getPremise(
+        premiseId: facility.premiseId,
+        apikey: TwinnedSession.instance.authToken,
+      );
+    }
+
+    await super.alertDialog(
+      title: facility == null ? 'Add New Facility' : 'Update Facility',
+      body: FacilitySnippet(
+        selectedPremise:
+            facility == null ? _selectedPremise! : res.body!.entity!,
+        facility: facility,
+      ),
+      width: 750,
+      height: MediaQuery.of(context).size.height - 150,
+    );
+
+    _load();
   }
 
   Future _edit(tapi.Facility e) async {
@@ -225,94 +225,6 @@ class _FacilitiesState extends BaseState<Facilities> {
       ),
     );
     await _load();
-  }
-
-  Future<void> _getBasicInfo(BuildContext context, String title,
-      {required BasicInfoCallback onPressed}) async {
-    String? nameText = '';
-    String? descText = '';
-    String? tagsText = '';
-    return showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) {
-          return AlertDialog(
-            title: Text(title),
-            content: SizedBox(
-              width: 500,
-              height: 150,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  TextField(
-                    style: theme.getStyle(),
-                    onChanged: (value) {
-                      setState(() {
-                        nameText = value;
-                      });
-                    },
-                    decoration: InputDecoration(
-                      hintText: 'Name',
-                      hintStyle: theme.getStyle(),
-                      labelStyle: theme.getStyle(),
-                    ),
-                  ),
-                  TextField(
-                    style: theme.getStyle(),
-                    onChanged: (value) {
-                      setState(() {
-                        descText = value;
-                      });
-                    },
-                    decoration: InputDecoration(
-                      hintText: 'Description',
-                      hintStyle: theme.getStyle(),
-                       labelStyle: theme.getStyle(),
-                    ),
-                  ),
-                  TextField(
-                    style: theme.getStyle(),
-                    onChanged: (value) {
-                      setState(() {
-                        tagsText = value;
-                      });
-                    },
-                    decoration: InputDecoration(
-                      hintText: 'Tags (space separated)',
-                      hintStyle: theme.getStyle(),
-                       labelStyle: theme.getStyle(),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            actions: <Widget>[
-              SecondaryButton(
-                labelKey: 'Cancel',
-                onPressed: () {
-                  setState(() {
-                    Navigator.pop(context);
-                  });
-                },
-              ),
-              PrimaryButton(
-                labelKey: 'Ok',
-                onPressed: () {
-                  if (nameText!.length < 3) {
-                    alert('Invalid',
-                        'Name is required and should be minimum 3 characters');
-                    return;
-                  }
-                  setState(() {
-                    onPressed(nameText!, descText, tagsText);
-                    Navigator.pop(context);
-                  });
-                },
-              ),
-            ],
-          );
-        });
   }
 
   Future _delete(tapi.Facility e) async {
