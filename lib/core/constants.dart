@@ -2,6 +2,8 @@ import 'package:twin_commons/core/twinned_session.dart';
 
 const bool production = true;
 
+const bool debug = true;
+
 const String mqttTcpUrl =
     production ? 'platform.boodskap.io' : 'nocode.boodskap.io';
 const String mqttWsUrl = 'wss://$mqttTcpUrl/mqtt';

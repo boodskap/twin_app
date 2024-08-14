@@ -135,7 +135,7 @@ class _FloorsState extends BaseState<Floors> {
     return SizedBox(
       width: width,
       height: width,
-      child: GestureDetector(
+      child: InkWell(
         onDoubleTap: () {
           _edit(e);
         },

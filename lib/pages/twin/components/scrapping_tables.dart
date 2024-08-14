@@ -21,6 +21,14 @@ class _ScrappingTablesState extends BaseState<ScrappingTables> {
   final List<tapi.ScrappingTable> _entities = [];
   final List<Widget> _cards = [];
   String _search = '';
+  bool _canEdit = false;
+  Map<String, bool> _editable = Map<String, bool>();
+
+  @override
+  void initState() {
+    super.initState();
+    _canEdit = TwinnedSession.instance.isAdmin();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,16 +44,17 @@ class _ScrappingTablesState extends BaseState<ScrappingTables> {
                 },
                 icon: Icon(Icons.refresh)),
             divider(horizontal: true),
-            PrimaryButton(
-              labelKey: 'Create New',
-              leading: Icon(
-                Icons.add,
-                color: Colors.white,
+            if (isAdmin())
+              PrimaryButton(
+                labelKey: 'Create New',
+                leading: Icon(
+                  Icons.add,
+                  color: Colors.white,
+                ),
+                onPressed: () {
+                  _create();
+                },
               ),
-              onPressed: () {
-                _create();
-              },
-            ),
             divider(horizontal: true),
             SizedBox(
                 height: 40,
@@ -94,9 +103,15 @@ class _ScrappingTablesState extends BaseState<ScrappingTables> {
   }
 
   Widget _buildCard(tapi.ScrappingTable e) {
+    bool editable = _canEdit;
+    if (!editable) {
+      editable = _editable[e.id] ?? false;
+    }
     return InkWell(
       onDoubleTap: () {
-        _edit(e);
+        if (editable) {
+          _edit(e);
+        }
       },
       child: Accordion(
           contentVerticalPadding: 0,
@@ -129,24 +144,26 @@ class _ScrappingTablesState extends BaseState<ScrappingTables> {
                   ),
                   Row(
                     children: [
-                      InkWell(
-                        onTap: () {
-                          _edit(e);
-                        },
-                        child: Icon(
-                          Icons.edit,
-                          color: theme.getPrimaryColor(),
+                      if (editable)
+                        InkWell(
+                          onTap: () {
+                            _edit(e);
+                          },
+                          child: Icon(
+                            Icons.edit,
+                            color: theme.getPrimaryColor(),
+                          ),
                         ),
-                      ),
-                      InkWell(
-                        onTap: () {
-                          confirmDeletion(context, e);
-                        },
-                        child: Icon(
-                          Icons.delete,
-                          color: theme.getPrimaryColor(),
+                      if (editable)
+                        InkWell(
+                          onTap: () {
+                            confirmDeletion(context, e);
+                          },
+                          child: Icon(
+                            Icons.delete,
+                            color: theme.getPrimaryColor(),
+                          ),
                         ),
-                      ),
                       divider(
                         horizontal: true,
                       ),
@@ -338,17 +355,21 @@ class _ScrappingTablesState extends BaseState<ScrappingTables> {
   }
 
   Future _delete(tapi.ScrappingTable e) async {
-    int index = _entities.indexWhere((element) => element.id == e.id);
+    await execute(() async {
+      int index = _entities.indexWhere((element) => element.id == e.id);
 
-    var res = await TwinnedSession.instance.twin.deleteScrappingTable(
-      apikey: TwinnedSession.instance.authToken,
-      scrappingTableid: e.id,
-    );
+      var res = await TwinnedSession.instance.twin.deleteScrappingTable(
+        apikey: TwinnedSession.instance.authToken,
+        scrappingTableid: e.id,
+      );
 
-    if (validateResponse(res)) {
-      _entities.removeAt(index);
-      _cards.removeAt(index);
-    }
+      if (validateResponse(res)) {
+        await _load();
+        _entities.removeAt(index);
+        _cards.removeAt(index);
+      }
+    });
+    loading = false;
     refresh();
   }
 
@@ -369,6 +390,7 @@ class _ScrappingTablesState extends BaseState<ScrappingTables> {
       }
 
       for (tapi.ScrappingTable e in _entities) {
+        _editable[e.id] = await super.isAdmin();
         _cards.add(_buildCard(e));
       }
     });

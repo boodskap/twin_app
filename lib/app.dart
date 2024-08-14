@@ -9,9 +9,15 @@ import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:twin_app/auth.dart';
 import 'package:twin_app/pages/admin/clients.dart';
+import 'package:twin_app/pages/admin/current_plan.dart';
+import 'package:twin_app/pages/admin/invoices.dart';
+import 'package:twin_app/pages/admin/orders.dart';
 import 'package:twin_app/pages/admin/users.dart';
 import 'package:twin_app/pages/branding.dart';
+import 'package:twin_app/pages/branding/fonts_colors.dart';
 import 'package:twin_app/pages/dashboard.dart';
+import 'package:twin_app/pages/branding/landing_page.dart';
+import 'package:twin_app/pages/landing.dart';
 import 'package:twin_app/pages/nocode_builder.dart';
 import 'package:twin_app/pages/roles_page.dart';
 import 'package:twin_app/pages/twin/components.dart';
@@ -37,12 +43,18 @@ enum TwinAppMenu {
   myProfile,
   twin,
   admin,
+  billing,
   twinComponents,
   twinNoCodeBuilder,
   twinBranding,
   adminUsers,
   adminClients,
   adminRoles,
+  brandingFontsColors,
+  brandingLanding,
+  billingCurrentPlan,
+  billingInvoices,
+  billingOrders,
 }
 
 void startApp() async {
@@ -169,6 +181,9 @@ class HomeScreenState extends BaseState<HomeScreen> {
   final List<session.TwinMenuItem> menuItems = [];
   final List<Widget> _sideMenus = [];
   final List<tapi.Client> _clients = [];
+  final Map<dynamic, ExpansionTileController> _expControllers =
+      Map<dynamic, ExpansionTileController>();
+  final Map<dynamic, bool> _expanded = Map<dynamic, bool>();
   Widget? body;
   tapi.TwinUser? user;
   int _selectedClient = -1;
@@ -242,8 +257,19 @@ class HomeScreenState extends BaseState<HomeScreen> {
         ));
       }
     }
+
+    if (null == _expControllers[item.id]) {
+      _expControllers[item.id] = ExpansionTileController();
+    }
+
     return ExpansionTile(
+      key: Key(item.id.toString()),
       initiallyExpanded: item.expanded,
+      //controller: _expControllers[item.id],
+      onExpansionChanged: (expanded) {
+        //_expanded[item.id] = expanded;
+      },
+      //maintainState: true,
       title: Wrap(
         spacing: 5.0,
         crossAxisAlignment: WrapCrossAlignment.center,
@@ -373,6 +399,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
 
     Widget widget = Scaffold(
       key: _scaffoldKey,
+      onDrawerChanged: (opened) {},
       appBar: AppBar(
         centerTitle: true,
         title: Text(
@@ -522,7 +549,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
     return widget;
   }
 
-  void showScreen(dynamic id) {
+  void showScreen(dynamic id) async {
     closeDrawer();
 
     session.pageBottomMenus.clear();
@@ -532,7 +559,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
     debugPrint('MENU: $id');
     session.TwinMenuItem? mi = _findMenuItem(menuItems, id);
     if (null != mi) {
-      body = mi.onMenuSelected(context);
+      body = await mi.onMenuSelected(context);
       session.pageBottomMenus.addAll(mi.bottomMenus);
       session.bottomMenuIndex = 0;
       for (int i = 0; i < session.pageBottomMenus.length; i++) {
@@ -560,34 +587,8 @@ class HomeScreenState extends BaseState<HomeScreen> {
         isMenuVisible: () {
           return true;
         },
-        onMenuSelected: (ctx) {
+        onMenuSelected: (ctx) async {
           return const Dashboard();
-        },
-      ),
-      session.TwinMenuItem(
-        text: 'Digital Twin',
-        id: TwinAppMenu.twin,
-        expanded: true,
-        assetImage: 'images/twin.png',
-        subItems: _twinSubMenuItems,
-        isMenuVisible: () {
-          return !session.smallScreen && session.isAdmin();
-        },
-        onMenuSelected: (ctx) {
-          return SizedBox.shrink();
-        },
-      ),
-      session.TwinMenuItem(
-        text: 'Admin',
-        id: TwinAppMenu.admin,
-        icon: Icons.shield,
-        expanded: false,
-        subItems: _adminSubMenuItems,
-        isMenuVisible: () {
-          return !session.smallScreen && session.isAdmin();
-        },
-        onMenuSelected: (ctx) {
-          return SizedBox.shrink();
         },
       ),
       session.TwinMenuItem(
@@ -597,18 +598,18 @@ class HomeScreenState extends BaseState<HomeScreen> {
         isMenuVisible: () {
           return null != user;
         },
-        onMenuSelected: (ctx) {
+        onMenuSelected: (ctx) async {
           return AlarmsNotificationsGrid();
         },
       ),
       session.TwinMenuItem(
-        text: 'My Events',
+        text: 'My Subscriptions',
         id: TwinAppMenu.myEvents,
         icon: Icons.event_available,
         isMenuVisible: () {
           return null != user;
         },
-        onMenuSelected: (ctx) {
+        onMenuSelected: (ctx) async {
           return ProfileInfoScreen(
             key: Key(Uuid().v4()),
             selectedTab: 2,
@@ -622,11 +623,50 @@ class HomeScreenState extends BaseState<HomeScreen> {
         isMenuVisible: () {
           return null != user;
         },
-        onMenuSelected: (ctx) {
+        onMenuSelected: (ctx) async {
           return ProfileInfoScreen(
             key: Key(Uuid().v4()),
             selectedTab: 0,
           );
+        },
+      ),
+      session.TwinMenuItem(
+        text: 'Digital Twin',
+        id: TwinAppMenu.twin,
+        expanded: false,
+        assetImage: 'images/twin.png',
+        subItems: _twinSubMenuItems,
+        isMenuVisible: () {
+          return !session.smallScreen && session.isAdmin();
+        },
+        onMenuSelected: (ctx) async {
+          return SizedBox.shrink();
+        },
+      ),
+      session.TwinMenuItem(
+        text: 'Admin',
+        id: TwinAppMenu.admin,
+        icon: Icons.shield,
+        expanded: false,
+        subItems: _adminSubMenuItems,
+        isMenuVisible: () {
+          return !session.smallScreen && session.isAdmin();
+        },
+        onMenuSelected: (ctx) async {
+          return SizedBox.shrink();
+        },
+      ),
+      session.TwinMenuItem(
+        text: 'Billing',
+        id: TwinAppMenu.billing,
+        icon: Icons.currency_exchange,
+        expanded: false,
+        subItems: _billingSubMenuItems,
+        isMenuVisible: () {
+          return !session.smallScreen && session.isAdmin();
+        },
+        onMenuSelected: (ctx) async {
+          return SizedBox.shrink();
         },
       ),
     ];
@@ -642,7 +682,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
         isMenuVisible: () {
           return true;
         },
-        onMenuSelected: (BuildContext context) {
+        onMenuSelected: (BuildContext context) async {
           return const Components();
         },
       ),
@@ -654,19 +694,21 @@ class HomeScreenState extends BaseState<HomeScreen> {
         isMenuVisible: () {
           return true;
         },
-        onMenuSelected: (BuildContext context) {
-          return const NocodeBuilder();
+        onMenuSelected: (BuildContext context) async {
+          return const NocodeBuilderPage();
         },
       ),
       session.TwinMenuItem(
-        id: TwinAppMenu.twinBranding,
         text: 'Branding',
-        icon: Icons.menu,
+        id: TwinAppMenu.twinBranding,
+        icon: Icons.admin_panel_settings_rounded,
+        expanded: false,
+        subItems: _brandingSubMenuItems,
         bottomMenus: _twinBottomMenus(),
         isMenuVisible: () {
-          return true;
+          return !session.smallScreen && session.isAdmin();
         },
-        onMenuSelected: (BuildContext context) {
+        onMenuSelected: (ctx) async {
           return const Branding();
         },
       ),
@@ -683,7 +725,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
         isMenuVisible: () {
           return session.isAdmin();
         },
-        onMenuSelected: (BuildContext context) {
+        onMenuSelected: (BuildContext context) async {
           return const Users();
         },
       ),
@@ -695,7 +737,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
         isMenuVisible: () {
           return session.isAdmin();
         },
-        onMenuSelected: (BuildContext context) {
+        onMenuSelected: (BuildContext context) async {
           return const Clients();
         },
       ),
@@ -707,8 +749,78 @@ class HomeScreenState extends BaseState<HomeScreen> {
         isMenuVisible: () {
           return session.isAdmin();
         },
-        onMenuSelected: (BuildContext context) {
+        onMenuSelected: (BuildContext context) async {
           return const RolesPage();
+        },
+      ),
+    ];
+  }
+
+  List<session.TwinMenuItem> get _billingSubMenuItems {
+    return [
+      session.TwinMenuItem(
+        id: TwinAppMenu.billingCurrentPlan,
+        text: 'Current Plan',
+        icon: Icons.account_balance_wallet,
+        bottomMenus: _billingBottomMenus(),
+        isMenuVisible: () {
+          return session.isAdmin();
+        },
+        onMenuSelected: (BuildContext context) async {
+          return const CurrentPlan();
+        },
+      ),
+      session.TwinMenuItem(
+        id: TwinAppMenu.billingInvoices,
+        text: 'Invoices',
+        icon: Icons.monetization_on,
+        bottomMenus: _billingBottomMenus(),
+        isMenuVisible: () {
+          return session.isAdmin();
+        },
+        onMenuSelected: (BuildContext context) async {
+          return const Invoices();
+        },
+      ),
+      session.TwinMenuItem(
+        id: TwinAppMenu.billingOrders,
+        text: 'Orders',
+        icon: Icons.shopping_cart,
+        bottomMenus: _billingBottomMenus(),
+        isMenuVisible: () {
+          return session.isAdmin();
+        },
+        onMenuSelected: (BuildContext context) async {
+          return const Orders();
+        },
+      ),
+    ];
+  }
+
+  List<session.TwinMenuItem> get _brandingSubMenuItems {
+    return [
+      session.TwinMenuItem(
+        id: TwinAppMenu.brandingFontsColors,
+        text: 'Fonts & Colors',
+        icon: Icons.font_download,
+        bottomMenus: _twinBottomMenus(),
+        isMenuVisible: () {
+          return session.isAdmin();
+        },
+        onMenuSelected: (BuildContext context) async {
+          return const FontsAndColorSettingPage();
+        },
+      ),
+      session.TwinMenuItem(
+        id: TwinAppMenu.brandingLanding,
+        text: 'Landing Page',
+        icon: Icons.pages,
+        bottomMenus: _twinBottomMenus(),
+        isMenuVisible: () {
+          return session.isAdmin();
+        },
+        onMenuSelected: (BuildContext context) async {
+          return const LandingContentPage();
         },
       ),
     ];
@@ -730,6 +842,26 @@ class HomeScreenState extends BaseState<HomeScreen> {
         id: TwinAppMenu.adminRoles,
         icon: Icon(Icons.key, size: 30),
         label: 'Roles',
+      ),
+    ];
+  }
+
+  List<BottomMenuItem> _billingBottomMenus() {
+    return [
+      const BottomMenuItem(
+        id: TwinAppMenu.billingCurrentPlan,
+        icon: Icon(Icons.account_balance_wallet, size: 30),
+        label: 'Current Plan',
+      ),
+      const BottomMenuItem(
+        id: TwinAppMenu.billingInvoices,
+        icon: Icon(Icons.monetization_on, size: 30),
+        label: 'Invoices',
+      ),
+      const BottomMenuItem(
+        id: TwinAppMenu.billingOrders,
+        icon: Icon(Icons.shopping_cart, size: 30),
+        label: 'Orders',
       ),
     ];
   }

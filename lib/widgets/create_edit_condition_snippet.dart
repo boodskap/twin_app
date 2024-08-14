@@ -26,10 +26,19 @@ class _CreateEditConditionSnippetState
   late TabController _tabController;
   int _currentPageIndex = 0;
 
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _descController = TextEditingController();
+  final TextEditingController _tagsController = TextEditingController();
+  final TextEditingController _valueController = TextEditingController();
+  final TextEditingController _lvalueController = TextEditingController();
+  final TextEditingController _rvalueController = TextEditingController();
+  final TextEditingController _valuesController = TextEditingController();
   final List<tapi.Parameter> _parameters = [];
   final List<tapi.DeviceModel> _models = [];
+  final List<DropdownMenuItem<tapi.DeviceModel>> _modelItems = [];
   final List<DropdownMenuItem<tapi.Parameter>> _parameterItems = [];
   final List<DropdownMenuItem<tapi.ConditionCondition>> _conditionItems = [];
+
   tapi.DeviceModel? _selectedModel;
   tapi.Parameter? _selectedParameter;
   tapi.ConditionCondition? _selectedCondition;
@@ -37,14 +46,6 @@ class _CreateEditConditionSnippetState
   bool _showLRValues = false;
   bool _showNDValues = false;
   bool _showTValues = false;
-
-  TextEditingController _valueController = TextEditingController();
-  TextEditingController _nameController = TextEditingController();
-  TextEditingController _leftValueController = TextEditingController();
-  TextEditingController _rightValueController = TextEditingController();
-  TextEditingController _valuesController = TextEditingController();
-  TextEditingController _tagsController = TextEditingController();
-  TextEditingController _descController = TextEditingController();
 
   @override
   void initState() {
@@ -146,17 +147,18 @@ class _CreateEditConditionSnippetState
           ),
         )));
     _selectedCondition = tapi.ConditionCondition.eq;
-
     setup();
   }
 
   Future<void> _loadModels() async {
+    _selectedParameter = null;
+    _selectedCondition = null;
+    _models.clear();
+    _modelItems.clear();
     _parameters.clear();
     _parameterItems.clear();
-    _conditionItems.clear();
 
     if (_selectedModel != null) {
-
       _models.add(_selectedModel!);
 
       if (_models.isNotEmpty) {
@@ -181,14 +183,6 @@ class _CreateEditConditionSnippetState
             );
           }).toList());
 
-          _conditionItems
-              .addAll(tapi.ConditionCondition.values.map((condition) {
-            return DropdownMenuItem<tapi.ConditionCondition>(
-              value: condition,
-              child: Text(condition.name),
-            );
-          }).toList());
-
           if (widget.condition != null) {
             _selectedCondition = widget.condition!.condition;
             _selectedParameter = _parameters.firstWhere(
@@ -200,14 +194,14 @@ class _CreateEditConditionSnippetState
       }
     }
 
-    setState(() {});
+    refresh();
   }
 
   @override
   void setup() async {
     await _loadModels();
 
-    if (widget.condition != null) {
+    if (null != widget.condition) {
       tapi.Condition e = widget.condition!;
       _nameController.text = e.name;
       _descController.text = e.description ?? '';
@@ -216,157 +210,22 @@ class _CreateEditConditionSnippetState
       _selectedCondition = e.condition;
 
       _valueController.text = e.$value ?? '';
-      _leftValueController.text = e.leftValue ?? '';
-      _rightValueController.text = e.rightValue ?? '';
-      // _valuesController.text = (null != e.values ? e.values!.join('\n') : '');
-      _valuesController.text = e.values?.join('\n') ?? '';
-      _updateFieldsVisibility();
-      _selectedModel = _models.firstWhere((model) => model.id == e.modelId,
-          orElse: () => _models.first);
-      if (_selectedModel != null) {
-        _selectedParameter = _selectedModel!.parameters.firstWhere(
-          (param) => param.name == e.field,
-          orElse: () => _parameters.first,
-        );
-      }
+      _lvalueController.text = e.leftValue ?? '';
+      _rvalueController.text = e.rightValue ?? '';
+      _valuesController.text = (null != e.values ? e.values!.join('\n') : '');
 
-      // switch (_selectedCondition!) {
-      //   case tapi.ConditionCondition.between:
-      //   case tapi.ConditionCondition.nbetween:
-      //     _showLRValues = true;
-      //     break;
-      //   case tapi.ConditionCondition.contains:
-      //   case tapi.ConditionCondition.ncontains:
-      //     if (_selectedParameter!.parameterType ==
-      //         tapi.ParameterParameterType.text) {
-      //       _showTValues = true;
-      //     } else {
-      //       _showNDValues = true;
-      //     }
-      //     break;
-      //   case tapi.ConditionCondition.lt:
-      //   case tapi.ConditionCondition.lte:
-      //   case tapi.ConditionCondition.gt:
-      //   case tapi.ConditionCondition.gte:
-      //   case tapi.ConditionCondition.eq:
-      //   case tapi.ConditionCondition.neq:
-      //   default:
-      //     _showValue = true;
-      //     break;
-      // }
-
-      // // _updateFieldsVisibility();
-      setState(() {});
-    } else {
-      _showValue = true;
-      _selectedCondition = tapi.ConditionCondition.eq;
-      _selectedModel = widget.selectedModel;
-      setState(() {});
-    }
-  }
-
-  void _updateFieldsVisibility() {
-    switch (_selectedCondition!) {
-      case tapi.ConditionCondition.between:
-      case tapi.ConditionCondition.nbetween:
-        _showLRValues = true;
-        break;
-      case tapi.ConditionCondition.contains:
-      case tapi.ConditionCondition.ncontains:
-        if (_selectedParameter!.parameterType ==
-            tapi.ParameterParameterType.text) {
-          _showTValues = true;
-        } else {
-          _showNDValues = true;
-        }
-        break;
-      case tapi.ConditionCondition.lt:
-      case tapi.ConditionCondition.lte:
-      case tapi.ConditionCondition.gt:
-      case tapi.ConditionCondition.gte:
-      case tapi.ConditionCondition.eq:
-      case tapi.ConditionCondition.neq:
-      default:
-        _showValue = true;
-        break;
-    }
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _pageViewController.dispose();
-    _tabController.dispose();
-    _valueController.dispose();
-    _nameController.dispose();
-  }
-
-  bool isBlank(String text) {
-    return text.isEmpty;
-  }
-
-  bool isBoolean(String text) {
-    return (text == 'true' || text == 'false');
-  }
-
-  bool _validateParameter(String data, String field) {
-    if (isBlank(data)) {
-      alert('Invalid Value', "$field can't be empty");
-      return false;
-    }
-
-    switch (_selectedParameter!.parameterType) {
-      case tapi.ParameterParameterType.yesno:
-        if (!isBoolean(data)) {
-          alert('Invalid Value', '$field ($data) should be true or false');
-          return false;
-        }
-        break;
-      case tapi.ParameterParameterType.numeric:
-        if (int.tryParse(data) == null) {
-          alert('Invalid Value', '$field ($data) should be a valid number');
-          return false;
-        }
-        break;
-      case tapi.ParameterParameterType.floating:
-        if (double.tryParse(data) == null) {
-          alert('Invalid Value', '$field ($data) should be a valid decimal');
-          return false;
-        }
-        break;
-      default:
-        break;
-    }
-    return true;
-  }
-
-  Future _save({bool shouldPop = false}) async {
-    busy();
-    try {
-      if (isBlank(_nameController.text)) {
-        alert('Missing Value', "Name can't be empty");
-        return;
-      }
       switch (_selectedCondition!) {
         case tapi.ConditionCondition.between:
         case tapi.ConditionCondition.nbetween:
-          if (!_validateParameter(_leftValueController.text, 'Left Value'))
-            return;
-          if (!_validateParameter(_rightValueController.text, 'Right Value')) {
-            return;
-          }
+          _showLRValues = true;
           break;
         case tapi.ConditionCondition.contains:
         case tapi.ConditionCondition.ncontains:
-          if (isBlank(_valuesController.text)) {
-            alert('Invalid Value', "Values can't be empty");
-            return;
-          }
-          var values = _valuesController.text.split('\n');
-          for (var value in values) {
-            value = value.trim();
-            if (value.isEmpty) continue;
-            if (!_validateParameter(value, 'Values')) return;
+          if (_selectedParameter!.parameterType ==
+              tapi.ParameterParameterType.text) {
+            _showTValues = true;
+          } else {
+            _showNDValues = true;
           }
           break;
         case tapi.ConditionCondition.lt:
@@ -376,86 +235,22 @@ class _CreateEditConditionSnippetState
         case tapi.ConditionCondition.eq:
         case tapi.ConditionCondition.neq:
         default:
-          if (!_validateParameter(_valueController.text, 'Value')) return;
+          _showValue = true;
           break;
       }
-
-      String value = _valueController.text;
-      String lValue = _leftValueController.text;
-      String rValue = _rightValueController.text;
-      List<String> values = [];
-
-      var cValues = _valuesController.text.split('\n');
-      for (var value in cValues) {
-        value = value.trim();
-        if (value.isEmpty) continue;
-        values.add(value);
-      }
-
-      values = values.toSet().toList();
-
-      chopper.Response<tapi.ConditionEntityRes> res;
-
-      if (null == widget.condition) {
-        res = await TwinnedSession.instance.twin.createCondition(
-            apikey: TwinnedSession.instance.authToken,
-            body: tapi.ConditionInfo(
-              name: _nameController.text,
-              modelId: _selectedModel!.id,
-              field: _selectedParameter!.name,
-              condition: tapi.ConditionInfoCondition.values
-                  .byName(_selectedCondition!.name),
-              tags: _tagsController.text.split(' '),
-              description: _descController.text,
-              $value: value,
-              leftValue: lValue,
-              rightValue: rValue,
-              values: values,
-            ));
-      } else {
-        res = await TwinnedSession.instance.twin.updateCondition(
-            apikey: TwinnedSession.instance.authToken,
-            conditionId: widget.condition!.id,
-            body: tapi.ConditionInfo(
-              name: _nameController.text,
-              modelId: _selectedModel!.id,
-              field: _selectedParameter!.name,
-              condition: tapi.ConditionInfoCondition.values
-                  .byName(_selectedCondition!.name),
-              tags: _tagsController.text.split(' '),
-              description: _descController.text,
-              $value: value,
-              leftValue: lValue,
-              rightValue: rValue,
-              values: values,
-              icon: widget.condition!.icon,
-            ));
-      }
-      if (validateResponse(res)) {
-        setState(() {
-          widget.condition = res.body!.entity;
-        });
-        await alert('', 'Condition ${_nameController.text} saved successfully');
-        if (shouldPop) {
-          _cancel();
-        }
-      }
-    } catch (e, s) {
-      debugPrint('$e\n$s');
-    } finally {
-      busy(busy: false);
+    } else {
+      _showValue = true;
+      _selectedCondition = tapi.ConditionCondition.eq;
     }
-  }
 
-  void _cancel() {
-    Navigator.pop(context);
+    refresh();
   }
 
   void _changeParameter(tapi.Parameter? parameter) {
     _selectedParameter = parameter;
     _valueController.text = '';
-    _leftValueController.text = '';
-    _rightValueController.text = '';
+    _lvalueController.text = '';
+    _rvalueController.text = '';
     _valuesController.text = '';
     _changeCondition(tapi.ConditionCondition.eq);
   }
@@ -492,8 +287,172 @@ class _CreateEditConditionSnippetState
         _showValue = true;
         break;
     }
-    _updateFieldsVisibility();
-    setState(() {});
+
+    refresh();
+  }
+
+  bool _validateParameter(String data, String field) {
+    if (isBlank(data)) {
+      alert('Invalid Value', "$field can't be empty");
+      return false;
+    }
+
+    switch (_selectedParameter!.parameterType) {
+      case tapi.ParameterParameterType.yesno:
+        if (!isBoolean(data)) {
+          alert('Invalid Value', '$field ($data) should be true or false');
+          return false;
+        }
+        break;
+      case tapi.ParameterParameterType.numeric:
+        if (int.tryParse(data) == null) {
+          alert('Invalid Value', '$field ($data) should be a valid number');
+          return false;
+        }
+        break;
+      case tapi.ParameterParameterType.floating:
+        if (double.tryParse(data) == null) {
+          alert('Invalid Value', '$field ($data) should be a valid decimal');
+          return false;
+        }
+        break;
+      default:
+        break;
+    }
+    return true;
+  }
+
+  Future _save({bool shouldPop = false}) async {
+    List<String>? clientIds = super.isClientAdmin()
+        ? await TwinnedSession.instance.getClientIds()
+        : null;
+    busy();
+    try {
+      if (isBlank(_nameController.text)) {
+        alert('Missing Value', "Name can't be empty");
+        return;
+      }
+
+      switch (_selectedCondition!) {
+        case tapi.ConditionCondition.between:
+        case tapi.ConditionCondition.nbetween:
+          if (!_validateParameter(_lvalueController.text, 'Left Value')) return;
+          if (!_validateParameter(_rvalueController.text, 'Right Value')) {
+            return;
+          }
+          break;
+        case tapi.ConditionCondition.contains:
+        case tapi.ConditionCondition.ncontains:
+          if (isBlank(_valuesController.text)) {
+            alert('Invalid Value', "Values can't be empty");
+            return;
+          }
+          var values = _valuesController.text.split('\n');
+          for (var value in values) {
+            value = value.trim();
+            if (value.isEmpty) continue;
+            if (!_validateParameter(value, 'Values')) return;
+          }
+          break;
+        case tapi.ConditionCondition.lt:
+        case tapi.ConditionCondition.lte:
+        case tapi.ConditionCondition.gt:
+        case tapi.ConditionCondition.gte:
+        case tapi.ConditionCondition.eq:
+        case tapi.ConditionCondition.neq:
+        default:
+          if (!_validateParameter(_valueController.text, 'Value')) return;
+          break;
+      }
+
+      String value = _valueController.text;
+      String lValue = _lvalueController.text;
+      String rValue = _rvalueController.text;
+      List<String> values = [];
+
+      var cValues = _valuesController.text.split('\n');
+      for (var value in cValues) {
+        value = value.trim();
+        if (value.isEmpty) continue;
+        values.add(value);
+      }
+
+      values = values.toSet().toList();
+
+      chopper.Response<tapi.ConditionEntityRes> res;
+
+      if (null == widget.condition) {
+        res = await TwinnedSession.instance.twin.createCondition(
+            apikey: TwinnedSession.instance.authToken,
+            body: tapi.ConditionInfo(
+              name: _nameController.text,
+              modelId: _selectedModel!.id,
+              field: _selectedParameter!.name,
+              condition: tapi.ConditionInfoCondition.values
+                  .byName(_selectedCondition!.name),
+              tags: _tagsController.text.split(' '),
+              description: _descController.text,
+              $value: value,
+              leftValue: lValue,
+              rightValue: rValue,
+              values: values,
+              clientIds: clientIds,
+            ));
+      } else {
+        res = await TwinnedSession.instance.twin.updateCondition(
+            apikey: TwinnedSession.instance.authToken,
+            conditionId: widget.condition!.id,
+            body: tapi.ConditionInfo(
+              name: _nameController.text,
+              modelId: _selectedModel!.id,
+              field: _selectedParameter!.name,
+              condition: tapi.ConditionInfoCondition.values
+                  .byName(_selectedCondition!.name),
+              tags: _tagsController.text.split(' '),
+              description: _descController.text,
+              $value: value,
+              leftValue: lValue,
+              rightValue: rValue,
+              values: values,
+              icon: widget.condition!.icon,
+              clientIds: clientIds,
+            ));
+      }
+      if (validateResponse(res)) {
+        setState(() {
+          widget.condition = res.body!.entity;
+        });
+        await alert('', 'Condition ${_nameController.text} saved successfully');
+        if (shouldPop) {
+          _cancel();
+        }
+      }
+    } catch (e, s) {
+      debugPrint('$e\n$s');
+    } finally {
+      busy(busy: false);
+    }
+  }
+
+  void _cancel() {
+    Navigator.pop(context);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _pageViewController.dispose();
+    _tabController.dispose();
+    _valueController.dispose();
+    _nameController.dispose();
+  }
+
+  bool isBlank(String text) {
+    return text.isEmpty;
+  }
+
+  bool isBoolean(String text) {
+    return (text == 'true' || text == 'false');
   }
 
   @override
@@ -598,6 +557,10 @@ class _CreateEditConditionSnippetState
               child: DropdownButton<tapi.Parameter>(
                 items: _parameterItems,
                 value: _selectedParameter,
+                isDense: false,
+                iconSize: 0.0,
+                isExpanded: true,
+                alignment: AlignmentDirectional.center,
                 onChanged: (tapi.Parameter? value) {
                   setState(() {
                     _changeParameter(value);
@@ -615,6 +578,10 @@ class _CreateEditConditionSnippetState
               width: 400,
               child: Center(
                 child: DropdownButton<tapi.ConditionCondition>(
+                  iconSize: 0.0,
+                  isDense: false,
+                  isExpanded: true,
+                  alignment: AlignmentDirectional.center,
                   items: _conditionItems,
                   value: _selectedCondition,
                   onChanged: (tapi.ConditionCondition? value) {
@@ -656,14 +623,14 @@ class _CreateEditConditionSnippetState
                   width: 200,
                   child: LabelTextField(
                     label: 'Enter Left Value',
-                    controller: _leftValueController,
+                    controller: _lvalueController,
                   ),
                 ),
                 SizedBox(
                   width: 200,
                   child: LabelTextField(
                     label: 'Enter Right Value',
-                    controller: _rightValueController,
+                    controller: _rvalueController,
                   ),
                 ),
               ],

@@ -24,6 +24,14 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
   final List<Widget> _cards = [];
   String _search = '';
   tapi.DeviceModel? _selectedDeviceModel;
+  bool _canEdit = false;
+  Map<String, bool> _editable = Map<String, bool>();
+
+  @override
+  void initState() {
+    super.initState();
+    _canEdit = TwinnedSession.instance.isAdmin();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,16 +60,17 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
                   }),
             ),
             divider(horizontal: true),
-            PrimaryButton(
-              labelKey: 'Create New',
-              leading: Icon(
-                Icons.add,
-                color: Colors.white,
+            if (canCreate())
+              PrimaryButton(
+                labelKey: 'Create New',
+                leading: Icon(
+                  Icons.add,
+                  color: Colors.white,
+                ),
+                onPressed: () {
+                  _create();
+                },
               ),
-              onPressed: () {
-                _create();
-              },
-            ),
             divider(horizontal: true),
             SizedBox(
               height: 40,
@@ -116,6 +125,10 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
 
   Widget _buildCard(tapi.Alarm e) {
     double width = MediaQuery.of(context).size.width / 8;
+    bool editable = _canEdit;
+    if (!editable) {
+      editable = _editable[e.id] ?? false;
+    }
     Widget icon = const Icon(
       Icons.question_mark,
       size: 45,
@@ -133,7 +146,9 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
     }
     return InkWell(
       onDoubleTap: () {
+        if (editable) {
         _edit(e);
+      }
       },
       child: SizedBox(
         width: width,
@@ -168,21 +183,23 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      InkWell(
+                      if (editable)
+                        InkWell(
+                            onTap: () {
+                              _edit(e);
+                            },
+                            child: Icon(Icons.edit,
+                                color: theme.getPrimaryColor())),
+                      if (editable)
+                        InkWell(
                           onTap: () {
-                            _edit(e);
+                            _confirmDeletionDialog(context, e);
                           },
-                          child:
-                              Icon(Icons.edit, color: theme.getPrimaryColor())),
-                      InkWell(
-                        onTap: () {
-                          _confirmDeletionDialog(context, e);
-                        },
-                        child: Icon(
-                          Icons.delete,
-                          color: theme.getPrimaryColor(),
+                          child: Icon(
+                            Icons.delete,
+                            color: theme.getPrimaryColor(),
+                          ),
                         ),
-                      ),
                     ],
                   ),
                 ),
@@ -269,6 +286,10 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
   }
 
   Future _create() async {
+    List<String>? clientIds = super.isClientAdmin()
+        ? await TwinnedSession.instance.getClientIds()
+        : null;
+
     if (loading) return;
     loading = true;
     await _getBasicInfo(context, 'New Alarm', onPressed: (name, desc, t) async {
@@ -285,6 +306,7 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
             tags: tags,
             state: -1,
             conditions: [],
+            clientIds: clientIds,
           ));
       if (validateResponse(mRes)) {
         await _edit(mRes.body!.entity!);
@@ -351,9 +373,7 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
   }
 
   Future _delete(tapi.Alarm e) async {
-    busy();
-
-    try {
+    await execute(() async {
       int index = _entities.indexWhere((element) => element.id == e.id);
       var res = await TwinnedSession.instance.twin.deleteAlarm(
         apikey: TwinnedSession.instance.authToken,
@@ -361,15 +381,13 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
       );
 
       if (validateResponse(res)) {
+        await _load();
         _entities.removeAt(index);
         _cards.removeAt(index);
       }
-      refresh();
-    } catch (e, s) {
-      debugPrint('$e\n$s');
-    }
-    await _load();
-    busy(busy: false);
+    });
+    loading = false;
+    refresh();
   }
 
   Future _load() async {
@@ -406,6 +424,7 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
       }
 
       for (tapi.Alarm e in _entities) {
+        _editable[e.id] = await super.canEdit(clientIds: e.clientIds);
         _cards.add(_buildCard(e));
       }
     });
