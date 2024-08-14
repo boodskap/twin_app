@@ -9,7 +9,7 @@ import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:go_router/go_router.dart';
-import 'package:verification_api/api/verification.swagger.dart' as vapi;
+import 'package:twinned_api/twinned_api.dart' as tapi;
 
 class VerifyOtpPage extends StatefulWidget {
   final bool? signUp;
@@ -69,12 +69,15 @@ class _VerifyOtpMobilePageState extends BaseState<_VerifyOtpMobilePage> {
 
     try {
       String pin = _pinController.text;
-      var body = vapi.VerificationReq(
+      var body = tapi.VerificationReq(
         pin: pin,
         pinToken: pinToken,
       );
-      var res = await config.verification
-          .verifyPin(body: body, dkey: config.twinDomainKey);
+      var res = await config.twinned.verifyPin(
+          body: body,
+          dkey: config.isTwinApp()
+              ? config.twinDomainKey
+              : config.noCodeDomainKey);
       if (validateResponse(res)) {
         localVariables['authToken'] = res.body!.authToken;
         localVariables['pin'] = pin;
