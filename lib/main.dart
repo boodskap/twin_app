@@ -18,7 +18,7 @@ void main() async {
     FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   }
 
-  session.flavor = 'jegan';
+  session.flavor = 'dev';
 
   start(
     appTitle: 'My Twin App',
@@ -46,8 +46,6 @@ void start({
   session.setDrawerOpen = setDrawerOpen;
   session.postLoginHook = postLoginHook;
   session.postSignUpHook = postSignUpHook;
-
-  session.flavor = 'dev';
 
   final String envFile = getEnvFileName(session.flavor);
 
