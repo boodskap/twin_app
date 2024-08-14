@@ -80,8 +80,11 @@ class _ResetPasswordMobilePageState
           pin: pin,
           password: confirmPassword,
         );
-        var res = await config.verification
-            .resetPassword(body: body, dkey: config.twinDomainKey);
+        var res = await config.verification.resetPassword(
+            body: body,
+            dkey: config.isTwinApp()
+                ? config.twinDomainKey
+                : config.noCodeDomainKey);
         if (validateResponse(res)) {
           localVariables.clear();
           alert("Success", "Password Changed Successfully");

@@ -52,7 +52,7 @@ PostLoginHook? postLoginHook;
 PostSignUpHook? postSignUpHook;
 nocode.Profile? profile;
 int selectedOrg = 0;
-final List<nocode.Organization> orgs = [];
+final List<String> orgs = [];
 
 bool isAdmin() {
   if (null != profile) return true;

@@ -223,7 +223,7 @@ class _AssetsState extends BaseState<Assets> {
     loading = true;
     await _getBasicInfo(
       context,
-      'New Floor',
+      'New Asset',
       onPressed: (name, desc, t) async {
         List<String> tags = [];
         if (null != t) {
