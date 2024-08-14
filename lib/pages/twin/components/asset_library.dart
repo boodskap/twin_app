@@ -24,6 +24,14 @@ class _AssetLibraryState extends BaseState<AssetLibrary> {
   final List<tapi.AssetModel> _entities = [];
   final List<Widget> _cards = [];
   String _search = '';
+  bool _canEdit = false;
+  Map<String, bool> _editable = Map<String, bool>();
+
+  @override
+  void initState() {
+    super.initState();
+    _canEdit = TwinnedSession.instance.isAdmin();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,16 +48,17 @@ class _AssetLibraryState extends BaseState<AssetLibrary> {
               icon: Icon(Icons.refresh),
             ),
             divider(horizontal: true),
-            PrimaryButton(
-              labelKey: 'Create New',
-              leading: Icon(
-                Icons.add,
-                color: Colors.white,
+            if (canCreate())
+              PrimaryButton(
+                labelKey: 'Create New',
+                leading: Icon(
+                  Icons.add,
+                  color: Colors.white,
+                ),
+                onPressed: () {
+                  _create();
+                },
               ),
-              onPressed: () {
-                _create();
-              },
-            ),
             divider(horizontal: true),
             SizedBox(
                 height: 40,
@@ -99,9 +108,15 @@ class _AssetLibraryState extends BaseState<AssetLibrary> {
 
   Widget _buildCard(tapi.AssetModel e) {
     double width = MediaQuery.of(context).size.width / 8;
+    bool editable = _canEdit;
+    if (!editable) {
+      editable = _editable[e.id] ?? false;
+    }
     return InkWell(
       onDoubleTap: () {
-        _edit(e);
+        if (editable) {
+          _edit(e);
+        }
       },
       child: SizedBox(
         width: width,
@@ -129,24 +144,26 @@ class _AssetLibraryState extends BaseState<AssetLibrary> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      InkWell(
+                      if (editable)
+                        InkWell(
+                            onTap: () {
+                              _edit(e);
+                            },
+                            child: Icon(Icons.edit,
+                                color: theme.getPrimaryColor())),
+                      if (editable)
+                        InkWell(
                           onTap: () {
-                            _edit(e);
+                            _confirmDeletionDialog(
+                              context,
+                              e,
+                            );
                           },
-                          child:
-                              Icon(Icons.edit, color: theme.getPrimaryColor())),
-                      InkWell(
-                        onTap: () {
-                          _confirmDeletionDialog(
-                            context,
-                            e,
-                          );
-                        },
-                        child: Icon(
-                          Icons.delete,
-                          color: theme.getPrimaryColor(),
+                          child: Icon(
+                            Icons.delete,
+                            color: theme.getPrimaryColor(),
+                          ),
                         ),
-                      ),
                     ],
                   ),
                 ),
@@ -239,6 +256,12 @@ class _AssetLibraryState extends BaseState<AssetLibrary> {
   }
 
   Future _create() async {
+    List<String>? clientIds = super.isClientAdmin()
+        ? await TwinnedSession.instance.getClientIds()
+        : null;
+
+    if (loading) return;
+    loading = true;
     await _getBasicInfo(context, 'New Asset Type',
         onPressed: (name, desc, t) async {
       List<String> tags = [];
@@ -251,6 +274,7 @@ class _AssetLibraryState extends BaseState<AssetLibrary> {
             name: name,
             description: desc,
             tags: tags,
+            clientIds: clientIds,
           ));
       if (validateResponse(mRes)) {
         // Twinned.selectedAssetModel = mRes.body!.entity!;
@@ -262,6 +286,8 @@ class _AssetLibraryState extends BaseState<AssetLibrary> {
         // }
       }
     });
+    loading = false;
+    refresh();
   }
 
   Future _edit(tapi.AssetModel e) async {
@@ -339,6 +365,7 @@ class _AssetLibraryState extends BaseState<AssetLibrary> {
       }
 
       for (tapi.AssetModel e in _entities) {
+        _editable[e.id] = await super.canEdit(clientIds: e.clientIds);
         _cards.add(_buildCard(e));
       }
     });

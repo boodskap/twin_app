@@ -10,7 +10,6 @@ import 'package:twin_commons/core/twinned_session.dart';
 import 'package:twinned_api/api/twinned.swagger.dart' as twinned;
 import 'package:twinned_api/api/twinned.swagger.dart';
 import 'package:twinned_widgets/core/top_bar.dart';
-import 'package:twin_app/core/session_variables.dart';
 
 class LandingWidgetType extends StatefulWidget {
   Load load;
@@ -33,7 +32,6 @@ class LandingWidgetType extends StatefulWidget {
 class _LandingWidgetTypeState extends BaseState<LandingWidgetType> {
   late Image logoImage;
 
-  // var res = UserSession().selectedOrganization;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   final TextEditingController _heading = TextEditingController();
@@ -124,35 +122,6 @@ class _LandingWidgetTypeState extends BaseState<LandingWidgetType> {
     }
 
     super.initState();
-  }
-
-  void _deleteImage(String image) async {
-    confirm(
-        title: 'Warning',
-        titleStyle: theme.getStyle().copyWith(
-              color: Colors.red,
-            ),
-        message: 'Are you sure you want to delete this image?',
-        onPressed: () async {
-          busy();
-          try {
-            var res = await TwinnedSession.instance.twin.deleteImage(
-                apikey: TwinnedSession.instance.authToken, id: image);
-
-            if (validateResponse(res)) {
-              // widget.model!.images!.remove(image);
-                logoImage = Image.asset(
-          'images/logo-large.png',
-          fit: BoxFit.contain,
-        );
-              setup();
-              alert('Image', 'Landing Page image deleted');
-            }
-          } catch (e, x) {
-            debugPrint('$e\n$x');
-          }
-          busy(busy: false);
-        });
   }
 
   @override
@@ -252,23 +221,23 @@ class _LandingWidgetTypeState extends BaseState<LandingWidgetType> {
                             ),
                           ),
                         ),
-                        if (widget.landingPage.logoImage != null &&
-                            widget.landingPage.logoImage!.isNotEmpty)
-                          Positioned(
-                            top: 10,
-                            right: 40,
-                            child: Tooltip(
-                                message: 'Delete Image',
-                                child: IconButton(
-                                  icon: const Icon(
-                                    Icons.delete,
-                                    color: Colors.red,
-                                  ),
-                                  onPressed: () async {
-                                     _deleteImage(widget.landingPage.logoImage!);
-                                  },
-                                )),
-                          )
+                        // if (widget.landingPage.logoImage != null)
+                        //   Positioned(
+                        //     top: 10,
+                        //     right: 40,
+                        //     child: Tooltip(
+                        //       message: 'Delete Image',
+                        //       child: IconButton(
+                        //         icon: const Icon(
+                        //           Icons.delete,
+                        //           color: Colors.red,
+                        //         ),
+                        //         onPressed: () async {
+                        //           await _deleteImage();
+                        //         },
+                        //       ),
+                        //     ),
+                        //   ),
                       ],
                     ),
                   ),

@@ -55,37 +55,56 @@ class _NocodeBuilderPageState extends BaseState<NocodeBuilderPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   TextField(
+                    style: theme.getStyle(),
                     onChanged: (value) {
                       setState(() {
                         nameText = value;
                       });
                     },
-                    decoration: const InputDecoration(hintText: 'Name'),
+                    decoration: InputDecoration(
+                      hintText: 'Name',
+                      hintStyle: theme.getStyle(),
+                      labelStyle: theme.getStyle(),
+                    ),
                   ),
                   TextField(
+                    style: theme.getStyle(),
                     onChanged: (value) {
                       setState(() {
                         titleText = value;
                       });
                     },
-                    decoration: const InputDecoration(hintText: 'Title'),
+                    decoration: InputDecoration(
+                      hintText: 'Title',
+                      hintStyle: theme.getStyle(),
+                      labelStyle: theme.getStyle(),
+                    ),
                   ),
                   TextField(
+                    style: theme.getStyle(),
                     onChanged: (value) {
                       setState(() {
                         descText = value;
                       });
                     },
-                    decoration: const InputDecoration(hintText: 'Description'),
+                    decoration: InputDecoration(
+                      hintText: 'Description',
+                      hintStyle: theme.getStyle(),
+                      labelStyle: theme.getStyle(),
+                    ),
                   ),
                   TextField(
+                    style: theme.getStyle(),
                     onChanged: (value) {
                       setState(() {
                         tagsText = value;
                       });
                     },
-                    decoration: const InputDecoration(
-                        hintText: 'Tags (space separated)'),
+                    decoration: InputDecoration(
+                      hintText: 'Tags (space separated)',
+                      hintStyle: theme.getStyle(),
+                      labelStyle: theme.getStyle(),
+                    ),
                   ),
                 ],
               ),
@@ -192,8 +211,6 @@ class _NocodeBuilderPageState extends BaseState<NocodeBuilderPage> {
   }
 
   void _buildCard(twinned.DashboardScreen entity, List<Widget> cards) {
-    // ImageProvider? image = const AssetImage('images/setting-icon.png');
-
     Widget newCard = Tooltip(
       message: '${entity.name}\n${entity.description ?? ""}',
       child: InkWell(
@@ -226,22 +243,12 @@ class _NocodeBuilderPageState extends BaseState<NocodeBuilderPage> {
                 borderRadius: const BorderRadius.all(Radius.circular(20))),
             child: Stack(
               children: [
-                Positioned(
-                  top: 40,
-                  left: 30,
-                  bottom: 30,
-                  right: 30,
-                  child: Container(
-                      height: 64,
-                      width: 64,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        // image: DecorationImage(
-                        //   image: image,
-                        //   fit: BoxFit.contain,
-                        // ),
-                      )),
-                ),
+                Container(
+                    height: 64,
+                    width: 64,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                    )),
                 Row(
                   children: [
                     Expanded(
@@ -249,7 +256,10 @@ class _NocodeBuilderPageState extends BaseState<NocodeBuilderPage> {
                       child: Text(
                         entity.name,
                         // clippedName,
-                        style: theme.getStyle().copyWith(color: Colors.black),
+                        style: theme.getStyle().copyWith(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -259,7 +269,7 @@ class _NocodeBuilderPageState extends BaseState<NocodeBuilderPage> {
                         onPressed: () {
                           confirmDeletion(context, entity);
                         },
-                        icon:  Icon(
+                        icon: Icon(
                           Icons.delete,
                           color: theme.getPrimaryColor(),
                         ),
@@ -415,21 +425,28 @@ class _NocodeBuilderPageState extends BaseState<NocodeBuilderPage> {
             divider(horizontal: true),
             SizedBox(
               width: 250,
-              height: 30,
+              height: 40,
               child: SearchBar(
+                textStyle: WidgetStatePropertyAll(theme.getStyle()),
+                hintStyle: WidgetStatePropertyAll(theme.getStyle()),
                 onChanged: (value) async {
                   await _load(search: value);
                 },
                 hintText: "Search Dashboard",
               ),
             ),
+            divider(horizontal: true)
           ],
         ),
         divider(horizontal: true),
         if (_cards.isEmpty)
           SizedBox(
             height: MediaQuery.of(context).size.height / 2,
-            child: const Center(child: Text(('No dashboards found'))),
+            child: Center(
+                child: Text(
+              'No dashboards found',
+              style: theme.getStyle(),
+            )),
           ),
         if (_cards.isNotEmpty)
           Expanded(
