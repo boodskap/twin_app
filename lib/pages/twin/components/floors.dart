@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/pages/twin/components/widgets/floor_content_page.dart';
+import 'package:twin_app/pages/twin/components/widgets/floor_snippet.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
-import 'package:twin_app/widgets/commons/secondary_button.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:twin_commons/core/twin_image_helper.dart';
@@ -10,7 +10,6 @@ import 'package:twin_commons/core/twinned_session.dart';
 import 'package:twinned_api/twinned_api.dart' as tapi;
 import 'package:twinned_widgets/core/facility_dropdown.dart';
 import 'package:twinned_widgets/core/premise_dropdown.dart';
-import 'package:twinned_widgets/core/top_bar.dart';
 import 'package:uuid/uuid.dart';
 
 class Floors extends StatefulWidget {
@@ -76,9 +75,7 @@ class _FloorsState extends BaseState<Floors> {
                 color: Colors.white,
               ),
               onPressed: (_selectedPremise != null && _selectedFacility != null)
-                  ? () {
-                      _create();
-                    }
+                  ? _addEditFloorDialog
                   : null,
             ),
             divider(horizontal: true),
@@ -162,19 +159,26 @@ class _FloorsState extends BaseState<Floors> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      InkWell(
-                        onTap: () {
-                          _edit(e);
-                        },
-                        child: Icon(Icons.edit, color: theme.getPrimaryColor()),
+                      Tooltip(
+                        message: "Update",
+                        child: InkWell(
+                          onTap: () {
+                            _addEditFloorDialog(floor: e);
+                          },
+                          child:
+                              Icon(Icons.edit, color: theme.getPrimaryColor()),
+                        ),
                       ),
-                      InkWell(
-                        onTap: () {
-                          _delete(e);
-                        },
-                        child: Icon(
-                          Icons.delete,
-                          color: theme.getPrimaryColor(),
+                      Tooltip(
+                        message: "Delete",
+                        child: InkWell(
+                          onTap: () {
+                            _delete(e);
+                          },
+                          child: Icon(
+                            Icons.delete,
+                            color: theme.getPrimaryColor(),
+                          ),
                         ),
                       ),
                     ],
@@ -198,120 +202,33 @@ class _FloorsState extends BaseState<Floors> {
     );
   }
 
-  Future<void> _getBasicInfo(
-    BuildContext context,
-    String title, {
-    required Function(String, String, String?) onPressed,
-  }) async {
-    String? nameText = '';
-    String? descText = '';
-    String? tagsText = '';
-    return showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return AlertDialog(
-          title: Text(title),
-          content: SizedBox(
-            width: 500,
-            height: 150,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                TextField(
-                  onChanged: (value) {
-                    nameText = value;
-                  },
-                  style: theme.getStyle(),
-                  decoration: InputDecoration(
-                    hintText: 'Name',
-                    hintStyle: theme.getStyle(),
-                  ),
-                ),
-                TextField(
-                  onChanged: (value) {
-                    descText = value;
-                  },
-                  style: theme.getStyle(),
-                  decoration: InputDecoration(
-                    hintText: 'Description',
-                    hintStyle: theme.getStyle(),
-                  ),
-                ),
-                TextField(
-                  onChanged: (value) {
-                    tagsText = value;
-                  },
-                  style: theme.getStyle(),
-                  decoration: InputDecoration(
-                    hintText: 'Tags (space separated)',
-                    hintStyle: theme.getStyle(),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            SecondaryButton(
-              labelKey: "Cancel",
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-            divider(horizontal: true),
-            PrimaryButton(
-              labelKey: "OK",
-              onPressed: () {
-                if (nameText!.length < 3) {
-                  alert(
-                    'Invalid',
-                    'Name is required and should be minimum 3 characters',
-                  );
-                  return;
-                }
-                onPressed(nameText!, descText!, tagsText);
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        );
-      },
+  void _addEditFloorDialog({tapi.Floor? floor}) async {
+    var pRes;
+    if (floor != null) {
+      pRes = await TwinnedSession.instance.twin.getPremise(
+        premiseId: floor.premiseId,
+        apikey: TwinnedSession.instance.authToken,
+      );
+    }
+    var fRes;
+    if (floor != null) {
+      fRes = await TwinnedSession.instance.twin.getFacility(
+        facilityId: floor.facilityId,
+        apikey: TwinnedSession.instance.authToken,
+      );
+    }
+    await super.alertDialog(
+      title: null == floor ? 'Add New Floor' : 'Update Floor',
+      body: FloorSnippet(
+        selectedPremise: floor == null ? _selectedPremise : pRes.body!.entity!,
+        selectedFacility:
+            floor == null ? _selectedFacility : fRes.body!.entity!,
+        floor: floor,
+      ),
+      width: 750,
+      height: MediaQuery.of(context).size.height - 150,
     );
-  }
-
-  Future _create() async {
-    if (loading) return;
-    loading = true;
-    await _getBasicInfo(
-      context,
-      'New Floor',
-      onPressed: (name, desc, t) async {
-        List<String> tags = [];
-        if (null != t) {
-          tags = t.trim().split(' ');
-        }
-        var mRes = await TwinnedSession.instance.twin.createFloor(
-          apikey: TwinnedSession.instance.authToken,
-          body: tapi.FloorInfo(
-            premiseId: _selectedPremise!.id,
-            facilityId: _selectedFacility!.id,
-            floorLevel: _cards.length,
-            floorType: tapi.FloorInfoFloorType.onground,
-            name: name,
-            description: desc,
-            tags: tags,
-            roles: _selectedFacility!.roles,
-          ),
-        );
-        if (validateResponse(mRes)) {
-          await _edit(mRes.body!.entity!);
-          alert("Floor${mRes.body!.entity!.name}", "Saved Successfully!");
-        }
-      },
-    );
-    loading = false;
-    refresh();
+    _load();
   }
 
   Future _edit(tapi.Floor e) async {
