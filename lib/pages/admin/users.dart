@@ -33,8 +33,6 @@ class _UsersState extends BaseState<Users> {
 
   @override
   Widget build(BuildContext context) {
- 
-    
     return Column(
       children: [
         divider(),
@@ -130,20 +128,6 @@ class _UsersState extends BaseState<Users> {
   }
 
   Widget _buildCard(tapi.TwinUser entity) {
-
-     String fullnum = "";
-    String? input = entity.phone;
-    List<String> splitString = input!.split('/');
-
-    if (splitString.length > 2) {
-      // countryCode = splitString[0];
-      // phoneController.text = splitString[2];
-      fullnum = splitString[1] + splitString[2];
-    } else {
-      // countryCode = "IN";
-      // phoneController.text = phoneController.text;
-      fullnum = entity.phone!;
-    }
     return Card(
       color: Colors.transparent,
       elevation: 5,
@@ -236,7 +220,7 @@ class _UsersState extends BaseState<Users> {
                     style: theme.getStyle(),
                   ),
                   Text(
-                    'Phone : $fullnum',
+                    'Phone : ${entity.phone}',
                     style: theme.getStyle(),
                   ),
                 ],
