@@ -47,6 +47,8 @@ void start({
   session.postLoginHook = postLoginHook;
   session.postSignUpHook = postSignUpHook;
 
+  //session.flavor = 'dev';
+
   final String envFile = getEnvFileName(session.flavor);
 
   debugPrint('ENV FILE: $envFile');

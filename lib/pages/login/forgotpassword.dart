@@ -77,7 +77,8 @@ class _ForgotPasswordMobilePageState
       );
       var res = await config.verification.forgotPassword(
         body: body,
-        dkey: config.twinDomainKey,
+        dkey:
+            config.isTwinApp() ? config.twinDomainKey : config.noCodeDomainKey,
       );
 
       if (validateResponse(res)) {

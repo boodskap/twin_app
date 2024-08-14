@@ -112,12 +112,6 @@ class _DigitalLandingContentPageState
     bool networkImg = false;
     String imgPath = '';
     if (landingPage.logoImage!.isNotEmpty) {
-      // imgPath = UserSession.twinImageUrl(
-      //   baseUrl(),
-      //   UserSession().getOrgSettings()!.twinDomainKey!,
-      //   landingPage.logoImage!,
-      // );
-
       imgPath =
           TwinImageHelper.getDomainImage(landingPage.logoImage!) as String;
       networkImg = true;

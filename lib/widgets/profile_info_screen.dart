@@ -80,7 +80,7 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
     if (splitString.length > 2) {
       countryCode = splitString[0];
       _phoneController.text = splitString[2];
-      fullnum = splitString[1]+splitString[2];
+      fullnum = splitString[1] + splitString[2];
     } else {
       countryCode = "IN";
       _phoneController.text = _phoneController.text;
@@ -403,8 +403,10 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
     if (loading) return;
     loading = true;
     await execute(() async {
-      var response = await TwinnedSession.instance.twin
-          .getMyProfile(apikey: TwinnedSession.instance.authToken);
+      var response = await TwinnedSession.instance.twin.getMyProfile(
+          apikey: config.isTwinApp()
+              ? TwinnedSession.instance.authToken
+              : TwinnedSession.instance.noCodeAuthToken);
       var res = response.body!.entity!;
 
       if (validateResponse(response)) {
