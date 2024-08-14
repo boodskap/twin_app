@@ -26,6 +26,14 @@ class _FacilitiesState extends BaseState<Facilities> {
   final List<Widget> _cards = [];
   String _search = '';
   tapi.Premise? _selectedPremise;
+  bool _canEdit = false;
+  Map<String, bool> _editable = Map<String, bool>();
+
+  @override
+  void initState() {
+    super.initState();
+    _canEdit = TwinnedSession.instance.isAdmin();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,21 +61,19 @@ class _FacilitiesState extends BaseState<Facilities> {
                   }),
             ),
             divider(horizontal: true),
-            PrimaryButton(
-              labelKey: 'Create New',
-              leading: Icon(
-                Icons.add,
-                color: Colors.white,
+            if (canCreate())
+              PrimaryButton(
+                labelKey: 'Create New',
+                leading: Icon(
+                  Icons.add,
+                  color: Colors.white,
+                ),
+                onPressed: (_selectedPremise != null && canCreate() )
+                    ? () {
+                        _addEditFacilityDialog();
+                      }
+                    : null,
               ),
-              // onPressed: () {
-              //   // _create();
-              // }
-              onPressed: (_selectedPremise != null)
-                  ? () {
-                      _addEditFacilityDialog();
-                    }
-                  : null,
-            ),
             divider(horizontal: true),
             SizedBox(
                 height: 40,
@@ -119,11 +125,20 @@ class _FacilitiesState extends BaseState<Facilities> {
 
   Widget _buildCard(tapi.Facility e) {
     double width = MediaQuery.of(context).size.width / 8;
+
+    bool editable = _canEdit;
+    if (!editable) {
+      editable = _editable[e.id] ?? false;
+    }
     return SizedBox(
       width: width,
       height: width,
       child: InkWell(
-        onDoubleTap: () => _edit(e),
+        onDoubleTap: () {
+          if (editable) {
+            _edit(e);
+          }
+        },
         child: Tooltip(
           textStyle: theme.getStyle().copyWith(color: Colors.white),
           message: '${e.name}\n${e.description ?? ""}',
@@ -152,12 +167,14 @@ class _FacilitiesState extends BaseState<Facilities> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
+                        if(editable)
                         InkWell(
                             onTap: () async {
                               _addEditFacilityDialog(facility: e);
                             },
                             child: Icon(Icons.edit,
                                 color: theme.getPrimaryColor())),
+                        if(editable)
                         InkWell(
                           onTap: () {
                             _delete(e);
@@ -287,6 +304,7 @@ class _FacilitiesState extends BaseState<Facilities> {
       }
 
       for (tapi.Facility e in _entities) {
+        _editable[e.id] = await super.canEdit(clientIds: e.clientIds);
         _cards.add(_buildCard(e));
       }
     });
