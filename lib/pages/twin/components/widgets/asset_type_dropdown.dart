@@ -28,9 +28,9 @@ class _AssetTypeDropdownState extends BaseState<AssetTypeDropdown> {
   Widget build(BuildContext context) {
     return SearchChoices<twin.AssetModel>.single(
       value: _selectedItem,
-      hint: 'Select Tank Type',
+      hint: 'Select Asset Type',
       style: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
-      searchHint: 'Search Tank Types',
+      searchHint: 'Search Asset Types',
       isExpanded: true,
       futureSearchFn: (String? keyword, String? orderBy, bool? orderAsc,
           List<Tuple2<String, String>>? filters, int? pageNb) async {
@@ -64,9 +64,6 @@ class _AssetTypeDropdownState extends BaseState<AssetTypeDropdown> {
       var pRes = await TwinnedSession.instance.twin.queryEqlAssetModel(
           apikey: TwinnedSession.instance.authToken,
           body: twin.EqlSearch(source: [], mustConditions: [
-            {
-              "term": {"tags.keyword": 'RIOT_TANK'},
-            },
             {
               "query_string": {
                 "query": '*$search*',

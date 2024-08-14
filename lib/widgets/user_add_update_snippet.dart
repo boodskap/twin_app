@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl_phone_field/countries.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:twin_app/widgets/commons/secondary_button.dart';
 import 'package:twin_app/core/session_variables.dart';
@@ -32,19 +33,19 @@ class _UserAddUpdateSnippetState extends BaseState<UserAddUpdateSnippet> {
   TextEditingController phoneController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   bool _isPhoneValid = true;
+  String countryCode = 'US';
+
   twinned.TwinUserInfo _twinUserInfo = const twinned.TwinUserInfo(
-    name: '',
-    email: '',
-    phone: '',
-    address: '',
-    tags: [],
-    roles: [],
-    images: [],
-    clientIds: [],
-    description: '',
-  );
-  String fullNumber = "";
-  String countryCode = "";
+      name: '',
+      email: '',
+      phone: '',
+      address: '',
+      tags: [],
+      roles: [],
+      images: [],
+      clientIds: [],
+      description: '',
+      countryCode: 'US');
 
   @override
   void initState() {
@@ -55,6 +56,7 @@ class _UserAddUpdateSnippetState extends BaseState<UserAddUpdateSnippet> {
         name: u.name,
         email: u.email,
         phone: u.phone,
+        countryCode: u.countryCode,
         address: u.address,
         clientIds: u.clientIds,
         description: u.description,
@@ -64,22 +66,13 @@ class _UserAddUpdateSnippetState extends BaseState<UserAddUpdateSnippet> {
         tags: u.tags,
       );
     }
-
     nameController.text = _twinUserInfo.name;
-    emailController.text = _twinUserInfo.email ?? '';
+    emailController.text = _twinUserInfo.email;
+    phoneController.text = _twinUserInfo.phone ?? '';
+    countryCode = _twinUserInfo.countryCode ?? '';
     nameController.addListener(_onNameChanged);
     emailController.addListener(_onNameChanged);
     phoneController.addListener(_onNameChanged);
-    String? input = _twinUserInfo.phone;
-    List<String> splitString = input!.split('/');
-
-    if (splitString.length > 2) {
-      countryCode = splitString[0];
-      phoneController.text = splitString[2];
-    } else {
-      countryCode = "IN";
-      phoneController.text = _twinUserInfo.phone!;
-    }
   }
 
   @override
@@ -159,11 +152,22 @@ class _UserAddUpdateSnippetState extends BaseState<UserAddUpdateSnippet> {
                           },
                           onChanged: (phone) {
                             setState(() {
-                              fullNumber =
-                                  "${phone.countryISOCode}/${phone.countryCode}/${phone.number}";
                               _isPhoneValid = phone.completeNumber.isNotEmpty &&
                                   phone.completeNumber.length >= 10 &&
                                   phone.isValidNumber();
+
+                              countryCode = phone.countryISOCode;
+
+                              _twinUserInfo = _twinUserInfo.copyWith(
+                                  countryCode: phone.countryISOCode);
+                            });
+                          },
+                          onCountryChanged: (country) {
+                            setState(() {
+                              countryCode = country.code;
+
+                              _twinUserInfo = _twinUserInfo.copyWith(
+                                  countryCode: country.code);
                             });
                           },
                         ),
@@ -288,10 +292,10 @@ class _UserAddUpdateSnippetState extends BaseState<UserAddUpdateSnippet> {
     loading = true;
 
     _twinUserInfo = _twinUserInfo.copyWith(
-      name: nameController.text.trim(),
-      email: emailController.text.trim(),
-      phone: fullNumber.trim(),
-    );
+        name: nameController.text.trim(),
+        email: emailController.text.trim(),
+        phone: phoneController.text.trim(),
+        countryCode: countryCode);
 
     await execute(() async {
       if (null == widget.twinUser) {

@@ -9,7 +9,7 @@ import 'package:twin_commons/core/base_state.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:go_router/go_router.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
-import 'package:verification_api/api/verification.swagger.dart' as vapi;
+import 'package:twinned_api/twinned_api.dart' as tapi;
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -48,7 +48,7 @@ class _SignUpMobilePageState extends BaseState<_SignUpMobilePage> {
   void setup() {
     // TODO: implement setup
   }
-  void _showOtpPage(vapi.RegistrationRes registrationRes) {
+  void _showOtpPage(tapi.RegistrationRes registrationRes) {
     context.push(Routes.otp, extra: {'signUp': true});
   }
 
@@ -61,7 +61,7 @@ class _SignUpMobilePageState extends BaseState<_SignUpMobilePage> {
       var lname = _lnameController.text.trim();
       var email = _emailController.text.trim();
 
-      var body = vapi.Registration(
+      var body = tapi.Registration(
         email: email,
         fname: fname,
         lname: lname,
@@ -71,8 +71,11 @@ class _SignUpMobilePageState extends BaseState<_SignUpMobilePage> {
         template: config.activationTemplate,
         properties: {},
       );
-      var res = await config.verification
-          .registerUser(dkey: config.twinDomainKey, body: body);
+      var res = await config.twinned.registerUser(
+          dkey: config.isTwinApp()
+              ? config.twinDomainKey
+              : config.noCodeDomainKey,
+          body: body);
 
       loading = false;
 

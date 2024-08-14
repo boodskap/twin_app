@@ -28,8 +28,7 @@ class _ClientSnippetState extends BaseState<ClientSnippet> {
   TextEditingController phoneController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   bool _isPhoneValid = true;
-  String fullNumber = "";
-  String countryCode = "";
+  String countryCode = 'US';
   twinned.ClientInfo _client = const twinned.ClientInfo(
       name: '',
       address: '',
@@ -37,24 +36,24 @@ class _ClientSnippetState extends BaseState<ClientSnippet> {
       phone: '',
       email: '',
       icon: '',
-      description: '');
-
-  // bool _isPhoneValid=true;
+      description: '',
+      countryCode: 'US');
 
   @override
   void initState() {
     super.initState();
     if (null != widget.client) {
-      twinned.Client p = widget.client!;
+      twinned.Client c = widget.client!;
       _client = _client.copyWith(
-          address: p.address,
-          description: p.description,
-          email: p.email,
-          icon: p.icon,
-          location: p.location,
-          name: p.name,
-          phone: p.phone,
-          tags: p.tags);
+          address: c.address,
+          description: c.description,
+          email: c.email,
+          icon: c.icon,
+          location: c.location,
+          name: c.name,
+          phone: c.phone,
+          countryCode: c.countryCode,
+          tags: c.tags);
     }
 
     nameController.text = _client.name;
@@ -62,19 +61,11 @@ class _ClientSnippetState extends BaseState<ClientSnippet> {
     addressController.text = _client.address ?? '';
 
     emailController.text = _client.email ?? '';
+    phoneController.text = _client.phone ?? '';
+    countryCode = _client.countryCode ?? '';
     nameController.addListener(_onNameChanged);
     emailController.addListener(_onNameChanged);
     phoneController.addListener(_onNameChanged);
-    String? input = _client.phone;
-    List<String> splitString = input!.split('/');
-
-       if (splitString.length > 1) {
-      countryCode = splitString[0];
-      phoneController.text = splitString[1];
-    } else {
-      countryCode = "IN";
-      phoneController.text=_client.phone!;
-    }
   }
 
   @override
@@ -161,43 +152,52 @@ class _ClientSnippetState extends BaseState<ClientSnippet> {
                       SizedBox(
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: IntlPhoneField(
-                          controller: phoneController,
-                          keyboardType: TextInputType.phone,
-                          initialCountryCode: countryCode,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                          ],
-                          decoration: InputDecoration(
-                            labelText: 'Enter Phone Number',
-                            counterText: "",
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(4.0),
-                            ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(4.0),
-                              borderSide: BorderSide(
-                                color: theme.getPrimaryColor(),
+                            controller: phoneController,
+                            keyboardType: TextInputType.phone,
+                            initialCountryCode: countryCode,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                            ],
+                            decoration: InputDecoration(
+                              labelText: 'Enter Phone Number',
+                              counterText: "",
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(4.0),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(4.0),
+                                borderSide: BorderSide(
+                                  color: theme.getPrimaryColor(),
+                                ),
                               ),
                             ),
-                          ),
-                          validator: (phone) {
-                            if (phone == null || phone.number.isEmpty) {
-                              return 'Enter a valid phone number';
-                            }
-                            return null;
-                          },
-                          onChanged: (phone)
-                           {
-                            setState(() {
-                               fullNumber =
-                                  "${phone.countryISOCode}/${phone.number}";
-                             
-                              _isPhoneValid = phone.completeNumber.isNotEmpty &&
-                                  phone.completeNumber.length >= 10 &&
-                                  phone.isValidNumber();
-                            });
-                          },
-                        ),
+                            validator: (phone) {
+                              if (phone == null || phone.number.isEmpty) {
+                                return 'Enter a valid phone number';
+                              }
+                              return null;
+                            },
+                            onChanged: (phone) {
+                              setState(() {
+                                _isPhoneValid =
+                                    phone.completeNumber.isNotEmpty &&
+                                        phone.completeNumber.length >= 10 &&
+                                        phone.isValidNumber();
+
+                                countryCode = phone.countryISOCode;
+                                _client = _client.copyWith(
+                                  countryCode: phone.countryISOCode,
+                                );
+                              });
+                            },
+                            onCountryChanged: (country) {
+                              setState(() {
+                                countryCode = country.code;
+
+                                _client =
+                                    _client.copyWith(countryCode: country.code);
+                              });
+                            }),
                       ),
                       const SizedBox(
                         height: 15,
@@ -365,12 +365,12 @@ class _ClientSnippetState extends BaseState<ClientSnippet> {
     loading = true;
 
     _client = _client.copyWith(
-      name: nameController.text.trim(),
-      description: descController.text.trim(),
-      address: addressController.text.trim(),
-      email: emailController.text.trim(),
-      phone: fullNumber.trim(),
-    );
+        name: nameController.text.trim(),
+        description: descController.text.trim(),
+        address: addressController.text.trim(),
+        email: emailController.text.trim(),
+        phone: phoneController.text.trim(),
+        countryCode: countryCode);
 
     await execute(() async {
       if (null == widget.client) {
