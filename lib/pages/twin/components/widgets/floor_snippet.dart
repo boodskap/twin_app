@@ -34,6 +34,7 @@ class _FloorSnippetState extends BaseState<FloorSnippet> {
   TextEditingController phoneController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   bool _isPhoneValid = true;
+  String countryCode = 'US';
   Future<List<String>>? clientIds =
       isClientAdmin() ? TwinnedSession.instance.getClientIds() : null;
   tapi.FloorInfo _floor = const tapi.FloorInfo(
@@ -47,15 +48,14 @@ class _FloorSnippetState extends BaseState<FloorSnippet> {
       tags: [],
       roles: [],
       phone: '',
+      countryCode: 'US',
       floorPlan: '',
       email: '',
       description: '');
-  String fullNumber = "";
-  String countryCode = "";
   @override
   void initState() {
     super.initState();
-    if (widget.selectedPremise != null) {
+    if (null == widget.floor) {
       _floor = _floor.copyWith(
         premiseId: widget.selectedPremise!.id,
         facilityId: widget.selectedFacility!.id,
@@ -73,6 +73,7 @@ class _FloorSnippetState extends BaseState<FloorSnippet> {
         location: p.location,
         name: p.name,
         phone: p.phone,
+        countryCode: p.countryCode,
         reportedStamp: p.reportedStamp,
         roles: p.roles,
         tags: p.tags,
@@ -87,18 +88,10 @@ class _FloorSnippetState extends BaseState<FloorSnippet> {
 
     emailController.text = _floor.email ?? '';
     phoneController.text = _floor.phone ?? '';
+    countryCode = _floor.countryCode ?? '';
     nameController.addListener(_onNameChanged);
     phoneController.addListener(_onNameChanged);
     emailController.addListener(_onNameChanged);
-    String? input = _floor.phone;
-    List<String> splitString = input!.split('/');
-    if (splitString.length > 1) {
-      countryCode = splitString[0];
-      phoneController.text = splitString[1];
-    } else {
-      countryCode = "IN";
-      phoneController.text = _floor.phone!;
-    }
   }
 
   @override
@@ -216,11 +209,21 @@ class _FloorSnippetState extends BaseState<FloorSnippet> {
                           },
                           onChanged: (phone) {
                             setState(() {
-                              fullNumber =
-                                  "${phone.countryISOCode}/${phone.number}";
                               _isPhoneValid = phone.completeNumber.isNotEmpty &&
                                   phone.completeNumber.length >= 10 &&
                                   phone.isValidNumber();
+                              countryCode = phone.countryISOCode;
+                              _floor = _floor.copyWith(
+                                  countryCode: phone.countryISOCode);
+                            });
+                          },
+                          onCountryChanged: (country) {
+                            setState(() {
+                              countryCode = country.code;
+
+                              _floor = _floor.copyWith(
+                                countryCode: country.code,
+                              );
                             });
                           },
                         ),
@@ -403,13 +406,13 @@ class _FloorSnippetState extends BaseState<FloorSnippet> {
     loading = true;
 
     _floor = _floor.copyWith(
-      name: nameController.text.trim(),
-      description: descController.text.trim(),
-      address: addressController.text.trim(),
-      email: emailController.text.trim(),
-      phone: fullNumber.trim(),
-      clientIds: clientIds ?? _floor.clientIds,
-    );
+        name: nameController.text.trim(),
+        description: descController.text.trim(),
+        address: addressController.text.trim(),
+        email: emailController.text.trim(),
+        phone: phoneController.text.trim(),
+        clientIds: clientIds ?? _floor.clientIds,
+        countryCode: countryCode);
     await execute(() async {
       if (null == widget.floor) {
         var cRes = await TwinnedSession.instance.twin.createFloor(
