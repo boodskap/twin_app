@@ -30,7 +30,7 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
   @override
   void initState() {
     super.initState();
-    _canEdit = TwinnedSession.instance.isAdmin();
+    _checkCanEdit();
   }
 
   @override
@@ -60,17 +60,14 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
                   }),
             ),
             divider(horizontal: true),
-            if (canCreate())
-              PrimaryButton(
-                labelKey: 'Create New',
-                leading: Icon(
-                  Icons.add,
-                  color: Colors.white,
-                ),
-                onPressed: () {
-                  _create();
-                },
+            PrimaryButton(
+              labelKey: 'Create New',
+              leading: Icon(
+                Icons.add,
+                color: Colors.white,
               ),
+              onPressed: (canCreate()) ? _create : null,
+            ),
             divider(horizontal: true),
             SizedBox(
               height: 40,
@@ -146,9 +143,9 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
     }
     return InkWell(
       onDoubleTap: () {
-        if (editable) {
-        _edit(e);
-      }
+        if (_canEdit) {
+          _edit(e);
+        }
       },
       child: SizedBox(
         width: width,
@@ -172,36 +169,51 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
                   child: Text(
                     e.name,
                     style:
-                        theme.getStyle().copyWith(fontWeight: FontWeight.bold),
+                        theme.getStyle().copyWith(fontWeight: FontWeight.bold,
+                        overflow: TextOverflow.ellipsis,
+                        ),
                   ),
                 ),
               ),
               Align(
                 alignment: Alignment.topRight,
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 8.0, top: 8.0),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (editable)
-                        InkWell(
-                            onTap: () {
-                              _edit(e);
-                            },
-                            child: Icon(Icons.edit,
-                                color: theme.getPrimaryColor())),
-                      if (editable)
-                        InkWell(
-                          onTap: () {
-                            _confirmDeletionDialog(context, e);
-                          },
-                          child: Icon(
-                            Icons.delete,
-                            color: theme.getPrimaryColor(),
-                          ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Tooltip(
+                      message: _canEdit ? "Update" : "No Permission to Edit",
+                      child: IconButton(
+                        onPressed: _canEdit
+                            ? () {
+                                _edit(e);
+                              }
+                            : null,
+                        icon: Icon(
+                          Icons.edit,
+                          color: _canEdit
+                              ? theme.getPrimaryColor()
+                              : Colors.grey,
                         ),
-                    ],
-                  ),
+                      ),
+                    ),
+                    Tooltip(
+                      message:
+                          _canEdit ? "Delete" : "No Permission to Delete",
+                      child: IconButton(
+                        onPressed: _canEdit
+                            ? () {
+                                _confirmDeletionDialog(context, e);
+                              }
+                            : null,
+                        icon: Icon(
+                          Icons.delete_forever_rounded,
+                          color: _canEdit
+                              ? theme.getPrimaryColor()
+                              : Colors.grey,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -209,6 +221,15 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
         ),
       ),
     );
+  }
+
+  Future<void> _checkCanEdit() async {
+    List<String> clientIds = await getClientIds();
+    bool canEditResult = await canEdit(clientIds: clientIds);
+
+    setState(() {
+      _canEdit = canEditResult;
+    });
   }
 
   Future<void> _getBasicInfo(BuildContext context, String title,
