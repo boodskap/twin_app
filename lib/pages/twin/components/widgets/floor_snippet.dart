@@ -85,7 +85,6 @@ class _FloorSnippetState extends BaseState<FloorSnippet> {
     nameController.text = _floor.name;
     descController.text = _floor.description ?? '';
     addressController.text = _floor.address ?? '';
-
     emailController.text = _floor.email ?? '';
     phoneController.text = _floor.phone ?? '';
     countryCode = _floor.countryCode ?? '';
@@ -406,13 +405,14 @@ class _FloorSnippetState extends BaseState<FloorSnippet> {
     loading = true;
 
     _floor = _floor.copyWith(
-        name: nameController.text.trim(),
-        description: descController.text.trim(),
-        address: addressController.text.trim(),
-        email: emailController.text.trim(),
-        phone: phoneController.text.trim(),
-        clientIds: clientIds ?? _floor.clientIds,
-        countryCode: countryCode);
+      name: nameController.text.trim(),
+      description: descController.text.trim(),
+      address: addressController.text.trim(),
+      email: emailController.text.trim(),
+      phone: phoneController.text.trim(),
+      countryCode: countryCode,
+      clientIds: clientIds ?? _floor.clientIds,
+    );
     await execute(() async {
       if (null == widget.floor) {
         var cRes = await TwinnedSession.instance.twin.createFloor(
