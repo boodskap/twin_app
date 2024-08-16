@@ -52,10 +52,17 @@ class _FloorsState extends BaseState<Floors> {
             SizedBox(
               width: 250,
               child: PremiseDropdown(
+                key: Key(const Uuid().v4()),
                 selectedItem: _selectedPremise?.id,
                 onPremiseSelected: (e) {
                   setState(() {
-                    _selectedPremise = e;
+                    if (e == null) {
+                      _selectedPremise = null;
+                      _selectedFacility = null;
+                    } else {
+                      _selectedPremise = e;
+                      _selectedFacility = null;
+                    }
                   });
                   _load();
                 },
@@ -65,6 +72,7 @@ class _FloorsState extends BaseState<Floors> {
             SizedBox(
               width: 250,
               child: FacilityDropdown(
+                key: Key(const Uuid().v4()),
                 selectedItem: _selectedFacility?.id,
                 selectedPremise: _selectedPremise?.id,
                 onFacilitySelected: (e) {
