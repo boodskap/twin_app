@@ -33,6 +33,14 @@ class _AssetsState extends BaseState<Assets> {
   tapi.Facility? _selectedFacility;
   tapi.AssetModel? _selectedAssetModel;
   tapi.Floor? _selectedFloor;
+  bool _canEdit = false;
+  Map<String, bool> _editable = Map<String, bool>();
+
+  @override
+  void initState() {
+    super.initState();
+    _checkCanEdit();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,41 +59,62 @@ class _AssetsState extends BaseState<Assets> {
             SizedBox(
               width: 250,
               child: PremiseDropdown(
-                  selectedItem: _selectedPremise?.id,
-                  onPremiseSelected: (e) {
-                    setState(() {
+                key: Key(const Uuid().v4()),
+                selectedItem: _selectedPremise?.id,
+                onPremiseSelected: (e) {
+                  setState(() {
+                    if (e == null) {
+                      _selectedPremise = null;
+                      _selectedFacility = null;
+                      _selectedFloor = null;
+                    } else {
                       _selectedPremise = e;
-                    });
-                    _load();
-                  }),
+                      _selectedFacility = null;
+                      _selectedFloor = null;
+                    }
+                  });
+                  _load();
+                },
+              ),
             ),
             divider(horizontal: true),
             SizedBox(
               width: 250,
               child: FacilityDropdown(
-                  selectedItem: _selectedFacility?.id,
-                  selectedPremise: _selectedPremise?.id,
-                  onFacilitySelected: (e) {
-                    setState(() {
+                key: Key(const Uuid().v4()),
+                selectedItem: _selectedFacility?.id,
+                selectedPremise: _selectedPremise?.id,
+                onFacilitySelected: (e) {
+                  setState(() {
+                    if (e == null) {
+                      _selectedFacility = null;
+                      _selectedFloor = null;
+                    } else {
                       _selectedFacility = e;
-                    });
-                    _load();
-                  }),
+                      _selectedFloor = null;
+                    }
+                  });
+                  _load();
+                },
+              ),
             ),
             SizedBox(
               width: 250,
               child: FloorDropdown(
-                  selectedItem: _selectedFloor?.id,
-                  selectedPremise: _selectedPremise?.id,
-                  selectedFacility: _selectedFacility?.id,
-                  onFloorSelected: (e) {
-                    setState(() {
-                      _selectedFloor = e;
-                    });
-                    _load();
-                  }),
+                key: Key(const Uuid().v4()),
+                selectedItem: _selectedFloor?.id,
+                selectedPremise: _selectedPremise?.id,
+                selectedFacility: _selectedFacility?.id,
+                onFloorSelected: (e) {
+                  setState(() {
+                    _selectedFloor = e;
+                  });
+                  _load();
+                },
+              ),
             ),
             divider(horizontal: true),
+            // if (canCreate())
             PrimaryButton(
               labelKey: 'Create New',
               leading: Icon(
@@ -94,7 +123,8 @@ class _AssetsState extends BaseState<Assets> {
               ),
               onPressed: (_selectedPremise != null &&
                       _selectedFacility != null &&
-                      _selectedFloor != null)
+                      _selectedFloor != null &&
+                      canCreate())
                   ? () {
                       _create();
                     }
@@ -149,13 +179,30 @@ class _AssetsState extends BaseState<Assets> {
     );
   }
 
+  Future<void> _checkCanEdit() async {
+    List<String> clientIds = await getClientIds();
+    bool canEditResult = await canEdit(clientIds: clientIds);
+
+    setState(() {
+      _canEdit = canEditResult;
+    });
+  }
+
   Widget _buildCard(tapi.Asset e) {
+    bool editable = _canEdit;
+    if (!editable) {
+      editable = _editable[e.id] ?? false;
+    }
     double width = MediaQuery.of(context).size.width / 8;
     return SizedBox(
       width: width,
       height: width,
       child: InkWell(
-        onDoubleTap: () => _edit(e),
+        onDoubleTap: () async {
+          if (_canEdit) {
+            await _edit(e);
+          }
+        },
         child: Tooltip(
           textStyle: theme.getStyle().copyWith(color: Colors.white),
           message: '${e.name}\n${e.description ?? ""}',
@@ -185,18 +232,37 @@ class _AssetsState extends BaseState<Assets> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         InkWell(
-                            onTap: () {
-                              _edit(e);
-                            },
-                            child: Icon(Icons.edit,
-                                color: theme.getPrimaryColor())),
+                          onTap: _canEdit
+                              ? () {
+                                  _edit(e);
+                                }
+                              : null,
+                          child: Tooltip(
+                              message: _canEdit
+                                  ? "Update"
+                                  : "No Permission to Update",
+                              child: Icon(
+                                Icons.edit,
+                                color: _canEdit
+                                    ? theme.getPrimaryColor()
+                                    : Colors.grey,
+                              )),
+                        ),
                         InkWell(
-                          onTap: () {
-                            _delete(e);
-                          },
-                          child: Icon(
-                            Icons.delete,
-                            color: theme.getPrimaryColor(),
+                          onTap: _canEdit
+                              ? () {
+                                  _delete(e);
+                                }
+                              : null,
+                          child: Tooltip(
+                            message:
+                                _canEdit ? "Delete" : "No Permission to Delete",
+                            child: Icon(
+                              Icons.delete,
+                              color: _canEdit
+                                  ? theme.getPrimaryColor()
+                                  : Colors.grey,
+                            ),
                           ),
                         ),
                       ],
@@ -221,9 +287,12 @@ class _AssetsState extends BaseState<Assets> {
   Future _create() async {
     if (loading) return;
     loading = true;
+    List<String>? clientIds = super.isClientAdmin()
+        ? await TwinnedSession.instance.getClientIds()
+        : null;
     await _getBasicInfo(
       context,
-      'New Asset',
+      'New Floor',
       onPressed: (name, desc, t) async {
         List<String> tags = [];
         if (null != t) {
@@ -240,6 +309,7 @@ class _AssetsState extends BaseState<Assets> {
             description: desc,
             tags: tags,
             roles: _selectedFacility!.roles,
+            clientIds: clientIds,
           ),
         );
         if (validateResponse(mRes)) {
@@ -435,6 +505,8 @@ class _AssetsState extends BaseState<Assets> {
       }
 
       for (tapi.Asset e in _entities) {
+        _editable[e.id] = await super.canEdit(clientIds: e.clientIds);
+
         _cards.add(_buildCard(e));
       }
     });
