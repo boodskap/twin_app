@@ -28,7 +28,7 @@ class _PremisesState extends BaseState<Premises> {
   @override
   void initState() {
     super.initState();
-    _canEdit = TwinnedSession.instance.isAdmin();
+    _checkCanEdit();
   }
 
   @override
@@ -45,15 +45,14 @@ class _PremisesState extends BaseState<Premises> {
                 },
                 icon: Icon(Icons.refresh)),
             divider(horizontal: true),
-            if (canCreate())
-              PrimaryButton(
-                labelKey: 'Create New',
-                leading: Icon(
-                  Icons.add,
-                  color: Colors.white,
-                ),
-                onPressed: _addEditPremiseDialog,
+            PrimaryButton(
+              labelKey: 'Create New',
+              leading: Icon(
+                Icons.add,
+                color: Colors.white,
               ),
+              onPressed: (canCreate()) ? _addEditPremiseDialog : null,
+            ),
             divider(horizontal: true),
             SizedBox(
                 height: 40,
@@ -109,7 +108,7 @@ class _PremisesState extends BaseState<Premises> {
     }
     return InkWell(
       onDoubleTap: () {
-        if (editable) {
+        if (_canEdit) {
           _edit(e);
         }
       },
@@ -134,36 +133,43 @@ class _PremisesState extends BaseState<Premises> {
               ),
               Align(
                 alignment: Alignment.topRight,
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 8.0, top: 8.0),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (editable)
-                        Tooltip(
-                          message: "Update",
-                          child: InkWell(
-                              onTap: () {
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Tooltip(
+                      message: _canEdit ? "Update" : "No Permission to Edit",
+                      child: IconButton(
+                        onPressed: _canEdit
+                            ? () {
                                 _addEditPremiseDialog(premise: e);
-                              },
-                              child: Icon(Icons.edit,
-                                  color: theme.getPrimaryColor(),),),
+                              }
+                            : null,
+                        icon: Icon(
+                          Icons.edit,
+                          color: _canEdit
+                              ? theme.getPrimaryColor()
+                              : Colors.grey,
                         ),
-                      if (editable)
-                        Tooltip(
-                          message: "Delete",
-                          child: InkWell(
-                            onTap: () {
-                              _confirmDeletionDialog(context, e);
-                            },
-                            child: Icon(
-                              Icons.delete,
-                              color: theme.getPrimaryColor(),
-                            ),
-                          ),
+                      ),
+                    ),
+                    Tooltip(
+                      message:
+                          _canEdit ? "Delete" : "No Permission to Delete",
+                      child: IconButton(
+                        onPressed: _canEdit
+                            ? () {
+                                _confirmDeletionDialog(context, e);
+                              }
+                            : null,
+                        icon: Icon(
+                          Icons.delete_forever_rounded,
+                          color: _canEdit
+                              ? theme.getPrimaryColor()
+                              : Colors.grey,
                         ),
-                    ],
-                  ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
               if (null != e.images && e.images!.isNotEmpty)
@@ -177,6 +183,15 @@ class _PremisesState extends BaseState<Premises> {
         ),
       ),
     );
+  }
+
+  Future<void> _checkCanEdit() async {
+    List<String> clientIds = await getClientIds();
+    bool canEditResult = await canEdit(clientIds: clientIds);
+
+    setState(() {
+      _canEdit = canEditResult;
+    });
   }
 
   Future _edit(tapi.Premise e) async {
