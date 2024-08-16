@@ -30,7 +30,7 @@ class _ConditionRulesState extends BaseState<ConditionRules> {
   @override
   void initState() {
     super.initState();
-     _checkCanEdit();
+    _checkCanEdit();
   }
 
   @override
@@ -59,14 +59,14 @@ class _ConditionRulesState extends BaseState<ConditionRules> {
                   }),
             ),
             divider(horizontal: true),
-                         PrimaryButton(
-                labelKey: 'Create New',
-                leading: Icon(
-                  Icons.add,
-                  color: Colors.white,
-                ),
-                onPressed: (canCreate())?_create:null,
+            PrimaryButton(
+              labelKey: 'Create New',
+              leading: Icon(
+                Icons.add,
+                color: Colors.white,
               ),
+              onPressed: (canCreate()) ? _create : null,
+            ),
             divider(horizontal: true),
             SizedBox(
                 height: 40,
@@ -190,43 +190,47 @@ class _ConditionRulesState extends BaseState<ConditionRules> {
                 children: [
                   Align(
                     alignment: Alignment.topRight,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Tooltip(
-                      message: _canEdit ? "Update" : "No Permission to Edit",
-                      child: IconButton(
-                        onPressed: _canEdit
-                            ? () {
-                                _edit(e);
-                              }
-                            : null,
-                        icon: Icon(
-                          Icons.edit,
-                          color: _canEdit
-                              ? theme.getPrimaryColor()
-                              : Colors.grey,
-                        ),
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 8.0, top: 8.0),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Tooltip(
+                            message:
+                                _canEdit ? "Update" : "No Permission to Edit",
+                            child: InkWell(
+                              onTap: _canEdit
+                                  ? () {
+                                      _edit(e);
+                                    }
+                                  : null,
+                              child: Icon(
+                                Icons.edit,
+                                color: _canEdit
+                                    ? theme.getPrimaryColor()
+                                    : Colors.grey,
+                              ),
+                            ),
+                          ),
+                          Tooltip(
+                            message:
+                                _canEdit ? "Delete" : "No Permission to Delete",
+                            child: InkWell(
+                              onTap: _canEdit
+                                  ? () {
+                                      _confirmDeletionDialog(context, e);
+                                    }
+                                  : null,
+                              child: Icon(
+                                Icons.delete_forever_rounded,
+                                color: _canEdit
+                                    ? theme.getPrimaryColor()
+                                    : Colors.grey,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                    Tooltip(
-                      message:
-                          _canEdit ? "Delete" : "No Permission to Delete",
-                      child: IconButton(
-                        onPressed: _canEdit
-                            ? () {
-                                _confirmDeletionDialog(context, e);
-                              }
-                            : null,
-                        icon: Icon(
-                          Icons.delete_forever_rounded,
-                          color: _canEdit
-                              ? theme.getPrimaryColor()
-                              : Colors.grey,
-                        ),
-                      ),
-                    ),
-                      ],
                     ),
                   ),
                   Column(
@@ -417,7 +421,7 @@ class _ConditionRulesState extends BaseState<ConditionRules> {
     );
   }
 
-   Future<void> _checkCanEdit() async {
+  Future<void> _checkCanEdit() async {
     List<String> clientIds = await getClientIds();
     bool canEditResult = await canEdit(clientIds: clientIds);
 
@@ -463,7 +467,7 @@ class _ConditionRulesState extends BaseState<ConditionRules> {
     );
   }
 
-    Future _edit(tapi.Condition e) async {
+  Future _edit(tapi.Condition e) async {
     var res = await TwinnedSession.instance.twin.getDeviceModel(
         modelId: e.modelId, apikey: TwinnedSession.instance.authToken);
     showDialog(
