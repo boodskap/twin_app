@@ -385,6 +385,9 @@ class _FacilitySnippetState extends BaseState<FacilitySnippet> {
   }
 
   Future _save({bool silent = false}) async {
+     List<String>? clientIds = super.isClientAdmin()
+      ? await TwinnedSession.instance.getClientIds()
+      : null;
     if (loading) return;
     loading = true;
 
@@ -395,7 +398,9 @@ class _FacilitySnippetState extends BaseState<FacilitySnippet> {
         address: addressController.text.trim(),
         email: emailController.text.trim(),
         phone: phoneController.text.trim(),
-        countryCode: countryCode);
+        countryCode: countryCode,
+        clientIds: clientIds??_facility.clientIds,
+        );
     await execute(() async {
       if (null == widget.facility) {
         var cRes = await TwinnedSession.instance.twin.createFacility(

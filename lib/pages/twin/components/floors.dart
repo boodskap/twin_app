@@ -25,6 +25,14 @@ class _FloorsState extends BaseState<Floors> {
   String _search = '';
   tapi.Premise? _selectedPremise;
   tapi.Facility? _selectedFacility;
+  bool _canEdit = false;
+  Map<String, bool> _editable = Map<String, bool>();
+
+  @override
+  void initState() {
+    super.initState();
+    _checkCanEdit();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +82,9 @@ class _FloorsState extends BaseState<Floors> {
                 Icons.add,
                 color: Colors.white,
               ),
-              onPressed: (_selectedPremise != null && _selectedFacility != null)
+              onPressed: (_selectedPremise != null &&
+                      _selectedFacility != null &&
+                      canCreate())
                   ? _addEditFloorDialog
                   : null,
             ),
@@ -129,12 +139,18 @@ class _FloorsState extends BaseState<Floors> {
 
   Widget _buildCard(tapi.Floor e) {
     double width = MediaQuery.of(context).size.width / 8;
+    bool editable = _canEdit;
+    if (!editable) {
+      editable = _editable[e.id] ?? false;
+    }
     return SizedBox(
       width: width,
       height: width,
       child: InkWell(
         onDoubleTap: () {
-          _edit(e);
+          if (_canEdit) {
+            _edit(e);
+          }
         },
         child: Card(
           elevation: 8,
@@ -160,24 +176,31 @@ class _FloorsState extends BaseState<Floors> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Tooltip(
-                        message: "Update",
+                        message: _canEdit ? "Update" : "No Permission to Edit",
                         child: InkWell(
-                          onTap: () {
-                            _addEditFloorDialog(floor: e);
-                          },
-                          child:
-                              Icon(Icons.edit, color: theme.getPrimaryColor()),
+                          onTap: _canEdit
+                              ? () {
+                                  _addEditFloorDialog(floor: e);
+                                }
+                              : null,
+                          child: Icon(
+                            Icons.edit,
+                            color: _canEdit ? theme.getPrimaryColor() : null,
+                          ),
                         ),
                       ),
                       Tooltip(
-                        message: "Delete",
+                        message:
+                            _canEdit ? "Delete" : "No Permission to Delete",
                         child: InkWell(
-                          onTap: () {
-                            _delete(e);
-                          },
+                          onTap: _canEdit
+                              ? () {
+                                  _delete(e);
+                                }
+                              : null,
                           child: Icon(
                             Icons.delete,
-                            color: theme.getPrimaryColor(),
+                            color: _canEdit ? theme.getPrimaryColor() : null,
                           ),
                         ),
                       ),
@@ -200,6 +223,15 @@ class _FloorsState extends BaseState<Floors> {
         ),
       ),
     );
+  }
+
+  Future<void> _checkCanEdit() async {
+    List<String> clientIds = await getClientIds();
+    bool canEditResult = await canEdit(clientIds: clientIds);
+
+    setState(() {
+      _canEdit = canEditResult;
+    });
   }
 
   void _addEditFloorDialog({tapi.Floor? floor}) async {
@@ -315,6 +347,7 @@ class _FloorsState extends BaseState<Floors> {
       }
 
       for (tapi.Floor e in _entities) {
+        _editable[e.id] = await super.canEdit(clientIds: e.clientIds);
         _cards.add(_buildCard(e));
       }
     });
