@@ -38,26 +38,24 @@ class _FloorSnippetState extends BaseState<FloorSnippet> {
   Future<List<String>>? clientIds =
       isClientAdmin() ? TwinnedSession.instance.getClientIds() : null;
   tapi.FloorInfo _floor = const tapi.FloorInfo(
-    premiseId: '',
-    facilityId: '',
-    floorLevel: 0,
-    floorType: tapi.FloorInfoFloorType.onground,
-    name: '',
-    address: '',
-    clientIds: [],
-    tags: [],
-    roles: [],
-    phone: '',
-    floorPlan: '',
-    email: '',
-    description: '',
-    countryCode: 'US',
-  );
-
+      premiseId: '',
+      facilityId: '',
+      floorLevel: 0,
+      floorType: tapi.FloorInfoFloorType.onground,
+      name: '',
+      address: '',
+      clientIds: [],
+      tags: [],
+      roles: [],
+      phone: '',
+      countryCode: 'US',
+      floorPlan: '',
+      email: '',
+      description: '');
   @override
   void initState() {
     super.initState();
-    if (widget.selectedPremise != null) {
+    if (null == widget.floor) {
       _floor = _floor.copyWith(
         premiseId: widget.selectedPremise!.id,
         facilityId: widget.selectedFacility!.id,
@@ -93,7 +91,6 @@ class _FloorSnippetState extends BaseState<FloorSnippet> {
     nameController.addListener(_onNameChanged);
     phoneController.addListener(_onNameChanged);
     emailController.addListener(_onNameChanged);
-    
   }
 
   @override
@@ -215,7 +212,6 @@ class _FloorSnippetState extends BaseState<FloorSnippet> {
                                   phone.completeNumber.length >= 10 &&
                                   phone.isValidNumber();
                               countryCode = phone.countryISOCode;
-
                               _floor = _floor.copyWith(
                                   countryCode: phone.countryISOCode);
                             });
