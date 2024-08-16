@@ -22,6 +22,14 @@ class _DeviceLibraryState extends BaseState<DeviceLibrary> {
   final List<tapi.DeviceModel> _entities = [];
   final List<Widget> _cards = [];
   String _search = '';
+  bool _canEdit = false;
+  Map<String, bool> _editable = Map<String, bool>();
+
+  @override
+  void initState() {
+    super.initState();
+    _checkCanEdit();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,9 +51,7 @@ class _DeviceLibraryState extends BaseState<DeviceLibrary> {
                 Icons.add,
                 color: Colors.white,
               ),
-              onPressed: () {
-                _create();
-              },
+              onPressed: (canCreate()) ? _create : null,
             ),
             divider(horizontal: true),
             SizedBox(
@@ -99,12 +105,18 @@ class _DeviceLibraryState extends BaseState<DeviceLibrary> {
 
   Widget _buildCard(tapi.DeviceModel e) {
     double width = MediaQuery.of(context).size.width / 8;
+    bool editable = _canEdit;
+    if (!editable) {
+      editable = _editable[e.id] ?? false;
+    }
     return SizedBox(
       width: width,
       height: width,
       child: InkWell(
         onDoubleTap: () {
-          _edit(e, "");
+          if (_canEdit) {
+            _edit(e, "");
+          }
         },
         child: Card(
           elevation: 8,
@@ -130,18 +142,17 @@ class _DeviceLibraryState extends BaseState<DeviceLibrary> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       InkWell(
-                          onTap: () {
-                            _edit(e, "");
-                          },
-                          child:
-                              Icon(Icons.edit, color: theme.getPrimaryColor())),
+                        onTap: _canEdit ? () => _edit(e, "") : null,
+                        child: Icon(
+                          Icons.edit,
+                          color: _canEdit ? theme.getPrimaryColor() : Colors.grey,
+                        ),
+                      ),
                       InkWell(
-                        onTap: () {
-                          _delete(e);
-                        },
+                        onTap: _canEdit ? () => _delete(e) : null,
                         child: Icon(
                           Icons.delete,
-                          color: theme.getPrimaryColor(),
+                          color: _canEdit ? theme.getPrimaryColor() : Colors.grey,
                         ),
                       ),
                     ],
@@ -159,6 +170,15 @@ class _DeviceLibraryState extends BaseState<DeviceLibrary> {
         ),
       ),
     );
+  }
+
+  Future<void> _checkCanEdit() async {
+    List<String> clientIds = await getClientIds();
+    bool canEditResult = await canEdit(clientIds: clientIds);
+
+    setState(() {
+      _canEdit = canEditResult;
+    });
   }
 
   Future<void> _getBasicInfo(BuildContext context, String title,
@@ -252,6 +272,9 @@ class _DeviceLibraryState extends BaseState<DeviceLibrary> {
   }
 
   Future _addDeviceModel() async {
+    List<String>? clientIds = super.isClientAdmin()
+        ? await TwinnedSession.instance.getClientIds()
+        : null;
     if (loading) return;
     loading = false;
     await _getBasicInfo(context, 'New Device Model',
@@ -263,13 +286,15 @@ class _DeviceLibraryState extends BaseState<DeviceLibrary> {
       var mRes = await TwinnedSession.instance.twin.createDeviceModel(
           apikey: TwinnedSession.instance.authToken,
           body: tapi.DeviceModelInfo(
-              name: name,
-              description: desc,
-              tags: tags,
-              make: '-',
-              model: '-',
-              version: '-',
-              parameters: []));
+            name: name,
+            description: desc,
+            tags: tags,
+            make: '-',
+            model: '-',
+            version: '-',
+            parameters: [],
+            clientIds: clientIds,
+          ));
       if (validateResponse(mRes)) {
         await _openDeviceModel(mRes.body!.entity!, "Add");
       }
@@ -336,6 +361,7 @@ class _DeviceLibraryState extends BaseState<DeviceLibrary> {
       }
 
       for (tapi.DeviceModel e in _entities) {
+        _editable[e.id] = await super.canEdit(clientIds: e.clientIds);
         _cards.add(_buildCard(e));
       }
     });
