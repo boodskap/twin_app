@@ -133,43 +133,46 @@ class _PremisesState extends BaseState<Premises> {
               ),
               Align(
                 alignment: Alignment.topRight,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Tooltip(
-                      message: _canEdit ? "Update" : "No Permission to Edit",
-                      child: IconButton(
-                        onPressed: _canEdit
-                            ? () {
-                                _addEditPremiseDialog(premise: e);
-                              }
-                            : null,
-                        icon: Icon(
-                          Icons.edit,
-                          color: _canEdit
-                              ? theme.getPrimaryColor()
-                              : Colors.grey,
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 8.0, top: 8.0),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Tooltip(
+                        message: _canEdit ? "Update" : "No Permission to Edit",
+                        child: InkWell(
+                          onTap: _canEdit
+                              ? () {
+                                  _addEditPremiseDialog(premise: e);
+                                }
+                              : null,
+                          child: Icon(
+                            Icons.edit,
+                            color: _canEdit
+                                ? theme.getPrimaryColor()
+                                : Colors.grey,
+                          ),
                         ),
                       ),
-                    ),
-                    Tooltip(
-                      message:
-                          _canEdit ? "Delete" : "No Permission to Delete",
-                      child: IconButton(
-                        onPressed: _canEdit
-                            ? () {
-                                _confirmDeletionDialog(context, e);
-                              }
-                            : null,
-                        icon: Icon(
-                          Icons.delete_forever_rounded,
-                          color: _canEdit
-                              ? theme.getPrimaryColor()
-                              : Colors.grey,
+                      Tooltip(
+                        message:
+                            _canEdit ? "Delete" : "No Permission to Delete",
+                        child: InkWell(
+                          onTap: _canEdit
+                              ? () {
+                                  _confirmDeletionDialog(context, e);
+                                }
+                              : null,
+                          child: Icon(
+                            Icons.delete_forever_rounded,
+                            color: _canEdit
+                                ? theme.getPrimaryColor()
+                                : Colors.grey,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
               if (null != e.images && e.images!.isNotEmpty)

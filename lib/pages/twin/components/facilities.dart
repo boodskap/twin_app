@@ -32,7 +32,7 @@ class _FacilitiesState extends BaseState<Facilities> {
   @override
   void initState() {
     super.initState();
-    _canEdit = TwinnedSession.instance.isAdmin();
+    _checkCanEdit();
   }
 
   @override
@@ -68,7 +68,7 @@ class _FacilitiesState extends BaseState<Facilities> {
                   Icons.add,
                   color: Colors.white,
                 ),
-                onPressed: (_selectedPremise != null && canCreate() )
+                onPressed: (_selectedPremise != null && canCreate())
                     ? () {
                         _addEditFacilityDialog();
                       }
@@ -135,7 +135,7 @@ class _FacilitiesState extends BaseState<Facilities> {
       height: width,
       child: InkWell(
         onDoubleTap: () {
-          if (editable) {
+          if (_canEdit) {
             _edit(e);
           }
         },
@@ -167,21 +167,35 @@ class _FacilitiesState extends BaseState<Facilities> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        if(editable)
-                        InkWell(
-                            onTap: () async {
-                              _addEditFacilityDialog(facility: e);
-                            },
-                            child: Icon(Icons.edit,
-                                color: theme.getPrimaryColor())),
-                        if(editable)
-                        InkWell(
-                          onTap: () {
-                            _delete(e);
-                          },
-                          child: Icon(
-                            Icons.delete,
-                            color: theme.getPrimaryColor(),
+                        Tooltip(
+                          message:
+                              _canEdit ? "Update" : "No Permission to Edit",
+                          child: InkWell(
+                              onTap: _canEdit
+                                  ? () async {
+                                      _addEditFacilityDialog(facility: e);
+                                    }
+                                  : null,
+                              child: Icon(
+                                Icons.edit,
+                                color: _canEdit
+                                    ? theme.getPrimaryColor()
+                                    : Colors.grey,
+                              )),
+                        ),
+                        Tooltip(
+                          message:
+                              _canEdit ? "Delete" : "No Permission to Delete",
+                          child: InkWell(
+                            onTap: _canEdit
+                                ? () {
+                                    _delete(e);
+                                  }
+                                : null,
+                            child: Icon(
+                              Icons.delete,
+                              color: _canEdit ? theme.getPrimaryColor() : null,
+                            ),
                           ),
                         ),
                       ],
@@ -201,6 +215,15 @@ class _FacilitiesState extends BaseState<Facilities> {
         ),
       ),
     );
+  }
+
+  Future<void> _checkCanEdit() async {
+    List<String> clientIds = await getClientIds();
+    bool canEditResult = await canEdit(clientIds: clientIds);
+
+    setState(() {
+      _canEdit = canEditResult;
+    });
   }
 
   void _addEditFacilityDialog({tapi.Facility? facility}) async {

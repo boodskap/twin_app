@@ -27,7 +27,7 @@ class _ScrappingTablesState extends BaseState<ScrappingTables> {
   @override
   void initState() {
     super.initState();
-  _checkCanEdit();
+    _checkCanEdit();
   }
 
   @override
@@ -44,14 +44,14 @@ class _ScrappingTablesState extends BaseState<ScrappingTables> {
                 },
                 icon: Icon(Icons.refresh)),
             divider(horizontal: true),
-                          PrimaryButton(
-                labelKey: 'Create New',
-                leading: Icon(
-                  Icons.add,
-                  color: Colors.white,
-                ),
-                onPressed:(isAdmin())?_create:null,
+            PrimaryButton(
+              labelKey: 'Create New',
+              leading: Icon(
+                Icons.add,
+                color: Colors.white,
               ),
+              onPressed: (isAdmin()) ? _create : null,
+            ),
             divider(horizontal: true),
             SizedBox(
                 height: 40,
@@ -141,15 +141,15 @@ class _ScrappingTablesState extends BaseState<ScrappingTables> {
                   ),
                   Row(
                     children: [
-                       Tooltip(
+                      Tooltip(
                         message: _canEdit ? "Update" : "No Permission to Edit",
-                        child: IconButton(
-                          onPressed: _canEdit
+                        child: InkWell(
+                          onTap: _canEdit
                               ? () {
                                   _edit(e);
                                 }
                               : null,
-                          icon: Icon(
+                          child: Icon(
                             Icons.edit,
                             color: _canEdit
                                 ? theme.getPrimaryColor()
@@ -160,13 +160,13 @@ class _ScrappingTablesState extends BaseState<ScrappingTables> {
                       Tooltip(
                         message:
                             _canEdit ? "Delete" : "No Permission to Delete",
-                        child: IconButton(
-                          onPressed: _canEdit
+                        child: InkWell(
+                          onTap: _canEdit
                               ? () {
                                   confirmDeletion(context, e);
                                 }
                               : null,
-                          icon: Icon(
+                          child: Icon(
                             Icons.delete_forever_rounded,
                             color: _canEdit
                                 ? theme.getPrimaryColor()
@@ -299,7 +299,7 @@ class _ScrappingTablesState extends BaseState<ScrappingTables> {
     return rows;
   }
 
-    Future<void> _checkCanEdit() async {
+  Future<void> _checkCanEdit() async {
     bool canEditResult = await isAdmin();
 
     setState(() {
