@@ -29,10 +29,319 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
   final List<twinned.DataFilter> _dataFilters = [];
   final List<twinned.FieldFilter> _fieldFilters = [];
   tapi.DeviceModel? _selectedDeviceModel;
+  bool _canEdit = false;
+  Map<String, bool> _editable = Map<String, bool>();
 
   @override
-  void setup() async {
-    await _load();
+  void initState() {
+    super.initState();
+    _checkCanEdit();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final List<Widget> cards = [];
+
+    for (var group in _fieldFilters) {
+      bool editable = _canEdit;
+      if (!editable) {
+        editable = _editable[group.id] ?? false;
+      }
+      _editable[group.id] = super.isAdmin();
+      Widget? image;
+      if (null != group.icon && group.icon!.isNotEmpty) {
+        image = TwinImageHelper.getImage(group.domainKey, group.icon!);
+      }
+      cards.add(InkWell(
+          onDoubleTap: () async {
+            if (editable) {
+              await alertDialog(
+                title: 'Generic Filter - ${group.name}',
+                body: FieldFilterSnippet(
+                  fieldFilter: group,
+                ),
+              );
+              await _load();
+            }
+          },
+          child: Card(
+            elevation: 10,
+            child: Container(
+              color: Colors.white,
+              width: widget.cardWidth,
+              height: widget.cardHeight,
+              child: Stack(
+                children: [
+                  Center(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        if (null != image)
+                          SizedBox(width: 48, height: 48, child: image),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            group.name,
+                            style: theme.getStyle().copyWith(
+                                  fontSize: 14,
+                                ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Positioned(
+                    left: 8,
+                    child: Tooltip(
+                      message: _canEdit ? "Delete" : "No Permission to Delete",
+                      child: IconButton(
+                        onPressed: _canEdit
+                            ? () async {
+                                await _deleteField(group);
+                              }
+                            : null,
+                        icon: Icon(
+                          Icons.delete,
+                          color:
+                              _canEdit ? theme.getPrimaryColor() : Colors.grey,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    right: 45,
+                    child: Tooltip(
+                      message: _canEdit ? "Update" : "No Permission to Edit",
+                      child: IconButton(
+                        onPressed: _canEdit
+                            ? () async {
+                                await alertDialog(
+                                  title: 'Generic Filter - ${group.name}',
+                                  body: FieldFilterSnippet(
+                                    fieldFilter: group,
+                                  ),
+                                );
+                                await _load();
+                              }
+                            : null,
+                        icon: Icon(
+                          Icons.edit,
+                          color:
+                              _canEdit ? theme.getPrimaryColor() : Colors.grey,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                      right: 8,
+                      child: Tooltip(
+                        message:
+                            _canEdit ? "Upload" : "No Permission to Upload",
+                        child: IconButton(
+                            onPressed: _canEdit
+                                ? () async {
+                                    await _uploadField(group);
+                                  }
+                                : null,
+                            icon: Icon(
+                              Icons.upload,
+                              color: _canEdit
+                                  ? theme.getPrimaryColor()
+                                  : Colors.grey,
+                            )),
+                      )),
+                ],
+              ),
+            ),
+          )));
+    }
+
+    for (var group in _dataFilters) {
+      Widget? image;
+      if (null != group.icon && group.icon!.isNotEmpty) {
+        image = TwinImageHelper.getImage(group.domainKey, group.icon!);
+      }
+      bool editable = _canEdit;
+      if (!editable) {
+        editable = _editable[group.id] ?? false;
+      }
+      _editable[group.id] = super.isAdmin();
+      cards.add(InkWell(
+          onDoubleTap: () async {
+            if (editable) {
+              await _editGroup(group);
+            }
+          },
+          child: Card(
+            elevation: 10,
+            child: Container(
+              color: Colors.white,
+              width: widget.cardWidth,
+              height: widget.cardHeight,
+              child: Stack(
+                children: [
+                  Center(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        if (null != image)
+                          SizedBox(width: 48, height: 48, child: image),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            group.name,
+                            style: theme.getStyle().copyWith(
+                                  fontSize: 14,
+                                ),
+                          ),
+                        ),
+                        Text(
+                          '${group.matchGroups.length} conditions',
+                          style: theme.getStyle().copyWith(
+                              fontSize: 10,
+                              color: Colors.blue,
+                              overflow: TextOverflow.ellipsis),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Positioned(
+                    left: 8,
+                    child: Tooltip(
+                      message: _canEdit ? "Delete" : "No Permission to Delete",
+                      child: IconButton(
+                        onPressed: _canEdit
+                            ? () async {
+                                await _delete(group);
+                              }
+                            : null,
+                        icon: Icon(
+                          Icons.delete,
+                          color:
+                              _canEdit ? theme.getPrimaryColor() : Colors.grey,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    right: 45,
+                    child: Tooltip(
+                      message: _canEdit ? "Update" : "No Permission to Edit",
+                      child: IconButton(
+                        onPressed: _canEdit
+                            ? () async {
+                                await _editGroup(group);
+                              }
+                            : null,
+                        icon: Icon(
+                          Icons.edit,
+                          color:
+                              _canEdit ? theme.getPrimaryColor() : Colors.grey,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                      right: 8,
+                      child: Tooltip(
+                        message:
+                            _canEdit ? "Upload" : "No Permission to Upload",
+                        child: IconButton(
+                          onPressed: _canEdit
+                              ? () async {
+                                  await _upload(group);
+                                }
+                              : null,
+                          icon: Icon(
+                            Icons.upload,
+                            color: _canEdit
+                                ? theme.getPrimaryColor()
+                                : Colors.grey,
+                          ),
+                        ),
+                      )),
+                ],
+              ),
+            ),
+          )));
+    }
+
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            const BusyIndicator(),
+            IconButton(
+                onPressed: () async {
+                  await _load();
+                },
+                icon: const Icon(Icons.refresh)),
+            divider(horizontal: true),
+            SizedBox(
+              width: 250,
+              child: DeviceModelDropdown(
+                  selectedItem: _selectedDeviceModel?.id,
+                  onDeviceModelSelected: (e) {
+                    setState(() {
+                      _selectedDeviceModel = e;
+                    });
+                    _load();
+                  }),
+            ),
+            divider(horizontal: true),
+            PrimaryButton(
+              labelKey: "Add New",
+              onPressed: (_selectedDeviceModel != null && isAdmin())
+                  ? () async {
+                      await _addNew();
+                    }
+                  : null,
+            ),
+            divider(horizontal: true),
+            PrimaryButton(
+              labelKey: "Add Generic",
+              onPressed: (_selectedDeviceModel != null && isAdmin())
+                  ? () async {
+                      await _addNewField();
+                    }
+                  : null,
+            ),
+          ],
+        ),
+        if (cards.isEmpty)
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              if (loading) const BusyIndicator(),
+              if (!loading)
+                Text(
+                  'No filter found',
+                  style: theme.getStyle(),
+                ),
+            ],
+          ),
+        if (cards.isNotEmpty)
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: cards,
+            ),
+          ),
+      ],
+    );
+  }
+
+  Future<void> _checkCanEdit() async {
+    bool canEditResult = await isAdmin();
+
+    setState(() {
+      _canEdit = canEditResult;
+    });
   }
 
   Future _load() async {
@@ -332,238 +641,8 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final List<Widget> cards = [];
-
-    for (var group in _fieldFilters) {
-      Widget? image;
-      if (null != group.icon && group.icon!.isNotEmpty) {
-        image = TwinImageHelper.getImage(group.domainKey, group.icon!);
-      }
-      cards.add(InkWell(
-          onDoubleTap: () async {
-            await alertDialog(
-              title: 'Generic Filter - ${group.name}',
-              body: FieldFilterSnippet(
-                fieldFilter: group,
-              ),
-            );
-            await _load();
-          },
-          child: Card(
-            elevation: 10,
-            child: Container(
-              color: Colors.white,
-              width: widget.cardWidth,
-              height: widget.cardHeight,
-              child: Stack(
-                children: [
-                  Center(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        if (null != image)
-                          SizedBox(width: 48, height: 48, child: image),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            group.name,
-                            style: theme.getStyle().copyWith(
-                                  fontSize: 14,
-                                ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Positioned(
-                    left: 8,
-                    child: IconButton(
-                      onPressed: () async {
-                        await _deleteField(group);
-                      },
-                      icon: Icon(
-                        Icons.delete,
-                        color: theme.getPrimaryColor(),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    right: 45,
-                    child: IconButton(
-                      onPressed: () async {
-                        await alertDialog(
-                          title: 'Generic Filter - ${group.name}',
-                          body: FieldFilterSnippet(
-                            fieldFilter: group,
-                          ),
-                        );
-                        await _load();
-                      },
-                      icon: Icon(Icons.edit, color: theme.getPrimaryColor()),
-                    ),
-                  ),
-                  Positioned(
-                      right: 8,
-                      child: IconButton(
-                          onPressed: () async {
-                            await _uploadField(group);
-                          },
-                          icon: Icon(
-                            Icons.upload,
-                            color: theme.getPrimaryColor(),
-                          ))),
-                ],
-              ),
-            ),
-          )));
-    }
-
-    for (var group in _dataFilters) {
-      Widget? image;
-      if (null != group.icon && group.icon!.isNotEmpty) {
-        image = TwinImageHelper.getImage(group.domainKey, group.icon!);
-      }
-      cards.add(InkWell(
-          onDoubleTap: () async {
-            await _editGroup(group);
-          },
-          child: Card(
-            elevation: 10,
-            child: Container(
-              color: Colors.white,
-              width: widget.cardWidth,
-              height: widget.cardHeight,
-              child: Stack(
-                children: [
-                  Center(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        if (null != image)
-                          SizedBox(width: 48, height: 48, child: image),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            group.name,
-                            style: theme.getStyle().copyWith(
-                                  fontSize: 14,
-                                ),
-                          ),
-                        ),
-                        Text(
-                          '${group.matchGroups.length} conditions',
-                          style: theme.getStyle().copyWith(
-                              fontSize: 10,
-                              color: Colors.blue,
-                              overflow: TextOverflow.ellipsis),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Positioned(
-                    left: 8,
-                    child: IconButton(
-                      onPressed: () async {
-                        await _delete(group);
-                      },
-                      icon: Icon(Icons.delete, color: theme.getPrimaryColor()),
-                    ),
-                  ),
-                  Positioned(
-                    right: 45,
-                    child: IconButton(
-                      onPressed: () async {
-                        await _editGroup(group);
-                      },
-                      icon: Icon(Icons.edit, color: theme.getPrimaryColor()),
-                    ),
-                  ),
-                  Positioned(
-                      right: 8,
-                      child: IconButton(
-                        onPressed: () async {
-                          await _upload(group);
-                        },
-                        icon: Icon(
-                          Icons.upload,
-                          color: theme.getPrimaryColor(),
-                        ),
-                      )),
-                ],
-              ),
-            ),
-          )));
-    }
-
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            const BusyIndicator(),
-            IconButton(
-                onPressed: () async {
-                  await _load();
-                },
-                icon: const Icon(Icons.refresh)),
-            divider(horizontal: true),
-            SizedBox(
-              width: 250,
-              child: DeviceModelDropdown(
-                  selectedItem: _selectedDeviceModel?.id,
-                  onDeviceModelSelected: (e) {
-                    setState(() {
-                      _selectedDeviceModel = e;
-                    });
-                    _load();
-                  }),
-            ),
-            divider(horizontal: true),
-            PrimaryButton(
-              labelKey: "Add New",
-              onPressed: (_selectedDeviceModel != null)
-                  ? () async {
-                      await _addNew();
-                    }
-                  : null,
-            ),
-            divider(horizontal: true),
-            PrimaryButton(
-              labelKey: "Add Generic",
-              onPressed: (_selectedDeviceModel != null)
-                  ? () async {
-                      await _addNewField();
-                    }
-                  : null,
-            ),
-          ],
-        ),
-        if (cards.isEmpty)
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              if (loading) const BusyIndicator(),
-              if (!loading)
-                Text(
-                  'No filter found',
-                  style: theme.getStyle(),
-                ),
-            ],
-          ),
-        if (cards.isNotEmpty)
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: cards,
-            ),
-          ),
-      ],
-    );
+  void setup() async {
+    await _load();
   }
 }
 
