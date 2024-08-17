@@ -28,26 +28,25 @@ class _FacilitySnippetState extends BaseState<FacilitySnippet> {
   TextEditingController phoneController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   bool _isPhoneValid = true;
-
+  String countryCode = 'US';
   tapi.FacilityInfo _facility = const tapi.FacilityInfo(
-    premiseId: '',
-    name: '',
-    address: '',
-    clientIds: [],
-    tags: [],
-    roles: [],
-    phone: '',
-    images: [],
-    email: '',
-    description: '',
-  );
-  String fullNumber = "";
-  String countryCode = "";
+      premiseId: '',
+      name: '',
+      address: '',
+      clientIds: [],
+      tags: [],
+      roles: [],
+      phone: '',
+      images: [],
+      email: '',
+      description: '',
+      countryCode: 'US');
+
   @override
   void initState() {
     super.initState();
 
-    if (widget.selectedPremise != null) {
+    if (widget.facility == null) {
       _facility = _facility.copyWith(premiseId: widget.selectedPremise!.id);
     }
     if (null != widget.facility) {
@@ -62,6 +61,7 @@ class _FacilitySnippetState extends BaseState<FacilitySnippet> {
           location: p.location,
           name: p.name,
           phone: p.phone,
+          countryCode: p.countryCode,
           reportedStamp: p.reportedStamp,
           roles: p.roles,
           selectedImage: p.selectedImage,
@@ -72,19 +72,11 @@ class _FacilitySnippetState extends BaseState<FacilitySnippet> {
     descController.text = _facility.description ?? '';
     addressController.text = _facility.address ?? '';
     phoneController.text = _facility.phone ?? '';
+    countryCode = _facility.countryCode ?? '';
     emailController.text = _facility.email ?? '';
     nameController.addListener(_onNameChanged);
     phoneController.addListener(_onNameChanged);
     emailController.addListener(_onNameChanged);
-    String? input = _facility.phone;
-    List<String> splitString = input!.split('/');
-    if (splitString.length > 1) {
-      countryCode = splitString[0];
-      phoneController.text = splitString[1];
-    } else {
-      countryCode = "IN";
-      phoneController.text = _facility.phone!;
-    }
   }
 
   @override
@@ -202,11 +194,22 @@ class _FacilitySnippetState extends BaseState<FacilitySnippet> {
                           },
                           onChanged: (phone) {
                             setState(() {
-                              fullNumber =
-                                  "${phone.countryISOCode}/${phone.number}";
                               _isPhoneValid = phone.completeNumber.isNotEmpty &&
                                   phone.completeNumber.length >= 10 &&
                                   phone.isValidNumber();
+
+                              countryCode = phone.countryISOCode;
+                              _facility = _facility.copyWith(
+                                  countryCode: phone.countryISOCode);
+                            });
+                          },
+                          onCountryChanged: (country) {
+                            setState(() {
+                              countryCode = country.code;
+
+                              _facility = _facility.copyWith(
+                                countryCode: country.code,
+                              );
                             });
                           },
                         ),
@@ -382,23 +385,29 @@ class _FacilitySnippetState extends BaseState<FacilitySnippet> {
   }
 
   Future _save({bool silent = false}) async {
+     List<String>? clientIds = super.isClientAdmin()
+      ? await TwinnedSession.instance.getClientIds()
+      : null;
     if (loading) return;
     loading = true;
 
     _facility = _facility.copyWith(
-      premiseId: widget.selectedPremise!.id,
-      name: nameController.text.trim(),
-      description: descController.text.trim(),
-      address: addressController.text.trim(),
-      email: emailController.text.trim(),
-      phone: fullNumber.trim(),
-    );
+        premiseId: widget.selectedPremise!.id,
+        name: nameController.text.trim(),
+        description: descController.text.trim(),
+        address: addressController.text.trim(),
+        email: emailController.text.trim(),
+        phone: phoneController.text.trim(),
+        countryCode: countryCode,
+        clientIds: clientIds??_facility.clientIds,
+        );
     await execute(() async {
       if (null == widget.facility) {
         var cRes = await TwinnedSession.instance.twin.createFacility(
             apikey: TwinnedSession.instance.authToken, body: _facility);
         if (validateResponse(cRes)) {
           _close();
+
           alert('Success', 'Facility ${_facility.name} created');
         }
       } else {
