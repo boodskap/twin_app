@@ -89,6 +89,12 @@ class _ResetPasswordMobilePageState
           localVariables.clear();
           alert("Success", "Password Changed Successfully");
 
+          if (widget.signUp ?? false) {
+            var pRes =
+                await config.nocode.getAppProfile(token: res.body!.authToken);
+            validateResponse(pRes);
+          }
+
           if ((widget.signUp ?? false) && null != postSignUpHook) {
             await postSignUpHook!(res.body!);
           }

@@ -17,7 +17,6 @@ import 'package:twin_app/pages/branding.dart';
 import 'package:twin_app/pages/branding/fonts_colors.dart';
 import 'package:twin_app/pages/dashboard.dart';
 import 'package:twin_app/pages/branding/landing_page.dart';
-import 'package:twin_app/pages/landing.dart';
 import 'package:twin_app/pages/nocode_builder.dart';
 import 'package:twin_app/pages/roles_page.dart';
 import 'package:twin_app/pages/twin/components.dart';
@@ -30,6 +29,7 @@ import 'package:twin_commons/core/twin_image_helper.dart';
 import 'package:twin_app/foundation/logger/logger.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:twin_commons/core/twinned_session.dart';
+import 'package:twinned_widgets/twinned_dashboard_widget.dart';
 import 'package:uuid/uuid.dart';
 import 'package:twinned_api/twinned_api.dart' as tapi;
 import 'package:twin_app/core/session_variables.dart' as session;
@@ -37,7 +37,7 @@ import 'package:twin_app/core/session_variables.dart' as session;
 const List<Locale> locales = [Locale("en", "US"), Locale("ta", "IN")];
 
 enum TwinAppMenu {
-  dashboard,
+  home,
   myNotifications,
   myEvents,
   myProfile,
@@ -55,6 +55,13 @@ enum TwinAppMenu {
   billingCurrentPlan,
   billingInvoices,
   billingOrders,
+  customDashboard,
+  ;
+}
+
+class CustomMenu {
+  final String screenId;
+  const CustomMenu({required this.screenId});
 }
 
 void startApp() async {
@@ -581,14 +588,27 @@ class HomeScreenState extends BaseState<HomeScreen> {
   List<session.TwinMenuItem> get _menuItems {
     return [
       session.TwinMenuItem(
-        text: 'Dashboard',
-        id: TwinAppMenu.dashboard,
+        text: 'Home',
+        id: TwinAppMenu.home,
         icon: Icons.dashboard,
         isMenuVisible: () {
           return true;
         },
         onMenuSelected: (ctx) async {
           return const Dashboard();
+        },
+      ),
+      session.TwinMenuItem(
+        text: 'Dashboard',
+        id: TwinAppMenu.customDashboard,
+        expanded: true,
+        assetImage: 'images/twin.png',
+        subItems: _dashboardSubMenuItems,
+        isMenuVisible: () {
+          return true;
+        },
+        onMenuSelected: (ctx) async {
+          return SizedBox.shrink();
         },
       ),
       session.TwinMenuItem(
@@ -670,6 +690,29 @@ class HomeScreenState extends BaseState<HomeScreen> {
         },
       ),
     ];
+  }
+
+  List<session.TwinMenuItem> get _dashboardSubMenuItems {
+    List<session.TwinMenuItem> list = [];
+
+    for (tapi.DashboardScreen ds in session.screens) {
+      list.add(session.TwinMenuItem(
+        id: CustomMenu(screenId: ds.id),
+        text: ds.name,
+        icon: Icons.menu,
+        isMenuVisible: () {
+          return true;
+        },
+        onMenuSelected: (BuildContext context) async {
+          return TwinnedDashboardWidget(
+            screen: ds,
+            screenId: ds.id,
+          );
+        },
+      ));
+    }
+
+    return list;
   }
 
   List<session.TwinMenuItem> get _twinSubMenuItems {

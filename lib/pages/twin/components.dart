@@ -18,6 +18,7 @@ import 'package:twin_app/pages/twin/components/report.dart';
 import 'package:twin_app/pages/twin/components/scrapping_tables.dart';
 import 'package:twin_app/pages/twin/components/visual_alarms.dart';
 import 'package:twin_app/pages/twin/components/visual_displays.dart';
+import 'package:twin_app/pages/wrapper_page.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
 
@@ -30,291 +31,131 @@ class Components extends StatefulWidget {
 
 class _ComponentsState extends BaseState<Components> {
   static const double iconSize = 20.0;
-  Widget? _screen;
+  final List<Widget> _list = [];
+  final List<Widget> _children = [];
+
+  @override
+  void initState() {
+    super.initState();
+
+    _list.add(_createChild(
+        icon: Icons.developer_board_rounded,
+        title: 'Device Library',
+        page: DeviceLibrary()));
+    _list.add(_createChild(
+        icon: Icons.memory_rounded,
+        title: 'Installation Database',
+        page: InstallationDatabase()));
+    _list.add(_createChild(
+        icon: Icons.departure_board_rounded,
+        title: 'Asset Library',
+        page: AssetLibrary()));
+    _list.add(_createChild(
+        icon: Icons.settings_display_sharp,
+        title: 'Condition Rules',
+        page: ConditionRules()));
+    _list.add(_createChild(
+        icon: Icons.doorbell_outlined,
+        title: 'Visual Alarms',
+        page: VisualAlarms()));
+    _list.add(_createChild(
+        icon: Icons.display_settings,
+        title: 'Visual Displays',
+        page: VisualDisplays()));
+    _list.add(_createChild(
+        icon: Icons.event_rounded,
+        title: 'Events & Notifications',
+        page: Events()));
+    _list.add(_createChild(
+        icon: Icons.settings_suggest,
+        title: 'Preprocessors',
+        page: Preprocessors()));
+    _list.add(_createChild(
+        icon: Icons.settings_suggest,
+        title: 'Scrapping Tables',
+        page: ScrappingTables()));
+    _list.add(
+        _createChild(icon: Icons.home, title: 'Premises', page: Premises()));
+    _list.add(_createChild(
+        icon: Icons.business, title: 'Facilities', page: Facilities()));
+    _list.add(_createChild(icon: Icons.cabin, title: 'Floors', page: Floors()));
+    _list.add(
+        _createChild(icon: Icons.view_comfy, title: 'Assets', page: Assets()));
+    _list.add(_createChild(
+        icon: Icons.group_add, title: 'Asset Groups', page: AssetGroupList()));
+    _list.add(_createChild(
+        icon: Icons.filter_alt_sharp,
+        title: 'Asset Filters',
+        page: AssetFilterList()));
+    _list.add(_createChild(
+        icon: Icons.menu_book,
+        title: 'Custom Reports',
+        page: AssetReportList()));
+
+    _children.addAll(_list);
+  }
 
   @override
   Widget build(BuildContext context) {
-    if (null == _screen) return BusyIndicator();
-
     return Column(
-      children: [_screen!],
+      children: [
+        SizedBox(height: 20),
+        Flexible(
+          child: SingleChildScrollView(
+            child: Center(
+              child: Wrap(
+                spacing: 15,
+                children: _children,
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
-  Future _load() async {
-    execute(() async {
-      double height = MediaQuery.of(context).size.width / 8 + 100;
-      Color openColor = theme.getPrimaryColor();
-      Color closedColor = Colors.black45;
-      _screen = Flexible(
-        child: ListView.builder(
-            itemCount: 1,
-            itemBuilder: (index, context) {
-              return Accordion(
-                contentBorderColor: Color(0xFF333333),
-                contentBackgroundColor: Colors.white,
-                contentBorderWidth: 1,
-                scaleWhenAnimating: true,
-                openAndCloseAnimation: true,
-                maxOpenSections: 1,
-                headerPadding:
-                    const EdgeInsets.symmetric(vertical: 3.5, horizontal: 7.5),
-                sectionOpeningHapticFeedback: SectionHapticFeedback.heavy,
-                sectionClosingHapticFeedback: SectionHapticFeedback.light,
-                children: [
-                  AccordionSection(
-                      isOpen: true,
-                      headerBackgroundColorOpened: openColor,
-                      headerBackgroundColor: closedColor,
-                      leftIcon: Icon(
-                        Icons.developer_board_rounded,
-                        color: Colors.white,
-                        size: iconSize,
+  Widget _createChild(
+      {required IconData icon, required String title, required Widget page}) {
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => Scaffold(
+                      body: WrapperPage(
+                        title: title,
+                        child: page,
                       ),
-                      header: Text('Device Library',
-                          style: theme.getStyle().copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white)),
-                      content: SingleChildScrollView(child: DeviceLibrary())),
-                  AccordionSection(
-                      isOpen: false,
-                      headerBackgroundColorOpened: openColor,
-                      headerBackgroundColor: closedColor,
-                      leftIcon: Icon(
-                        Icons.memory_rounded,
-                        color: Colors.white,
-                        size: iconSize,
-                      ),
-                      header: Text('Installation Database',
-                          style: theme.getStyle().copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white)),
-                      content:
-                          SingleChildScrollView(child: InstallationDatabase())),
-                  AccordionSection(
-                      isOpen: true,
-                      headerBackgroundColorOpened: openColor,
-                      headerBackgroundColor: closedColor,
-                      leftIcon: Icon(
-                        Icons.departure_board_rounded,
-                        color: Colors.white,
-                        size: iconSize,
-                      ),
-                      header: Text('Asset Library',
-                          style: theme.getStyle().copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white)),
-                      content: SingleChildScrollView(child: AssetLibrary())),
-                  AccordionSection(
-                      isOpen: false,
-                      headerBackgroundColorOpened: openColor,
-                      headerBackgroundColor: closedColor,
-                      leftIcon: Icon(
-                        Icons.settings_display_sharp,
-                        color: Colors.white,
-                        size: iconSize,
-                      ),
-                      header: Text('Condition Rules',
-                          style: theme.getStyle().copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white)),
-                      content: SingleChildScrollView(child: ConditionRules())),
-                  AccordionSection(
-                      isOpen: false,
-                      headerBackgroundColorOpened: openColor,
-                      headerBackgroundColor: closedColor,
-                      leftIcon: Icon(
-                        Icons.doorbell_outlined,
-                        color: Colors.white,
-                        size: iconSize,
-                      ),
-                      header: Text('Visual Alarms',
-                          style: theme.getStyle().copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white)),
-                      content: SizedBox(height: height, child: VisualAlarms())),
-                  AccordionSection(
-                      isOpen: false,
-                      headerBackgroundColorOpened: openColor,
-                      headerBackgroundColor: closedColor,
-                      leftIcon: Icon(
-                        Icons.display_settings,
-                        color: Colors.white,
-                        size: iconSize,
-                      ),
-                      header: Text('Visual Displays',
-                          style: theme.getStyle().copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white)),
-                      content:
-                          SizedBox(height: height, child: VisualDisplays())),
-                  AccordionSection(
-                      isOpen: false,
-                      headerBackgroundColorOpened: openColor,
-                      headerBackgroundColor: closedColor,
-                      leftIcon: Icon(
-                        Icons.event_rounded,
-                        color: Colors.white,
-                        size: iconSize,
-                      ),
-                      header: Text('Events & Notification',
-                          style: theme.getStyle().copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white)),
-                      content: SizedBox(height: height, child: Events())),
-                  AccordionSection(
-                      isOpen: false,
-                      headerBackgroundColorOpened: openColor,
-                      headerBackgroundColor: closedColor,
-                      leftIcon: Icon(
-                        Icons.settings_suggest,
-                        color: Colors.white,
-                        size: iconSize,
-                      ),
-                      header: Text('Preprocessors',
-                          style: theme.getStyle().copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white)),
-                      content: SizedBox(
-                          height: height,
-                          child:
-                              SingleChildScrollView(child: Preprocessors()))),
-                  AccordionSection(
-                      isOpen: false,
-                      headerBackgroundColorOpened: openColor,
-                      headerBackgroundColor: closedColor,
-                      leftIcon: Icon(
-                        Icons.settings_suggest,
-                        color: Colors.white,
-                        size: iconSize,
-                      ),
-                      header: Text('Scrapping Tables',
-                          style: theme.getStyle().copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white)),
-                      content: SizedBox(
-                          height: height,
-                          child:
-                              SingleChildScrollView(child: ScrappingTables()))),
-                  AccordionSection(
-                      isOpen: false,
-                      headerBackgroundColorOpened: openColor,
-                      headerBackgroundColor: closedColor,
-                      leftIcon: Icon(
-                        Icons.home,
-                        color: Colors.white,
-                        size: iconSize,
-                      ),
-                      header: Text('Premises',
-                          style: theme.getStyle().copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white)),
-                      content: SizedBox(
-                          height: height,
-                          child: SingleChildScrollView(child: Premises()))),
-                  AccordionSection(
-                      isOpen: false,
-                      headerBackgroundColorOpened: openColor,
-                      headerBackgroundColor: closedColor,
-                      leftIcon: Icon(
-                        Icons.business,
-                        color: Colors.white,
-                        size: iconSize,
-                      ),
-                      header: Text('Facilities',
-                          style: theme.getStyle().copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white)),
-                      content: SizedBox(
-                          height: height,
-                          child: SingleChildScrollView(child: Facilities()))),
-                  AccordionSection(
-                      isOpen: false,
-                      headerBackgroundColorOpened: openColor,
-                      headerBackgroundColor: closedColor,
-                      leftIcon: Icon(
-                        Icons.cabin,
-                        color: Colors.white,
-                        size: iconSize,
-                      ),
-                      header: Text('Floors',
-                          style: theme.getStyle().copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white)),
-                      content: SizedBox(
-                          height: height,
-                          child: SingleChildScrollView(child: Floors()))),
-                  AccordionSection(
-                      isOpen: false,
-                      headerBackgroundColorOpened: openColor,
-                      headerBackgroundColor: closedColor,
-                      leftIcon: Icon(
-                        Icons.view_comfy,
-                        color: Colors.white,
-                        size: iconSize,
-                      ),
-                      header: Text('Assets',
-                          style: theme.getStyle().copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white)),
-                      content: SizedBox(
-                          height: height,
-                          child: SingleChildScrollView(child: Assets()))),
-                  AccordionSection(
-                      isOpen: false,
-                      headerBackgroundColorOpened: openColor,
-                      headerBackgroundColor: closedColor,
-                      leftIcon: Icon(
-                        Icons.group_add,
-                        color: Colors.white,
-                        size: iconSize,
-                      ),
-                      header: Text('Asset Groups',
-                          style: theme.getStyle().copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white)),
-                      content:
-                          SizedBox(height: height, child: AssetGroupList())),
-                  AccordionSection(
-                      isOpen: false,
-                      headerBackgroundColorOpened: openColor,
-                      headerBackgroundColor: closedColor,
-                      leftIcon: Icon(
-                        Icons.filter_alt_sharp,
-                        color: Colors.white,
-                        size: iconSize,
-                      ),
-                      header: Text('Asset Filters',
-                          style: theme.getStyle().copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white)),
-                      content:
-                          SizedBox(height: height, child: AssetFilterList())),
-                  AccordionSection(
-                      isOpen: false,
-                      headerBackgroundColorOpened: openColor,
-                      headerBackgroundColor: closedColor,
-                      leftIcon: Icon(
-                        Icons.menu_book,
-                        color: Colors.white,
-                        size: iconSize,
-                      ),
-                      header: Text('Custom Reports',
-                          style: theme.getStyle().copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white)),
-                      content:
-                          SizedBox(height: height, child: AssetReportList())),
-                ],
-              );
-            }),
-      );
-      refresh();
-    });
+                    )));
+      },
+      child: SizedBox(
+        width: 250,
+        height: 250,
+        child: Card(
+          elevation: 5,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                color: theme.getPrimaryColor(),
+                size: 48,
+              ),
+              divider(),
+              Text(
+                title,
+                style: theme.getStyle().copyWith(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    overflow: TextOverflow.visible),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   @override
-  Future setup() async {
-    _load();
-  }
+  Future setup() async {}
 }

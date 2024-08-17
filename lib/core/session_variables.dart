@@ -53,6 +53,7 @@ PostSignUpHook? postSignUpHook;
 nocode.Profile? profile;
 int selectedOrg = 0;
 final List<String> orgs = [];
+final List<twin.DashboardScreen> screens = [];
 
 bool isAdmin() {
   if (null != profile) return true;
