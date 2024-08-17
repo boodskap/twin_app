@@ -31,6 +31,7 @@ class _InstallationDatabaseState extends BaseState<InstallationDatabase> {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        const SizedBox(height: 15),
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [

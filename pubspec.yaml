@@ -1,7 +1,7 @@
 name: twin_app
 description: "Boodskap Digital Twin Client Application"
 publish_to: 'none' 
-version: 1.0.2+2
+version: 1.0.2+3
 
 environment:
   sdk: '>=3.4.1 <4.0.0'

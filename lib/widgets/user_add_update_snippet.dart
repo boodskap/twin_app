@@ -10,6 +10,8 @@ import 'package:twin_commons/widgets/common/label_text_field.dart';
 import 'package:twin_commons/core/twin_image_helper.dart';
 import 'package:twin_commons/core/twinned_session.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:twinned_widgets/core/client_dropdown.dart';
+import 'package:twinned_widgets/core/multi_role_dropdown.dart';
 
 var userDefaultImage = Center(
   child: Image.asset(
@@ -168,6 +170,38 @@ class _UserAddUpdateSnippetState extends BaseState<UserAddUpdateSnippet> {
 
                               _twinUserInfo = _twinUserInfo.copyWith(
                                   countryCode: country.code);
+                            });
+                          },
+                        ),
+                      ),
+                      divider(height: 15),
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width / 2.5,
+                        child: ClientDropdown(
+                          selectedItem: (_twinUserInfo.clientIds!.isNotEmpty)
+                              ? _twinUserInfo.clientIds!.first
+                              : null,
+                          onClientSelected: (e) {
+                            setState(() {
+                              _twinUserInfo = _twinUserInfo.copyWith(
+                                  clientIds: null != e ? [e.id] : []);
+                            });
+                          },
+                        ),
+                      ),
+                      divider(height: 15),
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width / 2.5,
+                        child: MultiRoleDropdown(
+                          selectedItems: _twinUserInfo.roles ?? [],
+                          onRolesSelected: (e) {
+                            setState(() {
+                              _twinUserInfo = _twinUserInfo.copyWith(
+                                  roles: null != e
+                                      ? e.map((r) {
+                                          return r.id;
+                                        }).toList()
+                                      : []);
                             });
                           },
                         ),

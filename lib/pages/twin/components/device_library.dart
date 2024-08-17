@@ -35,6 +35,7 @@ class _DeviceLibraryState extends BaseState<DeviceLibrary> {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        const SizedBox(height: 15),
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
@@ -145,14 +146,16 @@ class _DeviceLibraryState extends BaseState<DeviceLibrary> {
                         onTap: _canEdit ? () => _edit(e, "") : null,
                         child: Icon(
                           Icons.edit,
-                          color: _canEdit ? theme.getPrimaryColor() : Colors.grey,
+                          color:
+                              _canEdit ? theme.getPrimaryColor() : Colors.grey,
                         ),
                       ),
                       InkWell(
                         onTap: _canEdit ? () => _delete(e) : null,
                         child: Icon(
                           Icons.delete,
-                          color: _canEdit ? theme.getPrimaryColor() : Colors.grey,
+                          color:
+                              _canEdit ? theme.getPrimaryColor() : Colors.grey,
                         ),
                       ),
                     ],
@@ -162,7 +165,8 @@ class _DeviceLibraryState extends BaseState<DeviceLibrary> {
               if (null != e.images && e.images!.isNotEmpty)
                 Align(
                   alignment: Alignment.center,
-                  child: TwinImageHelper.getImage(e.domainKey, e.images![e.selectedImage??0],
+                  child: TwinImageHelper.getImage(
+                      e.domainKey, e.images![e.selectedImage ?? 0],
                       width: width / 2, height: width / 2),
                 )
             ],
@@ -320,7 +324,7 @@ class _DeviceLibraryState extends BaseState<DeviceLibrary> {
         message:
             'Deleting is unrecoverable\nIt may also delete all the related models and components\n\nDo you want to proceed?',
         titleStyle: theme.getStyle().copyWith(color: Colors.red),
-        messageStyle:  theme.getStyle().copyWith(fontWeight: FontWeight.bold),
+        messageStyle: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
         onPressed: () async {
           await execute(() async {
             int index = _entities.indexWhere((element) => element.id == e.id);

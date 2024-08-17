@@ -106,14 +106,14 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
         bool debug = TwinnedSession.instance.debug;
         String host = TwinnedSession.instance.host;
 
-        session.orgs.addAll(lRes.body!.orgIds ?? []);
+        session.orgs.addAll(lRes.body!.orgs ?? []);
 
         TwinnedSession.instance.init(
             debug: debug,
             host: host,
             authToken: lRes.body!.authToken ?? '',
             domainKey: lRes.body!.user!.domainKey!,
-            noCodeAuthToken: '');
+            noCodeAuthToken: lRes.body!.nocodeAuthToken ?? '');
         loggedIn = true;
 
         if (_rememberMe) {

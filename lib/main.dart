@@ -6,6 +6,7 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:twin_app/core/twin_helper.dart';
 import 'package:twin_commons/core/twinned_session.dart';
 import 'package:verification_api/api/verification.swagger.dart' as vapi;
+import 'package:twinned_api/twinned_api.dart' as tapi;
 import 'dart:io' show Platform;
 
 import 'app.dart';
@@ -22,8 +23,8 @@ void main() async {
 
   start(
     appTitle: 'My Twin App',
-    homeMenu: TwinAppMenu.dashboard,
-    homeMenuTitle: 'Dashboard',
+    homeMenu: TwinAppMenu.home,
+    homeMenuTitle: 'Home',
   );
 }
 
@@ -34,7 +35,7 @@ void start({
   List<session.TwinMenuItem> menuItems = const [],
   session.BuildLandingPages? buildLandingPages,
   bool setDrawerOpen = false,
-  session.PostLoginHook? postLoginHook,
+  session.PostLoginHook? postLoginHook = _loadCustomDashboards,
   session.PostSignUpHook? postSignUpHook = _createDefaultClient,
 }) async {
   session.appTitle = appTitle;
@@ -93,6 +94,21 @@ Future _createDefaultClient(vapi.VerificationRes res) async {
         .makeMyselfAsNewClient(apikey: res.authToken);
     if (!TwinHelper.validateResponse(cRes)) {
       debugPrint(cRes.bodyString);
+    }
+  });
+}
+
+Future _loadCustomDashboards() async {
+  debugPrint('MY ORGANIZATIONS: ${session.orgs}');
+  await TwinHelper.execute(() async {
+    session.screens.clear();
+    var sRes = await TwinnedSession.instance.twin.listDashboardScreens(
+      apikey: TwinnedSession.instance.authToken,
+      body: tapi.ListReq(size: 25, page: 0),
+    );
+    if (TwinHelper.validateResponse(sRes)) {
+      session.screens.addAll(sRes.body?.values ?? []);
+      debugPrint('FOUND ${session.screens.length} dashboards');
     }
   });
 }
