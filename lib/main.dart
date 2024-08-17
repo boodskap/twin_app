@@ -19,7 +19,7 @@ void main() async {
     FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   }
 
-  session.flavor = 'jegan';
+  session.flavor = 'dev';
 
   start(
     appTitle: 'My Twin App',
@@ -99,6 +99,7 @@ Future _createDefaultClient(vapi.VerificationRes res) async {
 }
 
 Future _loadCustomDashboards() async {
+  debugPrint('MY ORGANIZATIONS: ${session.orgs}');
   await TwinHelper.execute(() async {
     session.screens.clear();
     var sRes = await TwinnedSession.instance.twin.listDashboardScreens(

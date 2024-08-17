@@ -37,6 +37,7 @@ class _AssetLibraryState extends BaseState<AssetLibrary> {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        const SizedBox(height: 15),
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [

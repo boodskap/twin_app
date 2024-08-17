@@ -46,12 +46,11 @@ enum TwinAppMenu {
   billing,
   twinComponents,
   twinNoCodeBuilder,
-  twinBranding,
+  twinFontsColors,
+  twinLanding,
   adminUsers,
   adminClients,
   adminRoles,
-  brandingFontsColors,
-  brandingLanding,
   billingCurrentPlan,
   billingInvoices,
   billingOrders,
@@ -418,6 +417,39 @@ class HomeScreenState extends BaseState<HomeScreen> {
         elevation: 5,
         iconTheme: IconThemeData(color: Colors.white),
         actions: [
+          if (session.orgs.length > 1)
+            DropdownMenu<tapi.OrgInfo>(
+              initialSelection: session.orgs[session.selectedOrg],
+              leadingIcon: Icon(
+                Icons.bungalow_sharp,
+                color: Colors.white,
+              ),
+              textStyle: session.theme.getStyle().copyWith(color: Colors.white),
+              dropdownMenuEntries: session.orgs.map((o) {
+                return DropdownMenuEntry(
+                    value: o,
+                    label: o.name,
+                    labelWidget: Text(
+                      o.name,
+                      style: session.theme.getStyle(),
+                    ));
+              }).toList(),
+              onSelected: (o) async {
+                if (null != o) {
+                  session.selectedOrg = session.orgs.indexOf(o!);
+                  TwinnedSession ts = TwinnedSession.instance;
+                  TwinnedSession.instance.init(
+                      debug: ts.debug,
+                      host: ts.host,
+                      authToken: o!.twinAuthToken,
+                      domainKey: o!.twinDomainKey,
+                      noCodeAuthToken: ts.noCodeAuthToken);
+                  await _load();
+                  showScreen(TwinAppMenu.home);
+                }
+              },
+            ),
+          if (session.orgs.length > 1) const SizedBox(width: 8),
           Text(
             user!.name,
             style: session.theme.getStyle().copyWith(color: Colors.white),
@@ -462,55 +494,60 @@ class HomeScreenState extends BaseState<HomeScreen> {
                 decoration: BoxDecoration(
                   color: session.theme.getPrimaryColor(),
                 ),
-                child: Row(
+                child: Column(
                   children: [
-                    if (_selectedClient == -1)
-                      Text(
-                        session.appTitle,
-                        style: session.theme.getStyle().copyWith(
-                            color: Colors.white,
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold),
-                      ),
-                    if (_selectedClient != -1)
-                      Wrap(
-                        crossAxisAlignment: WrapCrossAlignment.center,
-                        spacing: 5,
-                        children: [
-                          if (null != _clients[_selectedClient].icon &&
-                              _clients[_selectedClient].icon!.isNotEmpty)
-                            SizedBox(
-                                //width: 280,
-                                height: 64,
-                                child: TwinImageHelper.getDomainImage(
-                                    _clients[_selectedClient].icon!)),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                    Row(
+                      children: [
+                        if (_selectedClient == -1)
+                          Text(
+                            session.appTitle,
+                            style: session.theme.getStyle().copyWith(
+                                color: Colors.white,
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        if (_selectedClient != -1)
+                          Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            spacing: 5,
                             children: [
-                              if (null == _clients[_selectedClient].icon ||
-                                  _clients[_selectedClient].icon!.isEmpty)
-                                Text(
-                                  '${_clients[_selectedClient].name}',
-                                  style: session.theme.getStyle().copyWith(
-                                      overflow: TextOverflow.ellipsis,
-                                      color: Colors.white,
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              if (TwinnedSession.instance.isClientAdmin())
-                                IconButton(
-                                    onPressed: () {
-                                      _editClient(
-                                          client: _clients[_selectedClient]);
-                                    },
-                                    icon: Icon(
-                                      Icons.edit,
-                                      color: Colors.white,
-                                    )),
+                              if (null != _clients[_selectedClient].icon &&
+                                  _clients[_selectedClient].icon!.isNotEmpty)
+                                SizedBox(
+                                    //width: 280,
+                                    height: 64,
+                                    child: TwinImageHelper.getDomainImage(
+                                        _clients[_selectedClient].icon!)),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  if (null == _clients[_selectedClient].icon ||
+                                      _clients[_selectedClient].icon!.isEmpty)
+                                    Text(
+                                      '${_clients[_selectedClient].name}',
+                                      style: session.theme.getStyle().copyWith(
+                                          overflow: TextOverflow.ellipsis,
+                                          color: Colors.white,
+                                          fontSize: 22,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  if (TwinnedSession.instance.isClientAdmin())
+                                    IconButton(
+                                        onPressed: () {
+                                          _editClient(
+                                              client:
+                                                  _clients[_selectedClient]);
+                                        },
+                                        icon: Icon(
+                                          Icons.edit,
+                                          color: Colors.white,
+                                        )),
+                                ],
+                              ),
                             ],
                           ),
-                        ],
-                      ),
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -566,6 +603,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
     debugPrint('MENU: $id');
     session.TwinMenuItem? mi = _findMenuItem(menuItems, id);
     if (null != mi) {
+      session.selectedMenuTitle = mi.text;
       body = await mi.onMenuSelected(context);
       session.pageBottomMenus.addAll(mi.bottomMenus);
       session.bottomMenuIndex = 0;
@@ -720,7 +758,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
       session.TwinMenuItem(
         id: TwinAppMenu.twinComponents,
         text: 'Components',
-        icon: Icons.menu,
+        icon: Icons.settings_input_component,
         bottomMenus: _twinBottomMenus(),
         isMenuVisible: () {
           return true;
@@ -732,7 +770,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
       session.TwinMenuItem(
         id: TwinAppMenu.twinNoCodeBuilder,
         text: 'NoCode Builder',
-        icon: Icons.menu,
+        icon: Icons.tablet,
         bottomMenus: _twinBottomMenus(),
         isMenuVisible: () {
           return true;
@@ -742,17 +780,27 @@ class HomeScreenState extends BaseState<HomeScreen> {
         },
       ),
       session.TwinMenuItem(
-        text: 'Branding',
-        id: TwinAppMenu.twinBranding,
-        icon: Icons.admin_panel_settings_rounded,
-        expanded: false,
-        subItems: _brandingSubMenuItems,
+        id: TwinAppMenu.twinFontsColors,
+        text: 'Fonts & Colors',
+        icon: Icons.font_download,
         bottomMenus: _twinBottomMenus(),
         isMenuVisible: () {
-          return !session.smallScreen && session.isAdmin();
+          return session.isAdmin();
         },
-        onMenuSelected: (ctx) async {
-          return const Branding();
+        onMenuSelected: (BuildContext context) async {
+          return const FontsAndColorSettingPage();
+        },
+      ),
+      session.TwinMenuItem(
+        id: TwinAppMenu.twinLanding,
+        text: 'Landing Pages',
+        icon: Icons.pages,
+        bottomMenus: _twinBottomMenus(),
+        isMenuVisible: () {
+          return session.isAdmin();
+        },
+        onMenuSelected: (BuildContext context) async {
+          return const LandingContentPage();
         },
       ),
     ];
@@ -840,35 +888,6 @@ class HomeScreenState extends BaseState<HomeScreen> {
     ];
   }
 
-  List<session.TwinMenuItem> get _brandingSubMenuItems {
-    return [
-      session.TwinMenuItem(
-        id: TwinAppMenu.brandingFontsColors,
-        text: 'Fonts & Colors',
-        icon: Icons.font_download,
-        bottomMenus: _twinBottomMenus(),
-        isMenuVisible: () {
-          return session.isAdmin();
-        },
-        onMenuSelected: (BuildContext context) async {
-          return const FontsAndColorSettingPage();
-        },
-      ),
-      session.TwinMenuItem(
-        id: TwinAppMenu.brandingLanding,
-        text: 'Landing Page',
-        icon: Icons.pages,
-        bottomMenus: _twinBottomMenus(),
-        isMenuVisible: () {
-          return session.isAdmin();
-        },
-        onMenuSelected: (BuildContext context) async {
-          return const LandingContentPage();
-        },
-      ),
-    ];
-  }
-
   List<BottomMenuItem> _adminBottomMenus() {
     return [
       const BottomMenuItem(
@@ -913,18 +932,23 @@ class HomeScreenState extends BaseState<HomeScreen> {
     return [
       const BottomMenuItem(
         id: TwinAppMenu.twinComponents,
-        icon: Icon(Icons.menu, size: 30),
+        icon: Icon(Icons.settings_input_component, size: 30),
         label: 'Comps',
       ),
       const BottomMenuItem(
         id: TwinAppMenu.twinNoCodeBuilder,
-        icon: Icon(Icons.menu, size: 30),
+        icon: Icon(Icons.tablet, size: 30),
         label: 'Builder',
       ),
       const BottomMenuItem(
-        id: TwinAppMenu.twinBranding,
-        icon: Icon(Icons.menu, size: 30),
-        label: 'Branding',
+        id: TwinAppMenu.twinFontsColors,
+        icon: Icon(Icons.font_download_sharp, size: 30),
+        label: 'Fonts',
+      ),
+      const BottomMenuItem(
+        id: TwinAppMenu.twinLanding,
+        icon: Icon(Icons.pages, size: 30),
+        label: 'Landing',
       ),
     ];
   }
@@ -933,6 +957,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
     if (loading) return;
     loading = true;
 
+    _selectedClient = -1;
     _clients.clear();
 
     await execute(() async {
