@@ -30,7 +30,7 @@ class LandingWidgetType extends StatefulWidget {
 }
 
 class _LandingWidgetTypeState extends BaseState<LandingWidgetType> {
-  late Image logoImage;
+  late Widget logoImage;
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -117,7 +117,8 @@ class _LandingWidgetTypeState extends BaseState<LandingWidgetType> {
     _line_5.text = widget.landingPage.line5 ?? '';
 
     if (widget.landingPage.logoImage!.isNotEmpty) {
-      logoImage = TwinImageHelper.getDomainImage(widget.landingPage.logoImage!,
+      logoImage = TwinImageHelper.getCachedDomainImage(
+          widget.landingPage.logoImage!,
           fit: BoxFit.contain);
     }
 
@@ -171,7 +172,7 @@ class _LandingWidgetTypeState extends BaseState<LandingWidgetType> {
         widget.landingPage =
             widget.landingPage.copyWith(logoImage: res.entity!.id);
         uploaded = true;
-        logoImage = TwinImageHelper.getDomainImage(
+        logoImage = TwinImageHelper.getCachedDomainImage(
             widget.landingPage.logoImage!,
             fit: BoxFit.contain);
       }

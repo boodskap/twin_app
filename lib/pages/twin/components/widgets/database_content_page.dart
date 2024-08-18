@@ -310,7 +310,7 @@ class _DeviceContentPageState extends BaseState<DeviceContentPage> {
           String id = res.entity!.id;
           _imageIds.add(id);
           _imageCards.add(
-            TwinImageHelper.getImage(
+            TwinImageHelper.getCachedImage(
               TwinnedSession.instance.domainKey,
               id,
             ),
@@ -331,7 +331,7 @@ class _DeviceContentPageState extends BaseState<DeviceContentPage> {
       onLongPress: () {
         _deleteImage(image);
       },
-      child: TwinImageHelper.getImage(domainKey, image),
+      child: TwinImageHelper.getCachedImage(domainKey, image),
       // fit: BoxFit.contain,
     );
   }
@@ -573,7 +573,7 @@ class _DeviceContentPageState extends BaseState<DeviceContentPage> {
                   SizedBox(
                     height: 27, // Set your desired height
                     width: 27, // Set your desired width
-                    child: TwinImageHelper.getImage(
+                    child: TwinImageHelper.getCachedImage(
                       TwinnedSession.instance.domainKey,
                       param.icon.toString(),
                       fit: BoxFit.contain,

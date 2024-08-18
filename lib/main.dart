@@ -103,7 +103,7 @@ Future _loadCustomDashboards() async {
   await TwinHelper.execute(() async {
     session.screens.clear();
     var sRes = await TwinnedSession.instance.twin.listDashboardScreens(
-      apikey: TwinnedSession.instance.authToken,
+      apikey: session.orgs[session.selectedOrg].twinAuthToken,
       body: tapi.ListReq(size: 25, page: 0),
     );
     if (TwinHelper.validateResponse(sRes)) {

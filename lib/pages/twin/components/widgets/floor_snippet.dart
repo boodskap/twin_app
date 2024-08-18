@@ -271,8 +271,9 @@ class _FloorSnippetState extends BaseState<FloorSnippet> {
                                       child: SizedBox(
                                         width: 250,
                                         height: 250,
-                                        child: TwinImageHelper.getDomainImage(
-                                            _floor.floorPlan!),
+                                        child: TwinImageHelper
+                                            .getCachedDomainImage(
+                                                _floor.floorPlan!),
                                       ),
                                     ),
                                 ],

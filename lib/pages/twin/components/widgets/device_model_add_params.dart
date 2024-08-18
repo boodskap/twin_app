@@ -328,7 +328,7 @@ class _ParameterUpsertDialogState extends BaseState<ParameterUpsertDialog> {
                             SizedBox(
                               height: 30,
                               width: 30,
-                              child: TwinImageHelper.getImage(
+                              child: TwinImageHelper.getCachedImage(
                                 TwinnedSession.instance.domainKey,
                                 iconParamId,
                                 fit: BoxFit.contain,

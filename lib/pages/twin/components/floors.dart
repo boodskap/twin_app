@@ -219,7 +219,7 @@ class _FloorsState extends BaseState<Floors> {
               if (null != e.floorPlan && e.floorPlan!.isNotEmpty)
                 Align(
                   alignment: Alignment.center,
-                  child: TwinImageHelper.getImage(
+                  child: TwinImageHelper.getCachedImage(
                     e.domainKey,
                     e.floorPlan!,
                     width: width / 2,

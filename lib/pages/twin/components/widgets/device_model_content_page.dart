@@ -260,7 +260,7 @@ class _DeviceModelContentPageState extends BaseState<DeviceModelContentPage> {
               alert('Delete Prohibited', 'You need to have at least one image');
             }
           },
-          child: TwinImageHelper.getImage(e.domainKey, image),
+          child: TwinImageHelper.getCachedImage(e.domainKey, image),
         ));
       }
 
@@ -372,8 +372,8 @@ class _DeviceModelContentPageState extends BaseState<DeviceModelContentPage> {
         setState(() {
           String id = res.entity!.id;
           _imageIds.add(id);
-          _imageCards.add(
-              TwinImageHelper.getImage(TwinnedSession.instance.domainKey, id));
+          _imageCards.add(TwinImageHelper.getCachedImage(
+              TwinnedSession.instance.domainKey, id));
         });
       }
     } catch (e, s) {
@@ -579,7 +579,7 @@ class _DeviceModelContentPageState extends BaseState<DeviceModelContentPage> {
                 SizedBox(
                   height: 27,
                   width: 27,
-                  child: TwinImageHelper.getImage(
+                  child: TwinImageHelper.getCachedImage(
                     TwinnedSession.instance.domainKey,
                     param.icon,
                     fit: BoxFit.contain,

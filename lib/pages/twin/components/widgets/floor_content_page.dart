@@ -141,8 +141,8 @@ class _FloorContentPageState extends BaseState<FloorContentPage> {
     if (imageIds.length > selectedImage) {
       setState(() {
         imageId = imageIds[selectedImage];
-        infraImage =
-            TwinImageHelper.getImage(domainKey, imageId, fit: BoxFit.fill);
+        infraImage = TwinImageHelper.getCachedImage(domainKey, imageId,
+            fit: BoxFit.fill);
       });
     }
     await _load();
@@ -247,7 +247,7 @@ class _FloorContentPageState extends BaseState<FloorContentPage> {
 
       if (imageId.isNotEmpty) {
         setState(() {
-          infraImage = TwinImageHelper.getImage(domainKey, imageId);
+          infraImage = TwinImageHelper.getCachedImage(domainKey, imageId);
         });
       }
     });
@@ -322,7 +322,7 @@ class _FloorContentPageState extends BaseState<FloorContentPage> {
       imageId = e.images![idx];
     }
     Widget image = imageId.isNotEmpty
-        ? TwinImageHelper.getImage(e.domainKey, imageId)
+        ? TwinImageHelper.getCachedImage(e.domainKey, imageId)
         : _missingImage;
 
     return Card(
@@ -362,16 +362,16 @@ class _FloorContentPageState extends BaseState<FloorContentPage> {
                         Text(
                           e.name,
                           style: theme.getStyle().copyWith(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                         Text(
                           e.description ?? "",
                           style: theme.getStyle().copyWith(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                       ],
                     ),
@@ -392,7 +392,7 @@ class _FloorContentPageState extends BaseState<FloorContentPage> {
       imageId = e.floorPlan!;
     }
     Widget image = imageId.isNotEmpty
-        ? TwinImageHelper.getImage(e.domainKey, imageId)
+        ? TwinImageHelper.getCachedImage(e.domainKey, imageId)
         : _missingImage;
 
     return Card(
@@ -432,16 +432,16 @@ class _FloorContentPageState extends BaseState<FloorContentPage> {
                         Text(
                           e.name,
                           style: theme.getStyle().copyWith(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                         Text(
                           e.description ?? "",
                           style: theme.getStyle().copyWith(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                       ],
                     ),
@@ -463,7 +463,7 @@ class _FloorContentPageState extends BaseState<FloorContentPage> {
       imageId = e.images![idx];
     }
     Widget image = imageId.isNotEmpty
-        ? TwinImageHelper.getImage(e.domainKey, imageId)
+        ? TwinImageHelper.getCachedImage(e.domainKey, imageId)
         : _missingImage;
 
     return Card(
@@ -503,16 +503,16 @@ class _FloorContentPageState extends BaseState<FloorContentPage> {
                         Text(
                           e.name,
                           style: theme.getStyle().copyWith(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                         Text(
                           e.description ?? "",
                           style: theme.getStyle().copyWith(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                       ],
                     ),

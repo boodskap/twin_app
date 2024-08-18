@@ -156,8 +156,8 @@ class _AssetContentPageState extends BaseState<AssetContentPage> {
     if (imageIds.length > selectedImage) {
       setState(() {
         imageId = imageIds[selectedImage];
-        infraImage =
-            TwinImageHelper.getImage(domainKey, imageId, fit: BoxFit.fill);
+        infraImage = TwinImageHelper.getCachedImage(domainKey, imageId,
+            fit: BoxFit.fill);
       });
     }
     await _load();
@@ -262,7 +262,7 @@ class _AssetContentPageState extends BaseState<AssetContentPage> {
 
       if (imageId.isNotEmpty) {
         setState(() {
-          infraImage = TwinImageHelper.getImage(domainKey, imageId);
+          infraImage = TwinImageHelper.getCachedImage(domainKey, imageId);
         });
       }
     });
@@ -337,7 +337,7 @@ class _AssetContentPageState extends BaseState<AssetContentPage> {
       imageId = e.images![idx];
     }
     Widget image = imageId.isNotEmpty
-        ? TwinImageHelper.getImage(e.domainKey, imageId)
+        ? TwinImageHelper.getCachedImage(e.domainKey, imageId)
         : _missingImage;
 
     return Card(
@@ -407,7 +407,7 @@ class _AssetContentPageState extends BaseState<AssetContentPage> {
       imageId = e.floorPlan!;
     }
     Widget image = imageId.isNotEmpty
-        ? TwinImageHelper.getImage(e.domainKey, imageId)
+        ? TwinImageHelper.getCachedImage(e.domainKey, imageId)
         : _missingImage;
 
     return Card(
@@ -478,7 +478,7 @@ class _AssetContentPageState extends BaseState<AssetContentPage> {
       imageId = e.images![idx];
     }
     Widget image = imageId.isNotEmpty
-        ? TwinImageHelper.getImage(e.domainKey, imageId)
+        ? TwinImageHelper.getCachedImage(e.domainKey, imageId)
         : _missingImage;
 
     return Card(

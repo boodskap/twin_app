@@ -108,7 +108,7 @@ class _AssetReportListState extends BaseState<AssetReportList> {
     }
     Widget? image;
     if (null != report.icon && report.icon!.isNotEmpty) {
-      image = TwinImageHelper.getImage(report.domainKey, report.icon!);
+      image = TwinImageHelper.getCachedImage(report.domainKey, report.icon!);
     }
 
     return InkWell(

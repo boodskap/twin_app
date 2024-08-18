@@ -86,7 +86,7 @@ class _DeviceInfoSnippetState extends BaseState<DeviceInfoSnippet> {
         twin.DeviceModel deviceModel = mRes.body!.entity!;
 
         if (deviceModel.images!.isNotEmpty) {
-          image = TwinImageHelper.getImage(
+          image = TwinImageHelper.getCachedImage(
               deviceModel.domainKey, deviceModel.images!.first);
         }
         refresh(sync: () {

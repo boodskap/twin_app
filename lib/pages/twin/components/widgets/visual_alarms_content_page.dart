@@ -106,7 +106,7 @@ class _VisualAlarmsContentPageState extends BaseState<VisualAlarmsContentPage> {
       size: 45,
     );
     if (widget.alarm.stateIcons!.length > group.alarmState) {
-      icon = TwinImageHelper.getImage(
+      icon = TwinImageHelper.getCachedImage(
           widget.alarm.domainKey, widget.alarm.stateIcons![group.alarmState]);
     }
     return Card(

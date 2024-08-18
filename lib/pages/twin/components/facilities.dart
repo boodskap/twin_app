@@ -205,7 +205,7 @@ class _FacilitiesState extends BaseState<Facilities> {
                 if (null != e.images && e.images!.isNotEmpty)
                   Align(
                     alignment: Alignment.center,
-                    child: TwinImageHelper.getImage(
+                    child: TwinImageHelper.getCachedImage(
                         e.domainKey, e.images!.first,
                         width: width / 2, height: width / 2),
                   )

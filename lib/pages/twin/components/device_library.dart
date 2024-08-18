@@ -165,7 +165,7 @@ class _DeviceLibraryState extends BaseState<DeviceLibrary> {
               if (null != e.images && e.images!.isNotEmpty)
                 Align(
                   alignment: Alignment.center,
-                  child: TwinImageHelper.getImage(
+                  child: TwinImageHelper.getCachedImage(
                       e.domainKey, e.images![e.selectedImage ?? 0],
                       width: width / 2, height: width / 2),
                 )

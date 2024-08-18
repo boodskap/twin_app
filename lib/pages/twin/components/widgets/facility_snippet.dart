@@ -258,8 +258,9 @@ class _FacilitySnippetState extends BaseState<FacilitySnippet> {
                                       child: SizedBox(
                                         width: 250,
                                         height: 250,
-                                        child: TwinImageHelper.getDomainImage(
-                                            _facility.images!.first),
+                                        child: TwinImageHelper
+                                            .getCachedDomainImage(
+                                                _facility.images!.first),
                                       ),
                                     ),
                                 ],
@@ -385,22 +386,22 @@ class _FacilitySnippetState extends BaseState<FacilitySnippet> {
   }
 
   Future _save({bool silent = false}) async {
-     List<String>? clientIds = super.isClientAdmin()
-      ? await TwinnedSession.instance.getClientIds()
-      : null;
+    List<String>? clientIds = super.isClientAdmin()
+        ? await TwinnedSession.instance.getClientIds()
+        : null;
     if (loading) return;
     loading = true;
 
     _facility = _facility.copyWith(
-        premiseId: widget.selectedPremise!.id,
-        name: nameController.text.trim(),
-        description: descController.text.trim(),
-        address: addressController.text.trim(),
-        email: emailController.text.trim(),
-        phone: phoneController.text.trim(),
-        countryCode: countryCode,
-        clientIds: clientIds??_facility.clientIds,
-        );
+      premiseId: widget.selectedPremise!.id,
+      name: nameController.text.trim(),
+      description: descController.text.trim(),
+      address: addressController.text.trim(),
+      email: emailController.text.trim(),
+      phone: phoneController.text.trim(),
+      countryCode: countryCode,
+      clientIds: clientIds ?? _facility.clientIds,
+    );
     await execute(() async {
       if (null == widget.facility) {
         var cRes = await TwinnedSession.instance.twin.createFacility(

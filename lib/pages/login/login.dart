@@ -99,20 +99,23 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
       String password = _passwordController.text.trim();
       bool loggedIn = false;
 
-      var lRes = await session.config.twinned
-          .loginUser(body: tapi.Login(userId: userId, password: password));
+      var lRes = await session.config.twinned.loginUser(
+          body: tapi.Login(
+              userId: userId,
+              password: password,
+              domainKey: session.config.twinDomainKey ?? ''));
 
       if (validateResponse(lRes)) {
         bool debug = TwinnedSession.instance.debug;
         String host = TwinnedSession.instance.host;
 
-        session.orgs.addAll(lRes.body!.orgs ?? []);
+        session.orgs.addAll(lRes.body!.orgs!);
 
         TwinnedSession.instance.init(
             debug: debug,
             host: host,
-            authToken: lRes.body!.authToken ?? '',
-            domainKey: lRes.body!.user!.domainKey!,
+            authToken: session.orgs.first.twinAuthToken,
+            domainKey: session.orgs.first.twinDomainKey,
             noCodeAuthToken: lRes.body!.nocodeAuthToken ?? '');
         loggedIn = true;
 

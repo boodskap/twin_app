@@ -171,8 +171,9 @@ class _ClientLocationSnippetState extends BaseState<ClientLocationSnippet> {
                                       child: SizedBox(
                                           width: 250,
                                           height: 250,
-                                          child: TwinImageHelper.getDomainImage(
-                                              _location.images!.first))),
+                                          child: TwinImageHelper
+                                              .getCachedDomainImage(
+                                                  _location.images!.first))),
                               ],
                             ),
                           ),

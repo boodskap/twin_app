@@ -179,7 +179,7 @@ class _DisplayStateSectionState extends BaseState<DisplayStateSection> {
       if (null != widget.deviceModel.images &&
           widget.deviceModel.images!.length >=
               widget.deviceModel.selectedImage! + 1) {
-        selectedDisplayImage = TwinImageHelper.getImage(
+        selectedDisplayImage = TwinImageHelper.getCachedImage(
             widget.deviceModel.domainKey,
             widget.deviceModel.images![widget.deviceModel.selectedImage!],
             fit: BoxFit.fill);
