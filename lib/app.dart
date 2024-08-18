@@ -516,7 +516,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
                                 SizedBox(
                                     //width: 280,
                                     height: 64,
-                                    child: TwinImageHelper.getDomainImage(
+                                    child: TwinImageHelper.getCachedDomainImage(
                                         _clients[_selectedClient].icon!)),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,

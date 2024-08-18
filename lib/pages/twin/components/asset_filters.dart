@@ -50,7 +50,7 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
       _editable[group.id] = super.isAdmin();
       Widget? image;
       if (null != group.icon && group.icon!.isNotEmpty) {
-        image = TwinImageHelper.getImage(group.domainKey, group.icon!);
+        image = TwinImageHelper.getCachedImage(group.domainKey, group.icon!);
       }
       cards.add(InkWell(
           onDoubleTap: () async {
@@ -160,7 +160,7 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
     for (var group in _dataFilters) {
       Widget? image;
       if (null != group.icon && group.icon!.isNotEmpty) {
-        image = TwinImageHelper.getImage(group.domainKey, group.icon!);
+        image = TwinImageHelper.getCachedImage(group.domainKey, group.icon!);
       }
       bool editable = _canEdit;
       if (!editable) {

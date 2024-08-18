@@ -288,11 +288,9 @@ class _DeviceViewDefaultState extends BaseState<DeviceViewDefault> {
       //       widget.deviceModel.images![widget.deviceModel.selectedImage!]),
       //   fit: BoxFit.cover,
       // );
-      var image = TwinImageHelper.getImage(
-        widget.deviceModel.domainKey,
-        widget.deviceModel.images![widget.deviceModel.selectedImage!],
-        fit: BoxFit.cover
-      );
+      var image = TwinImageHelper.getCachedImage(widget.deviceModel.domainKey,
+          widget.deviceModel.images![widget.deviceModel.selectedImage!],
+          fit: BoxFit.cover);
       _deviceBody.add(Center(child: image));
     }
   }
@@ -325,7 +323,7 @@ class _DeviceViewDefaultState extends BaseState<DeviceViewDefault> {
       for (var alarm in res.body!.values!) {
         Map<String, dynamic> params = {};
         _getAlarmState(alarm, params);
-        Image image;
+        Widget image;
         if (params['state'] < 0) {
           image = Image.asset('images/new-alarm-icon.png', fit: BoxFit.cover);
         } else {
@@ -334,7 +332,7 @@ class _DeviceViewDefaultState extends BaseState<DeviceViewDefault> {
           //     alarm.stateIcons![params['state']]),
           // fit: BoxFit.cover,
           // );
-          image = TwinImageHelper.getImage(
+          image = TwinImageHelper.getCachedImage(
             widget.deviceModel.domainKey,
             alarm.stateIcons![params['state']],
             fit: BoxFit.cover,

@@ -138,7 +138,7 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
             alarmState: 0);
 
     if (e.stateIcons!.length > group.alarmState) {
-      icon = TwinImageHelper.getImage(
+      icon = TwinImageHelper.getCachedImage(
           e.domainKey, e.stateIcons![group.alarmState]);
     }
     return InkWell(

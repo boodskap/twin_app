@@ -79,11 +79,11 @@ class _TwinSysConfigWidgetState extends BaseState<TwinSysConfigWidget> {
         info = res.body!.entity!;
 
         if (info.bannerImage!.isNotEmpty) {
-          banner = TwinImageHelper.getDomainImage(info.bannerImage!);
+          banner = TwinImageHelper.getCachedDomainImage(info.bannerImage!);
         }
 
         if (info.logoImage!.isNotEmpty) {
-          logo = TwinImageHelper.getDomainImage(info.logoImage!);
+          logo = TwinImageHelper.getCachedDomainImage(info.logoImage!);
         }
 
         setState(() {});
@@ -103,7 +103,7 @@ class _TwinSysConfigWidgetState extends BaseState<TwinSysConfigWidget> {
       if (null != res) {
         setState(() {
           info = info.copyWith(bannerImage: res.entity!.id);
-          banner = TwinImageHelper.getDomainImage(info.bannerImage!);
+          banner = TwinImageHelper.getCachedDomainImage(info.bannerImage!);
         });
       }
     });
@@ -121,7 +121,7 @@ class _TwinSysConfigWidgetState extends BaseState<TwinSysConfigWidget> {
       if (null != res) {
         setState(() {
           info = info.copyWith(logoImage: res.entity!.id);
-          logo = TwinImageHelper.getDomainImage(info.logoImage!);
+          logo = TwinImageHelper.getCachedDomainImage(info.logoImage!);
         });
       }
     });

@@ -27,11 +27,9 @@ class _PremiseSnippetState extends BaseState<PremiseSnippet> {
   TextEditingController phoneController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   bool _isPhoneValid = true;
-  Future<List<String>>? clientIds = isClientAdmin()
-        ? TwinnedSession.instance.getClientIds()
-        : null;
+  Future<List<String>>? clientIds =
+      isClientAdmin() ? TwinnedSession.instance.getClientIds() : null;
   tapi.PremiseInfo _premise = const tapi.PremiseInfo(
-    
       name: '',
       address: '',
       clientIds: [],
@@ -78,7 +76,7 @@ class _PremiseSnippetState extends BaseState<PremiseSnippet> {
       phoneController.text = splitString[1];
     } else {
       countryCode = "IN";
-      phoneController.text=_premise.phone!;
+      phoneController.text = _premise.phone!;
     }
   }
 
@@ -250,8 +248,9 @@ class _PremiseSnippetState extends BaseState<PremiseSnippet> {
                                       child: SizedBox(
                                         width: 250,
                                         height: 250,
-                                        child: TwinImageHelper.getDomainImage(
-                                            _premise.images!.first),
+                                        child: TwinImageHelper
+                                            .getCachedDomainImage(
+                                                _premise.images!.first),
                                       ),
                                     ),
                                 ],
@@ -378,8 +377,8 @@ class _PremiseSnippetState extends BaseState<PremiseSnippet> {
 
   Future _save({bool silent = false}) async {
     List<String>? clientIds = super.isClientAdmin()
-      ? await TwinnedSession.instance.getClientIds()
-      : null;
+        ? await TwinnedSession.instance.getClientIds()
+        : null;
     if (loading) return;
     loading = true;
 
@@ -389,7 +388,7 @@ class _PremiseSnippetState extends BaseState<PremiseSnippet> {
       address: addressController.text.trim(),
       email: emailController.text.trim(),
       phone: fullNumber.trim(),
-      clientIds: clientIds??_premise.clientIds,
+      clientIds: clientIds ?? _premise.clientIds,
     );
     await execute(() async {
       if (null == widget.premise) {

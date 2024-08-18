@@ -200,8 +200,8 @@ class _UsersState extends BaseState<Users> {
             Expanded(
               child: (entity.images != null && entity.images!.isNotEmpty)
                   ? Center(
-                      child:
-                          TwinImageHelper.getDomainImage(entity.images!.first),
+                      child: TwinImageHelper.getCachedDomainImage(
+                          entity.images!.first),
                     )
                   : userdefaultImage,
             ),

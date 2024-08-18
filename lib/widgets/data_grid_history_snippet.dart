@@ -547,7 +547,7 @@ class DataGridHistorySnippetState extends BaseState<DataGridHistorySnippet> {
                       SizedBox(
                           width: 28,
                           height: 28,
-                          child: TwinImageHelper.getDomainImage(iconId)),
+                          child: TwinImageHelper.getCachedDomainImage(iconId)),
                     divider(),
                     Text(
                       '${dynData[field] ?? '-'} ${TwinUtils.getParameterUnit(field, deviceModel)}',

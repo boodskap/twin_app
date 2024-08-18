@@ -122,7 +122,7 @@ class _CustomLandingPageState extends State<CustomLandingPage> {
     }
 
     if (widget.landingPage.logoImage?.isNotEmpty ?? false) {
-      image = TwinImageHelper.getDomainImage(widget.landingPage.logoImage!,
+      image = TwinImageHelper.getCachedDomainImage(widget.landingPage.logoImage!,
           fit: BoxFit.contain);
     }
 

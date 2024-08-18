@@ -86,7 +86,7 @@ class _AssetTypeDropdownState extends BaseState<AssetTypeDropdown> {
                     SizedBox(
                         width: 48,
                         height: 48,
-                        child: TwinImageHelper.getDomainImage(
+                        child: TwinImageHelper.getCachedDomainImage(
                             entity.images!.first)),
                   Text(
                     '${entity.name} ${entity.description}',

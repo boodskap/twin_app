@@ -403,10 +403,8 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
     if (loading) return;
     loading = true;
     await execute(() async {
-      var response = await TwinnedSession.instance.twin.getMyProfile(
-          apikey: config.isTwinApp()
-              ? TwinnedSession.instance.authToken
-              : TwinnedSession.instance.noCodeAuthToken);
+      var response = await TwinnedSession.instance.twin
+          .getMyProfile(apikey: orgs[selectedOrg].twinAuthToken);
       var res = response.body!.entity!;
 
       if (validateResponse(response)) {

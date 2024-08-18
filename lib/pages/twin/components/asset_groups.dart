@@ -51,7 +51,7 @@ class _AssetGroupListState extends BaseState<AssetGroupList> {
       _editable[group.id] = super.isAdmin();
       Widget? image;
       if (group.icon != null && group.icon!.isNotEmpty) {
-        image = TwinImageHelper.getImage(group.domainKey, group.icon!);
+        image = TwinImageHelper.getCachedImage(group.domainKey, group.icon!);
       }
 
       cards.add(InkWell(

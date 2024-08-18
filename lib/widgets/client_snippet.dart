@@ -240,8 +240,8 @@ class _ClientSnippetState extends BaseState<ClientSnippet> {
                                         child: SizedBox(
                                             width: 250,
                                             height: 250,
-                                            child:
-                                                TwinImageHelper.getDomainImage(
+                                            child: TwinImageHelper
+                                                .getCachedDomainImage(
                                                     _client.icon!))),
                                 ],
                               ),
