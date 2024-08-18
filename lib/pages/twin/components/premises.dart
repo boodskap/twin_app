@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:twin_app/core/session_variables.dart';
+import 'package:twin_app/pages/twin/components/widgets/premise_snippet.dart';
 import 'package:twin_app/pages/twin/components/widgets/premises_content_page.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:twin_app/widgets/commons/secondary_button.dart';
@@ -8,7 +9,6 @@ import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:twin_commons/core/twin_image_helper.dart';
 import 'package:twin_commons/core/twinned_session.dart';
 import 'package:twinned_api/twinned_api.dart' as tapi;
-import 'package:twin_commons/util/osm_location_picker.dart';
 import 'package:uuid/uuid.dart';
 
 class Premises extends StatefulWidget {
@@ -28,7 +28,7 @@ class _PremisesState extends BaseState<Premises> {
   @override
   void initState() {
     super.initState();
-    _canEdit = TwinnedSession.instance.isAdmin();
+    _checkCanEdit();
   }
 
   @override
@@ -45,17 +45,14 @@ class _PremisesState extends BaseState<Premises> {
                 },
                 icon: Icon(Icons.refresh)),
             divider(horizontal: true),
-            if (canCreate())
-              PrimaryButton(
-                labelKey: 'Create New',
-                leading: Icon(
-                  Icons.add,
-                  color: Colors.white,
-                ),
-                onPressed: () {
-                  _addPremiseDialog(context);
-                },
+            PrimaryButton(
+              labelKey: 'Create New',
+              leading: Icon(
+                Icons.add,
+                color: Colors.white,
               ),
+              onPressed: (canCreate()) ? _addEditPremiseDialog : null,
+            ),
             divider(horizontal: true),
             SizedBox(
                 height: 40,
@@ -111,7 +108,7 @@ class _PremisesState extends BaseState<Premises> {
     }
     return InkWell(
       onDoubleTap: () {
-        if (editable) {
+        if (_canEdit) {
           _edit(e);
         }
       },
@@ -141,23 +138,39 @@ class _PremisesState extends BaseState<Premises> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      if (editable)
-                        InkWell(
-                            onTap: () {
-                              _edit(e);
-                            },
-                            child: Icon(Icons.edit,
-                                color: theme.getPrimaryColor())),
-                      if (editable)
-                        InkWell(
-                          onTap: () {
-                            _confirmDeletionDialog(context, e);
-                          },
+                      Tooltip(
+                        message: _canEdit ? "Update" : "No Permission to Edit",
+                        child: InkWell(
+                          onTap: _canEdit
+                              ? () {
+                                  _addEditPremiseDialog(premise: e);
+                                }
+                              : null,
                           child: Icon(
-                            Icons.delete,
-                            color: theme.getPrimaryColor(),
+                            Icons.edit,
+                            color: _canEdit
+                                ? theme.getPrimaryColor()
+                                : Colors.grey,
                           ),
                         ),
+                      ),
+                      Tooltip(
+                        message:
+                            _canEdit ? "Delete" : "No Permission to Delete",
+                        child: InkWell(
+                          onTap: _canEdit
+                              ? () {
+                                  _confirmDeletionDialog(context, e);
+                                }
+                              : null,
+                          child: Icon(
+                            Icons.delete_forever_rounded,
+                            color: _canEdit
+                                ? theme.getPrimaryColor()
+                                : Colors.grey,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -165,7 +178,8 @@ class _PremisesState extends BaseState<Premises> {
               if (null != e.images && e.images!.isNotEmpty)
                 Align(
                   alignment: Alignment.center,
-                  child: TwinImageHelper.getImage(e.domainKey, e.images!.first,
+                  child: TwinImageHelper.getCachedImage(
+                      e.domainKey, e.images!.first,
                       width: width / 2, height: width / 2),
                 )
             ],
@@ -175,236 +189,13 @@ class _PremisesState extends BaseState<Premises> {
     );
   }
 
-  Future<void> _mapDialog(BuildContext context) async {
-    return showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          content: SizedBox(
-            width: 1000,
-            child: OSMLocationPicker(
-              // longitude: _location.location?.coordinates[0],
-              // latitude: _location.location?.coordinates[1],
-              onPicked: (pickedData) {
-                setState(
-                  () {},
-                );
-                Navigator.of(context).pop();
-              },
-            ),
-          ),
-        );
-      },
-    );
-  }
+  Future<void> _checkCanEdit() async {
+    List<String> clientIds = await getClientIds();
+    bool canEditResult = await canEdit(clientIds: clientIds);
 
-  void _addPremiseDialog(BuildContext context) {
-    GlobalKey<FormState> formKey = GlobalKey<FormState>();
-    TextEditingController premiseName = TextEditingController();
-    TextEditingController premiseDescription = TextEditingController();
-    TextEditingController premiseTags = TextEditingController();
-    tapi.GeoLocation? location;
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          titlePadding: EdgeInsets.zero,
-          contentPadding: EdgeInsets.zero,
-          backgroundColor: Colors.white,
-          title: Container(
-            decoration: BoxDecoration(
-              color: theme.getPrimaryColor(),
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(10),
-                topRight: Radius.circular(10),
-              ),
-            ),
-            width: 400,
-            child: Padding(
-              padding: const EdgeInsets.all(13),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Add Premise',
-                    style: theme.getStyle().copyWith(
-                          color: Colors.white,
-                        ),
-                  ),
-                  MouseRegion(
-                    cursor: SystemMouseCursors.click,
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: const Icon(Icons.close, color: Colors.white),
-                    ),
-                  )
-                ],
-              ),
-            ),
-          ),
-          content: Padding(
-            padding: const EdgeInsets.all(10),
-            child: Form(
-              key: formKey,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  divider(),
-                  TextFormField(
-                    controller: premiseName,
-                    validator: (value) {
-                      if (value!.isEmpty) {
-                        return 'Please enter valid name';
-                      }
-                      return null;
-                    },
-                    decoration: InputDecoration(
-                      labelText: 'Enter Name',
-                      errorStyle: theme.getStyle(),
-                      labelStyle: theme.getStyle(),
-                    ),
-                  ),
-                  divider(),
-                  TextFormField(
-                    controller: premiseDescription,
-                    onFieldSubmitted: (value) {
-                      if (formKey.currentState!.validate()) {
-                        _addNewEntity(
-                          premiseName.text,
-                          premiseDescription.text,
-                          premiseTags.text.split(' '),
-                          location,
-                        );
-                        Navigator.of(context).pop();
-                      }
-                    },
-                    decoration: InputDecoration(
-                      labelText: 'Enter Description',
-                      errorStyle: theme.getStyle(),
-                      labelStyle: theme.getStyle(),
-                    ),
-                  ),
-                  divider(),
-                  TextFormField(
-                    controller: premiseTags,
-                    onFieldSubmitted: (value) {
-                      if (formKey.currentState!.validate()) {
-                        _addNewEntity(
-                          premiseName.text,
-                          premiseDescription.text,
-                          premiseTags.text.split(' '),
-                          location,
-                        );
-                        Navigator.of(context).pop();
-                      }
-                    },
-                    decoration: InputDecoration(
-                      labelText: 'Enter Tags',
-                      errorStyle: theme.getStyle(),
-                      labelStyle: theme.getStyle(),
-                    ),
-                  ),
-                  divider(),
-                  // TextFormField(
-                  //   readOnly: true,
-                  //   onChanged: (value) {
-                  //     location = location;
-                  //   },
-                  //   onFieldSubmitted: (value) {
-                  //     if (formKey.currentState!.validate()) {
-                  //       _addNewEntity(
-                  //         premiseName.text,
-                  //         premiseDescription.text,
-                  //         premiseTags.text.split(' '),
-                  //         location,
-                  //       );
-                  //       Navigator.of(context).pop();
-                  //     }
-                  //   },
-                  //   decoration: InputDecoration(
-                  //     labelText: 'Enter Location',
-                  //     errorStyle: theme.getStyle(),
-                  //     labelStyle: theme.getStyle(),
-                  //     suffixIcon: IconButton(
-                  //       onPressed: () {
-                  //         _mapDialog(context);
-                  //       },
-                  //       icon: const Icon(Icons.location_on_outlined),
-                  //     ),
-                  //   ),
-                  // ),
-                  divider(),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      SecondaryButton(
-                        labelKey: 'Cancel',
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                      ),
-                      divider(
-                        horizontal: true,
-                      ),
-                      PrimaryButton(
-                        labelKey: 'Save',
-                        onPressed: () {
-                          if (formKey.currentState!.validate()) {
-                            Navigator.of(context).pop();
-                            _addNewEntity(
-                              premiseName.text,
-                              premiseDescription.text,
-                              premiseTags.text.split(' '),
-                              location,
-                            );
-                          }
-                        },
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  void _addNewEntity(
-    String premiseName,
-    String description,
-    List<String> tags,
-    tapi.GeoLocation? location,
-  ) async {
-    List<String>? clientIds = super.isClientAdmin()
-        ? await TwinnedSession.instance.getClientIds()
-        : null;
-    if (loading) return;
-    loading = true;
-    var res = await TwinnedSession.instance.twin.createPremise(
-      apikey: TwinnedSession.instance.authToken,
-      body: tapi.PremiseInfo(
-        name: premiseName,
-        description: description,
-        location: location,
-        tags: tags,
-        clientIds: clientIds,
-      ),
-    );
-
-    if (validateResponse(res)) {
-      tapi.Premise entity = res.body!.entity!;
-      _entities.add(entity);
-      _buildCard(
-        entity,
-      );
-    }
-    loading = false;
-    refresh();
+    setState(() {
+      _canEdit = canEditResult;
+    });
   }
 
   Future _edit(tapi.Premise e) async {
@@ -504,6 +295,18 @@ class _PremisesState extends BaseState<Premises> {
 
     loading = false;
     refresh();
+  }
+
+  void _addEditPremiseDialog({tapi.Premise? premise}) async {
+    await super.alertDialog(
+      title: null == premise ? 'Add New Premise' : 'Update Premise',
+      body: PremiseSnippet(
+        premise: premise,
+      ),
+      width: 750,
+      height: MediaQuery.of(context).size.height - 150,
+    );
+    _load();
   }
 
   @override

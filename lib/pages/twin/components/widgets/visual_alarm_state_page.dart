@@ -22,12 +22,10 @@ class VisualAlarmStatePage extends StatefulWidget {
   });
 
   @override
-  State<VisualAlarmStatePage> createState() =>
-      _VisualAlarmStatePageState();
+  State<VisualAlarmStatePage> createState() => _VisualAlarmStatePageState();
 }
 
-class _VisualAlarmStatePageState
-    extends BaseState<VisualAlarmStatePage> {
+class _VisualAlarmStatePageState extends BaseState<VisualAlarmStatePage> {
   // final Image _banner = Image.asset(
   //   'images/banner.png',
   //   fit: BoxFit.contain,
@@ -134,14 +132,14 @@ class _VisualAlarmStatePageState
   Widget build(BuildContext context) {
     if ((widget.alarm.stateIcons?.length ?? 0) > widget.group.alarmState) {
       hasStateIcon = true;
-      stateIcon = TwinImageHelper.getImage(widget.alarm.domainKey,
+      stateIcon = TwinImageHelper.getCachedImage(widget.alarm.domainKey,
           widget.alarm.stateIcons![widget.group.alarmState]);
     } else {
       hasStateIcon = false;
     }
 
     if ((widget.model.images?.length ?? 0) > selectedDeviceImage) {
-      deviceImage = TwinImageHelper.getImage(
+      deviceImage = TwinImageHelper.getCachedImage(
           widget.model.domainKey, widget.model.images![selectedDeviceImage]);
     }
     _entries.clear();

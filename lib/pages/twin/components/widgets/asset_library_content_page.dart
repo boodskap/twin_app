@@ -167,7 +167,7 @@ class _AssetLibraryContentPageState extends BaseState<AssetLibraryContentPage> {
                                 SizedBox(
                                   width: 450,
                                   height: 450,
-                                  child: TwinImageHelper.getImage(
+                                  child: TwinImageHelper.getCachedImage(
                                       widget.assetModel.domainKey, imageId,
                                       fit: BoxFit.cover),
                                 ),

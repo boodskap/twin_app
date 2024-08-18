@@ -47,7 +47,7 @@ class _EvaluatedAlarmsSnippetState extends BaseState<EvaluatedAlarmsSnippet> {
 
         if (validateResponse(res, shouldAlert: false)) {
           var parent = res.body!.entity!;
-          var icon = TwinImageHelper.getDomainImage(
+          var icon = TwinImageHelper.getCachedDomainImage(
             alarm.stateIcon,
             fit: BoxFit.contain,
           );

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/pages/twin/components/widgets/floor_content_page.dart';
+import 'package:twin_app/pages/twin/components/widgets/floor_snippet.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
-import 'package:twin_app/widgets/commons/secondary_button.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:twin_commons/core/twin_image_helper.dart';
@@ -10,7 +10,6 @@ import 'package:twin_commons/core/twinned_session.dart';
 import 'package:twinned_api/twinned_api.dart' as tapi;
 import 'package:twinned_widgets/core/facility_dropdown.dart';
 import 'package:twinned_widgets/core/premise_dropdown.dart';
-import 'package:twinned_widgets/core/top_bar.dart';
 import 'package:uuid/uuid.dart';
 
 class Floors extends StatefulWidget {
@@ -26,6 +25,14 @@ class _FloorsState extends BaseState<Floors> {
   String _search = '';
   tapi.Premise? _selectedPremise;
   tapi.Facility? _selectedFacility;
+  bool _canEdit = false;
+  Map<String, bool> _editable = Map<String, bool>();
+
+  @override
+  void initState() {
+    super.initState();
+    _checkCanEdit();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,10 +52,17 @@ class _FloorsState extends BaseState<Floors> {
             SizedBox(
               width: 250,
               child: PremiseDropdown(
+                key: Key(const Uuid().v4()),
                 selectedItem: _selectedPremise?.id,
                 onPremiseSelected: (e) {
                   setState(() {
-                    _selectedPremise = e;
+                    if (e == null) {
+                      _selectedPremise = null;
+                      _selectedFacility = null;
+                    } else {
+                      _selectedPremise = e;
+                      _selectedFacility = null;
+                    }
                   });
                   _load();
                 },
@@ -58,6 +72,7 @@ class _FloorsState extends BaseState<Floors> {
             SizedBox(
               width: 250,
               child: FacilityDropdown(
+                key: Key(const Uuid().v4()),
                 selectedItem: _selectedFacility?.id,
                 selectedPremise: _selectedPremise?.id,
                 onFacilitySelected: (e) {
@@ -75,10 +90,10 @@ class _FloorsState extends BaseState<Floors> {
                 Icons.add,
                 color: Colors.white,
               ),
-              onPressed: (_selectedPremise != null && _selectedFacility != null)
-                  ? () {
-                      _create();
-                    }
+              onPressed: (_selectedPremise != null &&
+                      _selectedFacility != null &&
+                      canCreate())
+                  ? _addEditFloorDialog
                   : null,
             ),
             divider(horizontal: true),
@@ -132,12 +147,18 @@ class _FloorsState extends BaseState<Floors> {
 
   Widget _buildCard(tapi.Floor e) {
     double width = MediaQuery.of(context).size.width / 8;
+    bool editable = _canEdit;
+    if (!editable) {
+      editable = _editable[e.id] ?? false;
+    }
     return SizedBox(
       width: width,
       height: width,
       child: InkWell(
         onDoubleTap: () {
-          _edit(e);
+          if (_canEdit) {
+            _edit(e);
+          }
         },
         child: Card(
           elevation: 8,
@@ -162,19 +183,33 @@ class _FloorsState extends BaseState<Floors> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      InkWell(
-                        onTap: () {
-                          _edit(e);
-                        },
-                        child: Icon(Icons.edit, color: theme.getPrimaryColor()),
+                      Tooltip(
+                        message: _canEdit ? "Update" : "No Permission to Edit",
+                        child: InkWell(
+                          onTap: _canEdit
+                              ? () {
+                                  _addEditFloorDialog(floor: e);
+                                }
+                              : null,
+                          child: Icon(
+                            Icons.edit,
+                            color: _canEdit ? theme.getPrimaryColor() : null,
+                          ),
+                        ),
                       ),
-                      InkWell(
-                        onTap: () {
-                          _delete(e);
-                        },
-                        child: Icon(
-                          Icons.delete,
-                          color: theme.getPrimaryColor(),
+                      Tooltip(
+                        message:
+                            _canEdit ? "Delete" : "No Permission to Delete",
+                        child: InkWell(
+                          onTap: _canEdit
+                              ? () {
+                                  _delete(e);
+                                }
+                              : null,
+                          child: Icon(
+                            Icons.delete,
+                            color: _canEdit ? theme.getPrimaryColor() : null,
+                          ),
                         ),
                       ),
                     ],
@@ -184,7 +219,7 @@ class _FloorsState extends BaseState<Floors> {
               if (null != e.floorPlan && e.floorPlan!.isNotEmpty)
                 Align(
                   alignment: Alignment.center,
-                  child: TwinImageHelper.getImage(
+                  child: TwinImageHelper.getCachedImage(
                     e.domainKey,
                     e.floorPlan!,
                     width: width / 2,
@@ -198,120 +233,42 @@ class _FloorsState extends BaseState<Floors> {
     );
   }
 
-  Future<void> _getBasicInfo(
-    BuildContext context,
-    String title, {
-    required Function(String, String, String?) onPressed,
-  }) async {
-    String? nameText = '';
-    String? descText = '';
-    String? tagsText = '';
-    return showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return AlertDialog(
-          title: Text(title),
-          content: SizedBox(
-            width: 500,
-            height: 150,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                TextField(
-                  onChanged: (value) {
-                    nameText = value;
-                  },
-                  style: theme.getStyle(),
-                  decoration: InputDecoration(
-                    hintText: 'Name',
-                    hintStyle: theme.getStyle(),
-                  ),
-                ),
-                TextField(
-                  onChanged: (value) {
-                    descText = value;
-                  },
-                  style: theme.getStyle(),
-                  decoration: InputDecoration(
-                    hintText: 'Description',
-                    hintStyle: theme.getStyle(),
-                  ),
-                ),
-                TextField(
-                  onChanged: (value) {
-                    tagsText = value;
-                  },
-                  style: theme.getStyle(),
-                  decoration: InputDecoration(
-                    hintText: 'Tags (space separated)',
-                    hintStyle: theme.getStyle(),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            SecondaryButton(
-              labelKey: "Cancel",
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-            divider(horizontal: true),
-            PrimaryButton(
-              labelKey: "OK",
-              onPressed: () {
-                if (nameText!.length < 3) {
-                  alert(
-                    'Invalid',
-                    'Name is required and should be minimum 3 characters',
-                  );
-                  return;
-                }
-                onPressed(nameText!, descText!, tagsText);
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        );
-      },
-    );
+  Future<void> _checkCanEdit() async {
+    List<String> clientIds = await getClientIds();
+    bool canEditResult = await canEdit(clientIds: clientIds);
+
+    setState(() {
+      _canEdit = canEditResult;
+    });
   }
 
-  Future _create() async {
-    if (loading) return;
-    loading = true;
-    await _getBasicInfo(
-      context,
-      'New Floor',
-      onPressed: (name, desc, t) async {
-        List<String> tags = [];
-        if (null != t) {
-          tags = t.trim().split(' ');
-        }
-        var mRes = await TwinnedSession.instance.twin.createFloor(
-          apikey: TwinnedSession.instance.authToken,
-          body: tapi.FloorInfo(
-            premiseId: _selectedPremise!.id,
-            facilityId: _selectedFacility!.id,
-            floorLevel: _cards.length,
-            floorType: tapi.FloorInfoFloorType.onground,
-            name: name,
-            description: desc,
-            tags: tags,
-            roles: _selectedFacility!.roles,
-          ),
-        );
-        if (validateResponse(mRes)) {
-          await _edit(mRes.body!.entity!);
-          alert("Floor${mRes.body!.entity!.name}", "Saved Successfully!");
-        }
-      },
+  void _addEditFloorDialog({tapi.Floor? floor}) async {
+    var pRes;
+    if (floor != null) {
+      pRes = await TwinnedSession.instance.twin.getPremise(
+        premiseId: floor.premiseId,
+        apikey: TwinnedSession.instance.authToken,
+      );
+    }
+    var fRes;
+    if (floor != null) {
+      fRes = await TwinnedSession.instance.twin.getFacility(
+        facilityId: floor.facilityId,
+        apikey: TwinnedSession.instance.authToken,
+      );
+    }
+    await super.alertDialog(
+      title: null == floor ? 'Add New Floor' : 'Update Floor',
+      body: FloorSnippet(
+        selectedPremise: floor == null ? _selectedPremise : pRes.body!.entity!,
+        selectedFacility:
+            floor == null ? _selectedFacility : fRes.body!.entity!,
+        floor: floor,
+      ),
+      width: 750,
+      height: MediaQuery.of(context).size.height - 150,
     );
-    loading = false;
-    refresh();
+    _load();
   }
 
   Future _edit(tapi.Floor e) async {
@@ -398,6 +355,7 @@ class _FloorsState extends BaseState<Floors> {
       }
 
       for (tapi.Floor e in _entities) {
+        _editable[e.id] = await super.canEdit(clientIds: e.clientIds);
         _cards.add(_buildCard(e));
       }
     });

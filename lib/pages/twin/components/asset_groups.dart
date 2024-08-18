@@ -31,10 +31,176 @@ class AssetGroupList extends StatefulWidget {
 
 class _AssetGroupListState extends BaseState<AssetGroupList> {
   final List<twinned.AssetGroup> _groups = [];
+  bool _canEdit = false;
+  Map<String, bool> _editable = Map<String, bool>();
+  @override
+  void initState() {
+    super.initState();
+    _checkCanEdit();
+  }
 
   @override
-  void setup() async {
-    await _load();
+  Widget build(BuildContext context) {
+    final List<Widget> cards = [];
+
+    for (var group in _groups) {
+      bool editable = _canEdit;
+      if (!editable) {
+        editable = _editable[group.id] ?? false;
+      }
+      _editable[group.id] = super.isAdmin();
+      Widget? image;
+      if (group.icon != null && group.icon!.isNotEmpty) {
+        image = TwinImageHelper.getCachedImage(group.domainKey, group.icon!);
+      }
+
+      cards.add(InkWell(
+        onDoubleTap: () async {
+          if (editable) {
+            await _editGroup(group);
+          }
+        },
+        child: Card(
+          elevation: 10,
+          child: Container(
+            color: Colors.white,
+            width: widget.cardWidth,
+            height: widget.cardHeight,
+            child: Stack(
+              children: [
+                Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      if (image != null)
+                        SizedBox(width: 48, height: 48, child: image),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          group.name,
+                          style: theme.getStyle().copyWith(fontSize: 14),
+                        ),
+                      ),
+                      Text(
+                        '${group.assetIds.length} assets',
+                        style: theme
+                            .getStyle()
+                            .copyWith(fontSize: 10, color: Colors.blue),
+                      ),
+                    ],
+                  ),
+                ),
+                Positioned(
+                  left: 8,
+                  child: Tooltip(
+                    message: _canEdit ? "Delete" : "No Permission to Delete",
+                    child: IconButton(
+                      onPressed: _canEdit
+                          ? () async {
+                              await _delete(group);
+                            }
+                          : null,
+                      icon: Icon(
+                        Icons.delete,
+                        color: _canEdit ? theme.getPrimaryColor() : Colors.grey,
+                      ),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  right: 45,
+                  child: Tooltip(
+                    message: _canEdit ? "Update" : "No Permission to Edit",
+                    child: IconButton(
+                      onPressed: _canEdit
+                          ? () async {
+                              await _editGroup(group);
+                            }
+                          : null,
+                      icon: Icon(
+                        Icons.edit,
+                        color: _canEdit ? theme.getPrimaryColor() : Colors.grey,
+                      ),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  right: 8,
+                  child: Tooltip(
+                    message: _canEdit ? "Upload" : "No Permission to Upload",
+                    child: IconButton(
+                      onPressed: _canEdit
+                          ? () async {
+                              await _upload(group);
+                            }
+                          : null,
+                      icon: Icon(
+                        Icons.upload,
+                        color: _canEdit ? theme.getPrimaryColor() : Colors.grey,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ));
+    }
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            const BusyIndicator(),
+            IconButton(
+              onPressed: () async {
+                await _load();
+              },
+              icon: const Icon(Icons.refresh),
+            ),
+            divider(horizontal: true),
+            PrimaryButton(
+              labelKey: "Add New",
+              onPressed: isAdmin()
+                  ? () async {
+                      await _addNew();
+                    }
+                  : null,
+            ),
+          ],
+        ),
+        if (_groups.isEmpty)
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              if (loading) const BusyIndicator(),
+              if (!loading)
+                Text('No asset group found', style: theme.getStyle()),
+            ],
+          ),
+        if (_groups.isNotEmpty)
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: cards,
+            ),
+          ),
+      ],
+    );
+  }
+
+  Future<void> _checkCanEdit() async {
+    bool canEditResult = await isAdmin();
+
+    setState(() {
+      _canEdit = canEditResult;
+    });
   }
 
   Future<void> _load() async {
@@ -252,128 +418,7 @@ class _AssetGroupListState extends BaseState<AssetGroupList> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    final List<Widget> cards = [];
-
-    for (var group in _groups) {
-      Widget? image;
-      if (group.icon != null && group.icon!.isNotEmpty) {
-        image = TwinImageHelper.getImage(group.domainKey, group.icon!);
-      }
-
-      cards.add(InkWell(
-        onDoubleTap: () async {
-          await _editGroup(group);
-        },
-        child: Card(
-          elevation: 10,
-          child: Container(
-            color: Colors.white,
-            width: widget.cardWidth,
-            height: widget.cardHeight,
-            child: Stack(
-              children: [
-                Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      if (image != null)
-                        SizedBox(width: 48, height: 48, child: image),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          group.name,
-                          style: theme.getStyle().copyWith(fontSize: 14),
-                        ),
-                      ),
-                      Text(
-                        '${group.assetIds!.length} assets',
-                        style: theme
-                            .getStyle()
-                            .copyWith(fontSize: 10, color: Colors.blue),
-                      ),
-                    ],
-                  ),
-                ),
-                Positioned(
-                  left: 8,
-                  child: IconButton(
-                    onPressed: () async {
-                      await _delete(group);
-                    },
-                    icon: Icon(Icons.delete, color: theme.getPrimaryColor()),
-                  ),
-                ),
-                Positioned(
-                  right: 45,
-                  child: IconButton(
-                    onPressed: () async {
-                      await _editGroup(group);
-                    },
-                    icon: Icon(Icons.edit, color: theme.getPrimaryColor()),
-                  ),
-                ),
-                Positioned(
-                  right: 8,
-                  child: IconButton(
-                    onPressed: () async {
-                      await _upload(group);
-                    },
-                    icon: Icon(
-                      Icons.upload,
-                      color: theme.getPrimaryColor(),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ));
-    }
-
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            const BusyIndicator(),
-            IconButton(
-              onPressed: () async {
-                await _load();
-              },
-              icon: const Icon(Icons.refresh),
-            ),
-            divider(horizontal: true),
-            PrimaryButton(
-              labelKey: "Add New",
-              onPressed: () async {
-                await _addNew();
-              },
-            ),
-          ],
-        ),
-        if (_groups.isEmpty)
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              if (loading) const BusyIndicator(),
-              if (!loading)
-                Text('No asset group found', style: theme.getStyle()),
-            ],
-          ),
-        if (_groups.isNotEmpty)
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: cards,
-            ),
-          ),
-      ],
-    );
+  void setup() async {
+    await _load();
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl_phone_field/countries.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:twin_app/widgets/commons/secondary_button.dart';
 import 'package:twin_app/core/session_variables.dart';
@@ -9,6 +10,8 @@ import 'package:twin_commons/widgets/common/label_text_field.dart';
 import 'package:twin_commons/core/twin_image_helper.dart';
 import 'package:twin_commons/core/twinned_session.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:twinned_widgets/core/client_dropdown.dart';
+import 'package:twinned_widgets/core/multi_role_dropdown.dart';
 
 var userDefaultImage = Center(
   child: Image.asset(
@@ -32,19 +35,19 @@ class _UserAddUpdateSnippetState extends BaseState<UserAddUpdateSnippet> {
   TextEditingController phoneController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   bool _isPhoneValid = true;
+  String countryCode = 'US';
+
   twinned.TwinUserInfo _twinUserInfo = const twinned.TwinUserInfo(
-    name: '',
-    email: '',
-    phone: '',
-    address: '',
-    tags: [],
-    roles: [],
-    images: [],
-    clientIds: [],
-    description: '',
-  );
-  String fullNumber = "";
-  String countryCode = "";
+      name: '',
+      email: '',
+      phone: '',
+      address: '',
+      tags: [],
+      roles: [],
+      images: [],
+      clientIds: [],
+      description: '',
+      countryCode: 'US');
 
   @override
   void initState() {
@@ -55,6 +58,7 @@ class _UserAddUpdateSnippetState extends BaseState<UserAddUpdateSnippet> {
         name: u.name,
         email: u.email,
         phone: u.phone,
+        countryCode: u.countryCode,
         address: u.address,
         clientIds: u.clientIds,
         description: u.description,
@@ -64,22 +68,13 @@ class _UserAddUpdateSnippetState extends BaseState<UserAddUpdateSnippet> {
         tags: u.tags,
       );
     }
-
     nameController.text = _twinUserInfo.name;
-    emailController.text = _twinUserInfo.email ?? '';
+    emailController.text = _twinUserInfo.email;
+    phoneController.text = _twinUserInfo.phone ?? '';
+    countryCode = _twinUserInfo.countryCode ?? '';
     nameController.addListener(_onNameChanged);
     emailController.addListener(_onNameChanged);
     phoneController.addListener(_onNameChanged);
-    String? input = _twinUserInfo.phone;
-    List<String> splitString = input!.split('/');
-
-    if (splitString.length > 2) {
-      countryCode = splitString[0];
-      phoneController.text = splitString[2];
-    } else {
-      countryCode = "IN";
-      phoneController.text = _twinUserInfo.phone!;
-    }
   }
 
   @override
@@ -159,11 +154,54 @@ class _UserAddUpdateSnippetState extends BaseState<UserAddUpdateSnippet> {
                           },
                           onChanged: (phone) {
                             setState(() {
-                              fullNumber =
-                                  "${phone.countryISOCode}/${phone.countryCode}/${phone.number}";
                               _isPhoneValid = phone.completeNumber.isNotEmpty &&
                                   phone.completeNumber.length >= 10 &&
                                   phone.isValidNumber();
+
+                              countryCode = phone.countryISOCode;
+
+                              _twinUserInfo = _twinUserInfo.copyWith(
+                                  countryCode: phone.countryISOCode);
+                            });
+                          },
+                          onCountryChanged: (country) {
+                            setState(() {
+                              countryCode = country.code;
+
+                              _twinUserInfo = _twinUserInfo.copyWith(
+                                  countryCode: country.code);
+                            });
+                          },
+                        ),
+                      ),
+                      divider(height: 15),
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width / 2.5,
+                        child: ClientDropdown(
+                          selectedItem: (_twinUserInfo.clientIds!.isNotEmpty)
+                              ? _twinUserInfo.clientIds!.first
+                              : null,
+                          onClientSelected: (e) {
+                            setState(() {
+                              _twinUserInfo = _twinUserInfo.copyWith(
+                                  clientIds: null != e ? [e.id] : []);
+                            });
+                          },
+                        ),
+                      ),
+                      divider(height: 15),
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width / 2.5,
+                        child: MultiRoleDropdown(
+                          selectedItems: _twinUserInfo.roles ?? [],
+                          onRolesSelected: (e) {
+                            setState(() {
+                              _twinUserInfo = _twinUserInfo.copyWith(
+                                  roles: null != e
+                                      ? e.map((r) {
+                                          return r.id;
+                                        }).toList()
+                                      : []);
                             });
                           },
                         ),
@@ -206,7 +244,7 @@ class _UserAddUpdateSnippetState extends BaseState<UserAddUpdateSnippet> {
                                 child: SizedBox(
                                   width: 250,
                                   height: 250,
-                                  child: TwinImageHelper.getDomainImage(
+                                  child: TwinImageHelper.getCachedDomainImage(
                                       _twinUserInfo.images!.first),
                                 ),
                               ),
@@ -288,10 +326,10 @@ class _UserAddUpdateSnippetState extends BaseState<UserAddUpdateSnippet> {
     loading = true;
 
     _twinUserInfo = _twinUserInfo.copyWith(
-      name: nameController.text.trim(),
-      email: emailController.text.trim(),
-      phone: fullNumber.trim(),
-    );
+        name: nameController.text.trim(),
+        email: emailController.text.trim(),
+        phone: phoneController.text.trim(),
+        countryCode: countryCode);
 
     await execute(() async {
       if (null == widget.twinUser) {

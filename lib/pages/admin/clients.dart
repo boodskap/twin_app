@@ -59,8 +59,8 @@ class _ClientsState extends BaseState<Clients> {
                           child: SizedBox(
                               width: 250,
                               height: 250,
-                              child:
-                                  TwinImageHelper.getDomainImage(entity.icon!)),
+                              child: TwinImageHelper.getCachedDomainImage(
+                                  entity.icon!)),
                         ),
                     ],
                   ),

@@ -70,7 +70,7 @@ class _LandingContentPageState extends BaseState<LandingContentPage> {
                     child: Container(
                       height: 64,
                       width: 64,
-                      child: TwinImageHelper.getDomainImage(
+                      child: TwinImageHelper.getCachedDomainImage(
                           landingPage.logoImage!),
                     ),
                   ),

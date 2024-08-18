@@ -38,7 +38,6 @@ class PremiseContentPage extends StatefulWidget {
 }
 
 class _PremiseContentPageState extends BaseState<PremiseContentPage> {
-
   static const Widget _missingImage = Icon(
     Icons.question_mark,
     size: 50,
@@ -142,8 +141,8 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
     if (imageIds.length > selectedImage) {
       setState(() {
         imageId = imageIds[selectedImage];
-        infraImage =
-            TwinImageHelper.getImage(domainKey, imageId, fit: BoxFit.fill);
+        infraImage = TwinImageHelper.getCachedImage(domainKey, imageId,
+            fit: BoxFit.fill);
       });
     }
     await _load();
@@ -248,7 +247,7 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
 
       if (imageId.isNotEmpty) {
         setState(() {
-          infraImage = TwinImageHelper.getImage(domainKey, imageId);
+          infraImage = TwinImageHelper.getCachedImage(domainKey, imageId);
         });
       }
     });
@@ -323,7 +322,7 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
       imageId = e.images![idx];
     }
     Widget image = imageId.isNotEmpty
-        ? TwinImageHelper.getImage(e.domainKey, imageId)
+        ? TwinImageHelper.getCachedImage(e.domainKey, imageId)
         : _missingImage;
 
     return Card(
@@ -363,16 +362,16 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
                         Text(
                           e.name,
                           style: theme.getStyle().copyWith(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                         Text(
                           e.description ?? "",
                           style: theme.getStyle().copyWith(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                       ],
                     ),
@@ -393,7 +392,7 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
       imageId = e.floorPlan!;
     }
     Widget image = imageId.isNotEmpty
-        ? TwinImageHelper.getImage(e.domainKey, imageId)
+        ? TwinImageHelper.getCachedImage(e.domainKey, imageId)
         : _missingImage;
 
     return Card(
@@ -433,16 +432,16 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
                         Text(
                           e.name,
                           style: theme.getStyle().copyWith(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                         Text(
                           e.description ?? "",
                           style: theme.getStyle().copyWith(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                       ],
                     ),
@@ -464,7 +463,7 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
       imageId = e.images![idx];
     }
     Widget image = imageId.isNotEmpty
-        ? TwinImageHelper.getImage(e.domainKey, imageId)
+        ? TwinImageHelper.getCachedImage(e.domainKey, imageId)
         : _missingImage;
 
     return Card(
@@ -504,16 +503,16 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
                         Text(
                           e.name,
                           style: theme.getStyle().copyWith(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                         Text(
                           e.description ?? "",
                           style: theme.getStyle().copyWith(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                       ],
                     ),
@@ -794,7 +793,9 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
                                           alignment: Alignment.topRight,
                                           child: Text(
                                             "${widget.premise!.name} - Facilities",
-                                            style: theme.getStyle().copyWith(fontSize: 20),
+                                            style: theme
+                                                .getStyle()
+                                                .copyWith(fontSize: 20),
                                           ),
                                         ),
                                       if (widget.type == InfraType.facility)
@@ -802,7 +803,9 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
                                           alignment: Alignment.topRight,
                                           child: Text(
                                             "${widget.facility!.name} - Floors",
-                                            style: theme.getStyle().copyWith(fontSize: 20),
+                                            style: theme
+                                                .getStyle()
+                                                .copyWith(fontSize: 20),
                                           ),
                                         ),
                                       if (widget.type == InfraType.floor)
@@ -810,7 +813,9 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
                                           alignment: Alignment.topRight,
                                           child: Text(
                                             "${widget.floor!.name} - Assets",
-                                            style: theme.getStyle().copyWith(fontSize: 20),
+                                            style: theme
+                                                .getStyle()
+                                                .copyWith(fontSize: 20),
                                           ),
                                         ),
                                       if (widget.type == InfraType.asset)
@@ -822,7 +827,9 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
                                             children: [
                                               Text(
                                                 "${widget.asset!.name} - Devices",
-                                                style: theme.getStyle().copyWith(fontSize: 20),
+                                                style: theme
+                                                    .getStyle()
+                                                    .copyWith(fontSize: 20),
                                               ),
                                               divider(horizontal: true),
                                               IconButton(

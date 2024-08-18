@@ -31,6 +31,7 @@ class _InstallationDatabaseState extends BaseState<InstallationDatabase> {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        const SizedBox(height: 15),
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
@@ -166,7 +167,8 @@ class _InstallationDatabaseState extends BaseState<InstallationDatabase> {
               if (null != e.images && e.images!.isNotEmpty)
                 Align(
                   alignment: Alignment.center,
-                  child: TwinImageHelper.getImage(e.domainKey, e.images!.first,
+                  child: TwinImageHelper.getCachedImage(
+                      e.domainKey, e.images!.first,
                       width: width / 2, height: width / 2),
                 )
             ],

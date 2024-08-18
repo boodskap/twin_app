@@ -30,6 +30,14 @@ class _AssetReportListState extends BaseState<AssetReportList> {
   final List<twinned.Report> _reports = [];
   final List<Widget> _cards = [];
   tapi.DeviceModel? _selectedDeviceModel;
+  bool _canEdit = false;
+  Map<String, bool> _editable = Map<String, bool>();
+
+  @override
+  void initState() {
+    super.initState();
+    _checkCanEdit();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,17 +65,19 @@ class _AssetReportListState extends BaseState<AssetReportList> {
                   }),
             ),
             divider(horizontal: true),
-            if (null != _selectedDeviceModel)
-              PrimaryButton(
-                leading: const Icon(
-                  Icons.add_box,
-                  color: Colors.white,
-                ),
-                labelKey: "Add New",
-                onPressed: () async {
-                  await _addNew();
-                },
+            // if (null != _selectedDeviceModel)
+            PrimaryButton(
+              leading: const Icon(
+                Icons.add_box,
+                color: Colors.white,
               ),
+              labelKey: "Add New",
+              onPressed: (canCreate() && _selectedDeviceModel != null)
+                  ? () async {
+                      await _addNew();
+                    }
+                  : null,
+            ),
           ],
         ),
         if (_cards.isEmpty)
@@ -92,14 +102,20 @@ class _AssetReportListState extends BaseState<AssetReportList> {
   }
 
   Widget buildCard(twinned.Report report) {
+    bool editable = _canEdit;
+    if (!editable) {
+      editable = _editable[report.id] ?? false;
+    }
     Widget? image;
     if (null != report.icon && report.icon!.isNotEmpty) {
-      image = TwinImageHelper.getImage(report.domainKey, report.icon!);
+      image = TwinImageHelper.getCachedImage(report.domainKey, report.icon!);
     }
 
     return InkWell(
       onDoubleTap: () async {
-        await _edit(report);
+        if (_canEdit) {
+          await _edit(report);
+        }
       },
       child: Card(
         elevation: 10,
@@ -136,37 +152,50 @@ class _AssetReportListState extends BaseState<AssetReportList> {
               Positioned(
                   left: 8,
                   child: Tooltip(
-                    message: 'Delete this report',
+                    message: _canEdit ? "Delete" : "No Permission to Delete",
                     child: IconButton(
-                      onPressed: () async {
-                        await _delete(report);
-                      },
+                      onPressed: _canEdit
+                          ? () {
+                              _delete(report);
+                            }
+                          : null,
                       icon: Icon(
                         Icons.delete,
-                        color: theme.getPrimaryColor(),
+                        color: _canEdit ? theme.getPrimaryColor() : Colors.grey,
                       ),
                     ),
                   )),
               Positioned(
                 right: 45,
-                child: IconButton(
-                  onPressed: () async {
-                    await _edit(report);
-                  },
-                  icon: Icon(Icons.edit, color: theme.getPrimaryColor()),
+                child: Tooltip(
+                  message: _canEdit ? "Update" : "No Permission to Edit",
+                  child: IconButton(
+                    onPressed: _canEdit
+                        ? () async {
+                            await _edit(report);
+                          }
+                        : null,
+                    icon: Icon(
+                      Icons.edit,
+                      color: _canEdit ? theme.getPrimaryColor() : Colors.grey,
+                    ),
+                  ),
                 ),
               ),
               Positioned(
                   right: 8,
                   child: Tooltip(
-                    message: 'Upload icon',
+                    message: _canEdit ? "Upload" : "No Permission to Upload",
                     child: IconButton(
-                        onPressed: () async {
-                          await _upload(report);
-                        },
+                        onPressed: _canEdit
+                            ? () {
+                                _upload(report);
+                              }
+                            : null,
                         icon: Icon(
                           Icons.upload,
-                          color: theme.getPrimaryColor(),
+                          color:
+                              _canEdit ? theme.getPrimaryColor() : Colors.grey,
                         )),
                   )),
             ],
@@ -176,35 +205,42 @@ class _AssetReportListState extends BaseState<AssetReportList> {
     );
   }
 
+  Future<void> _checkCanEdit() async {
+    List<String> clientIds = await getClientIds();
+    bool canEditResult = await canEdit(clientIds: clientIds);
+
+    setState(() {
+      _canEdit = canEditResult;
+    });
+  }
+
   Future _load() async {
     if (loading) return;
     loading = true;
     await execute(() async {
       _reports.clear();
       _cards.clear();
-      var deviceModelsRes = await TwinnedSession.instance.twin.listDeviceModels(
-          apikey: TwinnedSession.instance.authToken,
-          body: const twinned.ListReq(page: 0, size: 10000));
 
-      if (validateResponse(deviceModelsRes)) {
-        var deviceModels = deviceModelsRes.body?.values ?? [];
-        if (deviceModels.isNotEmpty) {
-          if (_selectedDeviceModel == null) {
-            _selectedDeviceModel = deviceModels.first;
-          }
-        }
+      String modelId = "";
+      if (_selectedDeviceModel == null) {
+        modelId = ""
+            "";
+      } else {
+        modelId = _selectedDeviceModel!.id;
       }
-
       var res = await TwinnedSession.instance.twin.listReports(
           apikey: TwinnedSession.instance.authToken,
-          modelId: _selectedDeviceModel!.id,
+          modelId: modelId,
           body: const twinned.ListReq(page: 0, size: 10000));
 
       if (validateResponse(res)) {
         _reports.addAll(res.body!.values!);
         _cards.clear();
-        for (int i = 0; i < _reports.length; i++) {
-          _cards.add(buildCard(_reports[i]));
+
+        for (tapi.Report e in _reports) {
+          _editable[e.id] = await super.canEdit(clientIds: e.clientIds);
+
+          _cards.add(buildCard(e));
         }
       }
     });
@@ -215,6 +251,9 @@ class _AssetReportListState extends BaseState<AssetReportList> {
   Future _addNew() async {
     if (loading) return;
     loading = true;
+    List<String>? clientIds = super.isClientAdmin()
+        ? await TwinnedSession.instance.getClientIds()
+        : null;
     await execute(() async {
       await _getBasicInfo(context, 'New Report',
           onPressed: (String name, String? description, String? tags) async {
@@ -231,6 +270,7 @@ class _AssetReportListState extends BaseState<AssetReportList> {
               includeDevice: false,
               includeAsset: true,
               fields: [],
+              clientIds: clientIds,
             ));
         if (validateResponse(res)) {
           await _load();
@@ -375,6 +415,9 @@ class _AssetReportListState extends BaseState<AssetReportList> {
   Future _upload(twinned.Report filter) async {
     if (loading) return;
     loading = true;
+    List<String>? clientIds = super.isClientAdmin()
+        ? await TwinnedSession.instance.getClientIds()
+        : null;
     await execute(() async {
       var res = await TwinImageHelper.uploadDomainIcon();
       if (null != res && null != res.entity) {
@@ -388,6 +431,7 @@ class _AssetReportListState extends BaseState<AssetReportList> {
               icon: res.entity!.id,
               tags: filter.tags,
               description: filter.description,
+              clientIds: clientIds ?? filter.clientIds,
             ));
 
         if (validateResponse(rRes)) {

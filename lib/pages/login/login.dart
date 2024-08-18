@@ -12,7 +12,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:go_router/go_router.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:twin_commons/core/twinned_session.dart';
-import 'package:verification_api/api/verification.swagger.dart' as vapi;
+import 'package:twinned_api/twinned_api.dart' as tapi;
 import 'package:nocode_api/api/nocode.swagger.dart' as nocode;
 import 'package:twin_app/core/session_variables.dart' as session;
 
@@ -97,49 +97,27 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
     await execute(() async {
       String userId = _userController.text.trim();
       String password = _passwordController.text.trim();
-      String domainKey = session.config.isTwinApp()
-          ? session.config.twinDomainKey!
-          : session.config.noCodeDomainKey;
       bool loggedIn = false;
 
-      var lRes = await session.config.verification.loginUser(
-          dkey: domainKey,
-          body: vapi.Login(userId: userId, password: password));
+      var lRes = await session.config.twinned.loginUser(
+          body: tapi.Login(
+              userId: userId,
+              password: password,
+              domainKey: session.config.twinDomainKey ?? ''));
 
       if (validateResponse(lRes)) {
         bool debug = TwinnedSession.instance.debug;
         String host = TwinnedSession.instance.host;
 
-        if (session.config.isTwinApp()) {
-          TwinnedSession.instance.init(
-              debug: debug,
-              host: host,
-              authToken: lRes.body!.authToken ?? '',
-              domainKey: domainKey,
-              noCodeAuthToken: '');
-          loggedIn = true;
-        } else {
-          debugPrint('*** NOCODE LOGIN ***');
-          var pRes = await TwinnedSession.instance.nocode
-              .getAppProfile(token: lRes.body!.authToken);
+        session.orgs.addAll(lRes.body!.orgs!);
 
-          if (validateResponse(pRes)) {
-            session.profile = pRes.body!.profile!;
-
-            for (nocode.OrgTeam ot in (pRes.body!.orgTeams ?? [])) {
-              session.orgs.add(ot.organization!);
-            }
-
-            TwinnedSession.instance.init(
-                debug: debug,
-                host: host,
-                authToken: session.orgs.first.settings?.twinApiKey ?? '',
-                domainKey: domainKey,
-                noCodeAuthToken: lRes.body!.authToken ?? '');
-
-            loggedIn = true;
-          }
-        }
+        TwinnedSession.instance.init(
+            debug: debug,
+            host: host,
+            authToken: session.orgs.first.twinAuthToken,
+            domainKey: session.orgs.first.twinDomainKey,
+            noCodeAuthToken: lRes.body!.nocodeAuthToken ?? '');
+        loggedIn = true;
 
         if (_rememberMe) {
           TwinHelper.addStoredPassword(userId, password);

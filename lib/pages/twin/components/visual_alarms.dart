@@ -30,7 +30,7 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
   @override
   void initState() {
     super.initState();
-    _canEdit = TwinnedSession.instance.isAdmin();
+    _checkCanEdit();
   }
 
   @override
@@ -60,17 +60,14 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
                   }),
             ),
             divider(horizontal: true),
-            if (canCreate())
-              PrimaryButton(
-                labelKey: 'Create New',
-                leading: Icon(
-                  Icons.add,
-                  color: Colors.white,
-                ),
-                onPressed: () {
-                  _create();
-                },
+            PrimaryButton(
+              labelKey: 'Create New',
+              leading: Icon(
+                Icons.add,
+                color: Colors.white,
               ),
+              onPressed: (canCreate()) ? _create : null,
+            ),
             divider(horizontal: true),
             SizedBox(
               height: 40,
@@ -141,14 +138,14 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
             alarmState: 0);
 
     if (e.stateIcons!.length > group.alarmState) {
-      icon = TwinImageHelper.getImage(
+      icon = TwinImageHelper.getCachedImage(
           e.domainKey, e.stateIcons![group.alarmState]);
     }
     return InkWell(
       onDoubleTap: () {
-        if (editable) {
-        _edit(e);
-      }
+        if (_canEdit) {
+          _edit(e);
+        }
       },
       child: SizedBox(
         width: width,
@@ -171,8 +168,10 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
                     e.name,
-                    style:
-                        theme.getStyle().copyWith(fontWeight: FontWeight.bold),
+                    style: theme.getStyle().copyWith(
+                          fontWeight: FontWeight.bold,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                   ),
                 ),
               ),
@@ -183,23 +182,39 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      if (editable)
-                        InkWell(
-                            onTap: () {
-                              _edit(e);
-                            },
-                            child: Icon(Icons.edit,
-                                color: theme.getPrimaryColor())),
-                      if (editable)
-                        InkWell(
-                          onTap: () {
-                            _confirmDeletionDialog(context, e);
-                          },
+                      Tooltip(
+                        message: _canEdit ? "Update" : "No Permission to Edit",
+                        child: InkWell(
+                          onTap: _canEdit
+                              ? () {
+                                  _edit(e);
+                                }
+                              : null,
                           child: Icon(
-                            Icons.delete,
-                            color: theme.getPrimaryColor(),
+                            Icons.edit,
+                            color: _canEdit
+                                ? theme.getPrimaryColor()
+                                : Colors.grey,
                           ),
                         ),
+                      ),
+                      Tooltip(
+                        message:
+                            _canEdit ? "Delete" : "No Permission to Delete",
+                        child: InkWell(
+                          onTap: _canEdit
+                              ? () {
+                                  _confirmDeletionDialog(context, e);
+                                }
+                              : null,
+                          child: Icon(
+                            Icons.delete_forever_rounded,
+                            color: _canEdit
+                                ? theme.getPrimaryColor()
+                                : Colors.grey,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -209,6 +224,15 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
         ),
       ),
     );
+  }
+
+  Future<void> _checkCanEdit() async {
+    List<String> clientIds = await getClientIds();
+    bool canEditResult = await canEdit(clientIds: clientIds);
+
+    setState(() {
+      _canEdit = canEditResult;
+    });
   }
 
   Future<void> _getBasicInfo(BuildContext context, String title,
