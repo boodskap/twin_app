@@ -4,7 +4,9 @@ import 'package:twin_app/pages/dashboard_history.dart';
 import 'package:twin_app/pages/wrapper_page.dart';
 import 'package:twin_app/widgets/data_grid_snippet.dart';
 import 'package:twin_app/widgets/data_card_snippet.dart';
+import 'package:twin_app/widgets/field_analytics_page.dart';
 import 'package:twin_commons/core/base_state.dart';
+import 'package:twinned_api/api/twinned.swagger.dart' as tapi;
 
 class Dashboard extends StatefulWidget {
   final List<String> deviceModelIds;
@@ -74,6 +76,35 @@ class _DashboardState extends BaseState<Dashboard> {
     );
   }
 
+  void showAnalytics(
+      {required bool asPopup,
+      required List<String> fields,
+      required tapi.DeviceModel deviceModel,
+      required tapi.DeviceData dd}) {
+    if (asPopup) {
+      alertDialog(
+          title: '',
+          width: MediaQuery.of(context).size.width - 100,
+          body: FieldAnalyticsPage(
+            fields: fields,
+            deviceModel: deviceModel,
+            deviceData: dd,
+            asPopup: asPopup,
+            canDeleteRecord: false,
+          ));
+    } else {
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => FieldAnalyticsPage(
+                    fields: fields,
+                    deviceModel: deviceModel,
+                    deviceData: dd,
+                    canDeleteRecord: false,
+                  )));
+    }
+  }
+
   void _showDashboard(
     String title, {
     List<String> deviceModelIds = const [],
@@ -122,6 +153,35 @@ class _DashboardState extends BaseState<Dashboard> {
                 )));
   }
 
+  void _showAnalytics(
+      {required bool asPopup,
+      required List<String> fields,
+      required tapi.DeviceModel deviceModel,
+      required tapi.DeviceData dd}) {
+    if (asPopup) {
+      alertDialog(
+          title: '',
+          width: MediaQuery.of(context).size.width - 100,
+          body: FieldAnalyticsPage(
+            fields: fields,
+            deviceModel: deviceModel,
+            deviceData: dd,
+            asPopup: asPopup,
+            canDeleteRecord: false,
+          ));
+    } else {
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => FieldAnalyticsPage(
+                    fields: fields,
+                    deviceModel: deviceModel,
+                    deviceData: dd,
+                    canDeleteRecord: false,
+                  )));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (smallScreen || _cardView) {
@@ -146,16 +206,6 @@ class _DashboardState extends BaseState<Dashboard> {
                 facilityIds: widget.facilityIds,
                 floorIds: widget.floorIds,
                 clientIds: widget.clientIds,
-                onCardViewSelected: () {
-                  setState(() {
-                    _cardView = true;
-                  });
-                },
-                onGridViewSelected: () {
-                  setState(() {
-                    _cardView = false;
-                  });
-                },
                 onPremiseTapped: (id, dd) {
                   _showDashboard(dd.premise ?? '', premiseIds: [id]);
                 },
@@ -179,6 +229,28 @@ class _DashboardState extends BaseState<Dashboard> {
                 },
                 onDeviceTapped: (id, dd) {
                   _showDashboardHistory(dd.deviceName ?? '', deviceIds: [id]);
+                },
+                onAnalyticsTapped: (m, dd) async {
+                  _showAnalytics(
+                      asPopup: true,
+                      fields: dd.series!,
+                      deviceModel: m,
+                      dd: dd);
+                },
+                onAnalyticsDoubleTapped: (m, dd) async {
+                  _showAnalytics(
+                      asPopup: false,
+                      fields: dd.series!,
+                      deviceModel: m,
+                      dd: dd);
+                },
+                onDeviceAnalyticsTapped: (f, m, dd) async {
+                  _showAnalytics(
+                      asPopup: true, fields: [f], deviceModel: m, dd: dd);
+                },
+                onDeviceAnalyticsDoubleTapped: (f, m, dd) async {
+                  _showAnalytics(
+                      asPopup: false, fields: [f], deviceModel: m, dd: dd);
                 },
               ),
             ),
