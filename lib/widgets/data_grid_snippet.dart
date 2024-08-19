@@ -1,16 +1,19 @@
 import 'dart:async';
-import 'package:flutter/Material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 import 'package:twin_app/core/session_variables.dart';
+import 'package:twin_app/widgets/commons/alarm_search.dart';
+import 'package:twin_app/widgets/commons/asset_group_search.dart';
+import 'package:twin_app/widgets/commons/client_search.dart';
+import 'package:twin_app/widgets/commons/data_search.dart';
+import 'package:twin_app/widgets/commons/event_search.dart';
+import 'package:twin_app/widgets/commons/facility_search.dart';
+import 'package:twin_app/widgets/commons/floor_search.dart';
+import 'package:twin_app/widgets/commons/premise_search.dart';
 import 'package:twin_app/widgets/device_component_view.dart';
 import 'package:twin_app/widgets/field_analytics_page.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/util/nocode_utils.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
-import 'package:twinned_api/api/twinned.swagger.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:uuid/uuid.dart';
 import 'package:twin_commons/core/twinned_session.dart';
@@ -18,6 +21,7 @@ import 'package:twin_commons/widgets/default_deviceview.dart';
 import 'package:twin_commons/core/twin_image_helper.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:twin_commons/level/widgets/cylinder_tank.dart';
+import 'package:twinned_api/api/twinned.swagger.dart' as tapi;
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:chopper/chopper.dart' as chopper;
 import 'package:twin_commons/core/sensor_widget.dart' as sensors;
@@ -46,6 +50,14 @@ class DataGridSnippet extends StatefulWidget {
   final OnPremiseTapped? onPremiseTapped;
   final OnFacilityTapped? onFacilityTapped;
   final OnFloorTapped? onFloorTapped;
+  final bool enableClintFiler;
+  final bool enablePremiseFiler;
+  final bool enableFacilityFiler;
+  final bool enableFloorFiler;
+  final bool enableDataFiler;
+  final bool enableGroupFiler;
+  final bool enableAlarmFiler;
+  final bool enableEventFiler;
 
   const DataGridSnippet({
     super.key,
@@ -70,6 +82,14 @@ class DataGridSnippet extends StatefulWidget {
     this.onPremiseTapped,
     this.onFacilityTapped,
     this.onFloorTapped,
+    this.enableClintFiler = true,
+    this.enablePremiseFiler = true,
+    this.enableFacilityFiler = true,
+    this.enableFloorFiler = true,
+    this.enableDataFiler = true,
+    this.enableGroupFiler = true,
+    this.enableAlarmFiler = true,
+    this.enableEventFiler = true,
   });
 
   @override
@@ -77,14 +97,22 @@ class DataGridSnippet extends StatefulWidget {
 }
 
 class DataGridSnippetState extends BaseState<DataGridSnippet> {
-  final List<DeviceData> _data = [];
-  final Map<String, DeviceModel> _models = {};
-  final Map<String, Device> _devices = {};
+  final List<tapi.DeviceData> _data = [];
+  final Map<String, tapi.DeviceModel> _models = {};
   final List<String> _modelIds = [];
   Timer? timer;
   String _searchQuery = '';
   final TextEditingController _controller = TextEditingController();
   bool _cardView = true;
+  tapi.Client? _client;
+  tapi.Premise? _premise;
+  tapi.Facility? _facility;
+  tapi.Floor? _floor;
+  tapi.DataFilter? _dataFilter;
+  tapi.FieldFilter? _fieldFilter;
+  tapi.AssetGroup? _assetGroup;
+  tapi.Alarm? _alarm;
+  tapi.Event? _event;
 
   @override
   void initState() {
@@ -94,10 +122,10 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
 
   @override
   void setup() {
-    load();
+    _load();
     if (widget.autoRefresh) {
       timer = Timer.periodic(
-          Duration(seconds: widget.autoRefreshInterval), (Timer t) => load());
+          Duration(seconds: widget.autoRefreshInterval), (Timer t) => _load());
     }
   }
 
@@ -110,8 +138,8 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
   void showAnalytics(
       {required bool asPopup,
       required List<String> fields,
-      required DeviceModel deviceModel,
-      required DeviceData dd}) {
+      required tapi.DeviceModel deviceModel,
+      required tapi.DeviceData dd}) {
     if (asPopup) {
       alertDialog(
           title: '',
@@ -145,59 +173,332 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
   }
 
   Widget _buildControls() {
+    double dialogWidth = (MediaQuery.of(context).size.width / 2) + 100;
+    double dialogHeight = (MediaQuery.of(context).size.height / 2) + 100;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        const BusyIndicator(),
-        divider(horizontal: true),
-        if (null != widget.onCardViewSelected) divider(horizontal: true),
-        if (null != widget.onCardViewSelected)
-          Tooltip(
-            message: 'Card View',
-            child: IconButton(
-                onPressed: () {
-                  setState(() {
-                    _cardView = true;
-                  });
-                  widget.onCardViewSelected!();
+        Wrap(
+          spacing: smallScreen ? 8 : 16,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            if (widget.enableDataFiler)
+              Tooltip(
+                message: 'filter by data',
+                child: InkWell(
+                  child: Icon(Icons.filter_alt_sharp,
+                      color: (null != _dataFilter || null != _fieldFilter)
+                          ? theme.getPrimaryColor()
+                          : null),
+                  onLongPress: () async {
+                    setState(() {
+                      _dataFilter = null;
+                      _fieldFilter = null;
+                    });
+                    await _load(search: _searchQuery);
+                  },
+                  onTap: () async {
+                    await super.alertDialog(
+                      title: 'Filter by Data',
+                      width: dialogWidth,
+                      height: dialogHeight,
+                      body: DataSearch(
+                          clientIds: null != _client ? [_client!.id] : [],
+                          onFieldFilterSelected: (entity) async {
+                            setState(() {
+                              _fieldFilter = entity;
+                              _client = null;
+                              _premise = null;
+                              _facility = null;
+                              _floor = null;
+                              _assetGroup = null;
+                              _dataFilter = null;
+                            });
+                            await _load(search: _searchQuery);
+                          },
+                          onDataFilterSelected: (entity) async {
+                            setState(() {
+                              _dataFilter = entity;
+                              _client = null;
+                              _premise = null;
+                              _facility = null;
+                              _floor = null;
+                              _assetGroup = null;
+                              _fieldFilter = null;
+                            });
+                            await _load(search: _searchQuery);
+                          }),
+                    );
+                  },
+                ),
+              ),
+            if (isAdmin() && widget.enableClintFiler)
+              Tooltip(
+                message: 'filter by clients',
+                child: InkWell(
+                  child: Icon(Icons.perm_contact_cal_outlined,
+                      color: null == _client ? null : theme.getPrimaryColor()),
+                  onLongPress: () async {
+                    setState(() {
+                      _client = null;
+                      _premise = null;
+                      _facility = null;
+                      _floor = null;
+                      _assetGroup = null;
+                      _dataFilter = null;
+                      _fieldFilter = null;
+                    });
+                    await _load(search: _searchQuery);
+                  },
+                  onTap: () async {
+                    await super.alertDialog(
+                        title: 'Filter by Client',
+                        width: dialogWidth,
+                        height: dialogHeight,
+                        body: ClientSearch(onClientSelected: (entity) async {
+                          setState(() {
+                            _client = entity;
+                            _premise = null;
+                            _facility = null;
+                            _floor = null;
+                            _assetGroup = null;
+                            _dataFilter = null;
+                            _fieldFilter = null;
+                          });
+                          await _load(search: _searchQuery);
+                        }));
+                  },
+                ),
+              ),
+            if (widget.enablePremiseFiler)
+              Tooltip(
+                message: 'filter by premises',
+                child: InkWell(
+                  child: Icon(Icons.home,
+                      color: null == _premise ? null : theme.getPrimaryColor()),
+                  onLongPress: () async {
+                    setState(() {
+                      _premise = null;
+                      _facility = null;
+                      _floor = null;
+                    });
+                    await _load(search: _searchQuery);
+                  },
+                  onTap: () async {
+                    await super.alertDialog(
+                        title: 'Filter by Premise',
+                        width: dialogWidth,
+                        height: dialogHeight,
+                        body: PremiseSearch(
+                            clientIds: null != _client ? [_client!.id] : [],
+                            onPremiseSelected: (entity) async {
+                              setState(() {
+                                _premise = entity;
+                                _facility = null;
+                                _floor = null;
+                              });
+                              await _load(search: _searchQuery);
+                            }));
+                  },
+                ),
+              ),
+            if (widget.enableFacilityFiler)
+              Tooltip(
+                message: 'filter by facility',
+                child: InkWell(
+                  child: Icon(Icons.business,
+                      color:
+                          null == _facility ? null : theme.getPrimaryColor()),
+                  onLongPress: () async {
+                    setState(() {
+                      _facility = null;
+                      _floor = null;
+                    });
+                    await _load(search: _searchQuery);
+                  },
+                  onTap: () async {
+                    await super.alertDialog(
+                        title: 'Filter by Facility',
+                        width: dialogWidth,
+                        height: dialogHeight,
+                        body: FacilitySearch(
+                            clientIds: null != _client ? [_client!.id] : [],
+                            premiseId: _premise?.id,
+                            onFacilitySelected: (entity) async {
+                              setState(() {
+                                _facility = entity;
+                                _floor = null;
+                              });
+                              await _load(search: _searchQuery);
+                            }));
+                  },
+                ),
+              ),
+            if (widget.enableFloorFiler)
+              Tooltip(
+                message: 'filter by floor',
+                child: InkWell(
+                  child: Icon(Icons.cabin,
+                      color: null == _floor ? null : theme.getPrimaryColor()),
+                  onLongPress: () async {
+                    setState(() {
+                      _floor = null;
+                    });
+                    await _load(search: _searchQuery);
+                  },
+                  onTap: () async {
+                    await super.alertDialog(
+                        title: 'Filter by Floor',
+                        width: dialogWidth,
+                        height: dialogHeight,
+                        body: FloorSearch(
+                            premiseId: _premise?.id,
+                            facilityId: _facility?.id,
+                            onFloorSelected: (entity) async {
+                              setState(() {
+                                _floor = entity;
+                              });
+                              await _load(search: _searchQuery);
+                            }));
+                  },
+                ),
+              ),
+            if (widget.enableGroupFiler)
+              Tooltip(
+                message: 'filter by group',
+                child: InkWell(
+                  child: Icon(Icons.group_add,
+                      color:
+                          null == _assetGroup ? null : theme.getPrimaryColor()),
+                  onLongPress: () async {
+                    setState(() {
+                      _assetGroup = null;
+                    });
+                    await _load(search: _searchQuery);
+                  },
+                  onTap: () async {
+                    await super.alertDialog(
+                        title: 'Filter by Group',
+                        width: dialogWidth,
+                        height: dialogHeight,
+                        body: AssetGroupSearch(
+                            clientIds: null != _client ? [_client!.id] : [],
+                            onAssetGroupSelected: (entity) async {
+                              setState(() {
+                                _assetGroup = entity;
+                              });
+                              await _load(search: _searchQuery);
+                            }));
+                  },
+                ),
+              ),
+            if (widget.enableEventFiler)
+              Tooltip(
+                message: 'filter by event',
+                child: InkWell(
+                  child: Icon(Icons.event_rounded,
+                      color: null == _event ? null : theme.getPrimaryColor()),
+                  onLongPress: () async {
+                    setState(() {
+                      _event = null;
+                    });
+                    await _load(search: _searchQuery);
+                  },
+                  onTap: () async {
+                    await super.alertDialog(
+                        title: 'Filter by Event',
+                        width: dialogWidth,
+                        height: dialogHeight,
+                        body: EventSearch(
+                            clientIds: null != _client ? [_client!.id] : [],
+                            onEventSelected: (entity) async {
+                              setState(() {
+                                _event = entity;
+                              });
+                              await _load(search: _searchQuery);
+                            }));
+                  },
+                ),
+              ),
+            if (widget.enableAlarmFiler)
+              Tooltip(
+                message: 'filter by alarm',
+                child: InkWell(
+                  child: Icon(Icons.doorbell_outlined,
+                      color: null == _alarm ? null : theme.getPrimaryColor()),
+                  onLongPress: () async {
+                    setState(() {
+                      _alarm = null;
+                    });
+                    await _load(search: _searchQuery);
+                  },
+                  onTap: () async {
+                    await super.alertDialog(
+                        title: 'Filter by Alarm',
+                        width: dialogWidth,
+                        height: dialogHeight,
+                        body: AlarmSearch(
+                            clientIds: null != _client ? [_client!.id] : [],
+                            onAlarmSelected: (entity) async {
+                              setState(() {
+                                _alarm = entity;
+                              });
+                              await _load(search: _searchQuery);
+                            }));
+                  },
+                ),
+              ),
+            if (null != widget.onCardViewSelected)
+              Tooltip(
+                message: 'Card View',
+                child: InkWell(
+                    onTap: () {
+                      setState(() {
+                        _cardView = true;
+                      });
+                      widget.onCardViewSelected!();
+                    },
+                    child: Icon(Icons.grid_view,
+                        color: _cardView ? theme.getPrimaryColor() : null)),
+              ),
+            if (null != widget.onGridViewSelected)
+              Tooltip(
+                message: 'Grid View',
+                child: InkWell(
+                    onTap: () {
+                      setState(() {
+                        _cardView = false;
+                      });
+                      widget.onGridViewSelected!();
+                    },
+                    child: Icon(Icons.grid_on,
+                        color: !_cardView ? theme.getPrimaryColor() : null)),
+              ),
+            InkWell(
+                onTap: () {
+                  _load();
                 },
-                icon: Icon(Icons.grid_view,
-                    color: _cardView ? theme.getPrimaryColor() : null)),
-          ),
-        if (null != widget.onCardViewSelected) divider(horizontal: true),
-        if (null != widget.onGridViewSelected)
-          Tooltip(
-            message: 'Grid View',
-            child: IconButton(
-                onPressed: () {
-                  setState(() {
-                    _cardView = false;
-                  });
-                  widget.onGridViewSelected!();
-                },
-                icon: Icon(Icons.grid_on,
-                    color: !_cardView ? theme.getPrimaryColor() : null)),
-          ),
-        IconButton(
-            onPressed: () {
-              load();
-            },
-            icon: const Icon(Icons.refresh)),
-        Padding(
-          padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-          child: SizedBox(
-              width: 250,
-              height: 40,
-              child: SearchBar(
-                hintText: widget.searchHint,
-                controller: _controller,
-                onChanged: (val) {
-                  setState(() {
-                    _searchQuery = val.trim();
-                  });
-                  load();
-                },
-              )),
+                child: Icon(Icons.refresh,
+                    color: loading ? theme.getPrimaryColor() : null)),
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+              child: SizedBox(
+                  width: 250,
+                  height: 40,
+                  child: SearchBar(
+                    hintText: widget.searchHint,
+                    controller: _controller,
+                    trailing: [const BusyIndicator()],
+                    onChanged: (val) {
+                      setState(() {
+                        _searchQuery = val.trim();
+                      });
+                      _load();
+                    },
+                  )),
+            ),
+          ],
         ),
       ],
     );
@@ -266,9 +567,8 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
     if (_models.isNotEmpty) {
       for (var dd in _data) {
         var dT = DateTime.fromMillisecondsSinceEpoch(dd.updatedStamp);
-        List<Widget> children = [];
         Map<String, dynamic> dynData = dd.data as Map<String, dynamic>;
-        DeviceModel deviceModel = _models[dd.modelId]!;
+        tapi.DeviceModel deviceModel = _models[dd.modelId]!;
         List<String> timeSeriesFields =
             TwinUtils.getTimeSeriesFields(deviceModel);
         List<DataCell> cells = [];
@@ -411,8 +711,6 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
   }
 
   Widget _buildTable() {
-    if (smallScreen) return _buildSmallTable();
-
     List<DataColumn2> columns = [];
     List<DataRow2> rows = [];
 
@@ -504,7 +802,7 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
         var dT = DateTime.fromMillisecondsSinceEpoch(dd.updatedStamp);
         List<Widget> children = [];
         Map<String, dynamic> dynData = dd.data as Map<String, dynamic>;
-        DeviceModel deviceModel = _models[dd.modelId]!;
+        tapi.DeviceModel deviceModel = _models[dd.modelId]!;
         List<String> fields = TwinUtils.getSortedFields(deviceModel);
         List<String> timeSeriesFields =
             TwinUtils.getTimeSeriesFields(deviceModel);
@@ -567,7 +865,7 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
             ));
             children.add(divider(horizontal: true, width: 24));
           } else {
-            Parameter? parameter =
+            tapi.Parameter? parameter =
                 TwinUtils.getParameter(field, _models[dd.modelId]!);
             children.add(Tooltip(
               message: hasSeries ? "View TimeSeries" : "",
@@ -879,10 +1177,10 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
 
   @override
   Widget build(BuildContext context) {
-    return _buildTable();
+    return smallScreen ? _buildSmallTable() : _buildTable();
   }
 
-  Future load({String search = '*', int page = 0, int size = 1000}) async {
+  Future _load({String search = '*', int page = 0, int size = 1000}) async {
     if (loading) return;
     loading = true;
 
@@ -890,94 +1188,138 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
       search = '*';
     }
 
-    await execute(() async {
-      _data.clear();
-      _models.clear();
-      _modelIds.clear();
+    _data.clear();
+    _models.clear();
+    _modelIds.clear();
 
-      late final chopper.Response<DeviceDataArrayRes> dRes;
+    late final chopper.Response<tapi.DeviceDataArrayRes> dRes;
 
-      final List<Object> mustConditions = [
-        {
-          "query_string": {
-            "query": '*$_searchQuery*',
-            "fields": [
-              "name",
-              "asset",
-              "deviceName",
-              "modelName",
-              "premise",
-              "facility",
-              "floor",
-              "client",
-              "description",
-              "tags"
-            ]
-          }
-        }
-      ];
-
-      mustConditions.addAll([
-        if (widget.deviceModelIds.isNotEmpty)
-          {
-            "terms": {'modelId': widget.deviceModelIds}
-          },
-        if (widget.assetModelIds.isNotEmpty)
-          {
-            "terms": {"assetModelId": widget.assetModelIds}
-          },
-        if (widget.assetIds.isNotEmpty)
-          {
-            "terms": {"assetId": widget.assetIds}
-          },
-        if (widget.premiseIds.isNotEmpty)
-          {
-            "terms": {"premiseId": widget.premiseIds}
-          },
-        if (widget.facilityIds.isNotEmpty)
-          {
-            "terms": {"facilityId": widget.facilityIds}
-          },
-        if (widget.floorIds.isNotEmpty)
-          {
-            "terms": {"floorId": widget.floorIds}
-          },
-        if (widget.clientIds.isNotEmpty)
-          {
-            "terms": {"clientIds.keyword": widget.clientIds}
-          },
-      ]);
-
-      debugPrint('MUST: $mustConditions');
-
-      dRes = await TwinnedSession.instance.twin.queryEqlDeviceData(
-          apikey: TwinnedSession.instance.authToken,
-          body: EqlSearch(
-              source: [],
-              mustConditions: mustConditions,
-              page: 0,
-              size: 25,
-              sort: {'updatedStamp': 'desc'}));
-
-      if (validateResponse(dRes)) {
-        _data.addAll(dRes.body!.values!);
-
-        for (DeviceData dd in _data) {
-          if (_modelIds.contains(dd.modelId)) continue;
-          _modelIds.add(dd.modelId);
-        }
-
-        var mRes = await TwinnedSession.instance.twin.getDeviceModels(
+    if (null != _dataFilter) {
+      await execute(() async {
+        dRes = await TwinnedSession.instance.twin.filterRecentDeviceData(
             apikey: TwinnedSession.instance.authToken,
-            body: GetReq(ids: _modelIds));
+            filterId: _dataFilter!.id,
+            page: page,
+            size: size);
+      });
+    }
 
-        if (validateResponse(mRes)) {
-          for (var deviceModel in mRes.body!.values!) {
-            _models[deviceModel.id] = deviceModel;
+    if (null != _fieldFilter) {
+      await execute(() async {
+        dRes = await TwinnedSession.instance.twin.fieldFilterRecentDeviceData(
+            apikey: TwinnedSession.instance.authToken,
+            fieldFilterId: _fieldFilter!.id,
+            page: page,
+            size: size);
+      });
+    }
+
+    if (null == _dataFilter && null == _fieldFilter) {
+      await execute(() async {
+        final List<Object> mustConditions = [
+          {
+            "query_string": {
+              "query": '*$_searchQuery*',
+              "fields": [
+                "name",
+                "asset",
+                "deviceName",
+                "modelName",
+                "premise",
+                "facility",
+                "floor",
+                "client",
+                "description",
+                "tags"
+              ]
+            }
           }
+        ];
+
+        mustConditions.addAll([
+          if (widget.deviceModelIds.isNotEmpty)
+            {
+              "terms": {'modelId': widget.deviceModelIds}
+            },
+          if (widget.assetModelIds.isNotEmpty)
+            {
+              "terms": {"assetModelId": widget.assetModelIds}
+            },
+          if (widget.assetIds.isNotEmpty ||
+              null != _assetGroup && _assetGroup!.assetIds.isNotEmpty)
+            {
+              "terms": {
+                "assetId": null != _assetGroup
+                    ? _assetGroup!.assetIds
+                    : widget.assetIds
+              }
+            },
+          if (widget.premiseIds.isNotEmpty || null != _premise)
+            {
+              "terms": {
+                "premiseId":
+                    null != _premise ? [_premise!.id] : widget.premiseIds
+              }
+            },
+          if (widget.facilityIds.isNotEmpty || null != _facility)
+            {
+              "terms": {
+                "facilityId":
+                    null != _facility ? [_facility!.id] : widget.facilityIds
+              }
+            },
+          if (widget.floorIds.isNotEmpty || null != _floor)
+            {
+              "terms": {
+                "floorId": null != _floor ? [_floor!.id] : widget.floorIds
+              }
+            },
+          if (widget.clientIds.isNotEmpty || null != _client)
+            {
+              "terms": {
+                "clientIds.keyword":
+                    null != _client ? [_client!.id] : widget.clientIds
+              }
+            },
+          if (null != _alarm)
+            {
+              "match_phrase": {"alarms.alarmId": _alarm!.id}
+            },
+          if (null != _event)
+            {
+              "match_phrase": {"events.eventId": _event!.id}
+            },
+        ]);
+
+        dRes = await TwinnedSession.instance.twin.queryEqlDeviceData(
+            apikey: TwinnedSession.instance.authToken,
+            body: tapi.EqlSearch(
+                source: [],
+                mustConditions: mustConditions,
+                page: 0,
+                size: 25,
+                sort: {'updatedStamp': 'desc'}));
+      });
+    }
+
+    if (validateResponse(dRes)) {
+      _data.addAll(dRes.body!.values!);
+
+      for (tapi.DeviceData dd in _data) {
+        if (_modelIds.contains(dd.modelId)) continue;
+        _modelIds.add(dd.modelId);
+      }
+
+      var mRes = await TwinnedSession.instance.twin.getDeviceModels(
+          apikey: TwinnedSession.instance.authToken,
+          body: tapi.GetReq(ids: _modelIds));
+
+      if (validateResponse(mRes)) {
+        for (var deviceModel in mRes.body!.values!) {
+          _models[deviceModel.id] = deviceModel;
         }
       }
-    });
+    }
 
     loading = false;
     // _controller.text = _searchQuery;
