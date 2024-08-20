@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/pages/twin/components/asset_groups.dart';
 import 'package:twin_app/pages/twin/components/widgets/device_model_content_page.dart';
+import 'package:twin_app/pages/twin/components/widgets/device_model_snippet.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:twin_app/widgets/commons/secondary_button.dart';
 import 'package:twin_commons/core/base_state.dart';
@@ -166,7 +167,7 @@ class _DeviceLibraryState extends BaseState<DeviceLibrary> {
                 Align(
                   alignment: Alignment.center,
                   child: TwinImageHelper.getCachedImage(
-                      e.domainKey, e.images![e.selectedImage ?? 0],
+                      e.domainKey, e.images!.first,
                       width: width / 2, height: width / 2),
                 )
             ],
@@ -185,126 +186,16 @@ class _DeviceLibraryState extends BaseState<DeviceLibrary> {
     });
   }
 
-  Future<void> _getBasicInfo(BuildContext context, String title,
-      {required BasicInfoCallback onPressed}) async {
-    String? nameText = '';
-    String? descText = '';
-    String? tagsText = '';
-    return showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) {
-          return AlertDialog(
-            title: Text(
-              title,
-              style: theme.getStyle().copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-            ),
-            content: SizedBox(
-              width: 500,
-              height: 150,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  TextField(
-                    style: theme.getStyle(),
-                    onChanged: (value) {
-                      setState(() {
-                        nameText = value;
-                      });
-                    },
-                    decoration: InputDecoration(
-                      hintText: 'Name',
-                      hintStyle: theme.getStyle(),
-                    ),
-                  ),
-                  TextField(
-                    style: theme.getStyle(),
-                    onChanged: (value) {
-                      setState(() {
-                        descText = value;
-                      });
-                    },
-                    decoration: InputDecoration(
-                      hintText: 'Description',
-                      hintStyle: theme.getStyle(),
-                    ),
-                  ),
-                  TextField(
-                    style: theme.getStyle(),
-                    onChanged: (value) {
-                      setState(() {
-                        tagsText = value;
-                      });
-                    },
-                    decoration: InputDecoration(
-                      hintText: 'Tags (space separated)',
-                      hintStyle: theme.getStyle(),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            actions: <Widget>[
-              SecondaryButton(
-                labelKey: "Cancel",
-                onPressed: () {
-                  setState(() {
-                    Navigator.pop(context);
-                  });
-                },
-              ),
-              PrimaryButton(
-                labelKey: "OK",
-                onPressed: () {
-                  if (nameText!.length < 3) {
-                    alert('Invalid',
-                        'Name is required and should be minimum 3 characters');
-                    return;
-                  }
-                  setState(() {
-                    onPressed(nameText!, descText, tagsText);
-                    Navigator.pop(context);
-                  });
-                },
-              ),
-            ],
-          );
-        });
-  }
-
-  Future _addDeviceModel() async {
-    List<String>? clientIds = super.isClientAdmin()
-        ? await TwinnedSession.instance.getClientIds()
-        : null;
-    if (loading) return;
-    loading = false;
-    await _getBasicInfo(context, 'New Device Model',
-        onPressed: (name, desc, t) async {
-      List<String> tags = [];
-      if (null != t) {
-        tags = t.trim().split(' ');
-      }
-      var mRes = await TwinnedSession.instance.twin.createDeviceModel(
-          apikey: TwinnedSession.instance.authToken,
-          body: tapi.DeviceModelInfo(
-            name: name,
-            description: desc,
-            tags: tags,
-            make: '-',
-            model: '-',
-            version: '-',
-            parameters: [],
-            clientIds: clientIds,
-          ));
-      if (validateResponse(mRes)) {
-        await _openDeviceModel(mRes.body!.entity!, "Add");
-      }
-    });
-    loading = false;
-    refresh();
+  void _addEditDeviceModelDialog({tapi.DeviceModel? deviceModel}) async {
+    await super.alertDialog(
+      title: null == deviceModel ? 'Add New DeviceModel' : 'Update DeviceModel',
+      body: DeviceModelSnippet(
+        deviceModel: deviceModel,
+      ),
+      width: 750,
+      height: MediaQuery.of(context).size.height - 150,
+    );
+    _load();
   }
 
   Future _openDeviceModel(tapi.DeviceModel e, String type) async {
@@ -341,7 +232,7 @@ class _DeviceLibraryState extends BaseState<DeviceLibrary> {
   }
 
   Future _create() async {
-    _addDeviceModel();
+    _addEditDeviceModelDialog();
   }
 
   Future _edit(tapi.DeviceModel e, String type) async {
