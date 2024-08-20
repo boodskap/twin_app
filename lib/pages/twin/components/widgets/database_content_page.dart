@@ -62,6 +62,9 @@ class _DeviceContentPageState extends BaseState<DeviceContentPage> {
   double? _borderWidth;
   String? field;
   String? viewType;
+  Future<List<String>>? clientIds =
+      isClientAdmin() ? TwinnedSession.instance.getClientIds() : null;
+
   @override
   void initState() {
     paramHeaders.add(TableRow(children: [
@@ -161,6 +164,9 @@ class _DeviceContentPageState extends BaseState<DeviceContentPage> {
   }
 
   Future _save({bool shouldPop = false}) async {
+    List<String>? clientIds = super.isClientAdmin()
+        ? await TwinnedSession.instance.getClientIds()
+        : null;
     if (loading) return;
     loading = true;
 
@@ -191,6 +197,7 @@ class _DeviceContentPageState extends BaseState<DeviceContentPage> {
               selectedImage: widget.deviceModel.selectedImage,
               tags: _tagsController.text.split(' '),
               customWidget: customWidgetList,
+              clientIds: clientIds ?? widget.device!.clientIds,
             ));
       } else {
         res = await TwinnedSession.instance.twin.updateDevice(
@@ -210,6 +217,7 @@ class _DeviceContentPageState extends BaseState<DeviceContentPage> {
                 hasGeoLocation: _hasLocation,
                 movable: _hasTracked,
                 geolocation: _pickedLocation,
+                clientIds: clientIds ?? widget.device!.clientIds,
                 customWidget: customWidgetList));
       }
 

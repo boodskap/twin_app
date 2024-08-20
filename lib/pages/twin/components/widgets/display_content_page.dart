@@ -30,6 +30,8 @@ class _DisplayContentStatePageState extends BaseState<DisplayContentStatePage> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _descController = TextEditingController();
   final TextEditingController _tagsController = TextEditingController();
+  Future<List<String>>? clientIds =
+      isClientAdmin() ? TwinnedSession.instance.getClientIds() : null;
 
   bool _showDisplayStateSection = false;
   bool _displayStateEditMode = false;
@@ -112,6 +114,7 @@ class _DisplayContentStatePageState extends BaseState<DisplayContentStatePage> {
         description: _descController.text,
         tags: _tagsController.text.split(' '),
         conditions: widget.display.conditions,
+        clientIds: widget.display.clientIds,
       );
 
       res = await TwinnedSession.instance.twin.updateDisplay(
@@ -145,7 +148,8 @@ class _DisplayContentStatePageState extends BaseState<DisplayContentStatePage> {
         child: Card(
           color: Colors.transparent,
           elevation: 5,
-          child: Container(//justtt_dumb_
+          child: Container(
+            //justtt_dumb_
             height: 250,
             width: MediaQuery.of(context).size.width,
             margin: const EdgeInsets.all(5),
@@ -376,7 +380,7 @@ class _DisplayContentStatePageState extends BaseState<DisplayContentStatePage> {
                       if (_cards.isEmpty)
                         SizedBox(
                           height: MediaQuery.of(context).size.height / 2,
-                          child:  Center(
+                          child: Center(
                               child: Text(
                             'No Display State Found',
                             style: theme.getStyle(),
