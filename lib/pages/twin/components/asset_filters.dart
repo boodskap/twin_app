@@ -303,7 +303,7 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
             divider(horizontal: true),
             PrimaryButton(
               labelKey: "Add Generic",
-              onPressed: (_selectedDeviceModel != null && isAdmin())
+              onPressed: ( isAdmin())
                   ? () async {
                       await _addNewField();
                     }
