@@ -7,7 +7,7 @@ class AssetActionWidget extends StatefulWidget {
   final Map<String, tapi.DeviceModel> models;
   final tapi.DeviceData deviceData;
 
-  final OnDeviceTapped onDeviceTapped;
+  final OnDeviceTapped? onDeviceTapped;
   final OnDeviceModelTapped onDeviceModelTapped;
   final OnAssetModelTapped onAssetModelTapped;
   final OnAnalyticsTapped onTimeSeriesTapped;
@@ -19,11 +19,11 @@ class AssetActionWidget extends StatefulWidget {
     this.direction = Axis.vertical,
     required this.models,
     required this.deviceData,
-    required this.onDeviceTapped,
     required this.onDeviceModelTapped,
     required this.onAssetModelTapped,
     required this.onTimeSeriesTapped,
     required this.onTimeSeriesDoubleTapped,
+    this.onDeviceTapped,
   });
 
   @override
@@ -42,14 +42,15 @@ class _AssetActionWidgetState extends State<AssetActionWidget> {
       crossAxisAlignment: WrapCrossAlignment.center,
       spacing: smallScreen ? 2 : 8,
       children: [
-        InkWell(
-          onTap: () {
-            widget.onDeviceTapped(dd.deviceId, dd);
-          },
-          child: Tooltip(
-              message: '${dd.hardwareDeviceId} History Data',
-              child: Icon(Icons.history)),
-        ),
+        if (null != widget.onDeviceTapped)
+          InkWell(
+            onTap: () {
+              widget.onDeviceTapped!(dd.deviceId, dd);
+            },
+            child: Tooltip(
+                message: '${dd.hardwareDeviceId} History Data',
+                child: Icon(Icons.history)),
+          ),
         SizedBox(
           height: 8,
         ),
