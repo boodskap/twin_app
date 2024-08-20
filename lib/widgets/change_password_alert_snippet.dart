@@ -48,11 +48,6 @@ class _ChangePasswordSnippetState extends BaseState<ChangePasswordSnippet> {
 
         if (oPass.isNotEmpty) {
           if (nPass == cPass) {
-            // var response = await TwinnedSession.instance.twin.getMyProfile(
-            //     apikey: config.isTwinApp()
-            //         ? TwinnedSession.instance.authToken
-            //         : TwinnedSession.instance.noCodeAuthToken);
-            // var userId = response.body!.entity!.email;
             var res = await TwinnedSession.instance.twin.changePassword(
               apikey: TwinnedSession.instance.authToken,
               body: ChangePassReq(

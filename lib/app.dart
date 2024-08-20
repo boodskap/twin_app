@@ -439,11 +439,13 @@ class HomeScreenState extends BaseState<HomeScreen> {
                   session.selectedOrg = session.orgs.indexOf(o!);
                   TwinnedSession ts = TwinnedSession.instance;
                   TwinnedSession.instance.init(
-                      debug: ts.debug,
-                      host: ts.host,
-                      authToken: o!.twinAuthToken,
-                      domainKey: o!.twinDomainKey,
-                      noCodeAuthToken: ts.noCodeAuthToken);
+                    debug: ts.debug,
+                    host: ts.host,
+                    authToken: o!.twinAuthToken,
+                    domainKey: o!.twinDomainKey,
+                    orgId: o!.id,
+                    noCodeAuthToken: ts.noCodeAuthToken,
+                  );
                   await _load();
                   showScreen(TwinAppMenu.home);
                 }

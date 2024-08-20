@@ -66,6 +66,7 @@ void start({
     host: session.config.apiHost,
     authToken: '',
     noCodeAuthToken: '',
+    orgId: '',
   );
 
   startApp();
