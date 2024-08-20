@@ -8,6 +8,7 @@ import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:twin_app/auth.dart';
+import 'package:twin_app/core/twin_helper.dart';
 import 'package:twin_app/pages/admin/clients.dart';
 import 'package:twin_app/pages/admin/current_plan.dart';
 import 'package:twin_app/pages/admin/invoices.dart';
@@ -446,6 +447,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
                     orgId: o!.id,
                     noCodeAuthToken: ts.noCodeAuthToken,
                   );
+                  await TwinnedSession.instance.getUser();
                   await _load();
                   showScreen(TwinAppMenu.home);
                 }
@@ -643,9 +645,9 @@ class HomeScreenState extends BaseState<HomeScreen> {
         id: TwinAppMenu.customDashboard,
         expanded: true,
         assetImage: 'images/twin.png',
-        subItems: _dashboardSubMenuItems,
+        subItems: session.screenMenus,
         isMenuVisible: () {
-          return true;
+          return session.screens.isNotEmpty;
         },
         onMenuSelected: (ctx) async {
           return SizedBox.shrink();
@@ -730,29 +732,6 @@ class HomeScreenState extends BaseState<HomeScreen> {
         },
       ),
     ];
-  }
-
-  List<session.TwinMenuItem> get _dashboardSubMenuItems {
-    List<session.TwinMenuItem> list = [];
-
-    for (tapi.DashboardScreen ds in session.screens) {
-      list.add(session.TwinMenuItem(
-        id: CustomMenu(screenId: ds.id),
-        text: ds.name,
-        icon: Icons.menu,
-        isMenuVisible: () {
-          return true;
-        },
-        onMenuSelected: (BuildContext context) async {
-          return TwinnedDashboardWidget(
-            screen: ds,
-            screenId: ds.id,
-          );
-        },
-      ));
-    }
-
-    return list;
   }
 
   List<session.TwinMenuItem> get _twinSubMenuItems {
@@ -963,11 +942,44 @@ class HomeScreenState extends BaseState<HomeScreen> {
     _clients.clear();
 
     await execute(() async {
-      user = await TwinnedSession.instance.getUser();
-      var clients = await TwinnedSession.instance.getClients();
-      _clients.addAll(clients);
-      if (_clients.isNotEmpty) {
-        _selectedClient = 0;
+      {
+        user = await TwinnedSession.instance.getUser();
+        var clients = await TwinnedSession.instance.getClients();
+        _clients.addAll(clients);
+        if (_clients.isNotEmpty) {
+          _selectedClient = 0;
+        }
+      }
+
+      {
+        session.screens.clear();
+        session.screenMenus.clear();
+
+        var sRes = await TwinnedSession.instance.twin.listDashboardScreens(
+          apikey: session.orgs[session.selectedOrg].twinAuthToken,
+          body: tapi.ListReq(size: 25, page: 0),
+        );
+        if (TwinHelper.validateResponse(sRes)) {
+          session.screens.addAll(sRes.body?.values ?? []);
+          debugPrint('FOUND ${session.screens.length} dashboards');
+        }
+
+        for (tapi.DashboardScreen ds in session.screens) {
+          session.screenMenus.add(session.TwinMenuItem(
+            id: CustomMenu(screenId: ds.id),
+            text: ds.name,
+            icon: Icons.menu,
+            isMenuVisible: () {
+              return true;
+            },
+            onMenuSelected: (BuildContext context) async {
+              return TwinnedDashboardWidget(
+                screen: ds,
+                screenId: ds.id,
+              );
+            },
+          ));
+        }
       }
     });
 

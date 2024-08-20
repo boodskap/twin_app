@@ -70,7 +70,8 @@ class _DeviceFieldWidgetState extends BaseState<DeviceFieldWidget> {
                       overflow: TextOverflow.ellipsis,
                       fontWeight: FontWeight.bold),
                 ),
-                if (iconId.isNotEmpty) divider(),
+                divider(),
+                if (iconId.isEmpty) SizedBox(width: 28, height: 28),
                 if (iconId.isNotEmpty)
                   SizedBox(
                       width: 28,
@@ -106,15 +107,16 @@ class _DeviceFieldWidgetState extends BaseState<DeviceFieldWidget> {
                     widget.onDeviceAnalyticsDoubleTapped(
                         field, deviceModel, dd);
                   },
-            child: ConstrainedBox(
-                constraints: const BoxConstraints(
-                    minWidth: 80, minHeight: 160, maxWidth: 80, maxHeight: 160),
-                child: sensors.SensorWidget(
-                  parameter: parameter!,
-                  deviceData: dd,
-                  deviceModel: deviceModel,
-                  tiny: true,
-                )),
+            child: SizedBox(
+              width: 100,
+              height: 80,
+              child: sensors.SensorWidget(
+                parameter: parameter!,
+                deviceData: dd,
+                deviceModel: deviceModel,
+                tiny: true,
+              ),
+            ),
           ),
         ));
       }

@@ -54,6 +54,7 @@ nocode.Profile? profile;
 int selectedOrg = 0;
 final List<twin.OrgInfo> orgs = [];
 final List<twin.DashboardScreen> screens = [];
+final List<TwinMenuItem> screenMenus = [];
 
 bool isAdmin() {
   if (null != profile) return true;
