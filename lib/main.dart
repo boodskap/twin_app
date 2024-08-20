@@ -25,7 +25,7 @@ void main() async {
     appTitle: 'My Twin App',
     homeMenu: TwinAppMenu.home,
     homeMenuTitle: 'Home',
-    disableTwinApp: true,
+    disableTwinApp: false,
   );
 }
 

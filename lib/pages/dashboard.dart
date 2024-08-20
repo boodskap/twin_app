@@ -3,7 +3,6 @@ import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/pages/dashboard_history.dart';
 import 'package:twin_app/pages/wrapper_page.dart';
 import 'package:twin_app/widgets/data_grid_snippet.dart';
-import 'package:twin_app/widgets/data_card_snippet.dart';
 import 'package:twin_app/widgets/field_analytics_page.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twinned_api/api/twinned.swagger.dart' as tapi;
@@ -33,47 +32,9 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends BaseState<Dashboard> {
-  bool _cardView = true;
-
   @override
   void initState() {
     super.initState();
-    _cardView = smallScreen;
-  }
-
-  Widget _buildSmall(BuildContext context) {
-    return DataCardSnippet(
-      deviceModelIds: widget.deviceModelIds,
-      premiseIds: widget.premiseIds,
-      assetIds: widget.assetIds,
-      assetModelIds: widget.assetModelIds,
-      facilityIds: widget.facilityIds,
-      floorIds: widget.floorIds,
-      //clientIds : widget.clientIds,
-      onGridViewSelected: () {
-        setState(() {
-          _cardView = false;
-        });
-      },
-      onPremiseTapped: (id, dd) {
-        _showDashboard(dd.premise ?? '', premiseIds: [id]);
-      },
-      onFloorTapped: (id, dd) {
-        _showDashboard(dd.floor ?? '', floorIds: [id]);
-      },
-      onFacilityTapped: (id, dd) {
-        _showDashboard(dd.facility ?? '', facilityIds: [id]);
-      },
-      onDeviceModelTapped: (id, dd) {
-        _showDashboard(dd.modelName ?? '', deviceModelIds: [id]);
-      },
-      onAssetTapped: (id, dd) {
-        _showDashboard(dd.asset ?? '', assetIds: [id]);
-      },
-      onDeviceTapped: (id, dd) {
-        _showDashboardHistory(dd.deviceName ?? '', deviceIds: [id]);
-      },
-    );
   }
 
   void showAnalytics(
@@ -184,10 +145,6 @@ class _DashboardState extends BaseState<Dashboard> {
 
   @override
   Widget build(BuildContext context) {
-    if (smallScreen || _cardView) {
-      return _buildSmall(context);
-    }
-
     return Column(
       children: [
         Flexible(
