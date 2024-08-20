@@ -25,10 +25,12 @@ void main() async {
     appTitle: 'My Twin App',
     homeMenu: TwinAppMenu.home,
     homeMenuTitle: 'Home',
+    disableTwinApp: false,
   );
 }
 
 void start({
+  bool disableTwinApp = false,
   required String appTitle,
   required dynamic homeMenu,
   required String homeMenuTitle,
@@ -38,6 +40,7 @@ void start({
   session.PostLoginHook? postLoginHook = _loadCustomDashboards,
   session.PostSignUpHook? postSignUpHook = _createDefaultClient,
 }) async {
+  session.twinAppDisabled = disableTwinApp;
   session.appTitle = appTitle;
   session.selectedMenuTitle = homeMenuTitle;
   session.menuItems.addAll(menuItems);

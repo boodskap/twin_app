@@ -120,6 +120,8 @@ void _initialiseGetIt() {
   log.d("Initializing dependencies...");
 }
 
+GlobalKey appKey = GlobalKey();
+
 class TwinApp extends StatefulWidget {
   const TwinApp({super.key});
 
@@ -167,6 +169,7 @@ class _TwinAppState extends State<TwinApp> {
     }
 
     return MaterialApp.router(
+      key: appKey,
       debugShowCheckedModeBanner: false,
       debugShowMaterialGrid: false,
       localizationsDelegates: context.localizationDelegates,
@@ -196,13 +199,13 @@ class HomeScreenState extends BaseState<HomeScreen> {
   int _selectedClient = -1;
   bool firstTime = true;
   late StreamAuth auth;
-  GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   initState() {
     super.initState();
     menuItems.addAll(session.menuItems);
-    menuItems.addAll(_menuItems);
+    menuItems.addAll(session.twinAppDisabled ? [] : _menuItems);
     showScreen(session.selectedMenu);
   }
 
