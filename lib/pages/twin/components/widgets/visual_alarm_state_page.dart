@@ -105,7 +105,7 @@ class _VisualAlarmStatePageState extends BaseState<VisualAlarmStatePage> {
             modelId: widget.alarm.modelId,
             state: widget.alarm.state,
             conditions: widget.alarm.conditions,
-            clientIds: clientIds,
+            clientIds: clientIds ?? widget.alarm.clientIds,
             deviceId: widget.alarm.deviceId,
           ));
       if (validateResponse(res)) {
