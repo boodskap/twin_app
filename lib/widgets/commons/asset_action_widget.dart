@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_commons/widgets/default_deviceview.dart';
 import 'package:twinned_api/api/twinned.swagger.dart' as tapi;
 
@@ -11,9 +12,11 @@ class AssetActionWidget extends StatefulWidget {
   final OnAssetModelTapped onAssetModelTapped;
   final OnAnalyticsTapped onTimeSeriesTapped;
   final OnAnalyticsTapped onTimeSeriesDoubleTapped;
+  final Axis direction;
 
   const AssetActionWidget({
     super.key,
+    this.direction = Axis.vertical,
     required this.models,
     required this.deviceData,
     required this.onDeviceTapped,
@@ -32,8 +35,12 @@ class _AssetActionWidgetState extends State<AssetActionWidget> {
   Widget build(BuildContext context) {
     final tapi.DeviceData dd = widget.deviceData;
 
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Wrap(
+      direction: widget.direction,
+      alignment: WrapAlignment.spaceEvenly,
+      runAlignment: WrapAlignment.spaceEvenly,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      spacing: smallScreen ? 2 : 8,
       children: [
         InkWell(
           onTap: () {
