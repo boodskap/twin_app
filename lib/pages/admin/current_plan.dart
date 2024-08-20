@@ -355,7 +355,7 @@ class _CurrentPlanState extends BaseState<CurrentPlan> {
         builder: (ctx) {
           return AlertDialog(
             content: PurchaseChangeAddonWidget(
-                orgId: TwinnedSession.instance.noCodeAuthToken,
+                orgId: orgs[selectedOrg].id,
                 purchase: true,
                 archivals: archivals,
                 clients: clients,
