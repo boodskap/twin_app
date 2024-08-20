@@ -403,22 +403,19 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
     if (loading) return;
     loading = true;
     await execute(() async {
-      var response = await TwinnedSession.instance.twin
-          .getMyProfile(apikey: orgs[selectedOrg].twinAuthToken);
-      var res = response.body!.entity!;
-
-      if (validateResponse(response)) {
+      TwinUser? user = await TwinnedSession.instance.getUser();
+      if (null != user) {
         refresh(sync: () {
-          fullName = res.name;
+          fullName = user.name;
           initials = getInitials(fullName);
-          _emailController.text = res.email;
-          _nameController.text = res.name;
-          _addressController.text = res.address ?? '';
-          _phoneController.text = res.phone ?? '';
-          _descController.text = res.description ?? '';
-          twinUserId = res.id;
-          roles = res.roles ?? [];
-          clientIds = res.clientIds ?? [];
+          _emailController.text = user.email;
+          _nameController.text = user.name;
+          _addressController.text = user.address ?? '';
+          _phoneController.text = user.phone ?? '';
+          _descController.text = user.description ?? '';
+          twinUserId = user.id;
+          roles = user.roles ?? [];
+          clientIds = user.clientIds ?? [];
         });
       }
     });

@@ -11,6 +11,7 @@ import 'package:twin_app/widgets/commons/device_field_widget.dart';
 import 'package:twin_app/widgets/commons/event_search.dart';
 import 'package:twin_app/widgets/commons/facility_search.dart';
 import 'package:twin_app/widgets/commons/floor_search.dart';
+import 'package:twin_app/widgets/commons/location_info_widget.dart';
 import 'package:twin_app/widgets/commons/premise_search.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
@@ -555,6 +556,13 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
             divider(horizontal: true),
             SizedBox(
               width: colWidth,
+              child: LocationInfoWidget(
+                deviceData: dd,
+                onClientTapped: widget.onClientTapped,
+                onFacilityTapped: widget.onFacilityTapped,
+                onPremiseTapped: widget.onPremiseTapped,
+                onFloorTapped: widget.onFloorTapped,
+              ),
             ),
             divider(horizontal: true),
             DeviceFieldWidget(
