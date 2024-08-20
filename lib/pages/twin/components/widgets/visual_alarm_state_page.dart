@@ -77,6 +77,10 @@ class _VisualAlarmStatePageState extends BaseState<VisualAlarmStatePage> {
   }
 
   Future _save() async {
+    List<String>? clientIds = super.isClientAdmin()
+        ? await TwinnedSession.instance.getClientIds()
+        : null;
+
     busy();
     try {
       tapi.AlarmMatchGroup g = tapi.AlarmMatchGroup(
@@ -92,15 +96,18 @@ class _VisualAlarmStatePageState extends BaseState<VisualAlarmStatePage> {
           apikey: TwinnedSession.instance.authToken,
           alarmId: widget.alarm.id,
           body: tapi.AlarmInfo(
-              name: widget.alarm.name,
-              description: widget.alarm.description,
-              label: widget.alarm.label,
-              tags: widget.alarm.tags,
-              stateIcons: widget.alarm.stateIcons,
-              showOnlyIfMatched: true,
-              modelId: widget.alarm.modelId,
-              state: widget.alarm.state,
-              conditions: widget.alarm.conditions));
+            name: widget.alarm.name,
+            description: widget.alarm.description,
+            label: widget.alarm.label,
+            tags: widget.alarm.tags,
+            stateIcons: widget.alarm.stateIcons,
+            showOnlyIfMatched: true,
+            modelId: widget.alarm.modelId,
+            state: widget.alarm.state,
+            conditions: widget.alarm.conditions,
+            clientIds: clientIds,
+            deviceId: widget.alarm.deviceId,
+          ));
       if (validateResponse(res)) {
         await alert(widget.alarm.name, 'Saved successfully');
         _close();
