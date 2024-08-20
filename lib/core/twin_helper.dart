@@ -1,21 +1,36 @@
 import 'dart:convert';
 
+import 'package:flutter/Material.dart';
+import 'package:twin_app/app.dart';
 import 'package:verification_api/api/verification.swagger.dart' as vapi;
 import 'package:nocode_api/api/nocode.swagger.dart' as ncapi;
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_commons/util/nocode_utils.dart';
 import 'package:twin_commons/core/storage.dart';
-import '/foundation/logger/logger.dart';
 import 'package:chopper/chopper.dart' as chopper;
 
 class TwinHelper {
   static void registerNoCode() {}
 
-  static Future<void> execute(Function f) async {
+  static Future<void> execute(Function f, {Function()? onError}) async {
     try {
       await f();
     } catch (e, s) {
-      log.e('Call failed', time: DateTime.now(), error: e, stackTrace: s);
+      debugPrintStack();
+      debugPrint('ERROR: $e');
+      BuildContext? context = appKey.currentState?.context;
+      if (null != context) {
+        String errS = e.toString();
+        if (errS.contains('ClientError')) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text(
+                  'Network Error, Please check your internet connection',
+                  style: theme.getStyle())));
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(errS, style: theme.getStyle())));
+        }
+      }
     }
   }
 
