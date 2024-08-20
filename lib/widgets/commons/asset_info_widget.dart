@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:twin_app/core/session_variables.dart';
+import 'package:twin_app/widgets/commons/asset_action_widget.dart';
 import 'package:twin_commons/widgets/default_deviceview.dart';
 import 'package:twinned_api/api/twinned.swagger.dart' as tapi;
 import 'package:timeago/timeago.dart' as timeago;
 
 class AssetInfoWidget extends StatefulWidget {
+  final Map<String, tapi.DeviceModel> models;
   final tapi.DeviceData deviceData;
   final OnAssetTapped onAssetTapped;
   final OnDeviceTapped onDeviceTapped;
@@ -12,9 +14,14 @@ class AssetInfoWidget extends StatefulWidget {
   final OnPremiseTapped onPremiseTapped;
   final OnFacilityTapped onFacilityTapped;
   final OnFloorTapped onFloorTapped;
+  final OnDeviceModelTapped onDeviceModelTapped;
+  final OnAssetModelTapped onAssetModelTapped;
+  final OnAnalyticsTapped onTimeSeriesTapped;
+  final OnAnalyticsTapped onTimeSeriesDoubleTapped;
 
   const AssetInfoWidget({
     super.key,
+    required this.models,
     required this.deviceData,
     required this.onAssetTapped,
     required this.onDeviceTapped,
@@ -22,6 +29,10 @@ class AssetInfoWidget extends StatefulWidget {
     required this.onPremiseTapped,
     required this.onFacilityTapped,
     required this.onFloorTapped,
+    required this.onDeviceModelTapped,
+    required this.onAssetModelTapped,
+    required this.onTimeSeriesTapped,
+    required this.onTimeSeriesDoubleTapped,
   });
 
   @override
@@ -162,6 +173,18 @@ class _AssetInfoWidgetState extends State<AssetInfoWidget> {
                 .copyWith(fontWeight: FontWeight.bold, fontSize: 11),
           ),
         ),
+        if (!smallScreen) const SizedBox(height: 8),
+        if (!smallScreen)
+          AssetActionWidget(
+            direction: Axis.horizontal,
+            models: widget.models,
+            deviceData: widget.deviceData,
+            onDeviceTapped: widget.onDeviceTapped,
+            onDeviceModelTapped: widget.onDeviceModelTapped,
+            onAssetModelTapped: widget.onAssetModelTapped,
+            onTimeSeriesTapped: widget.onTimeSeriesTapped,
+            onTimeSeriesDoubleTapped: widget.onTimeSeriesDoubleTapped,
+          ),
       ],
     );
   }

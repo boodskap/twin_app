@@ -529,21 +529,24 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
         child: Row(
           mainAxisSize: MainAxisSize.max,
           children: [
-            Padding(
-              padding: const EdgeInsets.only(right: 8.0),
-              child: AssetActionWidget(
-                models: _models,
-                deviceData: dd,
-                onDeviceTapped: widget.onDeviceTapped,
-                onAssetModelTapped: widget.onAssetModelTapped,
-                onDeviceModelTapped: widget.onDeviceModelTapped,
-                onTimeSeriesDoubleTapped: widget.onAnalyticsDoubleTapped,
-                onTimeSeriesTapped: widget.onAnalyticsTapped,
+            if (smallScreen)
+              Padding(
+                padding: const EdgeInsets.only(right: 8.0),
+                child: AssetActionWidget(
+                  direction: Axis.vertical,
+                  models: _models,
+                  deviceData: dd,
+                  onDeviceTapped: widget.onDeviceTapped,
+                  onAssetModelTapped: widget.onAssetModelTapped,
+                  onDeviceModelTapped: widget.onDeviceModelTapped,
+                  onTimeSeriesDoubleTapped: widget.onAnalyticsDoubleTapped,
+                  onTimeSeriesTapped: widget.onAnalyticsTapped,
+                ),
               ),
-            ),
             SizedBox(
               width: colWidth,
               child: AssetInfoWidget(
+                models: _models,
                 deviceData: dd,
                 onDeviceTapped: widget.onDeviceTapped,
                 onClientTapped: widget.onClientTapped,
@@ -551,6 +554,10 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                 onFacilityTapped: widget.onFacilityTapped,
                 onPremiseTapped: widget.onPremiseTapped,
                 onFloorTapped: widget.onFloorTapped,
+                onAssetModelTapped: widget.onAssetModelTapped,
+                onDeviceModelTapped: widget.onDeviceModelTapped,
+                onTimeSeriesDoubleTapped: widget.onAnalyticsDoubleTapped,
+                onTimeSeriesTapped: widget.onAnalyticsTapped,
               ),
             ),
             divider(horizontal: true),
