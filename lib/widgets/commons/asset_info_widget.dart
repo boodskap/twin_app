@@ -9,7 +9,7 @@ class AssetInfoWidget extends StatefulWidget {
   final Map<String, tapi.DeviceModel> models;
   final tapi.DeviceData deviceData;
   final OnAssetTapped onAssetTapped;
-  final OnDeviceTapped onDeviceTapped;
+  final OnDeviceTapped? onDeviceTapped;
   final OnClientTapped onClientTapped;
   final OnPremiseTapped onPremiseTapped;
   final OnFacilityTapped onFacilityTapped;
@@ -24,7 +24,6 @@ class AssetInfoWidget extends StatefulWidget {
     required this.models,
     required this.deviceData,
     required this.onAssetTapped,
-    required this.onDeviceTapped,
     required this.onClientTapped,
     required this.onPremiseTapped,
     required this.onFacilityTapped,
@@ -33,6 +32,7 @@ class AssetInfoWidget extends StatefulWidget {
     required this.onAssetModelTapped,
     required this.onTimeSeriesTapped,
     required this.onTimeSeriesDoubleTapped,
+    this.onDeviceTapped,
   });
 
   @override
@@ -63,12 +63,12 @@ class _AssetInfoWidgetState extends State<AssetInfoWidget> {
               ),
             ),
           ),
-        if (dd.asset?.isEmpty ?? true)
+        if ((dd.asset?.isEmpty ?? true) && null != widget.onDeviceTapped)
           Tooltip(
             message: 'Device',
             child: InkWell(
               onTap: () {
-                widget.onDeviceTapped(dd.deviceId, dd);
+                widget.onDeviceTapped!(dd.deviceId, dd);
               },
               child: Text(
                 dd.deviceName ?? dd.hardwareDeviceId,
