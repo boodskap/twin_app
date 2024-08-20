@@ -20,8 +20,6 @@ import 'package:twin_commons/widgets/default_deviceview.dart';
 import 'package:twinned_api/api/twinned.swagger.dart' as tapi;
 import 'package:chopper/chopper.dart' as chopper;
 
-enum FilterType { none, data, field, group, model }
-
 class DataGridSnippet extends StatefulWidget {
   final bool autoRefresh;
   final int autoRefreshInterval;
@@ -158,6 +156,13 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                         });
                         await _load(search: _searchQuery);
                       },
+                      onDoubleTap: () async {
+                        setState(() {
+                          _dataFilter = null;
+                          _fieldFilter = null;
+                        });
+                        await _load(search: _searchQuery);
+                      },
                       onTap: () async {
                         await super.alertDialog(
                           title: 'Filter by Data',
@@ -212,6 +217,18 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                         });
                         await _load(search: _searchQuery);
                       },
+                      onDoubleTap: () async {
+                        setState(() {
+                          _client = null;
+                          _premise = null;
+                          _facility = null;
+                          _floor = null;
+                          _assetGroup = null;
+                          _dataFilter = null;
+                          _fieldFilter = null;
+                        });
+                        await _load(search: _searchQuery);
+                      },
                       onTap: () async {
                         await super.alertDialog(
                             title: 'Filter by Client',
@@ -242,6 +259,14 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                               ? null
                               : theme.getPrimaryColor()),
                       onLongPress: () async {
+                        setState(() {
+                          _premise = null;
+                          _facility = null;
+                          _floor = null;
+                        });
+                        await _load(search: _searchQuery);
+                      },
+                      onDoubleTap: () async {
                         setState(() {
                           _premise = null;
                           _facility = null;
@@ -282,6 +307,13 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                         });
                         await _load(search: _searchQuery);
                       },
+                      onDoubleTap: () async {
+                        setState(() {
+                          _facility = null;
+                          _floor = null;
+                        });
+                        await _load(search: _searchQuery);
+                      },
                       onTap: () async {
                         await super.alertDialog(
                             title: 'Filter by Facility',
@@ -308,6 +340,12 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                           color:
                               null == _floor ? null : theme.getPrimaryColor()),
                       onLongPress: () async {
+                        setState(() {
+                          _floor = null;
+                        });
+                        await _load(search: _searchQuery);
+                      },
+                      onDoubleTap: () async {
                         setState(() {
                           _floor = null;
                         });
@@ -344,6 +382,12 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                         });
                         await _load(search: _searchQuery);
                       },
+                      onDoubleTap: () async {
+                        setState(() {
+                          _assetGroup = null;
+                        });
+                        await _load(search: _searchQuery);
+                      },
                       onTap: () async {
                         await super.alertDialog(
                             title: 'Filter by Group',
@@ -373,6 +417,12 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                         });
                         await _load(search: _searchQuery);
                       },
+                      onDoubleTap: () async {
+                        setState(() {
+                          _event = null;
+                        });
+                        await _load(search: _searchQuery);
+                      },
                       onTap: () async {
                         await super.alertDialog(
                             title: 'Filter by Event',
@@ -397,6 +447,12 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                           color:
                               null == _alarm ? null : theme.getPrimaryColor()),
                       onLongPress: () async {
+                        setState(() {
+                          _alarm = null;
+                        });
+                        await _load(search: _searchQuery);
+                      },
+                      onDoubleTap: () async {
                         setState(() {
                           _alarm = null;
                         });
@@ -504,7 +560,15 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                   ],
                 ),
               ),
-            if (!loading && _children.isNotEmpty) ..._children,
+            if (!loading && _children.isNotEmpty)
+              Flexible(
+                child: SingleChildScrollView(
+                  child: Wrap(
+                    direction: Axis.vertical,
+                    children: _children,
+                  ),
+                ),
+              ),
           ],
         ));
   }
@@ -516,7 +580,7 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
     _children.add(Padding(
       padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
       child: Container(
-        width: MediaQuery.of(context).size.width,
+        width: MediaQuery.of(context).size.width - 10,
         height: 1,
         decoration:
             BoxDecoration(border: Border.all(color: theme.getPrimaryColor())),
@@ -524,72 +588,88 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
     ));
 
     for (tapi.DeviceData dd in _data) {
-      _children.add(SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            if (smallScreen)
-              Padding(
-                padding: const EdgeInsets.only(right: 8.0),
-                child: AssetActionWidget(
-                  direction: Axis.vertical,
+      refresh(sync: () {
+        _children.add(SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              if (smallScreen)
+                Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: AssetActionWidget(
+                    direction: Axis.vertical,
+                    models: _models,
+                    deviceData: dd,
+                    onDeviceTapped: widget.onDeviceTapped,
+                    onAssetModelTapped: widget.onAssetModelTapped,
+                    onDeviceModelTapped: widget.onDeviceModelTapped,
+                    onTimeSeriesDoubleTapped: widget.onAnalyticsDoubleTapped,
+                    onTimeSeriesTapped: widget.onAnalyticsTapped,
+                  ),
+                ),
+              SizedBox(
+                width: colWidth,
+                child: AssetInfoWidget(
                   models: _models,
                   deviceData: dd,
                   onDeviceTapped: widget.onDeviceTapped,
+                  onClientTapped: widget.onClientTapped,
+                  onAssetTapped: widget.onAssetTapped,
+                  onFacilityTapped: widget.onFacilityTapped,
+                  onPremiseTapped: widget.onPremiseTapped,
+                  onFloorTapped: widget.onFloorTapped,
                   onAssetModelTapped: widget.onAssetModelTapped,
                   onDeviceModelTapped: widget.onDeviceModelTapped,
                   onTimeSeriesDoubleTapped: widget.onAnalyticsDoubleTapped,
                   onTimeSeriesTapped: widget.onAnalyticsTapped,
                 ),
               ),
-            SizedBox(
-              width: colWidth,
-              child: AssetInfoWidget(
+              divider(horizontal: true),
+              SizedBox(
+                width: colWidth,
+                child: LocationInfoWidget(
+                  deviceData: dd,
+                  onClientTapped: widget.onClientTapped,
+                  onFacilityTapped: widget.onFacilityTapped,
+                  onPremiseTapped: widget.onPremiseTapped,
+                  onFloorTapped: widget.onFloorTapped,
+                ),
+              ),
+              divider(horizontal: true),
+              DeviceFieldWidget(
+                deviceData: dd,
                 models: _models,
-                deviceData: dd,
-                onDeviceTapped: widget.onDeviceTapped,
-                onClientTapped: widget.onClientTapped,
-                onAssetTapped: widget.onAssetTapped,
-                onFacilityTapped: widget.onFacilityTapped,
-                onPremiseTapped: widget.onPremiseTapped,
-                onFloorTapped: widget.onFloorTapped,
-                onAssetModelTapped: widget.onAssetModelTapped,
-                onDeviceModelTapped: widget.onDeviceModelTapped,
-                onTimeSeriesDoubleTapped: widget.onAnalyticsDoubleTapped,
-                onTimeSeriesTapped: widget.onAnalyticsTapped,
+                onDeviceAnalyticsTapped: widget.onDeviceAnalyticsTapped,
+                onDeviceAnalyticsDoubleTapped:
+                    widget.onDeviceAnalyticsDoubleTapped,
               ),
-            ),
-            divider(horizontal: true),
-            SizedBox(
-              width: colWidth,
-              child: LocationInfoWidget(
-                deviceData: dd,
-                onClientTapped: widget.onClientTapped,
-                onFacilityTapped: widget.onFacilityTapped,
-                onPremiseTapped: widget.onPremiseTapped,
-                onFloorTapped: widget.onFloorTapped,
-              ),
-            ),
-            divider(horizontal: true),
-            DeviceFieldWidget(
-              deviceData: dd,
-              models: _models,
-              onDeviceAnalyticsTapped: widget.onDeviceAnalyticsTapped,
-              onDeviceAnalyticsDoubleTapped:
-                  widget.onDeviceAnalyticsDoubleTapped,
-            ),
-          ],
-        ),
-      ));
-      _children.add(Padding(
-        padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-        child: Container(
-          width: MediaQuery.of(context).size.width,
-          height: 1,
-          decoration:
-              BoxDecoration(border: Border.all(color: theme.getPrimaryColor())),
-        ),
+            ],
+          ),
+        ));
+
+        _children.add(Padding(
+          padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+          child: Container(
+            width: MediaQuery.of(context).size.width - 10,
+            height: 1,
+            decoration: BoxDecoration(
+                border: Border.all(color: theme.getPrimaryColor())),
+          ),
+        ));
+      });
+    }
+
+    if (_data.isEmpty) {
+      _children.add(Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            'No Data',
+            style: theme.getStyle().copyWith(fontSize: 20),
+          ),
+        ],
       ));
     }
   }
