@@ -202,7 +202,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
   initState() {
     super.initState();
     menuItems.addAll(session.menuItems);
-    menuItems.addAll(_menuItems);
+    menuItems.addAll(session.twinAppDisabled ? [] : _menuItems);
     showScreen(session.selectedMenu);
   }
 
