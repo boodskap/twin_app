@@ -26,6 +26,14 @@ class _VisualDisplaysState extends BaseState<VisualDisplays> {
   final List<Widget> _cards = [];
   String _search = '';
   tapi.DeviceModel? _selectedDeviceModel;
+  bool _canEdit = false;
+  Map<String, bool> _editable = Map<String, bool>();
+
+  @override
+  void initState() {
+    super.initState();
+    _checkCanEdit();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +67,7 @@ class _VisualDisplaysState extends BaseState<VisualDisplays> {
                 Icons.add,
                 color: Colors.white,
               ),
-              onPressed: (_selectedDeviceModel != null)
+              onPressed: (canCreate() && _selectedDeviceModel != null)
                   ? () {
                       _create();
                     }
@@ -119,12 +127,21 @@ class _VisualDisplaysState extends BaseState<VisualDisplays> {
   }
 
   Widget _buildCard(tapi.Display e) {
+    bool editable = _canEdit;
+    if (!editable) {
+      editable = _editable[e.id] ?? false;
+    }
+
     double width = MediaQuery.of(context).size.width / 8;
     return SizedBox(
       width: width,
       height: width,
       child: InkWell(
-        onDoubleTap: () => _edit(e),
+        onDoubleTap: () {
+          if (_canEdit) {
+            _edit(e);
+          }
+        },
         child: Tooltip(
           textStyle: theme.getStyle().copyWith(color: Colors.white),
           message: '${e.name}\n${e.description ?? ""}',
@@ -153,18 +170,36 @@ class _VisualDisplaysState extends BaseState<VisualDisplays> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         InkWell(
-                            onTap: () {
-                              _edit(e);
-                            },
-                            child: Icon(Icons.edit,
-                                color: theme.getPrimaryColor())),
+                            onTap: _canEdit
+                                ? () {
+                                    _edit(e);
+                                  }
+                                : null,
+                            child: Tooltip(
+                              message:
+                                  _canEdit ? "Update" : "No Permission to Edit",
+                              child: Icon(
+                                Icons.edit,
+                                color: _canEdit
+                                    ? theme.getPrimaryColor()
+                                    : Colors.grey,
+                              ),
+                            )),
                         InkWell(
-                          onTap: () {
-                            _delete(e);
-                          },
-                          child: Icon(
-                            Icons.delete,
-                            color: theme.getPrimaryColor(),
+                          onTap: _canEdit
+                              ? () {
+                                  _delete(e);
+                                }
+                              : null,
+                          child: Tooltip(
+                            message:
+                                _canEdit ? "Delete" : "No Permission to Delete",
+                            child: Icon(
+                              Icons.delete,
+                              color: _canEdit
+                                  ? theme.getPrimaryColor()
+                                  : Colors.grey,
+                            ),
                           ),
                         ),
                       ],
@@ -185,6 +220,15 @@ class _VisualDisplaysState extends BaseState<VisualDisplays> {
     );
   }
 
+  Future<void> _checkCanEdit() async {
+    List<String> clientIds = await getClientIds();
+    bool canEditResult = await canEdit(clientIds: clientIds);
+
+    setState(() {
+      _canEdit = canEditResult;
+    });
+  }
+
   Future _create() async {
     if (loading) return;
     loading = true;
@@ -202,6 +246,7 @@ class _VisualDisplaysState extends BaseState<VisualDisplays> {
             description: desc,
             tags: tags,
             conditions: [],
+            clientIds: [],
           ));
       if (validateResponse(mRes)) {
         await _edit(mRes.body!.entity!);
@@ -365,6 +410,8 @@ class _VisualDisplaysState extends BaseState<VisualDisplays> {
       }
 
       for (tapi.Display e in _entities) {
+        _editable[e.id] = await super.canEdit(clientIds: e.clientIds);
+
         _cards.add(_buildCard(e));
       }
     });
