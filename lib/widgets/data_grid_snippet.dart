@@ -156,6 +156,13 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                         });
                         await _load(search: _searchQuery);
                       },
+                      onDoubleTap: () async {
+                        setState(() {
+                          _dataFilter = null;
+                          _fieldFilter = null;
+                        });
+                        await _load(search: _searchQuery);
+                      },
                       onTap: () async {
                         await super.alertDialog(
                           title: 'Filter by Data',
@@ -210,6 +217,18 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                         });
                         await _load(search: _searchQuery);
                       },
+                      onDoubleTap: () async {
+                        setState(() {
+                          _client = null;
+                          _premise = null;
+                          _facility = null;
+                          _floor = null;
+                          _assetGroup = null;
+                          _dataFilter = null;
+                          _fieldFilter = null;
+                        });
+                        await _load(search: _searchQuery);
+                      },
                       onTap: () async {
                         await super.alertDialog(
                             title: 'Filter by Client',
@@ -240,6 +259,14 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                               ? null
                               : theme.getPrimaryColor()),
                       onLongPress: () async {
+                        setState(() {
+                          _premise = null;
+                          _facility = null;
+                          _floor = null;
+                        });
+                        await _load(search: _searchQuery);
+                      },
+                      onDoubleTap: () async {
                         setState(() {
                           _premise = null;
                           _facility = null;
@@ -280,6 +307,13 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                         });
                         await _load(search: _searchQuery);
                       },
+                      onDoubleTap: () async {
+                        setState(() {
+                          _facility = null;
+                          _floor = null;
+                        });
+                        await _load(search: _searchQuery);
+                      },
                       onTap: () async {
                         await super.alertDialog(
                             title: 'Filter by Facility',
@@ -306,6 +340,12 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                           color:
                               null == _floor ? null : theme.getPrimaryColor()),
                       onLongPress: () async {
+                        setState(() {
+                          _floor = null;
+                        });
+                        await _load(search: _searchQuery);
+                      },
+                      onDoubleTap: () async {
                         setState(() {
                           _floor = null;
                         });
@@ -342,6 +382,12 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                         });
                         await _load(search: _searchQuery);
                       },
+                      onDoubleTap: () async {
+                        setState(() {
+                          _assetGroup = null;
+                        });
+                        await _load(search: _searchQuery);
+                      },
                       onTap: () async {
                         await super.alertDialog(
                             title: 'Filter by Group',
@@ -371,6 +417,12 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                         });
                         await _load(search: _searchQuery);
                       },
+                      onDoubleTap: () async {
+                        setState(() {
+                          _event = null;
+                        });
+                        await _load(search: _searchQuery);
+                      },
                       onTap: () async {
                         await super.alertDialog(
                             title: 'Filter by Event',
@@ -395,6 +447,12 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                           color:
                               null == _alarm ? null : theme.getPrimaryColor()),
                       onLongPress: () async {
+                        setState(() {
+                          _alarm = null;
+                        });
+                        await _load(search: _searchQuery);
+                      },
+                      onDoubleTap: () async {
                         setState(() {
                           _alarm = null;
                         });
