@@ -452,7 +452,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
                   );
                   await TwinnedSession.instance.getUser();
                   await _load();
-                  showScreen(TwinAppMenu.home);
+                  showScreen(session.homeMenu);
                 }
               },
             ),
@@ -632,17 +632,18 @@ class HomeScreenState extends BaseState<HomeScreen> {
 
   List<session.TwinMenuItem> get _menuItems {
     return [
-      session.TwinMenuItem(
-        text: 'Home',
-        id: TwinAppMenu.home,
-        icon: Icons.dashboard,
-        isMenuVisible: () {
-          return true;
-        },
-        onMenuSelected: (ctx) async {
-          return const Dashboard();
-        },
-      ),
+      if (session.homeMenu == TwinAppMenu.home)
+        session.TwinMenuItem(
+          text: 'Home',
+          id: TwinAppMenu.home,
+          icon: Icons.dashboard,
+          isMenuVisible: () {
+            return true;
+          },
+          onMenuSelected: (ctx) async {
+            return const Dashboard();
+          },
+        ),
       session.TwinMenuItem(
         text: 'Dashboard',
         id: TwinAppMenu.customDashboard,

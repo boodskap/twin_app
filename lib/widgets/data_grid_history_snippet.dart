@@ -24,6 +24,7 @@ class DataGridHistorySnippet extends StatefulWidget {
   final bool autoRefresh;
   final int autoRefreshInterval;
   final String searchHint;
+  final List<String> deviceModelIds;
   final List<String> deviceIds;
   final List<String> assetIds;
   final OnAnalyticsTapped onAnalyticsTapped;
@@ -46,6 +47,7 @@ class DataGridHistorySnippet extends StatefulWidget {
     this.autoRefresh = true,
     this.autoRefreshInterval = 60,
     this.searchHint = 'Search',
+    this.deviceModelIds = const [],
     this.deviceIds = const [],
     this.assetIds = const [],
     required this.onAnalyticsTapped,
@@ -134,6 +136,13 @@ class DataGridHistorySnippetState extends BaseState<DataGridHistorySnippet> {
                         });
                         await _load(search: _searchQuery);
                       },
+                      onDoubleTap: () async {
+                        setState(() {
+                          _dataFilter = null;
+                          _fieldFilter = null;
+                        });
+                        await _load(search: _searchQuery);
+                      },
                       onTap: () async {
                         await super.alertDialog(
                           title: 'Filter by Data',
@@ -182,6 +191,12 @@ class DataGridHistorySnippetState extends BaseState<DataGridHistorySnippet> {
                         });
                         await _load(search: _searchQuery);
                       },
+                      onDoubleTap: () async {
+                        setState(() {
+                          _event = null;
+                        });
+                        await _load(search: _searchQuery);
+                      },
                       onTap: () async {
                         await super.alertDialog(
                             title: 'Filter by Event',
@@ -206,6 +221,12 @@ class DataGridHistorySnippetState extends BaseState<DataGridHistorySnippet> {
                           color:
                               null == _alarm ? null : theme.getPrimaryColor()),
                       onLongPress: () async {
+                        setState(() {
+                          _alarm = null;
+                        });
+                        await _load(search: _searchQuery);
+                      },
+                      onDoubleTap: () async {
                         setState(() {
                           _alarm = null;
                         });
@@ -488,6 +509,10 @@ class DataGridHistorySnippetState extends BaseState<DataGridHistorySnippet> {
         ];
 
         mustConditions.addAll([
+          if (widget.deviceModelIds.isNotEmpty)
+            {
+              "terms": {"modelId": widget.deviceModelIds}
+            },
           if (widget.deviceIds.isNotEmpty)
             {
               "terms": {'deviceId': widget.deviceIds}
