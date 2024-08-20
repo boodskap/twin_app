@@ -8,6 +8,7 @@ import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/twinned_session.dart';
 import 'package:twinned_api/api/twinned.swagger.dart';
 import 'package:twin_app/core/session_variables.dart';
+import 'package:twinned_api/api/twinned.swagger.dart' as digital;
 
 class ProfileInfoScreen extends StatefulWidget {
   final int selectedTab;
@@ -25,6 +26,8 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
   String fullName = '';
   String initials = '';
   final _formKey = GlobalKey<FormState>();
+  String countryCode = 'US';
+  bool _isPhoneValid = true;
 
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
@@ -36,13 +39,20 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
   List<String> roleNames = [];
   List<String> clientIds = [];
   List<String> clients = [];
-  String fullNumber = "";
-  String countryCode = "";
 
-  bool _isPhoneValid = true;
-  void _onNameChanged() {
-    setState(() {});
-  }
+  // TwinUserInfo _twinUserInfo = const TwinUserInfo(
+  //   name: '',
+  //   email: '',
+  //   address: '',
+  //   city: '',
+  //   clientIds: [],
+  //   description: '',
+  //   phone: '',
+  //   images: [],
+  //   countryCode: 'US',
+  //   roles: [],
+  //   tags: [],
+  // );
 
   @override
   void initState() {
@@ -52,41 +62,10 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
     _tabController =
         TabController(length: 3, vsync: this, initialIndex: widget.selectedTab);
     _nameController.addListener(_onNameChanged);
-    String? input = _phoneController.text;
-
-    List<String> splitString = input!.split('/');
-
-    if (splitString.length > 1) {
-      countryCode = splitString[0];
-      _phoneController.text = splitString[1];
-    } else {
-      countryCode = "IN";
-    }
-  }
-
-  @override
-  void dispose() {
-    _nameController.removeListener(_onNameChanged);
-
-    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    String fullnum = "";
-    String? input = _phoneController.text;
-    List<String> splitString = input!.split('/');
-
-    if (splitString.length > 2) {
-      countryCode = splitString[0];
-      _phoneController.text = splitString[2];
-      fullnum = splitString[1] + splitString[2];
-    } else {
-      countryCode = "IN";
-      _phoneController.text = _phoneController.text;
-      fullnum = _phoneController.text;
-    }
-
     return Center(
       child: SizedBox(
         width: 900,
@@ -290,7 +269,7 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
                                             )),
                                             Expanded(
                                                 child: Text(
-                                              fullnum,
+                                              _phoneController.text,
                                               style: theme.getStyle().copyWith(
                                                   fontWeight: FontWeight.bold,
                                                   fontSize: 16),
@@ -404,6 +383,7 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
     loading = true;
     await execute(() async {
       TwinUser? user = await TwinnedSession.instance.getUser();
+
       if (null != user) {
         refresh(sync: () {
           fullName = user.name;
@@ -416,6 +396,7 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
           twinUserId = user.id;
           roles = user.roles ?? [];
           clientIds = user.clientIds ?? [];
+          countryCode = user.countryCode ?? 'US';
         });
       }
     });
@@ -434,8 +415,10 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
   }
 
   Future<void> updateProfile() async {
-    busy();
-    try {
+    if (loading) return;
+    loading = true;
+
+    await execute(() async {
       var res = await TwinnedSession.instance.twin.updateTwinUser(
         twinUserId: twinUserId,
         apikey: TwinnedSession.instance.authToken,
@@ -445,17 +428,19 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
           address: _addressController.text,
           phone: _phoneController.text,
           description: _descController.text,
+          countryCode: countryCode,
         ),
       );
+
       if (res.body!.ok) {
         alert('', 'Profile saved successfully!');
       } else {
         alert("Profile not Updated", res.body!.msg!);
       }
-    } catch (e) {
-      alert('Error', e.toString());
-    }
-    busy(busy: false);
+    });
+
+    loading = false;
+    refresh();
   }
 
   Future<void> _editPersonalDetails(BuildContext context) async {
@@ -465,6 +450,7 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
       'Address': _addressController.text,
       'Phone': _phoneController.text,
       'Description': _descController.text,
+      'countryCode': countryCode,
     };
 
     final controllers = {
@@ -577,43 +563,47 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
                       field = Column(
                         children: [
                           IntlPhoneField(
-                            controller: controller,
-                            keyboardType: TextInputType.phone,
-                            initialCountryCode: countryCode,
-                            inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly,
-                            ],
-                            decoration: InputDecoration(
-                              labelText: 'Enter Phone Number',
-                              counterText: "",
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(4.0),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(4.0),
-                                borderSide: BorderSide(
-                                  color: theme.getPrimaryColor(),
+                              controller: controller,
+                              keyboardType: TextInputType.phone,
+                              initialCountryCode: countryCode,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly,
+                              ],
+                              decoration: InputDecoration(
+                                labelText: 'Enter Phone Number',
+                                counterText: "",
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(4.0),
                                 ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(4.0),
+                                  borderSide: BorderSide(
+                                    color: theme.getPrimaryColor(),
+                                  ),
+                                ),
+                                labelStyle: theme.getStyle(),
                               ),
-                              labelStyle: theme.getStyle(),
-                            ),
-                            validator: (phone) {
-                              if (phone == null || phone.number.isEmpty) {
-                                return 'Enter a valid phone number';
-                              }
-                              return null;
-                            },
-                            onChanged: (phone) {
-                              setState(() {
-                                fullNumber =
-                                    "${phone.countryISOCode}/${phone.countryCode}/${phone.number}";
-                                _isPhoneValid =
-                                    phone.completeNumber.isNotEmpty &&
-                                        phone.completeNumber.length >= 10 &&
-                                        phone.isValidNumber();
-                              });
-                            },
-                          ),
+                              validator: (phone) {
+                                if (phone == null || phone.number.isEmpty) {
+                                  return 'Enter a valid phone number';
+                                }
+                                return null;
+                              },
+                              onChanged: (phone) {
+                                setState(() {
+                                  _isPhoneValid =
+                                      phone.completeNumber.isNotEmpty &&
+                                          phone.completeNumber.length >= 10 &&
+                                          phone.isValidNumber();
+
+                                  countryCode = phone.countryISOCode;
+                                });
+                              },
+                              onCountryChanged: (country) {
+                                setState(() {
+                                  countryCode = country.code;
+                                });
+                              }),
                           divider(height: 20),
                         ],
                       );
@@ -672,7 +662,7 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
                           _emailController.text = _emailController.text;
                           _nameController.text = _nameController.text;
                           _addressController.text = _addressController.text;
-                          _phoneController.text = fullNumber.trim();
+                          _phoneController.text = _phoneController.text;
                           _descController.text = _descController.text;
                         });
                         updateProfile();
@@ -687,8 +677,22 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
     );
   }
 
+  void _onNameChanged() {
+    setState(() {});
+  }
+
   @override
   void setup() {
     load();
+  }
+
+  @override
+  void dispose() {
+    _phoneController.text = '';
+    countryCode = 'US';
+
+    _nameController.removeListener(_onNameChanged);
+
+    super.dispose();
   }
 }
