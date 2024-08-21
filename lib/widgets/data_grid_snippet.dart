@@ -156,7 +156,6 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
       ),
     );
 
-    print(smallScreen);
 
     return Container(
       child: Column(
