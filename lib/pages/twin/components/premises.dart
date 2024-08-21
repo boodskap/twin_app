@@ -35,6 +35,7 @@ class _PremisesState extends BaseState<Premises> {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        divider(),
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
