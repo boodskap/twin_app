@@ -163,6 +163,7 @@ class _DashboardState extends BaseState<Dashboard> {
                 facilityIds: widget.facilityIds,
                 floorIds: widget.floorIds,
                 clientIds: widget.clientIds,
+                isTwin: true,
                 onPremiseTapped: (id, dd) {
                   _showDashboard(dd.premise ?? '', premiseIds: [id]);
                 },
