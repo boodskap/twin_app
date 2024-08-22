@@ -288,31 +288,13 @@ class _VisualAlarmStatePageState extends BaseState<VisualAlarmStatePage> {
                                   message: 'Change icon', child: stateIcon),
                             )),
                       if (!hasStateIcon)
-                        ElevatedButton(
+                        PrimaryButton(
+                          labelKey: 'Upload',
                           onPressed: () async {
                             await _uploadIcon();
                           },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: primaryColor,
-                            minimumSize: const Size(130, 40),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(3),
-                            ),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: <Widget>[
-                              Icon(Icons.cloud_upload,
-                                  color: theme.getPrimaryColor(),
-                                  size: 15), // Icon
-                              SizedBox(
-                                  width: 8.0), // Space between icon and text
-                              Text(
-                                'Upload',
-                                style: theme.getStyle(),
-                              ), // Text
-                            ],
-                          ),
+                          leading: Icon(Icons.cloud_upload,
+                              color: Colors.white, size: 15),
                         ),
                       divider(height: 8),
                       SizedBox(
