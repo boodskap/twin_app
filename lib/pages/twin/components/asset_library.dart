@@ -93,11 +93,13 @@ class _AssetLibraryState extends BaseState<AssetLibrary> {
             ],
           ),
         if (!loading && _cards.isNotEmpty)
-          SingleChildScrollView(
-            child: Wrap(
-              spacing: 8,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: _cards,
+          Expanded(
+            child: SingleChildScrollView(
+              child: Wrap(
+                spacing: 8,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: _cards,
+              ),
             ),
           ),
       ],
