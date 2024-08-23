@@ -1,7 +1,6 @@
 // ignore_for_file: must_be_immutable
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/pages/twin/components/widgets/device_model_add_params.dart';
 import 'package:twin_app/pages/twin/components/widgets/custom_setting_snippet.dart';
@@ -21,11 +20,15 @@ enum PickTarget { border, background }
 class DeviceModelContentPage extends StatefulWidget {
   twinned.DeviceModel? model;
   final String type;
+  final PageController? pageController;
+  int initialPage;
 
   DeviceModelContentPage({
     super.key,
     this.model,
     required this.type,
+    this.pageController,
+    required this.initialPage,
   });
 
   @override
@@ -42,7 +45,7 @@ class _DeviceModelContentPageState extends BaseState<DeviceModelContentPage> {
   final TextEditingController _modelController = TextEditingController();
   final TextEditingController _versionController = TextEditingController();
   final TextEditingController _tagsController = TextEditingController();
-  final PageController _pageController = PageController();
+  late PageController _pageController = PageController();
 
   final List<String> _imageIds = [];
   final List<Widget> _imageCards = [];
@@ -108,6 +111,11 @@ class _DeviceModelContentPageState extends BaseState<DeviceModelContentPage> {
   @override
   void initState() {
     super.initState();
+    _pageController = PageController(initialPage: widget.initialPage);
+   if(widget.initialPage==2){
+    _currentPage=2;
+   }
+
     paramHeaders.add(TableRow(children: [
       Center(
         child: Text(
