@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/pages/twin/components/widgets/asset_library_content_page.dart';
+import 'package:twin_app/pages/twin/components/widgets/create_asset_library_snippet.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:twin_app/widgets/commons/secondary_button.dart';
 import 'package:twin_commons/core/base_state.dart';
@@ -161,23 +162,23 @@ class _AssetLibraryState extends BaseState<AssetLibrary> {
                           ),
                         ),
                       ),
-                      Tooltip(
-                        message:
-                            _canEdit ? "Delete" : "No Permission to Delete",
-                        child: InkWell(
-                          onTap: _canEdit
-                              ? () {
-                                  _confirmDeletionDialog(context, e);
-                                }
-                              : null,
-                          child: Icon(
-                            Icons.delete_forever_rounded,
-                            color: _canEdit
-                                ? theme.getPrimaryColor()
-                                : Colors.grey,
-                          ),
-                        ),
-                      ),
+                      // Tooltip(
+                      //   message:
+                      //       _canEdit ? "Delete" : "No Permission to Delete",
+                      //   child: InkWell(
+                      //     onTap: _canEdit
+                      //         ? () {
+                      //             _confirmDeletionDialog(context, e);
+                      //           }
+                      //         : null,
+                      //     child: Icon(
+                      //       Icons.delete_forever_rounded,
+                      //       color: _canEdit
+                      //           ? theme.getPrimaryColor()
+                      //           : Colors.grey,
+                      //     ),
+                      //   ),
+                      // ),
                     ],
                   ),
                 ),
@@ -280,38 +281,13 @@ class _AssetLibraryState extends BaseState<AssetLibrary> {
   }
 
   Future _create() async {
-    List<String>? clientIds = super.isClientAdmin()
-        ? await TwinnedSession.instance.getClientIds()
-        : null;
-
-    if (loading) return;
-    loading = true;
-    await _getBasicInfo(context, 'New Asset Type',
-        onPressed: (name, desc, t) async {
-      List<String> tags = [];
-      if (null != t) {
-        tags = t.trim().split(' ');
-      }
-      var mRes = await TwinnedSession.instance.twin.createAssetModel(
-          apikey: TwinnedSession.instance.authToken,
-          body: tapi.AssetModelInfo(
-            name: name,
-            description: desc,
-            tags: tags,
-            clientIds: clientIds,
-          ));
-      if (validateResponse(mRes)) {
-        // Twinned.selectedAssetModel = mRes.body!.entity!;
-        // await _openAssetModel(mRes.body!.entity!);
-        // if (null != widget.newAssetModelAdded) {
-        //   widget.newAssetModelAdded!(mRes.body!.entity!);
-        //   BaseState.emitPageEvent(PageEvent.assetModelCreated,
-        //       sender: this, data: UserSession().selectedModel?.id);
-        // }
-      }
-    });
-    loading = false;
-    refresh();
+    await super.alertDialog(
+      title: 'New Tank Type',
+      width: MediaQuery.of(context).size.width / 2 + 100,
+      height: MediaQuery.of(context).size.height / 2 + 100,
+      body: const CreateEditAssetLibrary(),
+    );
+    _load();
   }
 
   Future _edit(tapi.AssetModel e) async {
@@ -325,52 +301,52 @@ class _AssetLibraryState extends BaseState<AssetLibrary> {
     await _load();
   }
 
-  _confirmDeletionDialog(BuildContext context, tapi.AssetModel e) {
-    Widget cancelButton = SecondaryButton(
-      labelKey: 'Cancel',
-      onPressed: () {
-        Navigator.pop(context);
-      },
-    );
-    Widget continueButton = PrimaryButton(
-      labelKey: 'Delete',
-      onPressed: () {
-        Navigator.pop(context);
-        _delete(e);
-      },
-    );
-    AlertDialog alert = AlertDialog(
-      title: Text(
-        "WARNING",
-        style: theme.getStyle(),
-      ),
-      content: Text(
-        "Deleting a Asset Library can not be undone.\nYou will loose all of the premise data, history, etc.\n\nAre you sure you want to delete?",
-        style: theme.getStyle(),
-        maxLines: 10,
-      ),
-      actions: [
-        cancelButton,
-        continueButton,
-      ],
-    );
+  // _confirmDeletionDialog(BuildContext context, tapi.AssetModel e) {
+  //   Widget cancelButton = SecondaryButton(
+  //     labelKey: 'Cancel',
+  //     onPressed: () {
+  //       Navigator.pop(context);
+  //     },
+  //   );
+  //   Widget continueButton = PrimaryButton(
+  //     labelKey: 'Delete',
+  //     onPressed: () {
+  //       Navigator.pop(context);
+  //       _delete(e);
+  //     },
+  //   );
+  //   AlertDialog alert = AlertDialog(
+  //     title: Text(
+  //       "WARNING",
+  //       style: theme.getStyle(),
+  //     ),
+  //     content: Text(
+  //       "Deleting a Asset Library can not be undone.\nYou will loose all of the premise data, history, etc.\n\nAre you sure you want to delete?",
+  //       style: theme.getStyle(),
+  //       maxLines: 10,
+  //     ),
+  //     actions: [
+  //       cancelButton,
+  //       continueButton,
+  //     ],
+  //   );
 
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
-      },
-    );
-  }
+  //   showDialog(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return alert;
+  //     },
+  //   );
+  // }
 
-  Future _delete(tapi.AssetModel e) async {
-    await execute(() async {
-      var res = await TwinnedSession.instance.twin.deleteAssetModel(
-          apikey: TwinnedSession.instance.authToken, assetModelId: e.id);
-      validateResponse(res);
-      await _load();
-    });
-  }
+  // Future _delete(tapi.AssetModel e) async {
+  //   await execute(() async {
+  //     var res = await TwinnedSession.instance.twin.deleteAssetModel(
+  //         apikey: TwinnedSession.instance.authToken, assetModelId: e.id);
+  //     validateResponse(res);
+  //     await _load();
+  //   });
+  // }
 
   Future _load() async {
     if (loading) return;
