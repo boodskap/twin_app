@@ -50,6 +50,7 @@ class _ConditionRulesState extends BaseState<ConditionRules> {
             SizedBox(
               width: 250,
               child: DeviceModelDropdown(
+                  style: theme.getStyle(),
                   selectedItem: _selectedDeviceModel?.id,
                   onDeviceModelSelected: (e) {
                     setState(() {

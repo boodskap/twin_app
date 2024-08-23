@@ -50,6 +50,7 @@ class _EventsState extends BaseState<Events> {
             SizedBox(
               width: 250,
               child: DeviceModelDropdown(
+                  style: theme.getStyle(),
                   selectedItem: _selectedDeviceModel?.id,
                   onDeviceModelSelected: (e) {
                     setState(() {

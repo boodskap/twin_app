@@ -52,6 +52,7 @@ class _FacilitiesState extends BaseState<Facilities> {
             SizedBox(
               width: 250,
               child: PremiseDropdown(
+                  style: theme.getStyle(),
                   selectedItem: _selectedPremise?.id,
                   onPremiseSelected: (e) {
                     setState(() {
@@ -68,7 +69,7 @@ class _FacilitiesState extends BaseState<Facilities> {
                   Icons.add,
                   color: Colors.white,
                 ),
-                onPressed: (_selectedPremise != null && canCreate())
+                onPressed: ( canCreate())
                     ? () {
                         _addEditFacilityDialog();
                       }

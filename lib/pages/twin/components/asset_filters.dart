@@ -283,6 +283,7 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
             SizedBox(
               width: 250,
               child: DeviceModelDropdown(
+                  style: theme.getStyle(),
                   selectedItem: _selectedDeviceModel?.id,
                   onDeviceModelSelected: (e) {
                     setState(() {
@@ -303,7 +304,7 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
             divider(horizontal: true),
             PrimaryButton(
               labelKey: "Add Generic",
-              onPressed: ( isAdmin())
+              onPressed: (isAdmin())
                   ? () async {
                       await _addNewField();
                     }
