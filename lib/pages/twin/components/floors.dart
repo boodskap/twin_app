@@ -52,6 +52,7 @@ class _FloorsState extends BaseState<Floors> {
             SizedBox(
               width: 250,
               child: PremiseDropdown(
+                style: theme.getStyle(),
                 key: Key(const Uuid().v4()),
                 selectedItem: _selectedPremise?.id,
                 onPremiseSelected: (e) {
@@ -72,6 +73,7 @@ class _FloorsState extends BaseState<Floors> {
             SizedBox(
               width: 250,
               child: FacilityDropdown(
+                style: theme.getStyle(),
                 key: Key(const Uuid().v4()),
                 selectedItem: _selectedFacility?.id,
                 selectedPremise: _selectedPremise?.id,
@@ -90,11 +92,7 @@ class _FloorsState extends BaseState<Floors> {
                 Icons.add,
                 color: Colors.white,
               ),
-              onPressed: (_selectedPremise != null &&
-                      _selectedFacility != null &&
-                      canCreate())
-                  ? _addEditFloorDialog
-                  : null,
+              onPressed: (canCreate()) ? _addEditFloorDialog : null,
             ),
             divider(horizontal: true),
             SizedBox(

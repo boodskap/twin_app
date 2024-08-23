@@ -59,6 +59,7 @@ class _AssetsState extends BaseState<Assets> {
             SizedBox(
               width: 250,
               child: PremiseDropdown(
+                style: theme.getStyle(),
                 key: Key(const Uuid().v4()),
                 selectedItem: _selectedPremise?.id,
                 onPremiseSelected: (e) {
@@ -81,6 +82,7 @@ class _AssetsState extends BaseState<Assets> {
             SizedBox(
               width: 250,
               child: FacilityDropdown(
+                style: theme.getStyle(),
                 key: Key(const Uuid().v4()),
                 selectedItem: _selectedFacility?.id,
                 selectedPremise: _selectedPremise?.id,
@@ -101,6 +103,7 @@ class _AssetsState extends BaseState<Assets> {
             SizedBox(
               width: 250,
               child: FloorDropdown(
+                style: theme.getStyle(),
                 key: Key(const Uuid().v4()),
                 selectedItem: _selectedFloor?.id,
                 selectedPremise: _selectedPremise?.id,
@@ -121,10 +124,7 @@ class _AssetsState extends BaseState<Assets> {
                 Icons.add,
                 color: Colors.white,
               ),
-              onPressed: (_selectedPremise != null &&
-                      _selectedFacility != null &&
-                      _selectedFloor != null &&
-                      canCreate())
+              onPressed: (canCreate())
                   ? () {
                       _create();
                     }
