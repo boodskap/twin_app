@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:twin_app/core/session_variables.dart';
-import 'package:twin_app/pages/twin/components/asset_groups.dart';
 import 'package:twin_app/pages/twin/components/widgets/device_model_content_page.dart';
 import 'package:twin_app/pages/twin/components/widgets/device_model_snippet.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
-import 'package:twin_app/widgets/commons/secondary_button.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:twin_commons/core/twin_image_helper.dart';
@@ -203,7 +201,11 @@ class _DeviceLibraryState extends BaseState<DeviceLibrary> {
       context,
       MaterialPageRoute(
         builder: (context) => DeviceModelContentPage(
-            key: Key(const Uuid().v4()), model: e, type: type),
+          key: Key(const Uuid().v4()),
+          model: e,
+          type: type,
+          initialPage: 0,
+        ),
       ),
     );
     await _load();

@@ -1,16 +1,15 @@
 import 'package:flutter/Material.dart';
-import 'package:flutter/services.dart';
 import 'package:twin_app/core/session_variables.dart';
+import 'package:twin_app/pages/twin/components/widgets/device_model_content_page.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:twin_app/widgets/commons/secondary_button.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/widgets/common/label_text_field.dart';
-import 'package:twin_commons/util/osm_location_picker.dart';
 import 'package:twinned_api/twinned_api.dart' as tapi;
 import 'package:twin_commons/core/twin_image_helper.dart';
 import 'package:twin_commons/core/twinned_session.dart';
+import 'package:twinned_widgets/core/client_dropdown.dart';
 import 'package:uuid/uuid.dart';
-import 'package:intl_phone_field/intl_phone_field.dart';
 
 class DeviceModelSnippet extends StatefulWidget {
   final tapi.DeviceModel? deviceModel;
@@ -27,9 +26,6 @@ class _DeviceModelSnippetState extends BaseState<DeviceModelSnippet> {
   TextEditingController modelController = TextEditingController(text: '-');
   TextEditingController versionController = TextEditingController(text: '-');
   TextEditingController makeController = TextEditingController(text: '-');
-
-  Future<List<String>>? clientIds =
-      isClientAdmin() ? TwinnedSession.instance.getClientIds() : null;
 
   tapi.DeviceModelInfo _deviceModelInfo = const tapi.DeviceModelInfo(
     name: '',
@@ -89,6 +85,19 @@ class _DeviceModelSnippetState extends BaseState<DeviceModelSnippet> {
                   padding: const EdgeInsets.all(10.0),
                   child: Column(
                     children: [
+                      ClientDropdown(
+                        key: Key(const Uuid().v4()),
+                        selectedItem: (null != _deviceModelInfo.clientIds &&
+                                _deviceModelInfo.clientIds!.isNotEmpty)
+                            ? _deviceModelInfo.clientIds!.first
+                            : null,
+                        onClientSelected: (client) {
+                          setState(() {
+                            _deviceModelInfo = _deviceModelInfo.copyWith(
+                                clientIds: null != client ? [client!.id] : []);
+                          });
+                        },
+                      ),
                       SizedBox(
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: LabelTextField(
@@ -292,7 +301,7 @@ class _DeviceModelSnippetState extends BaseState<DeviceModelSnippet> {
 
   bool _canCreateOrUpdate() {
     final text = nameController.text.trim();
-    print(text.isNotEmpty && text.length >= 3);
+
     return text.isNotEmpty && text.length >= 3;
   }
 
@@ -301,9 +310,11 @@ class _DeviceModelSnippetState extends BaseState<DeviceModelSnippet> {
   }
 
   Future _save({bool silent = false}) async {
-    List<String>? clientIds = super.isClientAdmin()
-        ? await TwinnedSession.instance.getClientIds()
-        : null;
+    List<String>? clientIds = _deviceModelInfo.clientIds?.isNotEmpty == true
+        ? _deviceModelInfo.clientIds
+        : (super.isClientAdmin()
+            ? await TwinnedSession.instance.getClientIds()
+            : null);
     if (loading) return;
     loading = true;
 
@@ -319,10 +330,24 @@ class _DeviceModelSnippetState extends BaseState<DeviceModelSnippet> {
     await execute(() async {
       if (null == widget.deviceModel) {
         var cRes = await TwinnedSession.instance.twin.createDeviceModel(
-            apikey: TwinnedSession.instance.authToken, body: _deviceModelInfo);
+          apikey: TwinnedSession.instance.authToken,
+          body: _deviceModelInfo,
+        );
         if (validateResponse(cRes)) {
           _close();
-          alert('Success', 'Device Model ${_deviceModelInfo.name} created');
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => DeviceModelContentPage(
+                key: Key(const Uuid().v4()),
+                type: '',
+                initialPage: 2,
+                model: cRes!.body!.entity,
+              ),
+            ),
+          );
+          debugPrint('res: $cRes');
+          // alert('Success', 'Device Model ${_deviceModelInfo.name} created');
         }
       } else {
         var uRes = await TwinnedSession.instance.twin.updateDeviceModel(
