@@ -92,77 +92,7 @@ class _GoogleMapWidgetState extends State<GoogleMapWidget> {
   }
 }
 
-// class GoogleMapMultiWidget extends StatefulWidget {
-//   final List<tapi.GeoLocation> geoLocationList;
-//    final List<String> markerNameList;
 
-//   const GoogleMapMultiWidget({
-//     super.key,
-//     required this.geoLocationList, required this.markerNameList,
-//   });
-
-//   @override
-//   State<GoogleMapMultiWidget> createState() => _GoogleMapMultiWidgetState();
-// }
-
-// class _GoogleMapMultiWidgetState extends State<GoogleMapMultiWidget> {
-//   GoogleMapController? mapController;
-//   late LatLng _center;
-//   Set<Marker> _markers = {};
-//   double zoomLevel = 5;
-
-//   @override
-//   void initState() {
-//     super.initState();
-
-//     _center = LatLng(0, 0);
-
-//     bool firstLocationAssigned = false;
-//    for (int i = 0; i < widget.geoLocationList.length; i++) {
-//   tapi.GeoLocation location = widget.geoLocationList[i];
-
-//   if (location.coordinates.isNotEmpty) {
-//     if (!firstLocationAssigned) {
-//       _center = LatLng(
-//         location.coordinates[1],
-//         location.coordinates[0],
-//       );
-//       firstLocationAssigned = true;
-//     }
-
-//     _markers.add(
-//       Marker(
-//         markerId: MarkerId(location.coordinates[0].toString()),
-//         position: LatLng(location.coordinates[1], location.coordinates[0]),
-//         infoWindow: InfoWindow(
-//           anchor: Offset(0, 0),
-//           title: widget.markerNameList[i],  // Access the corresponding name from markernamelist
-//           snippet:
-//             'Latitude: ${location.coordinates[1].toStringAsFixed(4)}, Longitude: ${location.coordinates[0].toStringAsFixed(4)}',
-//         ),
-//       ),
-//     );
-//   }
-
-//   zoomLevel = 2.5;
-// }
-
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return GoogleMap(
-//       onMapCreated: (GoogleMapController controller) {
-//         mapController = controller;
-//       },
-//       initialCameraPosition: CameraPosition(
-//         target: _center,
-//         zoom: zoomLevel,
-//       ),
-//       markers: _markers,
-//     );
-//   }
-// }
 
 class GoogleMapMultiWidget extends StatefulWidget {
   final List<tapi.GeoLocation> geoLocationList;
@@ -239,12 +169,11 @@ class _GoogleMapMultiWidgetState extends State<GoogleMapMultiWidget> {
         selectedMarkerDataLevel = widget.levelList[index];
       }
       selectedMarkerReportedTime = widget.reportedTimeList[index];
-      // selectedMarkerSnippet =
-      // 'Latitude: ${location.coordinates[1].toStringAsFixed(4)}, Longitude: ${location.coordinates[0].toStringAsFixed(4)}';
+     
 
       final screenSize = MediaQuery.of(context).size;
       customInfoWindowPosition = Offset(
-        screenSize.width / 2.3,
+        screenSize.width<=650 ? 10 : screenSize.width / 2.3,
         10,
       );
     });
@@ -257,7 +186,6 @@ class _GoogleMapMultiWidgetState extends State<GoogleMapMultiWidget> {
       selectedMarkerHardwareDeviceId = null;
       selectedMarkerDataLevel = "";
       selectedMarkerReportedTime = null;
-      // selectedMarkerSnippet = null;
     });
   }
 
@@ -318,7 +246,7 @@ class CustomInfoWindow extends StatelessWidget {
         elevation: 4.0,
         borderRadius: BorderRadius.circular(8.0),
         child: Container(
-          width: 330,
+          width: 310,
           padding: EdgeInsets.all(8.0),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(5),
