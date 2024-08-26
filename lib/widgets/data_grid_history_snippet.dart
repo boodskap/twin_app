@@ -41,6 +41,7 @@ class DataGridHistorySnippet extends StatefulWidget {
   final bool enableDataFiler;
   final bool enableAlarmFiler;
   final bool enableEventFiler;
+  final bool oldVersion;
 
   const DataGridHistorySnippet({
     super.key,
@@ -64,6 +65,7 @@ class DataGridHistorySnippet extends StatefulWidget {
     this.enableDataFiler = true,
     this.enableAlarmFiler = true,
     this.enableEventFiler = true,
+    this.oldVersion = false,
   });
 
   @override
@@ -515,15 +517,19 @@ class DataGridHistorySnippetState extends BaseState<DataGridHistorySnippet> {
             },
           if (widget.deviceIds.isNotEmpty)
             {
-              "terms": {'deviceId': widget.deviceIds}
+              "terms": {
+                widget.oldVersion ? 'deviceId' : 'deviceId.keyword':
+                    widget.deviceIds
+              }
             },
           if (widget.assetIds.isNotEmpty ||
               null != _assetGroup && _assetGroup!.assetIds.isNotEmpty)
             {
               "terms": {
-                "assetId": null != _assetGroup
-                    ? _assetGroup!.assetIds
-                    : widget.assetIds
+                widget.oldVersion ? 'assetId' : 'assetId.keyword':
+                    null != _assetGroup
+                        ? _assetGroup!.assetIds
+                        : widget.assetIds
               }
             },
           if (null != _alarm)

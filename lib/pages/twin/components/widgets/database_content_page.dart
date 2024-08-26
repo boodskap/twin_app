@@ -241,7 +241,7 @@ class _DeviceContentPageState extends BaseState<DeviceContentPage> {
     Navigator.pop(context);
   }
 
-  void removedata() async {
+  void removeData() async {
     if (loading) return;
     loading = true;
     try {
@@ -262,7 +262,7 @@ class _DeviceContentPageState extends BaseState<DeviceContentPage> {
     refresh();
   }
 
-  void confirmWipeallData() {
+  void confirmWipeAllData() {
     Widget cancelButton = SecondaryButton(
       labelKey: "Cancel",
       onPressed: () {
@@ -272,7 +272,7 @@ class _DeviceContentPageState extends BaseState<DeviceContentPage> {
     Widget continueButton = PrimaryButton(
       labelKey: "Delete",
       onPressed: () {
-        removedata();
+        removeData();
       },
     );
 
@@ -303,6 +303,71 @@ class _DeviceContentPageState extends BaseState<DeviceContentPage> {
         return alert;
       },
     );
+  }
+
+  void confirmReprocessData() {
+    Widget cancelButton = SecondaryButton(
+      labelKey: "Cancel",
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
+    Widget continueButton = PrimaryButton(
+      labelKey: "Process",
+      onPressed: () {
+        reprocessData();
+      },
+    );
+
+    AlertDialog alert = AlertDialog(
+      title: Text(
+        "WARNING",
+        style: theme.getStyle().copyWith(
+              color: Colors.red,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+      ),
+      content: Text(
+        "This action will clear all device history and reprocess from the received raw data, do you wish to proceed?",
+        style: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
+        maxLines: 10,
+      ),
+      actions: [
+        cancelButton,
+        continueButton,
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
+  void reprocessData() async {
+    if (loading) return;
+    loading = true;
+    try {
+      var res = await TwinnedSession.instance.twin.reprocessDeviceData(
+        apikey: TwinnedSession.instance.authToken,
+        body: twinned.ReprocessInfo(
+            hardwareDeviceId: widget.device!.deviceId,
+            clearHistory: true,
+            clearStatus: false),
+      );
+      if (validateResponse(res)) {
+        Navigator.pop(context);
+        alert(widget.device!.name, "Reprocessing started");
+      }
+    } catch (e, s) {
+      debugPrint('$e\n$s');
+    }
+    loading = false;
+    refresh();
   }
 
   void _uploadImage() async {
@@ -788,26 +853,50 @@ class _DeviceContentPageState extends BaseState<DeviceContentPage> {
                             ],
                           ),
                         ),
-                        divider(horizontal: true, width: 10),
-                        ElevatedButton(
-                          onPressed: () {
-                            confirmWipeallData();
-                          },
-                          style: ElevatedButton.styleFrom(
-                            minimumSize: Size(150, 50),
-                            backgroundColor: const Color(0XFF8B0000),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(3),
+                        if (null != widget.device)
+                          divider(horizontal: true, width: 10),
+                        if (null != widget.device)
+                          ElevatedButton(
+                            onPressed: () {
+                              confirmWipeAllData();
+                            },
+                            style: ElevatedButton.styleFrom(
+                              minimumSize: Size(150, 50),
+                              backgroundColor: const Color(0XFF8B0000),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(3),
+                              ),
+                            ),
+                            child: Text(
+                              'Wipe All Data',
+                              style: theme.getStyle().copyWith(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                  ),
                             ),
                           ),
-                          child: Text(
-                            'Wipe All Data',
-                            style: theme.getStyle().copyWith(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                ),
+                        if (null != widget.device)
+                          divider(horizontal: true, width: 10),
+                        if (null != widget.device)
+                          ElevatedButton(
+                            onPressed: () {
+                              confirmReprocessData();
+                            },
+                            style: ElevatedButton.styleFrom(
+                              minimumSize: Size(150, 50),
+                              backgroundColor: const Color(0XFF8B0000),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(3),
+                              ),
+                            ),
+                            child: Text(
+                              'Reprocess All Data',
+                              style: theme.getStyle().copyWith(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                  ),
+                            ),
                           ),
-                        ),
                       ],
                     ),
                     if (null != widget.device) divider(),

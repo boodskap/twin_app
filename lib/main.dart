@@ -19,10 +19,9 @@ void main() async {
     FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   }
 
-  session.flavor = 'dev';
-
   start(
     appTitle: 'My Twin App',
+    flavour: 'dev',
     homeMenu: TwinAppMenu.home,
     homeMenuTitle: 'Home',
     disableTwinApp: false,
@@ -31,6 +30,7 @@ void main() async {
 
 void start({
   bool disableTwinApp = false,
+  String flavour = "prod",
   required String appTitle,
   required dynamic homeMenu,
   required String homeMenuTitle,
@@ -51,7 +51,7 @@ void start({
   session.postLoginHook = postLoginHook;
   session.postSignUpHook = postSignUpHook;
 
-  final String envFile = getEnvFileName(session.flavor);
+  final String envFile = getEnvFileName(flavour);
 
   debugPrint('ENV FILE: $envFile');
 
