@@ -56,6 +56,7 @@ class _AssetReportListState extends BaseState<AssetReportList> {
             SizedBox(
               width: 250,
               child: DeviceModelDropdown(
+                  style: theme.getStyle(),
                   selectedItem: _selectedDeviceModel?.id,
                   onDeviceModelSelected: (e) {
                     setState(() {

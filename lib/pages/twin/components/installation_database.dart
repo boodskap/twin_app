@@ -46,14 +46,16 @@ class _InstallationDatabaseState extends BaseState<InstallationDatabase> {
             children: [
               BusyIndicator(),
               IconButton(
-                  onPressed: () {
-                    _load();
-                  },
-                  icon: Icon(Icons.refresh),),
+                onPressed: () {
+                  _load();
+                },
+                icon: Icon(Icons.refresh),
+              ),
               divider(horizontal: true),
               SizedBox(
                 width: 250,
                 child: DeviceModelDropdown(
+                    style: theme.getStyle(),
                     selectedItem: _selectedDeviceModel?.id,
                     onDeviceModelSelected: (e) {
                       setState(() {
