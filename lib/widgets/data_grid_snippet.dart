@@ -1197,24 +1197,9 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
       ),
     ));
     List<tapi.GeoLocation> geoLocationList = [];
-    List<String> markerNameList = [];
-    List<String> hardwareDeviceIdList = [];
-    List<String> reportedTimeList = [];
-    List<String> levelList = [];
     for (tapi.DeviceData dd in _data) {
       if (dd.geolocation != null) {
         geoLocationList.add(dd.geolocation!);
-        markerNameList.add(
-            dd.asset != "" ? dd.asset.toString() : dd.deviceName.toString());
-        hardwareDeviceIdList
-            .add(dd.hardwareDeviceId != "" ? dd.hardwareDeviceId : '-');
-        reportedTimeList.add(
-            DateTime.fromMillisecondsSinceEpoch(dd.updatedStamp).toString());
-        if (!widget.isTwin) {
-          final dynamicData = dd.data as Map<String, dynamic> ?? {};
-          levelList
-              .add(dynamicData != {} ? dynamicData['level'].toString() : '-');
-        }
       }
 
       refresh(sync: () {
@@ -1300,11 +1285,10 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                   : MediaQuery.of(context).size.height / 2.1,
               child: GoogleMapMultiWidget(
                 geoLocationList: geoLocationList,
-                markerNameList: markerNameList,
-                hardwareDeviceIdList: hardwareDeviceIdList,
-                reportedTimeList: reportedTimeList,
-                levelList: levelList,
                 isTwin: widget.isTwin,
+                deviceDataList: _data,
+                onAssetTapped: widget.onAssetTapped,
+                onDeviceTapped: widget.onDeviceTapped,
               ),
             )
           : Center(
