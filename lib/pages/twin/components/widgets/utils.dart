@@ -107,7 +107,7 @@ class Utils {
       facilityId: e.facilityId,
       floorLevel: floorLevel ?? e.floorLevel,
       floorType: tapi.FloorInfoFloorType.values
-          .byName(null != floorType ? floorType.name : e.floorType.name),
+          .byName(null != floorType ? floorType.name : e.floorType!.name),
       assets: e.assets,
     );
   }
