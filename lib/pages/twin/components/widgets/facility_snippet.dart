@@ -1,17 +1,15 @@
 import 'package:flutter/Material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:twin_app/widgets/commons/secondary_button.dart';
 import 'package:twin_app/widgets/google_map.dart';
 import 'package:twin_commons/core/base_state.dart';
-import 'package:twin_commons/widgets/common/label_text_field.dart';
-import 'package:twin_commons/util/osm_location_picker.dart';
-import 'package:twinned_api/twinned_api.dart' as tapi;
 import 'package:twin_commons/core/twin_image_helper.dart';
 import 'package:twin_commons/core/twinned_session.dart';
-import 'package:uuid/uuid.dart';
-import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:twin_commons/widgets/common/label_text_field.dart';
+import 'package:twinned_api/twinned_api.dart' as tapi;
 
 class FacilitySnippet extends StatefulWidget {
   final tapi.Facility? facility;
@@ -250,7 +248,7 @@ class _FacilitySnippetState extends BaseState<FacilitySnippet> {
                                     Align(
                                         alignment: Alignment.center,
                                         child: Text(
-                                          'Upload location image',
+                                          'Upload Facility image',
                                           style: theme.getStyle(),
                                         )),
                                   if (_facility.images!.isNotEmpty)
