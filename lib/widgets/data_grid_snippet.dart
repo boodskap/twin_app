@@ -1287,7 +1287,7 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
             },
           if (widget.assetModelIds.isNotEmpty)
             {
-              "terms": {"assetModelId": widget.assetModelIds}
+              "terms": {"assetModelId.keyword": widget.assetModelIds}
             },
           if (widget.assetIds.isNotEmpty ||
               null != _assetGroup && _assetGroup!.assetIds.isNotEmpty)
