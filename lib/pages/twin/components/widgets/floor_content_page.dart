@@ -7,6 +7,7 @@ import 'package:twin_app/pages/twin/components/widgets/roles_infrastructure_widg
 import 'package:twin_app/pages/twin/components/widgets/utils.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:twin_app/widgets/commons/secondary_button.dart';
+import 'package:twin_app/widgets/google_map.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:twin_commons/core/twin_image_helper.dart';
@@ -287,31 +288,125 @@ class _FloorContentPageState extends BaseState<FloorContentPage> {
         });
   }
 
-  Future<void> _pickLocation() async {
-    return showDialog(
+  // Future<void> _pickLocation() async {
+  //   return showDialog(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return AlertDialog(
+  //         content: SizedBox(
+  //           width: 1000,
+  //           child: OSMLocationPicker(
+  //             longitude: _pickedLocation?.coordinates[0],
+  //             latitude: _pickedLocation?.coordinates[1],
+  //             onPicked: (pickedData) {
+  //               setState(() {
+  //                 _pickedLocation = GeoLocation(
+  //                     type: 'point',
+  //                     coordinates: [pickedData.longitude, pickedData.latitude]);
+  //                 _location.text =
+  //                     '${_pickedLocation!.coordinates[0]}, ${_pickedLocation!.coordinates[1]}';
+  //               });
+  //               Navigator.of(context).pop();
+  //             },
+  //           ),
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
+
+   Future<void> _pickLocation(BuildContext context) async {
+    double pickedLatitude =
+        _pickedLocation != null ? _pickedLocation!.coordinates[1] : 39.6128;
+    double pickedLongitude =
+        _pickedLocation != null ? _pickedLocation!.coordinates[0] : -101.5382;
+
+    final result = await showDialog<Map<String, double>>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          content: SizedBox(
-            width: 1000,
-            child: OSMLocationPicker(
-              longitude: _pickedLocation?.coordinates[0],
-              latitude: _pickedLocation?.coordinates[1],
-              onPicked: (pickedData) {
-                setState(() {
-                  _pickedLocation = GeoLocation(
-                      type: 'point',
-                      coordinates: [pickedData.longitude, pickedData.latitude]);
-                  _location.text =
-                      '${_pickedLocation!.coordinates[0]}, ${_pickedLocation!.coordinates[1]}';
-                });
-                Navigator.of(context).pop();
-              },
+          backgroundColor: Colors.white,
+          content: SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.97,
+              ),
+              child: StatefulBuilder(
+                builder: (BuildContext context, StateSetter setState) {
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(
+                        width: 1000,
+                        height: MediaQuery.of(context).size.height * 0.85,
+                        child: GoogleMapWidget(
+                          longitude: pickedLongitude,
+                          latitude: pickedLatitude,
+                          saveLocation: (pickedData) {
+                            setState(() {
+                              pickedLatitude = double.parse(
+                                  pickedData.latitude.toStringAsFixed(4));
+                              pickedLongitude = double.parse(
+                                  pickedData.longitude.toStringAsFixed(4));
+                            });
+                          },
+                          viewMode: true,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Latitude: ${pickedLatitude.toStringAsFixed(4)}',
+                            style: const TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.w600),
+                          ),
+                          const SizedBox(width: 5),
+                          Text(
+                            'Longitude: ${pickedLongitude.toStringAsFixed(4)}',
+                            style: const TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.w600),
+                          ),
+                          const Spacer(),
+                          SecondaryButton(
+                            labelKey: 'Cancel',
+                            onPressed: () {
+                              Navigator.of(context)
+                                  .pop(); // Close without saving
+                            },
+                          ),
+                          SizedBox(width: 5),
+                          PrimaryButton(
+                            labelKey: 'Select',
+                            onPressed: () {
+                              Navigator.of(context).pop({
+                                'latitude': pickedLatitude,
+                                'longitude': pickedLongitude,
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  );
+                },
+              ),
             ),
           ),
         );
       },
     );
+
+    if (result != null) {
+      setState(() {
+        _pickedLocation = GeoLocation(
+            type: 'point',
+            coordinates: [result['longitude']!, result['latitude']!]);
+        _location.text =
+            '${_pickedLocation!.coordinates[0]}, ${_pickedLocation!.coordinates[1]}';
+      });
+    }
   }
 
   Widget _buildFacility(Facility e) {
@@ -720,7 +815,7 @@ class _FloorContentPageState extends BaseState<FloorContentPage> {
                     preferBelow: false,
                     child: InkWell(
                       onTap: () async {
-                        await _pickLocation();
+                        await _pickLocation(context);
                       },
                       child: const Icon(
                         Icons.location_pin,
