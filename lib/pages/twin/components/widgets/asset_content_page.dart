@@ -657,7 +657,6 @@ class _AssetContentPageState extends BaseState<AssetContentPage> {
           apikey: TwinnedSession.instance.authToken,
           assetId: widget.asset!.id,
           body: body);
-
       if (validateResponse(res)) {
         _close();
       }

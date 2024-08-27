@@ -15,7 +15,7 @@ import 'package:intl_phone_field/intl_phone_field.dart';
 
 class FacilitySnippet extends StatefulWidget {
   final tapi.Facility? facility;
-  tapi.Premise? selectedPremise;
+  final tapi.Premise? selectedPremise;
   FacilitySnippet({super.key, this.facility, this.selectedPremise});
 
   @override
@@ -47,13 +47,13 @@ class _FacilitySnippetState extends BaseState<FacilitySnippet> {
   void initState() {
     super.initState();
 
-    if (widget.facility == null) {
+    if (widget.selectedPremise != null) {
       _facility = _facility.copyWith(premiseId: widget.selectedPremise!.id);
     }
     if (null != widget.facility) {
       tapi.Facility p = widget.facility!;
       _facility = _facility.copyWith(
-          premiseId: widget.selectedPremise?.id ?? '',
+          premiseId: p.premiseId,
           address: p.address,
           clientIds: p.clientIds,
           description: p.description,
@@ -407,7 +407,6 @@ class _FacilitySnippetState extends BaseState<FacilitySnippet> {
     loading = true;
 
     _facility = _facility.copyWith(
-      premiseId: widget.selectedPremise!.id,
       name: nameController.text.trim(),
       description: descController.text.trim(),
       address: addressController.text.trim(),
