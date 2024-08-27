@@ -99,6 +99,7 @@ class _DashboardHistoryState extends BaseState<DashboardHistory> {
               child: DataGridHistorySnippet(
                 assetIds: widget.assetIds,
                 deviceIds: widget.deviceIds,
+                isTwin: true,
                 onPremiseTapped: (id, dd) {
                   _showDashboard(dd.premise ?? '', premiseIds: [id]);
                 },
