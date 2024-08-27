@@ -41,7 +41,8 @@ class DataGridHistorySnippet extends StatefulWidget {
   final bool enableDataFiler;
   final bool enableAlarmFiler;
   final bool enableEventFiler;
-    final bool isTwin;
+  final bool isTwin;
+  final bool oldVersion;
 
   const DataGridHistorySnippet({
     super.key,
@@ -64,8 +65,9 @@ class DataGridHistorySnippet extends StatefulWidget {
     required this.onFloorTapped,
     this.enableDataFiler = true,
     this.enableAlarmFiler = true,
-    this.enableEventFiler = true, required this.isTwin,
-    
+    this.enableEventFiler = true,
+    required this.isTwin,
+    this.oldVersion = false,
   });
 
   @override
@@ -138,172 +140,176 @@ class DataGridHistorySnippetState extends BaseState<DataGridHistorySnippet> {
     return Column(
       children: [
         if (widget.isTwin || smallScreen)
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Wrap(
-              spacing: smallScreen ? 8 : 16,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: [
-                if (widget.enableDataFiler)
-                  Tooltip(
-                    message: 'filter by data',
-                    child: InkWell(
-                      child: Icon(Icons.filter_alt_sharp,
-                          color: (null != _dataFilter || null != _fieldFilter)
-                              ? theme.getPrimaryColor()
-                              : null),
-                      onLongPress: () async {
-                        setState(() {
-                          _dataFilter = null;
-                          _fieldFilter = null;
-                        });
-                        await _load(search: _searchQuery);
-                      },
-                      onDoubleTap: () async {
-                        setState(() {
-                          _dataFilter = null;
-                          _fieldFilter = null;
-                        });
-                        await _load(search: _searchQuery);
-                      },
-                      onTap: () async {
-                        await super.alertDialog(
-                          title: 'Filter by Data',
-                          width: dialogWidth,
-                          height: dialogHeight,
-                          body: DataSearch(
-                              clientIds: null != _client ? [_client!.id] : [],
-                              onFieldFilterSelected: (entity) async {
-                                setState(() {
-                                  _fieldFilter = entity;
-                                  _client = null;
-                                  _premise = null;
-                                  _facility = null;
-                                  _floor = null;
-                                  _assetGroup = null;
-                                  _dataFilter = null;
-                                });
-                                await _load(search: _searchQuery);
-                              },
-                              onDataFilterSelected: (entity) async {
-                                setState(() {
-                                  _dataFilter = entity;
-                                  _client = null;
-                                  _premise = null;
-                                  _facility = null;
-                                  _floor = null;
-                                  _assetGroup = null;
-                                  _fieldFilter = null;
-                                });
-                                await _load(search: _searchQuery);
-                              }),
-                        );
-                      },
-                    ),
-                  ),
-                if (widget.enableEventFiler)
-                  Tooltip(
-                    message: 'filter by event',
-                    child: InkWell(
-                      child: Icon(Icons.event_rounded,
-                          color:
-                              null == _event ? null : theme.getPrimaryColor()),
-                      onLongPress: () async {
-                        setState(() {
-                          _event = null;
-                        });
-                        await _load(search: _searchQuery);
-                      },
-                      onDoubleTap: () async {
-                        setState(() {
-                          _event = null;
-                        });
-                        await _load(search: _searchQuery);
-                      },
-                      onTap: () async {
-                        await super.alertDialog(
-                            title: 'Filter by Event',
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Wrap(
+                spacing: smallScreen ? 8 : 16,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  if (widget.enableDataFiler)
+                    Tooltip(
+                      message: 'filter by data',
+                      child: InkWell(
+                        child: Icon(Icons.filter_alt_sharp,
+                            color: (null != _dataFilter || null != _fieldFilter)
+                                ? theme.getPrimaryColor()
+                                : null),
+                        onLongPress: () async {
+                          setState(() {
+                            _dataFilter = null;
+                            _fieldFilter = null;
+                          });
+                          await _load(search: _searchQuery);
+                        },
+                        onDoubleTap: () async {
+                          setState(() {
+                            _dataFilter = null;
+                            _fieldFilter = null;
+                          });
+                          await _load(search: _searchQuery);
+                        },
+                        onTap: () async {
+                          await super.alertDialog(
+                            title: 'Filter by Data',
                             width: dialogWidth,
                             height: dialogHeight,
-                            body: EventSearch(
+                            body: DataSearch(
                                 clientIds: null != _client ? [_client!.id] : [],
-                                onEventSelected: (entity) async {
+                                onFieldFilterSelected: (entity) async {
                                   setState(() {
-                                    _event = entity;
+                                    _fieldFilter = entity;
+                                    _client = null;
+                                    _premise = null;
+                                    _facility = null;
+                                    _floor = null;
+                                    _assetGroup = null;
+                                    _dataFilter = null;
                                   });
                                   await _load(search: _searchQuery);
-                                }));
-                      },
-                    ),
-                  ),
-                if (widget.enableAlarmFiler)
-                  Tooltip(
-                    message: 'filter by alarm',
-                    child: InkWell(
-                      child: Icon(Icons.doorbell_outlined,
-                          color:
-                              null == _alarm ? null : theme.getPrimaryColor()),
-                      onLongPress: () async {
-                        setState(() {
-                          _alarm = null;
-                        });
-                        await _load(search: _searchQuery);
-                      },
-                      onDoubleTap: () async {
-                        setState(() {
-                          _alarm = null;
-                        });
-                        await _load(search: _searchQuery);
-                      },
-                      onTap: () async {
-                        await super.alertDialog(
-                            title: 'Filter by Alarm',
-                            width: dialogWidth,
-                            height: dialogHeight,
-                            body: AlarmSearch(
-                                clientIds: null != _client ? [_client!.id] : [],
-                                onAlarmSelected: (entity) async {
+                                },
+                                onDataFilterSelected: (entity) async {
                                   setState(() {
-                                    _alarm = entity;
+                                    _dataFilter = entity;
+                                    _client = null;
+                                    _premise = null;
+                                    _facility = null;
+                                    _floor = null;
+                                    _assetGroup = null;
+                                    _fieldFilter = null;
                                   });
                                   await _load(search: _searchQuery);
-                                }));
-                      },
+                                }),
+                          );
+                        },
+                      ),
                     ),
-                  ),
-                InkWell(
-                    onTap: () {
-                      _load();
-                    },
-                    child: Icon(Icons.refresh,
-                        color: loading ? theme.getPrimaryColor() : null)),
-                if (!smallScreen)
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-                    child: SizedBox(
-                        width: 250,
-                        height: 40,
-                        child: SearchBar(
-                          hintText: widget.searchHint,
-                          controller: _controller,
-                          trailing: [const BusyIndicator()],
-                          onChanged: (val) {
-                            if (loading) {
-                              _controller.text = _searchQuery;
-                              return;
-                            }
-                            setState(() {
-                              _searchQuery = val.trim();
-                            });
-                            _load(search: _searchQuery);
-                          },
-                        )),
-                  ),
-              ],
-            ),
-          ],
-        ),
+                  if (widget.enableEventFiler)
+                    Tooltip(
+                      message: 'filter by event',
+                      child: InkWell(
+                        child: Icon(Icons.event_rounded,
+                            color: null == _event
+                                ? null
+                                : theme.getPrimaryColor()),
+                        onLongPress: () async {
+                          setState(() {
+                            _event = null;
+                          });
+                          await _load(search: _searchQuery);
+                        },
+                        onDoubleTap: () async {
+                          setState(() {
+                            _event = null;
+                          });
+                          await _load(search: _searchQuery);
+                        },
+                        onTap: () async {
+                          await super.alertDialog(
+                              title: 'Filter by Event',
+                              width: dialogWidth,
+                              height: dialogHeight,
+                              body: EventSearch(
+                                  clientIds:
+                                      null != _client ? [_client!.id] : [],
+                                  onEventSelected: (entity) async {
+                                    setState(() {
+                                      _event = entity;
+                                    });
+                                    await _load(search: _searchQuery);
+                                  }));
+                        },
+                      ),
+                    ),
+                  if (widget.enableAlarmFiler)
+                    Tooltip(
+                      message: 'filter by alarm',
+                      child: InkWell(
+                        child: Icon(Icons.doorbell_outlined,
+                            color: null == _alarm
+                                ? null
+                                : theme.getPrimaryColor()),
+                        onLongPress: () async {
+                          setState(() {
+                            _alarm = null;
+                          });
+                          await _load(search: _searchQuery);
+                        },
+                        onDoubleTap: () async {
+                          setState(() {
+                            _alarm = null;
+                          });
+                          await _load(search: _searchQuery);
+                        },
+                        onTap: () async {
+                          await super.alertDialog(
+                              title: 'Filter by Alarm',
+                              width: dialogWidth,
+                              height: dialogHeight,
+                              body: AlarmSearch(
+                                  clientIds:
+                                      null != _client ? [_client!.id] : [],
+                                  onAlarmSelected: (entity) async {
+                                    setState(() {
+                                      _alarm = entity;
+                                    });
+                                    await _load(search: _searchQuery);
+                                  }));
+                        },
+                      ),
+                    ),
+                  InkWell(
+                      onTap: () {
+                        _load();
+                      },
+                      child: Icon(Icons.refresh,
+                          color: loading ? theme.getPrimaryColor() : null)),
+                  if (!smallScreen)
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                      child: SizedBox(
+                          width: 250,
+                          height: 40,
+                          child: SearchBar(
+                            hintText: widget.searchHint,
+                            controller: _controller,
+                            trailing: [const BusyIndicator()],
+                            onChanged: (val) {
+                              if (loading) {
+                                _controller.text = _searchQuery;
+                                return;
+                              }
+                              setState(() {
+                                _searchQuery = val.trim();
+                              });
+                              _load(search: _searchQuery);
+                            },
+                          )),
+                    ),
+                ],
+              ),
+            ],
+          ),
         if (smallScreen)
           Padding(
             padding: const EdgeInsets.only(top: 8.0, left: 8.0, right: 8.0),
@@ -794,15 +800,19 @@ class DataGridHistorySnippetState extends BaseState<DataGridHistorySnippet> {
             },
           if (widget.deviceIds.isNotEmpty)
             {
-              "terms": {'deviceId': widget.deviceIds}
+              "terms": {
+                widget.oldVersion ? 'deviceId' : 'deviceId.keyword':
+                    widget.deviceIds
+              }
             },
           if (widget.assetIds.isNotEmpty ||
               null != _assetGroup && _assetGroup!.assetIds.isNotEmpty)
             {
               "terms": {
-                "assetId": null != _assetGroup
-                    ? _assetGroup!.assetIds
-                    : widget.assetIds
+                widget.oldVersion ? 'assetId' : 'assetId.keyword':
+                    null != _assetGroup
+                        ? _assetGroup!.assetIds
+                        : widget.assetIds
               }
             },
           if (null != _alarm)

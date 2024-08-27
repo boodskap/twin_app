@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:twinned_api/api/twinned.swagger.dart' as tapi;
 
@@ -27,17 +26,17 @@ class CapitalizeAndDisallowSpacesFormatter extends TextInputFormatter {
 class Utils {
   static tapi.AlarmInfo alarmInfo(tapi.Alarm e) {
     return tapi.AlarmInfo(
-        name: e.name,
-        modelId: e.modelId,
-        state: e.state,
-        conditions: e.conditions,
-        tags: e.tags,
-        showOnlyIfMatched: e.showOnlyIfMatched,
-        stateIcons: e.stateIcons,
-        label: e.label,
-        description: e.description,
-        clientIds: e.clientIds,
-        );
+      name: e.name,
+      modelId: e.modelId,
+      state: e.state,
+      conditions: e.conditions,
+      tags: e.tags,
+      showOnlyIfMatched: e.showOnlyIfMatched,
+      stateIcons: e.stateIcons,
+      label: e.label,
+      description: e.description,
+      clientIds: e.clientIds,
+    );
   }
 
   static tapi.PremiseInfo premiseInfo(tapi.Premise e,
@@ -106,8 +105,9 @@ class Utils {
       premiseId: e.premiseId,
       facilityId: e.facilityId,
       floorLevel: floorLevel ?? e.floorLevel,
-      floorType: tapi.FloorInfoFloorType.values
-          .byName(null != floorType ? floorType.name : e.floorType!.name),
+      floorType: tapi.FloorInfoFloorType.values.byName(null != floorType
+          ? floorType.name
+          : tapi.FloorInfoFloorType.onground.name),
       assets: e.assets,
     );
   }
