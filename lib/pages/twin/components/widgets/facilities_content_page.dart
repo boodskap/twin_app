@@ -39,7 +39,6 @@ class FacilityContentPage extends StatefulWidget {
 }
 
 class _FacilityContentPageState extends BaseState<FacilityContentPage> {
-
   static const Widget _missingImage = Icon(
     Icons.question_mark,
     size: 50,
@@ -143,8 +142,8 @@ class _FacilityContentPageState extends BaseState<FacilityContentPage> {
     if (imageIds.length > selectedImage) {
       setState(() {
         imageId = imageIds[selectedImage];
-        infraImage =
-            TwinImageHelper.getCachedImage(domainKey, imageId, fit: BoxFit.fill);
+        infraImage = TwinImageHelper.getCachedImage(domainKey, imageId,
+            fit: BoxFit.fill);
       });
     }
     await _load();
@@ -316,7 +315,7 @@ class _FacilityContentPageState extends BaseState<FacilityContentPage> {
   //   );
   // }
 
-   Future<void> _pickLocation(BuildContext context) async {
+  Future<void> _pickLocation(BuildContext context) async {
     double pickedLatitude =
         _pickedLocation != null ? _pickedLocation!.coordinates[1] : 39.6128;
     double pickedLongitude =
@@ -346,7 +345,7 @@ class _FacilityContentPageState extends BaseState<FacilityContentPage> {
                           saveLocation: (pickedData) {
                             setState(() {
                               pickedLatitude = double.parse(
-                                  pickedData.latitude.toStringAsFixed(4));
+                                  pickedData!.latitude.toStringAsFixed(4));
                               pickedLongitude = double.parse(
                                   pickedData.longitude.toStringAsFixed(4));
                             });
@@ -458,16 +457,16 @@ class _FacilityContentPageState extends BaseState<FacilityContentPage> {
                         Text(
                           e.name,
                           style: theme.getStyle().copyWith(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                         Text(
                           e.description ?? "",
                           style: theme.getStyle().copyWith(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                       ],
                     ),
@@ -528,16 +527,16 @@ class _FacilityContentPageState extends BaseState<FacilityContentPage> {
                         Text(
                           e.name,
                           style: theme.getStyle().copyWith(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                         Text(
                           e.description ?? "",
                           style: theme.getStyle().copyWith(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                       ],
                     ),
@@ -599,16 +598,16 @@ class _FacilityContentPageState extends BaseState<FacilityContentPage> {
                         Text(
                           e.name,
                           style: theme.getStyle().copyWith(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                         Text(
                           e.description ?? "",
                           style: theme.getStyle().copyWith(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
                         ),
                       ],
                     ),
@@ -889,7 +888,9 @@ class _FacilityContentPageState extends BaseState<FacilityContentPage> {
                                           alignment: Alignment.topRight,
                                           child: Text(
                                             "${widget.premise!.name} - Facilities",
-                                            style: theme.getStyle().copyWith(fontSize: 20),
+                                            style: theme
+                                                .getStyle()
+                                                .copyWith(fontSize: 20),
                                           ),
                                         ),
                                       if (widget.type == InfraType.facility)
@@ -897,7 +898,9 @@ class _FacilityContentPageState extends BaseState<FacilityContentPage> {
                                           alignment: Alignment.topRight,
                                           child: Text(
                                             "${widget.facility!.name} - Floors",
-                                            style: theme.getStyle().copyWith(fontSize: 20),
+                                            style: theme
+                                                .getStyle()
+                                                .copyWith(fontSize: 20),
                                           ),
                                         ),
                                       if (widget.type == InfraType.floor)
@@ -905,7 +908,9 @@ class _FacilityContentPageState extends BaseState<FacilityContentPage> {
                                           alignment: Alignment.topRight,
                                           child: Text(
                                             "${widget.floor!.name} - Assets",
-                                            style: theme.getStyle().copyWith(fontSize: 20),
+                                            style: theme
+                                                .getStyle()
+                                                .copyWith(fontSize: 20),
                                           ),
                                         ),
                                       if (widget.type == InfraType.asset)
@@ -917,7 +922,9 @@ class _FacilityContentPageState extends BaseState<FacilityContentPage> {
                                             children: [
                                               Text(
                                                 "${widget.asset!.name} - Devices",
-                                                style: theme.getStyle().copyWith(fontSize: 20),
+                                                style: theme
+                                                    .getStyle()
+                                                    .copyWith(fontSize: 20),
                                               ),
                                               divider(horizontal: true),
                                               IconButton(

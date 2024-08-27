@@ -56,17 +56,21 @@ class _FloorSnippetState extends BaseState<FloorSnippet> {
   @override
   void initState() {
     super.initState();
-    if (null == widget.floor) {
+    if (widget.selectedPremise != null) {
       _floor = _floor.copyWith(
         premiseId: widget.selectedPremise!.id,
+      );
+    }
+    if (widget.selectedFacility != null) {
+      _floor = _floor.copyWith(
         facilityId: widget.selectedFacility!.id,
       );
     }
     if (null != widget.floor) {
       tapi.Floor p = widget.floor!;
       _floor = _floor.copyWith(
-        premiseId: widget.selectedPremise!.id,
-        facilityId: widget.selectedFacility!.id,
+        premiseId: p.premiseId,
+        facilityId: p.facilityId,
         address: p.address,
         clientIds: p.clientIds,
         description: p.description,

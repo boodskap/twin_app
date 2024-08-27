@@ -54,40 +54,43 @@ class DataGridSnippet extends StatefulWidget {
   final bool enableAlarmFiler;
   final bool enableEventFiler;
   final bool isTwin;
+  final bool oldVersion;
 
-  const DataGridSnippet(
-      {super.key,
-      this.autoRefresh = true,
-      this.autoRefreshInterval = 60,
-      this.searchHint = 'Search',
-      this.deviceModelIds = const [],
-      this.assetModelIds = const [],
-      this.assetIds = const [],
-      this.premiseIds = const [],
-      this.facilityIds = const [],
-      this.floorIds = const [],
-      this.clientIds = const [],
-      required this.onAnalyticsTapped,
-      required this.onAnalyticsDoubleTapped,
-      required this.onDeviceAnalyticsTapped,
-      required this.onDeviceAnalyticsDoubleTapped,
-      required this.onAssetModelTapped,
-      required this.onAssetTapped,
-      required this.onDeviceTapped,
-      required this.onDeviceModelTapped,
-      required this.onClientTapped,
-      required this.onPremiseTapped,
-      required this.onFacilityTapped,
-      required this.onFloorTapped,
-      this.enableClintFiler = true,
-      this.enablePremiseFiler = true,
-      this.enableFacilityFiler = true,
-      this.enableFloorFiler = true,
-      this.enableDataFiler = true,
-      this.enableGroupFiler = true,
-      this.enableAlarmFiler = true,
-      this.enableEventFiler = true,
-      required this.isTwin});
+  const DataGridSnippet({
+    super.key,
+    this.autoRefresh = true,
+    this.autoRefreshInterval = 60,
+    this.searchHint = 'Search',
+    this.deviceModelIds = const [],
+    this.assetModelIds = const [],
+    this.assetIds = const [],
+    this.premiseIds = const [],
+    this.facilityIds = const [],
+    this.floorIds = const [],
+    this.clientIds = const [],
+    required this.onAnalyticsTapped,
+    required this.onAnalyticsDoubleTapped,
+    required this.onDeviceAnalyticsTapped,
+    required this.onDeviceAnalyticsDoubleTapped,
+    required this.onAssetModelTapped,
+    required this.onAssetTapped,
+    required this.onDeviceTapped,
+    required this.onDeviceModelTapped,
+    required this.onClientTapped,
+    required this.onPremiseTapped,
+    required this.onFacilityTapped,
+    required this.onFloorTapped,
+    this.enableClintFiler = true,
+    this.enablePremiseFiler = true,
+    this.enableFacilityFiler = true,
+    this.enableFloorFiler = true,
+    this.enableDataFiler = true,
+    this.enableGroupFiler = true,
+    this.enableAlarmFiler = true,
+    this.enableEventFiler = true,
+    required this.isTwin,
+    this.oldVersion = false,
+  });
 
   @override
   State<DataGridSnippet> createState() => DataGridSnippetState();
@@ -1384,7 +1387,7 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
             },
           if (widget.assetModelIds.isNotEmpty)
             {
-              "terms": {"assetModelId": widget.assetModelIds}
+              "terms": {"assetModelId.keyword": widget.assetModelIds}
             },
           if (widget.assetIds.isNotEmpty ||
               null != _assetGroup && _assetGroup!.assetIds.isNotEmpty)
