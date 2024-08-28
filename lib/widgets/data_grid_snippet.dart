@@ -54,40 +54,43 @@ class DataGridSnippet extends StatefulWidget {
   final bool enableAlarmFiler;
   final bool enableEventFiler;
   final bool isTwin;
+  final bool oldVersion;
 
-  const DataGridSnippet(
-      {super.key,
-      this.autoRefresh = true,
-      this.autoRefreshInterval = 60,
-      this.searchHint = 'Search',
-      this.deviceModelIds = const [],
-      this.assetModelIds = const [],
-      this.assetIds = const [],
-      this.premiseIds = const [],
-      this.facilityIds = const [],
-      this.floorIds = const [],
-      this.clientIds = const [],
-      required this.onAnalyticsTapped,
-      required this.onAnalyticsDoubleTapped,
-      required this.onDeviceAnalyticsTapped,
-      required this.onDeviceAnalyticsDoubleTapped,
-      required this.onAssetModelTapped,
-      required this.onAssetTapped,
-      required this.onDeviceTapped,
-      required this.onDeviceModelTapped,
-      required this.onClientTapped,
-      required this.onPremiseTapped,
-      required this.onFacilityTapped,
-      required this.onFloorTapped,
-      this.enableClintFiler = true,
-      this.enablePremiseFiler = true,
-      this.enableFacilityFiler = true,
-      this.enableFloorFiler = true,
-      this.enableDataFiler = true,
-      this.enableGroupFiler = true,
-      this.enableAlarmFiler = true,
-      this.enableEventFiler = true,
-      required this.isTwin});
+  const DataGridSnippet({
+    super.key,
+    this.autoRefresh = true,
+    this.autoRefreshInterval = 60,
+    this.searchHint = 'Search',
+    this.deviceModelIds = const [],
+    this.assetModelIds = const [],
+    this.assetIds = const [],
+    this.premiseIds = const [],
+    this.facilityIds = const [],
+    this.floorIds = const [],
+    this.clientIds = const [],
+    required this.onAnalyticsTapped,
+    required this.onAnalyticsDoubleTapped,
+    required this.onDeviceAnalyticsTapped,
+    required this.onDeviceAnalyticsDoubleTapped,
+    required this.onAssetModelTapped,
+    required this.onAssetTapped,
+    required this.onDeviceTapped,
+    required this.onDeviceModelTapped,
+    required this.onClientTapped,
+    required this.onPremiseTapped,
+    required this.onFacilityTapped,
+    required this.onFloorTapped,
+    this.enableClintFiler = true,
+    this.enablePremiseFiler = true,
+    this.enableFacilityFiler = true,
+    this.enableFloorFiler = true,
+    this.enableDataFiler = true,
+    this.enableGroupFiler = true,
+    this.enableAlarmFiler = true,
+    this.enableEventFiler = true,
+    required this.isTwin,
+    this.oldVersion = false,
+  });
 
   @override
   State<DataGridSnippet> createState() => DataGridSnippetState();
@@ -1197,24 +1200,9 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
       ),
     ));
     List<tapi.GeoLocation> geoLocationList = [];
-    List<String> markerNameList = [];
-    List<String> hardwareDeviceIdList = [];
-    List<String> reportedTimeList = [];
-    List<String> levelList = [];
     for (tapi.DeviceData dd in _data) {
       if (dd.geolocation != null) {
         geoLocationList.add(dd.geolocation!);
-        markerNameList.add(
-            dd.asset != "" ? dd.asset.toString() : dd.deviceName.toString());
-        hardwareDeviceIdList
-            .add(dd.hardwareDeviceId != "" ? dd.hardwareDeviceId : '-');
-        reportedTimeList.add(
-            DateTime.fromMillisecondsSinceEpoch(dd.updatedStamp).toString());
-        if (!widget.isTwin) {
-          final dynamicData = dd.data as Map<String, dynamic> ?? {};
-          levelList
-              .add(dynamicData != {} ? dynamicData['level'].toString() : '-');
-        }
       }
 
       refresh(sync: () {
@@ -1300,11 +1288,10 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                   : MediaQuery.of(context).size.height / 2.1,
               child: GoogleMapMultiWidget(
                 geoLocationList: geoLocationList,
-                markerNameList: markerNameList,
-                hardwareDeviceIdList: hardwareDeviceIdList,
-                reportedTimeList: reportedTimeList,
-                levelList: levelList,
                 isTwin: widget.isTwin,
+                deviceDataList: _data,
+                onAssetTapped: widget.onAssetTapped,
+                onDeviceTapped: widget.onDeviceTapped,
               ),
             )
           : Center(
@@ -1400,7 +1387,7 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
             },
           if (widget.assetModelIds.isNotEmpty)
             {
-              "terms": {"assetModelId": widget.assetModelIds}
+              "terms": {"assetModelId.keyword": widget.assetModelIds}
             },
           if (widget.assetIds.isNotEmpty ||
               null != _assetGroup && _assetGroup!.assetIds.isNotEmpty)

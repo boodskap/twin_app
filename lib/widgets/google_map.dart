@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:twinned_api/api/twinned.swagger.dart' as tapi;
+import 'package:twin_commons/widgets/default_deviceview.dart';
 
 class GoogleMapWidget extends StatefulWidget {
   final double longitude;
@@ -92,24 +93,20 @@ class _GoogleMapWidgetState extends State<GoogleMapWidget> {
   }
 }
 
-
-
 class GoogleMapMultiWidget extends StatefulWidget {
   final List<tapi.GeoLocation> geoLocationList;
-  final List<String> markerNameList;
-  final List<String> hardwareDeviceIdList;
-  final List<String> reportedTimeList;
-  final List<String> levelList;
   final bool isTwin;
+  final List<tapi.DeviceData> deviceDataList;
+  final OnAssetTapped onAssetTapped;
+  final OnDeviceTapped onDeviceTapped;
 
   const GoogleMapMultiWidget({
     super.key,
     required this.geoLocationList,
-    required this.markerNameList,
-    required this.hardwareDeviceIdList,
-    required this.reportedTimeList,
-    required this.levelList,
     required this.isTwin,
+    required this.deviceDataList,
+    required this.onAssetTapped,
+    required this.onDeviceTapped,
   });
 
   @override
@@ -122,12 +119,7 @@ class _GoogleMapMultiWidgetState extends State<GoogleMapMultiWidget> {
   Set<Marker> _markers = {};
   double zoomLevel = 5;
   Offset? customInfoWindowPosition;
-  String? selectedMarkerTitle;
-  // String? selectedMarkerSnippet;
-  String? selectedMarkerHardwareDeviceId;
-  String selectedMarkerDataLevel = '-';
-  String? selectedMarkerReportedTime;
-
+  tapi.DeviceData? selectedDeviceData;
   @override
   void initState() {
     super.initState();
@@ -163,17 +155,11 @@ class _GoogleMapMultiWidgetState extends State<GoogleMapMultiWidget> {
   void _showCustomInfoWindow(
       BuildContext context, int index, tapi.GeoLocation location) {
     setState(() {
-      selectedMarkerTitle = widget.markerNameList[index];
-      selectedMarkerHardwareDeviceId = widget.hardwareDeviceIdList[index];
-      if (!widget.isTwin) {
-        selectedMarkerDataLevel = widget.levelList[index];
-      }
-      selectedMarkerReportedTime = widget.reportedTimeList[index];
      
-
+      selectedDeviceData = widget.deviceDataList[index];
       final screenSize = MediaQuery.of(context).size;
       customInfoWindowPosition = Offset(
-        screenSize.width<=650 ? 10 : screenSize.width / 2.3,
+        screenSize.width <= 650 ? 10 : screenSize.width / 2.3,
         10,
       );
     });
@@ -182,10 +168,6 @@ class _GoogleMapMultiWidgetState extends State<GoogleMapMultiWidget> {
   void _closeCustomInfoWindow() {
     setState(() {
       customInfoWindowPosition = null;
-      selectedMarkerTitle = null;
-      selectedMarkerHardwareDeviceId = null;
-      selectedMarkerDataLevel = "";
-      selectedMarkerReportedTime = null;
     });
   }
 
@@ -203,42 +185,39 @@ class _GoogleMapMultiWidgetState extends State<GoogleMapMultiWidget> {
           ),
           markers: _markers,
         ),
-        if (customInfoWindowPosition != null && selectedMarkerTitle != null)
+        if (customInfoWindowPosition != null)
           CustomInfoWindow(
-            title: selectedMarkerTitle!,
-            position: customInfoWindowPosition!,
-            onClose: _closeCustomInfoWindow,
-            hardwareDeviceId: selectedMarkerHardwareDeviceId!,
-            level: selectedMarkerDataLevel,
-            reportedtime: selectedMarkerReportedTime!,
-            isTwinPage: widget.isTwin,
-          ),
+              position: customInfoWindowPosition!,
+              onClose: _closeCustomInfoWindow,
+              isTwinPage: widget.isTwin,
+              deviceData: selectedDeviceData!,
+              onAssetTapped: widget.onAssetTapped,
+              onDeviceTapped: widget.onDeviceTapped),
       ],
     );
   }
 }
 
 class CustomInfoWindow extends StatelessWidget {
-  final String title;
   final Offset position;
-  final String hardwareDeviceId;
-  final String level;
-  final String reportedtime;
   final VoidCallback onClose;
   final bool isTwinPage;
+  final tapi.DeviceData deviceData;
+  final OnAssetTapped onAssetTapped;
+  final OnDeviceTapped onDeviceTapped;
   const CustomInfoWindow(
       {Key? key,
-      required this.title,
       required this.position,
       required this.onClose,
-      required this.hardwareDeviceId,
-      required this.level,
-      required this.reportedtime,
-      required this.isTwinPage})
+      required this.isTwinPage,
+      required this.deviceData,
+      required this.onAssetTapped,
+      required this.onDeviceTapped})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final dynamicLevelData = deviceData.data as Map<String, dynamic> ?? {};
     return Positioned(
       left: position.dx,
       top: position.dy,
@@ -259,11 +238,22 @@ class CustomInfoWindow extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Expanded(
-                    child: Text(
-                      title,
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                      overflow: TextOverflow.ellipsis,
+                    child: InkWell(
+                      onTap: () {
+                        if (deviceData.asset != "") {
+                          onAssetTapped(deviceData.assetId!, deviceData);
+                        } else if (deviceData.deviceName != "") {
+                          onDeviceTapped(deviceData.deviceId, deviceData);
+                        }
+                      },
+                      child: Text(
+                        deviceData.asset != ""
+                            ? deviceData.asset.toString()
+                            : deviceData.deviceName.toString(),
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 16),
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                   ),
                   IconButton(
@@ -284,7 +274,7 @@ class CustomInfoWindow extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   Text(
-                    hardwareDeviceId,
+                    deviceData.hardwareDeviceId.toString(),
                     style: TextStyle(fontWeight: FontWeight.bold),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -299,7 +289,7 @@ class CustomInfoWindow extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
-                      level,
+                      dynamicLevelData['level'].toString(),
                       style: TextStyle(fontWeight: FontWeight.bold),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -313,7 +303,11 @@ class CustomInfoWindow extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   Text(
-                    reportedtime,
+                    deviceData.updatedStamp != 0
+                        ? DateTime.fromMillisecondsSinceEpoch(
+                                deviceData.updatedStamp)
+                            .toString()
+                        : '-',
                     style: TextStyle(fontWeight: FontWeight.bold),
                     overflow: TextOverflow.ellipsis,
                   ),
