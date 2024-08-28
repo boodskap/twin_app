@@ -186,7 +186,7 @@ class _DeviceLibraryState extends BaseState<DeviceLibrary> {
 
   void _addEditDeviceModelDialog({tapi.DeviceModel? deviceModel}) async {
     await super.alertDialog(
-      title: null == deviceModel ? 'Add New DeviceModel' : 'Update DeviceModel',
+      title: null == deviceModel ? 'Add New Device Model' : 'Update Device Model',
       body: DeviceModelSnippet(
         deviceModel: deviceModel,
       ),

@@ -112,9 +112,9 @@ class _DeviceModelContentPageState extends BaseState<DeviceModelContentPage> {
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: widget.initialPage);
-   if(widget.initialPage==2){
-    _currentPage=2;
-   }
+    if (widget.initialPage == 2) {
+      _currentPage = 2;
+    }
 
     paramHeaders.add(TableRow(children: [
       Center(
@@ -1280,94 +1280,52 @@ class _DeviceModelContentPageState extends BaseState<DeviceModelContentPage> {
                           ],
                         ),
                         divider(horizontal: true),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        Column(
                           children: [
-                            Expanded(
-                              flex: 40,
-                              child: Column(
-                                children: [
-                                  Row(
-                                    children: [
-                                      DropdownButton<int>(
-                                        items: imageItems,
-                                        onChanged: (int? value) {
-                                          setState(() {
-                                            _selectedImage = value ?? -1;
-                                          });
-                                        },
-                                        value: _selectedImage,
-                                      ),
-                                      divider(horizontal: true),
-                                      PrimaryButton(
-                                        labelKey: "Upload Image",
-                                        onPressed: () {
-                                          _uploadImage();
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                  divider(horizontal: true),
-                                  if (displayCards)
-                                    SafeArea(
-                                      child: SizedBox(
-                                        height: 200,
-                                        child: GridView.builder(
-                                          itemCount: _imageCards.length,
-                                          itemBuilder: (ctx, index) {
-                                            return SizedBox(
-                                              width: 180,
-                                              height: 180,
-                                              child: _imageCards[index],
-                                            );
-                                          },
-                                          gridDelegate:
-                                              const SliverGridDelegateWithFixedCrossAxisCount(
-                                            crossAxisCount: 4,
-                                            childAspectRatio: 1.0,
-                                            crossAxisSpacing: 8,
-                                            mainAxisSpacing: 8,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                ],
-                              ),
+                            Row(
+                              children: [
+                                DropdownButton<int>(
+                                  items: imageItems,
+                                  onChanged: (int? value) {
+                                    setState(() {
+                                      _selectedImage = value ?? -1;
+                                    });
+                                  },
+                                  value: _selectedImage,
+                                ),
+                                divider(horizontal: true),
+                                PrimaryButton(
+                                  labelKey: "Upload Image",
+                                  onPressed: () {
+                                    _uploadImage();
+                                  },
+                                ),
+                              ],
                             ),
                             divider(horizontal: true),
-                            Expanded(
-                              flex: 60,
-                              child: Column(
-                                children: [
-                                  Row(
-                                    children: [
-                                      divider(horizontal: true),
-                                      Tooltip(
-                                        message: displayCards
-                                            ? 'Hide images'
-                                            : 'Show images',
-                                        child: IconButton(
-                                          onPressed: () {
-                                            setState(() {
-                                              displayCards = !displayCards;
-                                            });
-                                          },
-                                          icon: displayCards
-                                              ? const Icon(
-                                                  Icons.arrow_upward,
-                                                )
-                                              : const Icon(
-                                                  Icons.arrow_downward,
-                                                ),
-                                        ),
-                                      ),
-                                    ],
+                            if (displayCards)
+                              SafeArea(
+                                child: SizedBox(
+                                  height: 200,
+                                  child: GridView.builder(
+                                    itemCount: _imageCards.length,
+                                    itemBuilder: (ctx, index) {
+                                      return SizedBox(
+                                        width: 100,
+                                        height: 100,
+                                        child: _imageCards[index],
+                                      );
+                                    },
+                                    gridDelegate:
+                                        const SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 8,
+                                      childAspectRatio: 1.0,
+                                      crossAxisSpacing: 8,
+                                      mainAxisSpacing: 8,
+                                    ),
                                   ),
-                                  divider(),
-                                ],
+                                ),
                               ),
-                            ),
                           ],
                         ),
                         Row(
