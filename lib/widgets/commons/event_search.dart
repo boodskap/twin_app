@@ -65,26 +65,29 @@ class _EventSearchState extends BaseState<EventSearch> {
   }
 
   Widget _buildRow(twin.Event entity) {
-    return InkWell(
-      onTap: () {
-        widget.onEventSelected(entity);
-        Navigator.pop(context);
-      },
-      child: Row(
-        children: [
-          if (entity.icon?.isNotEmpty ?? false)
-            SizedBox(
-                width: 64,
-                height: 48,
-                child: TwinImageHelper.getCachedDomainImage(entity.icon!)),
-          if (entity.icon?.isEmpty ?? true)
-            SizedBox(width: 64, height: 48, child: const Icon(Icons.image)),
-          divider(horizontal: true),
-          Text(
-            entity.name,
-            style: theme.getStyle(),
-          ),
-        ],
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: InkWell(
+        onTap: () {
+          widget.onEventSelected(entity);
+          Navigator.pop(context);
+        },
+        child: Row(
+          children: [
+            if (entity.icon?.isNotEmpty ?? false)
+              SizedBox(
+                  width: 64,
+                  height: 48,
+                  child: TwinImageHelper.getCachedDomainImage(entity.icon!)),
+            if (entity.icon?.isEmpty ?? true)
+              SizedBox(width: 64, height: 48, child: const Icon(Icons.image)),
+            divider(horizontal: true),
+            Text(
+              entity.name,
+              style: theme.getStyle(),
+            ),
+          ],
+        ),
       ),
     );
   }
