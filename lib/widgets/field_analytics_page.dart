@@ -50,6 +50,14 @@ class _FieldAnalyticsPageState extends BaseState<FieldAnalyticsPage> {
             color: Color(0XFFFFFFFF),
           ),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.close, color: Color(0XFFFFFFFF)),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [

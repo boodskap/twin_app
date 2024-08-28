@@ -64,27 +64,30 @@ class _PremiseSearchState extends BaseState<PremiseSearch> {
   }
 
   Widget _buildRow(twin.Premise entity) {
-    return InkWell(
-      onTap: () {
-        widget.onPremiseSelected(entity);
-        Navigator.pop(context);
-      },
-      child: Row(
-        children: [
-          if (entity.images?.isNotEmpty ?? false)
-            SizedBox(
-                width: 64,
-                height: 48,
-                child:
-                    TwinImageHelper.getCachedDomainImage(entity.images!.first)),
-          if (entity.images?.isEmpty ?? true)
-            SizedBox(width: 64, height: 48, child: const Icon(Icons.image)),
-          divider(horizontal: true),
-          Text(
-            entity.name,
-            style: theme.getStyle(),
-          ),
-        ],
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: InkWell(
+        onTap: () {
+          widget.onPremiseSelected(entity);
+          Navigator.pop(context);
+        },
+        child: Row(
+          children: [
+            if (entity.images?.isNotEmpty ?? false)
+              SizedBox(
+                  width: 64,
+                  height: 48,
+                  child: TwinImageHelper.getCachedDomainImage(
+                      entity.images!.first)),
+            if (entity.images?.isEmpty ?? true)
+              SizedBox(width: 64, height: 48, child: const Icon(Icons.image)),
+            divider(horizontal: true),
+            Text(
+              entity.name,
+              style: theme.getStyle(),
+            ),
+          ],
+        ),
       ),
     );
   }

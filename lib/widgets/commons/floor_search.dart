@@ -66,26 +66,30 @@ class _FloorSearchState extends BaseState<FloorSearch> {
   }
 
   Widget _buildRow(twin.Floor entity) {
-    return InkWell(
-      onTap: () {
-        widget.onFloorSelected(entity);
-        Navigator.pop(context);
-      },
-      child: Row(
-        children: [
-          if (entity.floorPlan?.isNotEmpty ?? false)
-            SizedBox(
-                width: 64,
-                height: 48,
-                child: TwinImageHelper.getCachedDomainImage(entity.floorPlan!)),
-          if (entity.floorPlan?.isEmpty ?? true)
-            SizedBox(width: 64, height: 48, child: const Icon(Icons.image)),
-          divider(horizontal: true),
-          Text(
-            entity.name,
-            style: theme.getStyle(),
-          ),
-        ],
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: InkWell(
+        onTap: () {
+          widget.onFloorSelected(entity);
+          Navigator.pop(context);
+        },
+        child: Row(
+          children: [
+            if (entity.floorPlan?.isNotEmpty ?? false)
+              SizedBox(
+                  width: 64,
+                  height: 48,
+                  child:
+                      TwinImageHelper.getCachedDomainImage(entity.floorPlan!)),
+            if (entity.floorPlan?.isEmpty ?? true)
+              SizedBox(width: 64, height: 48, child: const Icon(Icons.image)),
+            divider(horizontal: true),
+            Text(
+              entity.name,
+              style: theme.getStyle(),
+            ),
+          ],
+        ),
       ),
     );
   }
