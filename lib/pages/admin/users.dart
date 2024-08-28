@@ -304,49 +304,52 @@ class _UsersState extends BaseState<Users> {
                   ),
                 ),
               ),
-              Tooltip(
-                message: isClientAdmin
-                    ? 'Remove Admin Privilege'
-                    : 'Assign Admin Privilege',
-                child: IconButton(
-                  onPressed: () {
-                    confirm(
-                        title: 'Info',
-                        message: !isClientAdmin
-                            ? "Are you sure you want to assign this person as administrator?"
-                            : "Are you sure you want to remove administrative privilege from this person?",
-                        titleStyle: theme.getStyle(),
-                        messageStyle:
-                            const TextStyle(fontWeight: FontWeight.bold),
-                        onPressed: () async {
-                          await execute(() async {
-                            if (isClientAdmin) {
-                              var res = await TwinnedSession.instance.twin
-                                  .unsetClientAdmin(
-                                      apikey: TwinnedSession.instance.authToken,
-                                      twinUserId: user.id,
-                                      clientId: '');
-                              validateResponse(res);
-                              _load();
-                            } else {
-                              var res = await TwinnedSession.instance.twin
-                                  .setClientAdmin(
-                                      apikey: TwinnedSession.instance.authToken,
-                                      twinUserId: user.id,
-                                      clientId: '');
-                              validateResponse(res);
-                              _load();
-                            }
+              if (!isAdmin)
+                Tooltip(
+                  message: isClientAdmin
+                      ? 'Remove ClientAdmin Privilege'
+                      : 'Assign ClientAdmin Privilege',
+                  child: IconButton(
+                    onPressed: () {
+                      confirm(
+                          title: 'Info',
+                          message: !isClientAdmin
+                              ? "Are you sure you want to assign this person as client administrator?"
+                              : "Are you sure you want to remove client administrative privilege from this person?",
+                          titleStyle: theme.getStyle(),
+                          messageStyle:
+                              const TextStyle(fontWeight: FontWeight.bold),
+                          onPressed: () async {
+                            await execute(() async {
+                              if (isClientAdmin) {
+                                var res = await TwinnedSession.instance.twin
+                                    .unsetClientAdmin(
+                                        apikey:
+                                            TwinnedSession.instance.authToken,
+                                        twinUserId: user.id,
+                                        clientId: user.clientIds!.first);
+                                validateResponse(res);
+                                _load();
+                              } else {
+                                var res = await TwinnedSession.instance.twin
+                                    .setClientAdmin(
+                                        apikey:
+                                            TwinnedSession.instance.authToken,
+                                        twinUserId: user.id,
+                                        clientId: user.clientIds!.first);
+                                validateResponse(res);
+                                _load();
+                              }
+                            });
                           });
-                        });
-                  },
-                  icon: Icon(
-                    Icons.account_circle,
-                    size: 18,
-                    color: isClientAdmin ? Colors.black : Colors.grey,
+                    },
+                    icon: Icon(
+                      Icons.account_circle,
+                      size: 18,
+                      color: isClientAdmin ? Colors.black : Colors.grey,
+                    ),
                   ),
                 ),
-              ),
               Tooltip(
                 message: 'Update',
                 child: IconButton(

@@ -20,6 +20,8 @@ import 'package:twin_commons/widgets/default_deviceview.dart';
 import 'package:twinned_api/api/twinned.swagger.dart' as tapi;
 import 'package:chopper/chopper.dart' as chopper;
 
+import 'google_map.dart';
+
 class DataGridSnippet extends StatefulWidget {
   final bool autoRefresh;
   final int autoRefreshInterval;
@@ -52,40 +54,43 @@ class DataGridSnippet extends StatefulWidget {
   final bool enableAlarmFiler;
   final bool enableEventFiler;
   final bool isTwin;
+  final bool oldVersion;
 
-  const DataGridSnippet(
-      {super.key,
-      this.autoRefresh = true,
-      this.autoRefreshInterval = 60,
-      this.searchHint = 'Search',
-      this.deviceModelIds = const [],
-      this.assetModelIds = const [],
-      this.assetIds = const [],
-      this.premiseIds = const [],
-      this.facilityIds = const [],
-      this.floorIds = const [],
-      this.clientIds = const [],
-      required this.onAnalyticsTapped,
-      required this.onAnalyticsDoubleTapped,
-      required this.onDeviceAnalyticsTapped,
-      required this.onDeviceAnalyticsDoubleTapped,
-      required this.onAssetModelTapped,
-      required this.onAssetTapped,
-      required this.onDeviceTapped,
-      required this.onDeviceModelTapped,
-      required this.onClientTapped,
-      required this.onPremiseTapped,
-      required this.onFacilityTapped,
-      required this.onFloorTapped,
-      this.enableClintFiler = true,
-      this.enablePremiseFiler = true,
-      this.enableFacilityFiler = true,
-      this.enableFloorFiler = true,
-      this.enableDataFiler = true,
-      this.enableGroupFiler = true,
-      this.enableAlarmFiler = true,
-      this.enableEventFiler = true,
-      required this.isTwin});
+  const DataGridSnippet({
+    super.key,
+    this.autoRefresh = true,
+    this.autoRefreshInterval = 60,
+    this.searchHint = 'Search',
+    this.deviceModelIds = const [],
+    this.assetModelIds = const [],
+    this.assetIds = const [],
+    this.premiseIds = const [],
+    this.facilityIds = const [],
+    this.floorIds = const [],
+    this.clientIds = const [],
+    required this.onAnalyticsTapped,
+    required this.onAnalyticsDoubleTapped,
+    required this.onDeviceAnalyticsTapped,
+    required this.onDeviceAnalyticsDoubleTapped,
+    required this.onAssetModelTapped,
+    required this.onAssetTapped,
+    required this.onDeviceTapped,
+    required this.onDeviceModelTapped,
+    required this.onClientTapped,
+    required this.onPremiseTapped,
+    required this.onFacilityTapped,
+    required this.onFloorTapped,
+    this.enableClintFiler = true,
+    this.enablePremiseFiler = true,
+    this.enableFacilityFiler = true,
+    this.enableFloorFiler = true,
+    this.enableDataFiler = true,
+    this.enableGroupFiler = true,
+    this.enableAlarmFiler = true,
+    this.enableEventFiler = true,
+    required this.isTwin,
+    this.oldVersion = false,
+  });
 
   @override
   State<DataGridSnippet> createState() => DataGridSnippetState();
@@ -109,6 +114,9 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
   tapi.Alarm? _alarm;
   tapi.Event? _event;
   bool _isExpanded = true;
+  bool _isTableView = true;
+  bool _isMapView = false;
+
   @override
   void initState() {
     super.initState();
@@ -1026,7 +1034,7 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                                     ),
                                   ),
                                 Padding(
-                                  padding: const EdgeInsets.only(top:5),
+                                  padding: const EdgeInsets.only(top: 5),
                                   child: InkWell(
                                       onTap: () {
                                         _load();
@@ -1036,31 +1044,31 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                                               ? theme.getPrimaryColor()
                                               : null)),
                                 ),
-                                            if (!smallScreen)
-                      Padding(
-                        padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-                        child: SizedBox(
-                            width: 250,
-                            height: 40,
-                            child: SearchBar(
-                              hintText: widget.searchHint,
-                              controller: _controller,
-                              trailing: [const BusyIndicator()],
-                              onChanged: (val) {
-                                if (loading) {
-                                  _controller.text = _searchQuery;
-                                  return;
-                                }
-                                setState(() {
-                                  _searchQuery = val.trim();
-                                });
-                                _load(search: _searchQuery);
-                              },
-                            )),
-                      ),
+                                if (!smallScreen)
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 8.0, right: 8.0),
+                                    child: SizedBox(
+                                        width: 250,
+                                        height: 40,
+                                        child: SearchBar(
+                                          hintText: widget.searchHint,
+                                          controller: _controller,
+                                          trailing: [const BusyIndicator()],
+                                          onChanged: (val) {
+                                            if (loading) {
+                                              _controller.text = _searchQuery;
+                                              return;
+                                            }
+                                            setState(() {
+                                              _searchQuery = val.trim();
+                                            });
+                                            _load(search: _searchQuery);
+                                          },
+                                        )),
+                                  ),
                               ],
                             ),
-                          
                           ],
                         ),
                       )
@@ -1094,22 +1102,86 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                           height: 100,
                           child: CircularProgressIndicator()),
                     if (!loading)
-                      Text(
-                        'No Data',
-                        style: theme.getStyle().copyWith(fontSize: 20),
+                      Center(
+                        child: Text(
+                          'No Data',
+                          style: theme.getStyle().copyWith(fontSize: 20),
+                        ),
                       ),
                   ],
                 ),
               ),
             if (!loading && _children.isNotEmpty)
-              Flexible(
-                child: SingleChildScrollView(
-                  child: Wrap(
-                    direction: Axis.vertical,
-                    children: _children,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Tooltip(
+                    message: "Grid view",
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: _isTableView
+                            ? Colors.blue[200]
+                            : Colors.transparent,
+                        shape: BoxShape.circle,
+                      ),
+                      child: IconButton(
+                        icon: Icon(
+                          Icons.grid_on,
+                          color: _isTableView
+                              ? Colors.black
+                              : theme.getPrimaryColor(),
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _isMapView = false;
+                            _isTableView = true;
+                          });
+                          _buildChildren();
+                        },
+                      ),
+                    ),
                   ),
+                  divider(horizontal: true),
+                  Tooltip(
+                    message: "Map view",
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: !_isTableView
+                            ? Colors.blue[200]
+                            : Colors.transparent,
+                        shape: BoxShape.circle,
+                      ),
+                      child: IconButton(
+                        icon: Icon(
+                          Icons.location_on,
+                          color: !_isTableView
+                              ? Colors.black
+                              : theme.getPrimaryColor(),
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _isMapView = true;
+                            _isTableView = false;
+                          });
+                          _buildChildren();
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            Flexible(
+              child: SingleChildScrollView(
+                child: Wrap(
+                  alignment: WrapAlignment.center,
+                  crossAxisAlignment: _data.length == 0
+                      ? WrapCrossAlignment.center
+                      : WrapCrossAlignment.start,
+                  direction: _isTableView ? Axis.vertical : Axis.horizontal,
+                  children: _children,
                 ),
               ),
+            ),
           ],
         ));
   }
@@ -1127,88 +1199,119 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
             BoxDecoration(border: Border.all(color: theme.getPrimaryColor())),
       ),
     ));
-
+    List<tapi.GeoLocation> geoLocationList = [];
     for (tapi.DeviceData dd in _data) {
+      if (dd.geolocation != null) {
+        geoLocationList.add(dd.geolocation!);
+      }
+
       refresh(sync: () {
-        _children.add(SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              if (smallScreen)
-                Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
-                  child: AssetActionWidget(
-                    direction: Axis.vertical,
+        if (_isTableView) {
+          _children.add(SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                if (smallScreen)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: AssetActionWidget(
+                      direction: Axis.vertical,
+                      models: _models,
+                      deviceData: dd,
+                      onDeviceTapped: widget.onDeviceTapped,
+                      onAssetModelTapped: widget.onAssetModelTapped,
+                      onDeviceModelTapped: widget.onDeviceModelTapped,
+                      onTimeSeriesDoubleTapped: widget.onAnalyticsDoubleTapped,
+                      onTimeSeriesTapped: widget.onAnalyticsTapped,
+                    ),
+                  ),
+                SizedBox(
+                  width: colWidth,
+                  child: AssetInfoWidget(
                     models: _models,
                     deviceData: dd,
                     onDeviceTapped: widget.onDeviceTapped,
+                    onClientTapped: widget.onClientTapped,
+                    onAssetTapped: widget.onAssetTapped,
+                    onFacilityTapped: widget.onFacilityTapped,
+                    onPremiseTapped: widget.onPremiseTapped,
+                    onFloorTapped: widget.onFloorTapped,
                     onAssetModelTapped: widget.onAssetModelTapped,
                     onDeviceModelTapped: widget.onDeviceModelTapped,
                     onTimeSeriesDoubleTapped: widget.onAnalyticsDoubleTapped,
                     onTimeSeriesTapped: widget.onAnalyticsTapped,
                   ),
                 ),
-              SizedBox(
-                width: colWidth,
-                child: AssetInfoWidget(
+                divider(horizontal: true),
+                SizedBox(
+                  width: colWidth,
+                  child: LocationInfoWidget(
+                    deviceData: dd,
+                    onClientTapped: widget.onClientTapped,
+                    onFacilityTapped: widget.onFacilityTapped,
+                    onPremiseTapped: widget.onPremiseTapped,
+                    onFloorTapped: widget.onFloorTapped,
+                  ),
+                ),
+                divider(horizontal: true),
+                DeviceFieldWidget(
+                  deviceData: dd,
                   models: _models,
-                  deviceData: dd,
-                  onDeviceTapped: widget.onDeviceTapped,
-                  onClientTapped: widget.onClientTapped,
-                  onAssetTapped: widget.onAssetTapped,
-                  onFacilityTapped: widget.onFacilityTapped,
-                  onPremiseTapped: widget.onPremiseTapped,
-                  onFloorTapped: widget.onFloorTapped,
-                  onAssetModelTapped: widget.onAssetModelTapped,
-                  onDeviceModelTapped: widget.onDeviceModelTapped,
-                  onTimeSeriesDoubleTapped: widget.onAnalyticsDoubleTapped,
-                  onTimeSeriesTapped: widget.onAnalyticsTapped,
+                  onDeviceAnalyticsTapped: widget.onDeviceAnalyticsTapped,
+                  onDeviceAnalyticsDoubleTapped:
+                      widget.onDeviceAnalyticsDoubleTapped,
                 ),
-              ),
-              divider(horizontal: true),
-              SizedBox(
-                width: colWidth,
-                child: LocationInfoWidget(
-                  deviceData: dd,
-                  onClientTapped: widget.onClientTapped,
-                  onFacilityTapped: widget.onFacilityTapped,
-                  onPremiseTapped: widget.onPremiseTapped,
-                  onFloorTapped: widget.onFloorTapped,
-                ),
-              ),
-              divider(horizontal: true),
-              DeviceFieldWidget(
-                deviceData: dd,
-                models: _models,
-                onDeviceAnalyticsTapped: widget.onDeviceAnalyticsTapped,
-                onDeviceAnalyticsDoubleTapped:
-                    widget.onDeviceAnalyticsDoubleTapped,
-              ),
-            ],
-          ),
-        ));
+              ],
+            ),
+          ));
 
-        _children.add(Padding(
-          padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-          child: Container(
-            width: MediaQuery.of(context).size.width - 10,
-            height: 1,
-            decoration: BoxDecoration(
-                border: Border.all(color: theme.getPrimaryColor())),
-          ),
-        ));
+          _children.add(Padding(
+            padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+            child: Container(
+              width: MediaQuery.of(context).size.width - 10,
+              height: 1,
+              decoration: BoxDecoration(
+                  border: Border.all(color: theme.getPrimaryColor())),
+            ),
+          ));
+        }
       });
     }
 
-    if (_data.isEmpty) {
+    if (_isMapView) {
+      _children.add(geoLocationList.isNotEmpty
+          ? SizedBox(
+              width: MediaQuery.of(context).size.width,
+              height: widget.isTwin
+                  ? MediaQuery.of(context).size.height
+                  : MediaQuery.of(context).size.height / 1.6,
+              child: GoogleMapMultiWidget(
+                geoLocationList: geoLocationList,
+                isTwin: widget.isTwin,
+                deviceDataList: _data,
+                onAssetTapped: widget.onAssetTapped,
+                onDeviceTapped: widget.onDeviceTapped,
+              ),
+            )
+          : Center(
+              child: Text(
+                'No Data',
+                style: theme.getStyle().copyWith(fontSize: 20),
+              ),
+            ));
+    }
+
+    if ((_data.isEmpty && !loading && _isTableView)) {
       _children.add(Row(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            'No Data',
-            style: theme.getStyle().copyWith(fontSize: 20),
+          Center(
+            child: Text(
+              'No Data',
+              style: theme.getStyle().copyWith(fontSize: 20),
+            ),
           ),
         ],
       ));
@@ -1284,7 +1387,7 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
             },
           if (widget.assetModelIds.isNotEmpty)
             {
-              "terms": {"assetModelId": widget.assetModelIds}
+              "terms": {"assetModelId.keyword": widget.assetModelIds}
             },
           if (widget.assetIds.isNotEmpty ||
               null != _assetGroup && _assetGroup!.assetIds.isNotEmpty)
@@ -1367,5 +1470,36 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
     _buildChildren();
 
     refresh();
+  }
+
+  Future<void> _showLocationDialog(longitude, latitude) async {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text('Preview Location'),
+              IconButton(
+                icon: Icon(Icons.close),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
+          content: SizedBox(
+            width: 1000,
+            child: GoogleMapWidget(
+              longitude: longitude,
+              latitude: latitude,
+              viewMode: false,
+            ),
+          ),
+        );
+      },
+    );
   }
 }
