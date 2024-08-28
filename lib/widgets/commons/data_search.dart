@@ -69,41 +69,45 @@ class _DataSearchState extends BaseState<DataSearch> {
 
   Widget _buildRow(
       {twin.DataFilter? dataFilter, twin.FieldFilter? fieldFilter}) {
-    return InkWell(
-      onTap: () {
-        if (null != dataFilter) {
-          widget.onDataFilterSelected(dataFilter!);
-        } else {
-          widget.onFieldFilterSelected(fieldFilter!);
-        }
-        Navigator.pop(context);
-      },
-      child: Row(
-        children: [
-          if (null != dataFilter && (dataFilter?.icon?.isNotEmpty ?? false))
-            SizedBox(
-                width: 64,
-                height: 48,
-                child: TwinImageHelper.getCachedDomainImage(dataFilter!.icon!)),
-          if (null != dataFilter && (dataFilter?.icon?.isEmpty ?? true))
-            SizedBox(width: 64, height: 48, child: const Icon(Icons.image)),
-          if (null != fieldFilter && (fieldFilter?.icon?.isNotEmpty ?? false))
-            SizedBox(
-                width: 64,
-                height: 48,
-                child:
-                    TwinImageHelper.getCachedDomainImage(fieldFilter!.icon!)),
-          if (null != fieldFilter && (fieldFilter?.icon?.isEmpty ?? true))
-            SizedBox(width: 64, height: 48, child: const Icon(Icons.image)),
-          divider(horizontal: true),
-          if (null != dataFilter) Icon(Icons.dataset_linked),
-          if (null != fieldFilter) Icon(Icons.text_fields),
-          divider(horizontal: true),
-          Text(
-            null != dataFilter ? dataFilter!.name : fieldFilter!.name,
-            style: theme.getStyle(),
-          ),
-        ],
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: InkWell(
+        onTap: () {
+          if (null != dataFilter) {
+            widget.onDataFilterSelected(dataFilter!);
+          } else {
+            widget.onFieldFilterSelected(fieldFilter!);
+          }
+          Navigator.pop(context);
+        },
+        child: Row(
+          children: [
+            if (null != dataFilter && (dataFilter?.icon?.isNotEmpty ?? false))
+              SizedBox(
+                  width: 64,
+                  height: 48,
+                  child:
+                      TwinImageHelper.getCachedDomainImage(dataFilter!.icon!)),
+            if (null != dataFilter && (dataFilter?.icon?.isEmpty ?? true))
+              SizedBox(width: 64, height: 48, child: const Icon(Icons.image)),
+            if (null != fieldFilter && (fieldFilter?.icon?.isNotEmpty ?? false))
+              SizedBox(
+                  width: 64,
+                  height: 48,
+                  child:
+                      TwinImageHelper.getCachedDomainImage(fieldFilter!.icon!)),
+            if (null != fieldFilter && (fieldFilter?.icon?.isEmpty ?? true))
+              SizedBox(width: 64, height: 48, child: const Icon(Icons.image)),
+            divider(horizontal: true),
+            if (null != dataFilter) Icon(Icons.dataset_linked),
+            if (null != fieldFilter) Icon(Icons.text_fields),
+            divider(horizontal: true),
+            Text(
+              null != dataFilter ? dataFilter!.name : fieldFilter!.name,
+              style: theme.getStyle(),
+            ),
+          ],
+        ),
       ),
     );
   }

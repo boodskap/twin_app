@@ -65,27 +65,30 @@ class _AlarmSearchState extends BaseState<AlarmSearch> {
   }
 
   Widget _buildRow(twin.Alarm entity) {
-    return InkWell(
-      onTap: () {
-        widget.onAlarmSelected(entity);
-        Navigator.pop(context);
-      },
-      child: Row(
-        children: [
-          if (entity.stateIcons?.isNotEmpty ?? false)
-            SizedBox(
-                width: 64,
-                height: 48,
-                child: TwinImageHelper.getCachedDomainImage(
-                    entity.stateIcons!.first)),
-          if (entity.stateIcons?.isEmpty ?? true)
-            SizedBox(width: 64, height: 48, child: const Icon(Icons.image)),
-          divider(horizontal: true),
-          Text(
-            entity.name,
-            style: theme.getStyle(),
-          ),
-        ],
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: InkWell(
+        onTap: () {
+          widget.onAlarmSelected(entity);
+          Navigator.pop(context);
+        },
+        child: Row(
+          children: [
+            if (entity.stateIcons?.isNotEmpty ?? false)
+              SizedBox(
+                  width: 64,
+                  height: 48,
+                  child: TwinImageHelper.getCachedDomainImage(
+                      entity.stateIcons!.first)),
+            if (entity.stateIcons?.isEmpty ?? true)
+              SizedBox(width: 64, height: 48, child: const Icon(Icons.image)),
+            divider(horizontal: true),
+            Text(
+              entity.name,
+              style: theme.getStyle(),
+            ),
+          ],
+        ),
       ),
     );
   }

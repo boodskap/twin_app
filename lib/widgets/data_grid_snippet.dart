@@ -236,6 +236,7 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                     if (isAdmin() && widget.enableClintFiler)
                       Tooltip(
                         message: 'filter by clients',
+                        textStyle: theme.getStyle(),
                         child: InkWell(
                           child: Icon(Icons.perm_contact_cal_outlined,
                               color: null == _client
