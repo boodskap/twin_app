@@ -21,6 +21,7 @@ import 'package:twin_app/pages/branding/landing_page.dart';
 import 'package:twin_app/pages/nocode_builder.dart';
 import 'package:twin_app/pages/roles_page.dart';
 import 'package:twin_app/pages/twin/components.dart';
+import 'package:twin_app/pages/twin/organization_page.dart';
 import 'package:twin_app/router.dart';
 import 'package:twin_app/widgets/client_snippet.dart';
 import 'package:twin_app/widgets/notifications.dart';
@@ -49,6 +50,7 @@ enum TwinAppMenu {
   twinNoCodeBuilder,
   twinFontsColors,
   twinLanding,
+  twinOrganization,
   adminUsers,
   adminClients,
   adminRoles,
@@ -788,6 +790,20 @@ class HomeScreenState extends BaseState<HomeScreen> {
           return const LandingContentPage();
         },
       ),
+      session.TwinMenuItem(
+        id: TwinAppMenu.twinOrganization,
+        text: 'My Organization',
+        icon: Icons.business,
+        bottomMenus: _twinBottomMenus(),
+        isMenuVisible: () {
+          return session.isAdmin() &&
+          TwinnedSession.instance.noCodeAuthToken != null &&
+          TwinnedSession.instance.noCodeAuthToken.isNotEmpty;
+        },
+        onMenuSelected: (BuildContext context) async {
+          return OrganizationPage();
+        },
+      ),
     ];
   }
 
@@ -934,6 +950,11 @@ class HomeScreenState extends BaseState<HomeScreen> {
         id: TwinAppMenu.twinLanding,
         icon: Icon(Icons.pages, size: 30),
         label: 'Landing',
+      ),
+      const BottomMenuItem(
+        id: TwinAppMenu.twinOrganization,
+        icon: Icon(Icons.business, size: 30),
+        label: 'Organization',
       ),
     ];
   }
