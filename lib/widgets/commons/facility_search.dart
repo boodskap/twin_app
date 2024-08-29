@@ -52,11 +52,13 @@ class _FacilitySearchState extends BaseState<FacilitySearch> {
             ],
           ),
           divider(),
-          SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: _children,
+          Expanded(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: _children,
+                ),
               ),
             ),
           ),
@@ -66,27 +68,30 @@ class _FacilitySearchState extends BaseState<FacilitySearch> {
   }
 
   Widget _buildRow(twin.Facility entity) {
-    return InkWell(
-      onTap: () {
-        widget.onFacilitySelected(entity);
-        Navigator.pop(context);
-      },
-      child: Row(
-        children: [
-          if (entity.images?.isNotEmpty ?? false)
-            SizedBox(
-                width: 64,
-                height: 48,
-                child:
-                    TwinImageHelper.getCachedDomainImage(entity.images!.first)),
-          if (entity.images?.isEmpty ?? true)
-            SizedBox(width: 64, height: 48, child: const Icon(Icons.image)),
-          divider(horizontal: true),
-          Text(
-            entity.name,
-            style: theme.getStyle(),
-          ),
-        ],
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: InkWell(
+        onTap: () {
+          widget.onFacilitySelected(entity);
+          Navigator.pop(context);
+        },
+        child: Row(
+          children: [
+            if (entity.images?.isNotEmpty ?? false)
+              SizedBox(
+                  width: 64,
+                  height: 48,
+                  child: TwinImageHelper.getCachedDomainImage(
+                      entity.images!.first)),
+            if (entity.images?.isEmpty ?? true)
+              SizedBox(width: 64, height: 48, child: const Icon(Icons.image)),
+            divider(horizontal: true),
+            Text(
+              entity.name,
+              style: theme.getStyle(),
+            ),
+          ],
+        ),
       ),
     );
   }

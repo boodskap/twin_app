@@ -165,7 +165,7 @@ class _DeviceModelSnippetState extends BaseState<DeviceModelSnippet> {
                       SizedBox(
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: LabelTextField(
-                          label: 'version',
+                          label: 'Version',
                           style: theme.getStyle(),
                           controller: versionController,
                           focusedBorder: OutlineInputBorder(
@@ -181,7 +181,7 @@ class _DeviceModelSnippetState extends BaseState<DeviceModelSnippet> {
                       SizedBox(
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: LabelTextField(
-                          label: 'make',
+                          label: 'Make',
                           style: theme.getStyle(),
                           controller: makeController,
                           focusedBorder: OutlineInputBorder(
@@ -226,7 +226,7 @@ class _DeviceModelSnippetState extends BaseState<DeviceModelSnippet> {
                                     Align(
                                         alignment: Alignment.center,
                                         child: Text(
-                                          'Upload DeviceModel image',
+                                          'Upload Device Model image',
                                           style: theme.getStyle(),
                                         )),
                                   if (_deviceModelInfo.images!.isNotEmpty)
@@ -346,8 +346,6 @@ class _DeviceModelSnippetState extends BaseState<DeviceModelSnippet> {
               ),
             ),
           );
-          debugPrint('res: $cRes');
-          // alert('Success', 'Device Model ${_deviceModelInfo.name} created');
         }
       } else {
         var uRes = await TwinnedSession.instance.twin.updateDeviceModel(

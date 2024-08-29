@@ -79,6 +79,7 @@ class _AssetReportListState extends BaseState<AssetReportList> {
                     }
                   : null,
             ),
+            divider(horizontal: true),
           ],
         ),
         if (_cards.isEmpty)

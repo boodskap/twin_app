@@ -36,6 +36,7 @@ class _PreprocessorsState extends BaseState<Preprocessors> {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        divider(),
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
@@ -72,6 +73,7 @@ class _PreprocessorsState extends BaseState<Preprocessors> {
                     _load();
                   },
                 )),
+            divider(horizontal: true),
           ],
         ),
         divider(),

@@ -236,6 +236,7 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                     if (isAdmin() && widget.enableClintFiler)
                       Tooltip(
                         message: 'filter by clients',
+                        textStyle: theme.getStyle(),
                         child: InkWell(
                           child: Icon(Icons.perm_contact_cal_outlined,
                               color: null == _client
@@ -1285,7 +1286,7 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
               width: MediaQuery.of(context).size.width,
               height: widget.isTwin
                   ? MediaQuery.of(context).size.height
-                  : MediaQuery.of(context).size.height / 2.1,
+                  : MediaQuery.of(context).size.height / 1.6,
               child: GoogleMapMultiWidget(
                 geoLocationList: geoLocationList,
                 isTwin: widget.isTwin,

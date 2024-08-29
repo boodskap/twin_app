@@ -1,24 +1,21 @@
 import 'dart:async';
+
+import 'package:chopper/chopper.dart' as chopper;
 import 'package:flutter/material.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/widgets/commons/alarm_search.dart';
 import 'package:twin_app/widgets/commons/asset_action_widget.dart';
-import 'package:twin_app/widgets/commons/asset_group_search.dart';
 import 'package:twin_app/widgets/commons/asset_info_widget.dart';
-import 'package:twin_app/widgets/commons/client_search.dart';
 import 'package:twin_app/widgets/commons/data_search.dart';
 import 'package:twin_app/widgets/commons/device_field_widget.dart';
 import 'package:twin_app/widgets/commons/event_search.dart';
-import 'package:twin_app/widgets/commons/facility_search.dart';
-import 'package:twin_app/widgets/commons/floor_search.dart';
 import 'package:twin_app/widgets/commons/location_info_widget.dart';
-import 'package:twin_app/widgets/commons/premise_search.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:twin_commons/core/twinned_session.dart';
 import 'package:twin_commons/widgets/default_deviceview.dart';
 import 'package:twinned_api/api/twinned.swagger.dart' as tapi;
-import 'package:chopper/chopper.dart' as chopper;
+import 'package:intl/intl.dart';
 
 class DataGridHistorySnippet extends StatefulWidget {
   final bool autoRefresh;
@@ -92,6 +89,11 @@ class DataGridHistorySnippetState extends BaseState<DataGridHistorySnippet> {
   tapi.Alarm? _alarm;
   tapi.Event? _event;
   bool _isExpanded = true;
+  tapi.DeviceDataSeriesDeviceIdFieldPageSizeGetFilter? filter =
+      tapi.DeviceDataSeriesDeviceIdFieldPageSizeGetFilter.recent;
+  int? beginStamp;
+  int? endStamp;
+  DateTimeRange? selectedDateRange;
   @override
   void initState() {
     super.initState();
@@ -118,6 +120,36 @@ class DataGridHistorySnippetState extends BaseState<DataGridHistorySnippet> {
     });
   }
 
+  String _getFilterLabel(
+      tapi.DeviceDataSeriesDeviceIdFieldPageSizeGetFilter? filter) {
+    switch (filter) {
+      case tapi.DeviceDataSeriesDeviceIdFieldPageSizeGetFilter.recent:
+        return 'Recent';
+      case tapi.DeviceDataSeriesDeviceIdFieldPageSizeGetFilter.today:
+        return 'Today';
+      case tapi.DeviceDataSeriesDeviceIdFieldPageSizeGetFilter.yesterday:
+        return 'Yesterday';
+      case tapi.DeviceDataSeriesDeviceIdFieldPageSizeGetFilter.thisweek:
+        return 'This Week';
+      case tapi.DeviceDataSeriesDeviceIdFieldPageSizeGetFilter.lastweek:
+        return 'Last Week';
+      case tapi.DeviceDataSeriesDeviceIdFieldPageSizeGetFilter.thismonth:
+        return 'This Month';
+      case tapi.DeviceDataSeriesDeviceIdFieldPageSizeGetFilter.lastmonth:
+        return 'Last Month';
+      case tapi.DeviceDataSeriesDeviceIdFieldPageSizeGetFilter.thisquarter:
+        return 'This Quarter';
+      case tapi.DeviceDataSeriesDeviceIdFieldPageSizeGetFilter.thisyear:
+        return 'This Year';
+      case tapi.DeviceDataSeriesDeviceIdFieldPageSizeGetFilter.lastyear:
+        return 'Last Year';
+      case tapi.DeviceDataSeriesDeviceIdFieldPageSizeGetFilter.range:
+        return 'Date Range';
+      default:
+        return 'Filter';
+    }
+  }
+
   Widget _buildControls() {
     double dialogWidth = (MediaQuery.of(context).size.width / 2) + 100;
     double dialogHeight = (MediaQuery.of(context).size.height / 2) + 100;
@@ -137,6 +169,12 @@ class DataGridHistorySnippetState extends BaseState<DataGridHistorySnippet> {
         borderRadius: BorderRadius.circular(5), // Border radius (optional)
       ),
     );
+    String filterLabel = _getFilterLabel(filter);
+    if (filter == tapi.DeviceDataSeriesDeviceIdFieldPageSizeGetFilter.range &&
+        selectedDateRange != null) {
+      filterLabel =
+          '${DateFormat('MM-dd-yyyy').format(selectedDateRange!.start)}  ${DateFormat('MM-dd-yyyy').format(selectedDateRange!.end)}';
+    }
     return Column(
       children: [
         if (widget.isTwin || smallScreen)
@@ -383,202 +421,342 @@ class DataGridHistorySnippetState extends BaseState<DataGridHistorySnippet> {
                       padding: const EdgeInsets.only(top: 10, bottom: 10),
                       child: Column(
                         children: [
-                          Wrap(
-                            spacing: 8,
-                            runSpacing: 8,
-                            crossAxisAlignment: WrapCrossAlignment.start,
-                            children: [
-                              if (widget.enableDataFiler)
-                                GestureDetector(
-                                  onLongPress: () async {
-                                    setState(() {
-                                      _dataFilter = null;
-                                      _fieldFilter = null;
-                                    });
-                                    await _load(search: _searchQuery);
-                                  },
-                                  onDoubleTap: () async {
-                                    setState(() {
-                                      _dataFilter = null;
-                                      _fieldFilter = null;
-                                    });
-                                    await _load(search: _searchQuery);
-                                  },
-                                  child: ElevatedButton(
-                                    style: (null != _dataFilter ||
-                                            null != _fieldFilter)
-                                        ? customEnabledButtonStyle
-                                        : customButtonStyle,
-                                    child: Text(
-                                      'Filter by Data',
-                                      style: TextStyle(
-                                          color: (null != _dataFilter ||
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              children: [
+                                Wrap(
+                                  spacing: 8,
+                                  runSpacing: 8,
+                                  crossAxisAlignment: WrapCrossAlignment.start,
+                                  children: [
+                                    if (widget.enableDataFiler)
+                                      GestureDetector(
+                                        onLongPress: () async {
+                                          setState(() {
+                                            _dataFilter = null;
+                                            _fieldFilter = null;
+                                          });
+                                          await _load(search: _searchQuery);
+                                        },
+                                        onDoubleTap: () async {
+                                          setState(() {
+                                            _dataFilter = null;
+                                            _fieldFilter = null;
+                                          });
+                                          await _load(search: _searchQuery);
+                                        },
+                                        child: ElevatedButton(
+                                          style: (null != _dataFilter ||
                                                   null != _fieldFilter)
-                                              ? Colors.white
-                                              : null),
-                                    ),
-                                    onPressed: () async {
-                                      await super.alertDialog(
-                                        title: 'Filter by Data',
-                                        width: dialogWidth,
-                                        height: dialogHeight,
-                                        body: DataSearch(
-                                          clientIds: null != _client
-                                              ? [_client!.id]
-                                              : [],
-                                          onFieldFilterSelected:
-                                              (entity) async {
-                                            setState(() {
-                                              _fieldFilter = entity;
-                                              _client = null;
-                                              _premise = null;
-                                              _facility = null;
-                                              _floor = null;
-                                              _assetGroup = null;
-                                              _dataFilter = null;
-                                            });
-                                            await _load(search: _searchQuery);
-                                          },
-                                          onDataFilterSelected: (entity) async {
-                                            setState(() {
-                                              _dataFilter = entity;
-                                              _client = null;
-                                              _premise = null;
-                                              _facility = null;
-                                              _floor = null;
-                                              _assetGroup = null;
-                                              _fieldFilter = null;
-                                            });
-                                            await _load(search: _searchQuery);
+                                              ? customEnabledButtonStyle
+                                              : customButtonStyle,
+                                          child: Text(
+                                            'Filter by Data',
+                                            style: TextStyle(
+                                                color: (null != _dataFilter ||
+                                                        null != _fieldFilter)
+                                                    ? Colors.white
+                                                    : null),
+                                          ),
+                                          onPressed: () async {
+                                            await super.alertDialog(
+                                              title: 'Filter by Data',
+                                              width: dialogWidth,
+                                              height: dialogHeight,
+                                              body: DataSearch(
+                                                clientIds: null != _client
+                                                    ? [_client!.id]
+                                                    : [],
+                                                onFieldFilterSelected:
+                                                    (entity) async {
+                                                  setState(() {
+                                                    _fieldFilter = entity;
+                                                    _client = null;
+                                                    _premise = null;
+                                                    _facility = null;
+                                                    _floor = null;
+                                                    _assetGroup = null;
+                                                    _dataFilter = null;
+                                                  });
+                                                  await _load(
+                                                      search: _searchQuery);
+                                                },
+                                                onDataFilterSelected:
+                                                    (entity) async {
+                                                  setState(() {
+                                                    _dataFilter = entity;
+                                                    _client = null;
+                                                    _premise = null;
+                                                    _facility = null;
+                                                    _floor = null;
+                                                    _assetGroup = null;
+                                                    _fieldFilter = null;
+                                                  });
+                                                  await _load(
+                                                      search: _searchQuery);
+                                                },
+                                              ),
+                                            );
                                           },
                                         ),
-                                      );
-                                    },
-                                  ),
-                                ),
-                              if (widget.enableEventFiler)
-                                GestureDetector(
-                                  onLongPress: () async {
-                                    setState(() {
-                                      _event = null;
-                                    });
-                                    await _load(search: _searchQuery);
-                                  },
-                                  onDoubleTap: () async {
-                                    setState(() {
-                                      _event = null;
-                                    });
-                                    await _load(search: _searchQuery);
-                                  },
-                                  child: ElevatedButton(
-                                    style: null == _event
-                                        ? customButtonStyle
-                                        : customEnabledButtonStyle,
-                                    child: Text(
-                                      'Filter by Event',
-                                      style: TextStyle(
-                                          color: null == _event
-                                              ? null
-                                              : Colors.white),
-                                    ),
-                                    onPressed: () async {
-                                      await super.alertDialog(
-                                          title: 'Filter by Event',
-                                          width: dialogWidth,
-                                          height: dialogHeight,
-                                          body: EventSearch(
-                                              clientIds: null != _client
-                                                  ? [_client!.id]
-                                                  : [],
-                                              onEventSelected: (entity) async {
-                                                setState(() {
-                                                  _event = entity;
-                                                });
-                                                await _load(
-                                                    search: _searchQuery);
-                                              }));
-                                    },
-                                  ),
-                                ),
-                              if (widget.enableAlarmFiler)
-                                GestureDetector(
-                                  onLongPress: () async {
-                                    setState(() {
-                                      _alarm = null;
-                                    });
-                                    await _load(search: _searchQuery);
-                                  },
-                                  onDoubleTap: () async {
-                                    setState(() {
-                                      _alarm = null;
-                                    });
-                                    await _load(search: _searchQuery);
-                                  },
-                                  child: ElevatedButton(
-                                    style: null == _alarm
-                                        ? customButtonStyle
-                                        : customEnabledButtonStyle,
-                                    child: Text(
-                                      'Filter by Alarm',
-                                      style: TextStyle(
-                                          color: null == _alarm
-                                              ? null
-                                              : Colors.white),
-                                    ),
-                                    onPressed: () async {
-                                      await super.alertDialog(
-                                          title: 'Filter by Alarm',
-                                          width: dialogWidth,
-                                          height: dialogHeight,
-                                          body: AlarmSearch(
-                                              clientIds: null != _client
-                                                  ? [_client!.id]
-                                                  : [],
-                                              onAlarmSelected: (entity) async {
-                                                setState(() {
-                                                  _alarm = entity;
-                                                });
-                                                await _load(
-                                                    search: _searchQuery);
-                                              }));
-                                    },
-                                  ),
-                                ),
-                              Padding(
-                                padding: const EdgeInsets.only(top: 5),
-                                child: InkWell(
-                                    onTap: () {
-                                      _load();
-                                    },
-                                    child: Icon(Icons.refresh,
-                                        color: loading
-                                            ? theme.getPrimaryColor()
-                                            : null)),
-                              ),
-                              if (!smallScreen)
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 8.0, right: 8.0),
-                                  child: SizedBox(
-                                      width: 250,
-                                      height: 40,
-                                      child: SearchBar(
-                                        hintText: widget.searchHint,
-                                        controller: _controller,
-                                        trailing: [const BusyIndicator()],
-                                        onChanged: (val) {
-                                          if (loading) {
-                                            _controller.text = _searchQuery;
-                                            return;
-                                          }
+                                      ),
+                                    if (widget.enableEventFiler)
+                                      GestureDetector(
+                                        onLongPress: () async {
                                           setState(() {
-                                            _searchQuery = val.trim();
+                                            _event = null;
                                           });
-                                          _load(search: _searchQuery);
+                                          await _load(search: _searchQuery);
                                         },
-                                      )),
+                                        onDoubleTap: () async {
+                                          setState(() {
+                                            _event = null;
+                                          });
+                                          await _load(search: _searchQuery);
+                                        },
+                                        child: ElevatedButton(
+                                          style: null == _event
+                                              ? customButtonStyle
+                                              : customEnabledButtonStyle,
+                                          child: Text(
+                                            'Filter by Event',
+                                            style: TextStyle(
+                                                color: null == _event
+                                                    ? null
+                                                    : Colors.white),
+                                          ),
+                                          onPressed: () async {
+                                            await super.alertDialog(
+                                                title: 'Filter by Event',
+                                                width: dialogWidth,
+                                                height: dialogHeight,
+                                                body: EventSearch(
+                                                    clientIds: null != _client
+                                                        ? [_client!.id]
+                                                        : [],
+                                                    onEventSelected:
+                                                        (entity) async {
+                                                      setState(() {
+                                                        _event = entity;
+                                                      });
+                                                      await _load(
+                                                          search: _searchQuery);
+                                                    }));
+                                          },
+                                        ),
+                                      ),
+                                    if (widget.enableAlarmFiler)
+                                      GestureDetector(
+                                        onLongPress: () async {
+                                          setState(() {
+                                            _alarm = null;
+                                          });
+                                          await _load(search: _searchQuery);
+                                        },
+                                        onDoubleTap: () async {
+                                          setState(() {
+                                            _alarm = null;
+                                          });
+                                          await _load(search: _searchQuery);
+                                        },
+                                        child: ElevatedButton(
+                                          style: null == _alarm
+                                              ? customButtonStyle
+                                              : customEnabledButtonStyle,
+                                          child: Text(
+                                            'Filter by Alarm',
+                                            style: TextStyle(
+                                                color: null == _alarm
+                                                    ? null
+                                                    : Colors.white),
+                                          ),
+                                          onPressed: () async {
+                                            await super.alertDialog(
+                                                title: 'Filter by Alarm',
+                                                width: dialogWidth,
+                                                height: dialogHeight,
+                                                body: AlarmSearch(
+                                                    clientIds: null != _client
+                                                        ? [_client!.id]
+                                                        : [],
+                                                    onAlarmSelected:
+                                                        (entity) async {
+                                                      setState(() {
+                                                        _alarm = entity;
+                                                      });
+                                                      await _load(
+                                                          search: _searchQuery);
+                                                    }));
+                                          },
+                                        ),
+                                      ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 5),
+                                      child: InkWell(
+                                          onTap: () {
+                                            _load();
+                                          },
+                                          child: Icon(Icons.refresh,
+                                              color: loading
+                                                  ? theme.getPrimaryColor()
+                                                  : null)),
+                                    ),
+                                    if (!smallScreen)
+                                      Row(
+                                        children: [
+                                          PopupMenuButton<
+                                              tapi
+                                              .DeviceDataSeriesDeviceIdFieldPageSizeGetFilter>(
+                                            initialValue: filter,
+                                            icon: Row(
+                                              children: [
+                                                Text(
+                                                  filterLabel,
+                                                  style: const TextStyle(
+                                                      fontSize: 16),
+                                                ),
+                                                divider(horizontal: true),
+                                                const Icon(
+                                                    Icons.filter_alt_rounded),
+                                              ],
+                                            ),
+                                            tooltip: 'Show Filters',
+                                            elevation: 10,
+                                            itemBuilder: (context) {
+                                              return <PopupMenuEntry<
+                                                  tapi
+                                                  .DeviceDataSeriesDeviceIdFieldPageSizeGetFilter>>[
+                                                const PopupMenuItem<
+                                                    tapi
+                                                    .DeviceDataSeriesDeviceIdFieldPageSizeGetFilter>(
+                                                  value: tapi
+                                                      .DeviceDataSeriesDeviceIdFieldPageSizeGetFilter
+                                                      .recent,
+                                                  child: Text('Recent'),
+                                                ),
+                                                const PopupMenuItem<
+                                                    tapi
+                                                    .DeviceDataSeriesDeviceIdFieldPageSizeGetFilter>(
+                                                  value: tapi
+                                                      .DeviceDataSeriesDeviceIdFieldPageSizeGetFilter
+                                                      .today,
+                                                  child: Text('Today'),
+                                                ),
+                                                const PopupMenuItem<
+                                                    tapi
+                                                    .DeviceDataSeriesDeviceIdFieldPageSizeGetFilter>(
+                                                  value: tapi
+                                                      .DeviceDataSeriesDeviceIdFieldPageSizeGetFilter
+                                                      .yesterday,
+                                                  child: Text('Yesterday'),
+                                                ),
+                                                const PopupMenuItem<
+                                                    tapi
+                                                    .DeviceDataSeriesDeviceIdFieldPageSizeGetFilter>(
+                                                  value: tapi
+                                                      .DeviceDataSeriesDeviceIdFieldPageSizeGetFilter
+                                                      .thisweek,
+                                                  child: Text('This Week'),
+                                                ),
+                                                const PopupMenuItem<
+                                                    tapi
+                                                    .DeviceDataSeriesDeviceIdFieldPageSizeGetFilter>(
+                                                  value: tapi
+                                                      .DeviceDataSeriesDeviceIdFieldPageSizeGetFilter
+                                                      .lastweek,
+                                                  child: Text('Last Week'),
+                                                ),
+                                                const PopupMenuItem<
+                                                    tapi
+                                                    .DeviceDataSeriesDeviceIdFieldPageSizeGetFilter>(
+                                                  value: tapi
+                                                      .DeviceDataSeriesDeviceIdFieldPageSizeGetFilter
+                                                      .thismonth,
+                                                  child: Text('This Month'),
+                                                ),
+                                                const PopupMenuItem<
+                                                    tapi
+                                                    .DeviceDataSeriesDeviceIdFieldPageSizeGetFilter>(
+                                                  value: tapi
+                                                      .DeviceDataSeriesDeviceIdFieldPageSizeGetFilter
+                                                      .lastmonth,
+                                                  child: Text('Last Month'),
+                                                ),
+                                                const PopupMenuItem<
+                                                    tapi
+                                                    .DeviceDataSeriesDeviceIdFieldPageSizeGetFilter>(
+                                                  value: tapi
+                                                      .DeviceDataSeriesDeviceIdFieldPageSizeGetFilter
+                                                      .thisquarter,
+                                                  child: Text('This Quarter'),
+                                                ),
+                                                const PopupMenuItem<
+                                                    tapi
+                                                    .DeviceDataSeriesDeviceIdFieldPageSizeGetFilter>(
+                                                  value: tapi
+                                                      .DeviceDataSeriesDeviceIdFieldPageSizeGetFilter
+                                                      .thisyear,
+                                                  child: Text('This Year'),
+                                                ),
+                                                const PopupMenuItem<
+                                                    tapi
+                                                    .DeviceDataSeriesDeviceIdFieldPageSizeGetFilter>(
+                                                  value: tapi
+                                                      .DeviceDataSeriesDeviceIdFieldPageSizeGetFilter
+                                                      .lastyear,
+                                                  child: Text('Last Year'),
+                                                ),
+                                                const PopupMenuItem<
+                                                    tapi
+                                                    .DeviceDataSeriesDeviceIdFieldPageSizeGetFilter>(
+                                                  value: tapi
+                                                      .DeviceDataSeriesDeviceIdFieldPageSizeGetFilter
+                                                      .range,
+                                                  child: Text('Date Range'),
+                                                ),
+                                              ];
+                                            },
+                                            onSelected: (tapi
+                                                .DeviceDataSeriesDeviceIdFieldPageSizeGetFilter
+                                                value) {
+                                              setState(() {
+                                                filter = value;
+                                              });
+                                              applyFilter(value);
+                                            },
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 8.0, right: 8.0),
+                                            child: SizedBox(
+                                                width: 250,
+                                                height: 40,
+                                                child: SearchBar(
+                                                  hintText: widget.searchHint,
+                                                  controller: _controller,
+                                                  trailing: [
+                                                    const BusyIndicator()
+                                                  ],
+                                                  onChanged: (val) {
+                                                    if (loading) {
+                                                      _controller.text =
+                                                          _searchQuery;
+                                                      return;
+                                                    }
+                                                    setState(() {
+                                                      _searchQuery = val.trim();
+                                                    });
+                                                    _load(search: _searchQuery);
+                                                  },
+                                                )),
+                                          ),
+                                        ],
+                                      ),
+                                  ],
                                 ),
-                            ],
+                              ],
+                            ),
                           ),
                         ],
                       ),
@@ -589,6 +767,51 @@ class DataGridHistorySnippetState extends BaseState<DataGridHistorySnippet> {
           ),
       ],
     );
+  }
+
+  Future applyFilter(
+      tapi.DeviceDataSeriesDeviceIdFieldPageSizeGetFilter? filter) async {
+    this.filter = filter;
+    beginStamp = null;
+    endStamp = null;
+    DateTimeRange? picked;
+
+    if (filter == tapi.DeviceDataSeriesDeviceIdFieldPageSizeGetFilter.range) {
+      picked = await showDateRangePicker(
+          context: context,
+          currentDate: DateTime.now(),
+          firstDate: DateTime(DateTime.now().month - 1),
+          lastDate: DateTime.now(),
+          saveText: 'Apply',
+          initialDateRange: DateTimeRange(
+            start: DateTime(DateTime.now().year, DateTime.now().month,
+                DateTime.now().day - 7),
+            end: DateTime.now(),
+          ),
+          builder: (context, child) {
+            return Column(
+              children: [
+                ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    maxWidth: 400.0,
+                    maxHeight: 800.0,
+                  ),
+                  child: child,
+                )
+              ],
+            );
+          });
+
+      if (picked != null) {
+        selectedDateRange = picked;
+        beginStamp = picked.start.millisecondsSinceEpoch;
+        endStamp = picked.end.millisecondsSinceEpoch;
+      }
+    }
+
+    debugPrint('begin: $beginStamp, end: $endStamp');
+
+    await _load();
   }
 
   @override

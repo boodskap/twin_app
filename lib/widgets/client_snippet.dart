@@ -4,6 +4,7 @@ import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:twin_app/widgets/commons/secondary_button.dart';
+import 'package:twin_app/widgets/google_map.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/widgets/common/label_text_field.dart';
 import 'package:twin_commons/util/osm_location_picker.dart';
@@ -258,18 +259,31 @@ class _ClientSnippetState extends BaseState<ClientSnippet> {
                               ),
                               child: Stack(
                                 children: [
-                                  _client.location != null
-                                      ? OSMLocationPicker(
-                                          key: Key(const Uuid().v4()),
-                                          viewMode: true,
-                                          longitude:
-                                              _client.location?.coordinates[0],
-                                          latitude:
-                                              _client.location?.coordinates[1],
-                                          onPicked: (_) {},
+                                  // _client.location != null
+                                  //     ? OSMLocationPicker(
+                                  //         key: Key(const Uuid().v4()),
+                                  //         viewMode: true,
+                                  //         longitude:
+                                  //             _client.location?.coordinates[0],
+                                  //         latitude:
+                                  //             _client.location?.coordinates[1],
+                                  //         onPicked: (_) {},
+                                  //       )
+                                  //     : const Center(
+                                  //         child: Text('No location selected')),
+                                   _client.location != null
+                                      ? GoogleMapWidget(
+                                          longitude: _client
+                                              .location!.coordinates[0],
+                                          latitude: _client
+                                              .location!.coordinates[1],
+                                          viewMode: false,
                                         )
-                                      : const Center(
-                                          child: Text('No location selected')),
+                                      : Center(
+                                          child: Text(
+                                          'No location selected',
+                                          style: theme.getStyle(),
+                                        )),
                                   Align(
                                     alignment: Alignment.topRight,
                                     child: Tooltip(
@@ -423,33 +437,121 @@ class _ClientSnippetState extends BaseState<ClientSnippet> {
     }
   }
 
-  Future<void> _showLocationDialog(BuildContext context) async {
-    return showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          content: SizedBox(
-            width: 1000,
-            child: OSMLocationPicker(
-              longitude: _client.location?.coordinates[0],
-              latitude: _client.location?.coordinates[1],
-              onPicked: (pickedData) {
-                Navigator.of(context).pop();
-                setState(() {
-                  _client = _client.copyWith(
-                      location: twinned.GeoLocation(coordinates: [
-                    pickedData.longitude,
-                    pickedData.latitude
-                  ]));
-                });
+  // Future<void> _showLocationDialog(BuildContext context) async {
+  //   return showDialog(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       return AlertDialog(
+  //         content: SizedBox(
+  //           width: 1000,
+  //           child: OSMLocationPicker(
+  //             longitude: _client.location?.coordinates[0],
+  //             latitude: _client.location?.coordinates[1],
+  //             onPicked: (pickedData) {
+  //               Navigator.of(context).pop();
+  //               setState(() {
+  //                 _client = _client.copyWith(
+  //                     location: twinned.GeoLocation(coordinates: [
+  //                   pickedData.longitude,
+  //                   pickedData.latitude
+  //                 ]));
+  //               });
+  //             },
+  //           ),
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
+
+ /// using google map
+Future<void> _showLocationDialog(BuildContext context) async {
+  double pickedLatitude = _client.location != null ? _client.location!.coordinates[1] : 39.6128;
+  double pickedLongitude = _client.location != null ? _client.location!.coordinates[0] : -101.5382;
+
+  final result = await showDialog<Map<String, double>>(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        backgroundColor: Colors.white,
+        content: SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.97,
+            ),
+            child: StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(
+                      width: 1000,
+                      height: MediaQuery.of(context).size.height * 0.85,
+                      child: GoogleMapWidget(
+                        longitude: pickedLongitude,
+                        latitude: pickedLatitude,
+                        saveLocation: (pickedData) {
+                          setState(() {
+                            pickedLatitude = double.parse(pickedData.latitude.toStringAsFixed(4));
+                            pickedLongitude = double.parse(pickedData.longitude.toStringAsFixed(4));
+                          });
+                        },
+                        viewMode: true,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Latitude: ${pickedLatitude.toStringAsFixed(4)}',
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                          'Longitude: ${pickedLongitude.toStringAsFixed(4)}',
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                        ),
+                        const Spacer(),
+                        SecondaryButton(
+                          labelKey: 'Cancel',
+                          onPressed: () {
+                            Navigator.of(context).pop(); // Close without saving
+                          },
+                        ),
+                        SizedBox(width:5),
+                        PrimaryButton(
+                          labelKey: 'Select',
+                          onPressed: () {
+                            Navigator.of(context).pop({
+                              'latitude': pickedLatitude,
+                              'longitude': pickedLongitude,
+                            }); 
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                );
               },
             ),
           ),
-        );
-      },
-    );
-  }
+        ),
+      );
+    },
+  );
 
+  if (result != null) {
+    setState(() {
+      _client = _client.copyWith(
+        location: twinned.GeoLocation(coordinates: [
+          result['longitude']!,
+          result['latitude']!,
+        ]),
+      );
+    });
+  }
+}
   @override
   void setup() {}
 }

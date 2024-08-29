@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:twin_app/core/session_variables.dart';
 import 'package:twinned_api/api/twinned.swagger.dart' as tapi;
 import 'package:twin_commons/widgets/default_deviceview.dart';
 
@@ -251,6 +252,7 @@ class CustomInfoWindow extends StatelessWidget {
                             ? deviceData.asset.toString()
                             : deviceData.deviceName.toString(),
                         style: TextStyle(
+                          color:theme.getPrimaryColor(),
                             fontWeight: FontWeight.bold, fontSize: 16),
                         overflow: TextOverflow.ellipsis,
                       ),

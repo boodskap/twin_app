@@ -152,6 +152,7 @@ class _AssetGroupListState extends BaseState<AssetGroupList> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
+        divider(),
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
@@ -171,6 +172,7 @@ class _AssetGroupListState extends BaseState<AssetGroupList> {
                     }
                   : null,
             ),
+            divider(horizontal: true),
           ],
         ),
         if (_groups.isEmpty)

@@ -326,8 +326,9 @@ class _CreateEditConditionSnippetState
     List<String>? clientIds = super.isClientAdmin()
         ? await TwinnedSession.instance.getClientIds()
         : null;
-    busy();
-    try {
+    if (loading) return;
+    loading = true;
+    await execute(() async {
       if (isBlank(_nameController.text)) {
         alert('Missing Value', "Name can't be empty");
         return;
@@ -427,11 +428,10 @@ class _CreateEditConditionSnippetState
           _cancel();
         }
       }
-    } catch (e, s) {
-      debugPrint('$e\n$s');
-    } finally {
-      busy(busy: false);
-    }
+    });
+
+    loading = false;
+    refresh();
   }
 
   void _cancel() {
