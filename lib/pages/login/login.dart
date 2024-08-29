@@ -57,12 +57,12 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
   void setup() async {
     await execute(() async {
       _userController.text = await TwinHelper.getLastStoredUser();
-      if (_userController.text.trim().isNotEmpty) {
+      if (_userController.text.toLowerCase().trim().isNotEmpty) {
         _rememberMe = true;
         _passwordController.text =
             await TwinHelper.getStoredPassword(_userController.text.trim());
       }
-      if (_userController.text.trim().isNotEmpty &&
+      if (_userController.text.toLowerCase().trim().isNotEmpty &&
           _passwordController.text.trim().isNotEmpty) {
         _hasEmail = true;
         _hasPassword = true;
@@ -95,13 +95,13 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
     session.selectedOrg = 0;
 
     await execute(() async {
-      String userId = _userController.text.trim();
+      String userId = _userController.text.toLowerCase().trim();
       String password = _passwordController.text.trim();
       bool loggedIn = false;
 
       var lRes = await session.config.twinned.loginUser(
           body: tapi.Login(
-              userId: userId,
+              userId: userId.toLowerCase(),
               password: password,
               domainKey: session.config.twinDomainKey ?? ''));
 

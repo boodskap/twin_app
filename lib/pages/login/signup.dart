@@ -59,7 +59,7 @@ class _SignUpMobilePageState extends BaseState<_SignUpMobilePage> {
     await execute(() async {
       var fname = _fnameController.text.trim();
       var lname = _lnameController.text.trim();
-      var email = _emailController.text.trim();
+      var email = _emailController.text.trim().toLowerCase();
 
       var body = tapi.Registration(
         email: email,
@@ -174,6 +174,7 @@ class _SignUpMobilePageState extends BaseState<_SignUpMobilePage> {
                                       setState(() {
                                         _canSignup = _emailController.text
                                                     .trim()
+                                                    .toLowerCase()
                                                     .length >
                                                 0 &&
                                             _fnameController.text
@@ -202,6 +203,7 @@ class _SignUpMobilePageState extends BaseState<_SignUpMobilePage> {
                                         setState(() {
                                           _canSignup = _emailController.text
                                                       .trim()
+                                                      .toLowerCase()
                                                       .length >
                                                   0 &&
                                               _fnameController.text
@@ -238,6 +240,7 @@ class _SignUpMobilePageState extends BaseState<_SignUpMobilePage> {
                                         setState(() {
                                           _canSignup = _emailController.text
                                                       .trim()
+                                                      .toLowerCase()
                                                       .length >
                                                   0 &&
                                               _fnameController.text
