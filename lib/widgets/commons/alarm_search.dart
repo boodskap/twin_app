@@ -51,11 +51,13 @@ class _AlarmSearchState extends BaseState<AlarmSearch> {
             ],
           ),
           divider(),
-          SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: _children,
+          Expanded(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: _children,
+                ),
               ),
             ),
           ),

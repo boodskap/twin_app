@@ -48,11 +48,13 @@ class _ClientSearchState extends BaseState<ClientSearch> {
             ],
           ),
           divider(),
-          SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: _children,
+          Expanded(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: _children,
+                ),
               ),
             ),
           ),
@@ -63,7 +65,7 @@ class _ClientSearchState extends BaseState<ClientSearch> {
 
   Widget _buildRow(twin.Client entity) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(88.0),
       child: InkWell(
         onTap: () {
           widget.onClientSelected(entity);

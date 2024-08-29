@@ -51,11 +51,13 @@ class _EventSearchState extends BaseState<EventSearch> {
             ],
           ),
           divider(),
-          SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: _children,
+          Expanded(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: _children,
+                ),
               ),
             ),
           ),
