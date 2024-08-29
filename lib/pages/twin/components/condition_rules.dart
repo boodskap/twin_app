@@ -451,7 +451,7 @@ class _ConditionRulesState extends BaseState<ConditionRules> {
   }
 
   Future _create() async {
-    showDialog(
+    await showDialog(
       context: context,
       builder: (BuildContext context) {
         return Dialog(
@@ -466,12 +466,13 @@ class _ConditionRulesState extends BaseState<ConditionRules> {
         );
       },
     );
+    _load();
   }
 
   Future _edit(tapi.Condition e) async {
     var res = await TwinnedSession.instance.twin.getDeviceModel(
         modelId: e.modelId, apikey: TwinnedSession.instance.authToken);
-    showDialog(
+    await showDialog(
       context: context,
       builder: (BuildContext context) {
         return Dialog(
@@ -485,6 +486,7 @@ class _ConditionRulesState extends BaseState<ConditionRules> {
         );
       },
     );
+    _load();
   }
 
   Future _confirmDeletionDialog(
@@ -552,10 +554,9 @@ class _ConditionRulesState extends BaseState<ConditionRules> {
 
       if (validateResponse(res)) {
         _entities.removeAt(index);
+        _cards.removeAt(index);
       }
-      refresh();
     });
-
     loading = false;
     refresh();
   }

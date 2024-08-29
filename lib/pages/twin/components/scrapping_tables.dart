@@ -116,8 +116,8 @@ class _ScrappingTablesState extends BaseState<ScrappingTables> {
           contentVerticalPadding: 0,
           headerBorderColor: theme.getPrimaryColor(),
           headerBorderColorOpened: theme.getPrimaryColor(),
-          headerBackgroundColorOpened: theme.getSecondaryColor(),
-          headerBackgroundColor: theme.getSecondaryColor(),
+          headerBackgroundColorOpened: theme.getPrimaryColor(),
+          headerBackgroundColor: theme.getPrimaryColor(),
           contentBackgroundColor: Colors.white,
           contentBorderColor: theme.getPrimaryColor(),
           headerBorderRadius: 1.2,
@@ -138,6 +138,7 @@ class _ScrappingTablesState extends BaseState<ScrappingTables> {
                   Text(
                     e.name,
                     style: theme.getStyle().copyWith(
+                          color: Colors.white,
                           fontWeight: FontWeight.bold,
                         ),
                   ),
