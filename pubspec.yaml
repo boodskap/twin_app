@@ -58,7 +58,5 @@ flutter:
     - assets/images/
     - assets/.env
     - assets/.env.dev
-    - assets/.env.qa
-    - assets/.env.test
     - assets/
     - default.conf

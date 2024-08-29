@@ -16,6 +16,8 @@ import 'package:twinned_api/twinned_api.dart' as tapi;
 import 'package:nocode_api/api/nocode.swagger.dart' as nocode;
 import 'package:twin_app/core/session_variables.dart' as session;
 
+import '../../core/session_variables.dart';
+
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -109,7 +111,16 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
         bool debug = TwinnedSession.instance.debug;
         String host = TwinnedSession.instance.host;
 
-        session.orgs.addAll(lRes.body!.orgs ?? []);
+        if (config.isTwinApp()) {
+          for (tapi.OrgInfo oi in lRes.body!.orgs!) {
+            if (oi.twinDomainKey == config.twinDomainKey) {
+              session.orgs.add(oi);
+              break;
+            }
+          }
+        } else {
+          session.orgs.addAll(lRes.body!.orgs ?? []);
+        }
 
         TwinnedSession.instance.init(
           debug: debug,

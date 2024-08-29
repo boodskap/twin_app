@@ -79,6 +79,7 @@ class _AssetReportListState extends BaseState<AssetReportList> {
                     }
                   : null,
             ),
+            divider(horizontal: true),
           ],
         ),
         if (_cards.isEmpty)
@@ -397,6 +398,9 @@ class _AssetReportListState extends BaseState<AssetReportList> {
   }
 
   Future _edit(twinned.Report report) async {
+    var res = await TwinnedSession.instance.twin.getDeviceModel(
+        modelId: report.modelId, apikey: TwinnedSession.instance.authToken);
+
     await showDialog(
         context: context,
         useSafeArea: true,
@@ -405,7 +409,7 @@ class _AssetReportListState extends BaseState<AssetReportList> {
             child: AlertDialog(
               content: ReportContentWidget(
                 report: report,
-                deviceModel: _selectedDeviceModel!,
+                deviceModel: res.body!.entity!,
               ),
             ),
           );
@@ -419,6 +423,7 @@ class _AssetReportListState extends BaseState<AssetReportList> {
     List<String>? clientIds = super.isClientAdmin()
         ? await TwinnedSession.instance.getClientIds()
         : null;
+
     await execute(() async {
       var res = await TwinImageHelper.uploadDomainIcon();
       if (null != res && null != res.entity) {
