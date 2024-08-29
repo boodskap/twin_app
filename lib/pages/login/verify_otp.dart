@@ -11,6 +11,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:go_router/go_router.dart';
 import 'package:twinned_api/twinned_api.dart' as tapi;
 import 'package:chopper/chopper.dart' as chopper;
+import 'package:verification_api/api/verification.swagger.dart' as vapi;
 
 class VerifyOtpPage extends StatefulWidget {
   final bool? signUp;
@@ -60,8 +61,7 @@ class _VerifyOtpMobilePageState extends BaseState<_VerifyOtpMobilePage> {
     context.push(Routes.reset, extra: {'signUp': widget.signUp ?? false});
   }
 
-  Future<void> _doVerifyPin() async {
-    debugPrint('VARIABLES: $localVariables');
+  Future<void> _doVerifyNoCodePin() async {
     String pinToken = localVariables['pinToken'] ?? '';
     if (pinToken.isEmpty) {
       alert("", "Pin token is missing");
@@ -86,6 +86,34 @@ class _VerifyOtpMobilePageState extends BaseState<_VerifyOtpMobilePage> {
               : config.noCodeDomainKey,
         );
       }
+
+      if (validateResponse(res)) {
+        localVariables['authToken'] = res.body!.authToken;
+        localVariables['pin'] = pin;
+        _doShowResetPassword();
+      }
+    } catch (e) {
+      alert("", "Error: $e");
+    }
+  }
+
+  Future<void> _doVerifyTwinPin() async {
+    String pinToken = localVariables['pinToken'] ?? '';
+    if (pinToken.isEmpty) {
+      alert("", "Pin token is missing");
+      return;
+    }
+
+    try {
+      String pin = _pinController.text;
+      var body = vapi.VerificationReq(
+        pin: pin,
+        pinToken: pinToken,
+      );
+      chopper.Response res;
+
+      res = await config.verification
+          .verifyPin(dkey: config.twinDomainKey, body: body);
 
       if (validateResponse(res)) {
         localVariables['authToken'] = res.body!.authToken;
@@ -164,7 +192,11 @@ class _VerifyOtpMobilePageState extends BaseState<_VerifyOtpMobilePage> {
                                     child: Pinput(
                                       onSubmitted: (value) async {
                                         if (value.length == 6) {
-                                          await _doVerifyPin();
+                                          if (config.isTwinApp()) {
+                                            await _doVerifyTwinPin();
+                                          } else {
+                                            await _doVerifyNoCodePin();
+                                          }
                                         } else {
                                           alert("", "Pin Required");
                                         }
@@ -200,7 +232,11 @@ class _VerifyOtpMobilePageState extends BaseState<_VerifyOtpMobilePage> {
                                   minimumSize: Size(200, 50),
                                   onPressed: () async {
                                     if (_pinController.text.length == 6) {
-                                      await _doVerifyPin();
+                                      if (config.isTwinApp()) {
+                                        await _doVerifyTwinPin();
+                                      } else {
+                                        await _doVerifyNoCodePin();
+                                      }
                                     } else {
                                       alert("", "Pin Required");
                                     }
