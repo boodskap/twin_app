@@ -150,14 +150,14 @@ class _OrganizationPageState extends BaseState<OrganizationPage> {
                       height: 250,
                       child: Stack(
                         children: [
-                          if (orgInfo.logo!.isNotEmpty)
+                          if (orgInfo.logo?.isNotEmpty ?? false)
                             Positioned.fill(
                               child: TwinImageHelper.getCachedDomainImage(
                                 orgInfo.logo!,
                                 fit: BoxFit.cover,
                               ),
                             ),
-                          if (orgInfo.logo!.isEmpty)
+                          if (orgInfo.logo?.isEmpty ?? false)
                             const Center(
                               child: Icon(
                                 Icons.image,
@@ -234,7 +234,7 @@ class _OrganizationPageState extends BaseState<OrganizationPage> {
                                   ),
                                   divider(),
                                   Text(
-                                    orgInfo.settings!.twinDomainKey ?? '',
+                                    orgInfo.settings?.twinDomainKey ?? '',
                                     style: theme.getStyle(),
                                   ),
                                   divider(),
@@ -243,7 +243,7 @@ class _OrganizationPageState extends BaseState<OrganizationPage> {
                                       Clipboard.setData(
                                         ClipboardData(
                                           text:
-                                              orgInfo.settings!.twinDomainKey ??
+                                              orgInfo.settings?.twinDomainKey ??
                                                   '',
                                         ),
                                       );
@@ -356,6 +356,10 @@ class _OrganizationPageState extends BaseState<OrganizationPage> {
           logo: org.logo,
           portraitBanner: org.portraitBanner,
           settings: org.settings,
+          phone: org.phone,
+          email: org.email,
+          address: org.address,
+          currency: org.currency,
         ),
         orgId: orgInfo.id,
       );
@@ -373,7 +377,7 @@ class _OrganizationPageState extends BaseState<OrganizationPage> {
 
   Widget buildAppEdit(BuildContext context) {
     _appNameController.text = orgInfo.name;
-    _appDescController.text = orgInfo.description!;
+    _appDescController.text = orgInfo.description ?? '';
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
