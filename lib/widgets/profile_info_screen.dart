@@ -396,7 +396,9 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
           twinUserId = user.id;
           roles = user.roles ?? [];
           clientIds = user.clientIds ?? [];
-          countryCode = user.countryCode ?? 'US';
+          countryCode = (user.countryCode?.isNotEmpty ?? false)
+              ? user.countryCode!
+              : 'US';
         });
       }
     });

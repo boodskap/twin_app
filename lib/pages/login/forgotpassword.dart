@@ -47,18 +47,22 @@ class _ForgotPasswordMobilePageState
 
   @override
   void setup() async {
-    await execute(() async {
-      var uRes = await TwinnedSession.instance.twin
-          .getUsageByDomainKey(domainKey: config.twinDomainKey);
-      if (validateResponse(uRes)) {
-        var usage = uRes.body!.entity!;
-        if (config.signUpAsClient) {
-          _canSignUp = usage.availableClients > usage.usedClients;
-        } else {
-          _canSignUp = usage.availableUsers > usage.usedUsers;
+    if (config.isTwinApp()) {
+      await execute(() async {
+        var uRes = await TwinnedSession.instance.twin
+            .getUsageByDomainKey(domainKey: config.twinDomainKey);
+        if (validateResponse(uRes)) {
+          var usage = uRes.body!.entity!;
+          if (config.signUpAsClient) {
+            _canSignUp = usage.availableClients > usage.usedClients;
+          } else {
+            _canSignUp = usage.availableUsers > usage.usedUsers;
+          }
         }
-      }
-    });
+      });
+    } else {
+      _canSignUp = true;
+    }
 
     refresh();
   }
