@@ -10,6 +10,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:go_router/go_router.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:twinned_api/twinned_api.dart' as tapi;
+import 'package:verification_api/api/verification.swagger.dart' as vapi;
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -48,11 +49,11 @@ class _SignUpMobilePageState extends BaseState<_SignUpMobilePage> {
   void setup() {
     // TODO: implement setup
   }
-  void _showOtpPage(tapi.RegistrationRes registrationRes) {
+  void _showOtpPage() {
     context.push(Routes.otp, extra: {'signUp': true});
   }
 
-  Future<void> _doSignup() async {
+  Future<void> _doTwinSignup() async {
     if (loading) return;
     loading = true;
 
@@ -61,7 +62,7 @@ class _SignUpMobilePageState extends BaseState<_SignUpMobilePage> {
       var lname = _lnameController.text.trim();
       var email = _emailController.text.trim();
 
-      var body = tapi.Registration(
+      var body = vapi.Registration(
         email: email,
         fname: fname,
         lname: lname,
@@ -71,11 +72,8 @@ class _SignUpMobilePageState extends BaseState<_SignUpMobilePage> {
         template: config.activationTemplate,
         properties: {},
       );
-      var res = await config.twinned.registerUser(
-          dkey: config.isTwinApp()
-              ? config.twinDomainKey
-              : config.noCodeDomainKey,
-          body: body);
+      var res = await config.verification
+          .registerUser(dkey: config.twinDomainKey, body: body);
 
       loading = false;
 
@@ -96,7 +94,60 @@ class _SignUpMobilePageState extends BaseState<_SignUpMobilePage> {
                     minimumSize: Size(20, 20),
                     onPressed: () {
                       Navigator.of(context).pop();
-                      _showOtpPage(res.body!);
+                      _showOtpPage();
+                    },
+                    labelKey: 'OK'),
+              ],
+            );
+          },
+        );
+      }
+    });
+    loading = false;
+  }
+
+  Future<void> _doNoCodeSignup() async {
+    if (loading) return;
+    loading = true;
+
+    await execute(() async {
+      var fname = _fnameController.text.trim();
+      var lname = _lnameController.text.trim();
+      var email = _emailController.text.trim();
+
+      var body = tapi.Registration(
+        email: email,
+        fname: fname,
+        lname: lname,
+        phone: "",
+        roles: config.roles,
+        subject: config.emailSubject,
+        template: config.activationTemplate,
+        properties: {},
+      );
+      var res = await config.twinned
+          .registerUser(dkey: config.noCodeDomainKey, body: body);
+
+      loading = false;
+
+      if (validateResponse(res)) {
+        localVariables['userId'] = email;
+        localVariables['pinToken'] = res.body!.pinToken;
+
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('OTP Sent'),
+              content: Text(
+                  'A 6 digit OTP has been sent to your email.\nPlease check it.'),
+              actions: <Widget>[
+                PrimaryButton(
+                    minimumSize: Size(20, 20),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      _showOtpPage();
                     },
                     labelKey: 'OK'),
               ],
@@ -253,7 +304,11 @@ class _SignUpMobilePageState extends BaseState<_SignUpMobilePage> {
                                       onSubmitted: !_canSignup
                                           ? null
                                           : (value) {
-                                              _doSignup();
+                                              if (config.isTwinApp()) {
+                                                _doTwinSignup();
+                                              } else {
+                                                _doNoCodeSignup();
+                                              }
                                             },
                                       decoration: InputDecoration(
                                         hintText: "lastName".tr(),
@@ -284,7 +339,11 @@ class _SignUpMobilePageState extends BaseState<_SignUpMobilePage> {
                                   onPressed: !_canSignup
                                       ? null
                                       : () {
-                                          _doSignup();
+                                          if (config.isTwinApp()) {
+                                            _doTwinSignup();
+                                          } else {
+                                            _doNoCodeSignup();
+                                          }
                                         },
                                 ),
                               ],
