@@ -50,8 +50,6 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
   final TextEditingController _userController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _rememberMe = false;
-  bool _hasEmail = false;
-  bool _hasPassword = false;
   bool _loggedIn = false;
   bool _canSignUp = false;
 
@@ -65,10 +63,7 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
             await TwinHelper.getStoredPassword(_userController.text.trim());
       }
       if (_userController.text.toLowerCase().trim().isNotEmpty &&
-          _passwordController.text.trim().isNotEmpty) {
-        _hasEmail = true;
-        _hasPassword = true;
-      }
+          _passwordController.text.trim().isNotEmpty) {}
 
       if (!session.config.isTwinApp()) {
         _canSignUp = true;
@@ -89,8 +84,13 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
     refresh();
   }
 
+  bool _canLogin() {
+    return _userController.text.trim().isNotEmpty &&
+        _passwordController.text.trim().isNotEmpty;
+  }
+
   Future _doLogin() async {
-    if (loading) return false;
+    if (loading || !_canLogin()) return false;
     loading = true;
 
     session.orgs.clear();
@@ -244,7 +244,6 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
                                             await TwinHelper.getStoredPassword(
                                                 _userController.text.trim());
                                         setState(() {
-                                          _hasEmail = true;
                                           if (password.isNotEmpty) {
                                             _passwordController.text = password;
                                           }
@@ -252,19 +251,19 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
                                       },
                                     ),
                                     PasswordField(
-                                      onSubmitted: (!_hasEmail || !_hasPassword)
+                                      onSubmitted: (_userController.text
+                                                  .trim()
+                                                  .isEmpty ||
+                                              _passwordController.text
+                                                  .trim()
+                                                  .isEmpty)
                                           ? null
                                           : (value) {
                                               _doLogin();
                                             },
                                       controller: _passwordController,
                                       onChanged: (value) {
-                                        setState(() {
-                                          _hasPassword = _passwordController
-                                              .text
-                                              .trim()
-                                              .isNotEmpty;
-                                        });
+                                        setState(() {});
                                       },
                                     ),
                                   ],
@@ -313,7 +312,7 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
                               PrimaryButton(
                                 labelKey: 'login',
                                 minimumSize: Size(400, 50),
-                                onPressed: (!_hasEmail || !_hasPassword)
+                                onPressed: !_canLogin()
                                     ? null
                                     : () {
                                         _doLogin();
