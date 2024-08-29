@@ -370,6 +370,30 @@ class _ParameterUpsertDialogState extends BaseState<ParameterUpsertDialog> {
                       widget.isEdit ? 'Update Parameter' : 'Add Parameter',
                   onPressed: () {
                     widget.addRow();
+                    setState(() {
+                      if (widget.isEdit) {
+                        if (SensorWidgetType.values
+                            .asNameMap()
+                            .containsKey(widget.sensorWidget.widgetId)) {
+                          selectedWidgetType = SensorWidgetType.values
+                              .byName(widget.sensorWidget.widgetId);
+                        }
+                      } else {
+                        selectedWidgetType = SensorWidgetType.none;
+                        widget.sensorWidget = twinned.SensorWidget(
+                          widgetId: SensorWidgetType.none.name,
+                          attributes: {},
+                        );
+                      }
+                      widget.paramType.value =
+                          twinned.ParameterParameterType.numeric;
+                      selectedWidgetType = SensorWidgetType.none;
+                      widget.sensorWidget = twinned.SensorWidget(
+                        widgetId: SensorWidgetType.none.name,
+                        attributes: {},
+                      );
+                      widget.onSensorWidgetUpdated(widget.sensorWidget);
+                    });
                     Navigator.pop(context);
                   },
                 ),
