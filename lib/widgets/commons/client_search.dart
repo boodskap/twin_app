@@ -65,7 +65,7 @@ class _ClientSearchState extends BaseState<ClientSearch> {
 
   Widget _buildRow(twin.Client entity) {
     return Padding(
-      padding: const EdgeInsets.all(88.0),
+      padding: const EdgeInsets.all(8.0),
       child: InkWell(
         onTap: () {
           widget.onClientSelected(entity);
