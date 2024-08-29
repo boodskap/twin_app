@@ -310,6 +310,7 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
                     }
                   : null,
             ),
+            divider(horizontal: true),
           ],
         ),
         if (cards.isEmpty)
