@@ -794,21 +794,21 @@ class HomeScreenState extends BaseState<HomeScreen> {
             return const LandingContentPage();
           },
         ),
-      if (session.isAdmin())
-      session.TwinMenuItem(
-        id: TwinAppMenu.twinOrganization,
-        text: 'My Organization',
-        icon: Icons.business,
-        bottomMenus: _twinBottomMenus(),
-        isMenuVisible: () {
-          return session.isAdmin() &&
-          TwinnedSession.instance.noCodeAuthToken != null &&
-          TwinnedSession.instance.noCodeAuthToken.isNotEmpty;
-        },
-        onMenuSelected: (BuildContext context) async {
-          return OrganizationPage();
-        },
-      ),
+      if (session.isOrgOwner())
+        session.TwinMenuItem(
+          id: TwinAppMenu.twinOrganization,
+          text: 'My Organization',
+          icon: Icons.business,
+          bottomMenus: _twinBottomMenus(),
+          isMenuVisible: () {
+            return session.isAdmin() &&
+                TwinnedSession.instance.noCodeAuthToken != null &&
+                TwinnedSession.instance.noCodeAuthToken.isNotEmpty;
+          },
+          onMenuSelected: (BuildContext context) async {
+            return OrganizationPage();
+          },
+        ),
     ];
   }
 
@@ -962,12 +962,12 @@ class HomeScreenState extends BaseState<HomeScreen> {
           icon: Icon(Icons.pages, size: 30),
           label: 'Landing',
         ),
-      if (session.isAdmin())
-      const BottomMenuItem(
-        id: TwinAppMenu.twinOrganization,
-        icon: Icon(Icons.business, size: 30),
-        label: 'Organization',
-      ),
+      if (session.isOrgOwner())
+        const BottomMenuItem(
+          id: TwinAppMenu.twinOrganization,
+          icon: Icon(Icons.business, size: 30),
+          label: 'Organization',
+        ),
     ];
   }
 

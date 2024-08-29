@@ -71,6 +71,13 @@ bool isClientAdmin() {
   return TwinnedSession.instance.isClientAdmin();
 }
 
+bool isOrgOwner() {
+  if (null != orgs[selectedOrg]) {
+    return orgs[selectedOrg]!.profileId == orgs[selectedOrg]!.userProfileId;
+  }
+  return false;
+}
+
 class TwinMenuItem {
   TwinMenuItem({
     required this.id,
