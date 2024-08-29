@@ -574,33 +574,35 @@ class _UsersState extends BaseState<Users> {
     _twinUsers.clear();
 
     await execute(() async {
-      if (TwinnedSession.instance.isAdmin()) {
-        var qres = await TwinnedSession.instance.twin.queryEqlTwinUser(
-          apikey: TwinnedSession.instance.authToken,
-          body: tapi.EqlSearch(
-            source: [],
-            page: 0,
-            size: 25,
-            sort: {"namek": "asc"},
-            mustConditions: [
-              {
-                "query_string": {
-                  "query": _searchQuery,
-                  "fields": ["name"]
-                }
+      var qres = await TwinnedSession.instance.twin.queryEqlTwinUser(
+        apikey: TwinnedSession.instance.authToken,
+        body: tapi.EqlSearch(
+          source: [],
+          page: 0,
+          size: 25,
+          sort: {"namek": "asc"},
+          mustConditions: [
+            {
+              "query_string": {
+                "query": _searchQuery,
+                "fields": ["name"]
               }
-            ],
-          ),
-        );
-        // debugPrint(qres.body!.values.toString());
-        if (validateResponse(qres)) {
-          totalCount = qres.body!.total;
-          refresh(
-            sync: () {
-              _twinUsers.addAll(qres.body!.values!);
             },
-          );
-        }
+            if (isClient())
+              {
+                "terms": {"clientIds.keyword": await getClientIds()}
+              },
+          ],
+        ),
+      );
+      // debugPrint(qres.body!.values.toString());
+      if (validateResponse(qres)) {
+        totalCount = qres.body!.total;
+        refresh(
+          sync: () {
+            _twinUsers.addAll(qres.body!.values!);
+          },
+        );
       }
     });
 

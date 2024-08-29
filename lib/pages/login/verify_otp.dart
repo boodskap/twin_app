@@ -70,16 +70,22 @@ class _VerifyOtpMobilePageState extends BaseState<_VerifyOtpMobilePage> {
 
     try {
       String pin = _pinController.text;
-      var body = tapi.VerificationReq(
-        pin: pin,
-        pinToken: pinToken,
-      );
       chopper.Response res;
 
       if (widget.signUp ?? false) {
+        var body = tapi.VerificationReq(
+          pin: pin,
+          pinToken: pinToken,
+        );
+
         res = await config.twinned.verifyRegistrationPin(body: body);
       } else {
-        res = await config.twinned.verifyResetPin(
+        var body = vapi.VerificationReq(
+          pin: pin,
+          pinToken: pinToken,
+        );
+
+        res = await config.verification.verifyPin(
           body: body,
           dkey: config.isTwinApp()
               ? config.twinDomainKey
