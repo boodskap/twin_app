@@ -65,12 +65,19 @@ class _UserAddUpdateSnippetState extends BaseState<UserAddUpdateSnippet> {
         roles: u.roles,
         selectedImage: u.selectedImage,
         tags: u.tags,
+        city: u.city,
+        country: u.country,
+        stateProvince: u.stateProvince,
+        userState: u.userState,
+        zipcode: u.zipcode,
       );
     }
     nameController.text = _twinUserInfo.name;
     emailController.text = _twinUserInfo.email;
     phoneController.text = _twinUserInfo.phone ?? '';
-    countryCode = _twinUserInfo.countryCode ?? '';
+    countryCode = (_twinUserInfo.countryCode?.isNotEmpty ?? false)
+        ? _twinUserInfo.countryCode!
+        : 'US';
     nameController.addListener(_onNameChanged);
     emailController.addListener(_onNameChanged);
     phoneController.addListener(_onNameChanged);
@@ -173,21 +180,22 @@ class _UserAddUpdateSnippetState extends BaseState<UserAddUpdateSnippet> {
                           },
                         ),
                       ),
-                      divider(height: 15),
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width / 2.5,
-                        child: ClientDropdown(
-                          selectedItem: (_twinUserInfo.clientIds!.isNotEmpty)
-                              ? _twinUserInfo.clientIds!.first
-                              : null,
-                          onClientSelected: (e) {
-                            setState(() {
-                              _twinUserInfo = _twinUserInfo.copyWith(
-                                  clientIds: null != e ? [e.id] : []);
-                            });
-                          },
+                      if (isAdmin()) divider(height: 15),
+                      if (isAdmin())
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width / 2.5,
+                          child: ClientDropdown(
+                            selectedItem: (_twinUserInfo.clientIds!.isNotEmpty)
+                                ? _twinUserInfo.clientIds!.first
+                                : null,
+                            onClientSelected: (e) {
+                              setState(() {
+                                _twinUserInfo = _twinUserInfo.copyWith(
+                                    clientIds: null != e ? [e.id] : []);
+                              });
+                            },
+                          ),
                         ),
-                      ),
                       divider(height: 15),
                       SizedBox(
                         width: MediaQuery.of(context).size.width / 2.5,
@@ -332,6 +340,11 @@ class _UserAddUpdateSnippetState extends BaseState<UserAddUpdateSnippet> {
 
     await execute(() async {
       if (null == widget.twinUser) {
+        if (isClient()) {
+          _twinUserInfo =
+              _twinUserInfo.copyWith(clientIds: await getClientIds());
+        }
+
         var cRes = await TwinnedSession.instance.twin.createTwinUser(
             apikey: TwinnedSession.instance.authToken, body: _twinUserInfo);
         if (validateResponse(cRes)) {

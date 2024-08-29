@@ -78,6 +78,10 @@ bool isOrgOwner() {
   return false;
 }
 
+Future<List<String>> getClientIds() async {
+  return await TwinnedSession.instance.getClientIds();
+}
+
 class TwinMenuItem {
   TwinMenuItem({
     required this.id,
