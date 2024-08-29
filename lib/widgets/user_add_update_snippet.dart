@@ -70,7 +70,9 @@ class _UserAddUpdateSnippetState extends BaseState<UserAddUpdateSnippet> {
     nameController.text = _twinUserInfo.name;
     emailController.text = _twinUserInfo.email;
     phoneController.text = _twinUserInfo.phone ?? '';
-    countryCode = _twinUserInfo.countryCode ?? '';
+    countryCode = (_twinUserInfo.countryCode?.isNotEmpty ?? false)
+        ? _twinUserInfo.countryCode!
+        : 'US';
     nameController.addListener(_onNameChanged);
     emailController.addListener(_onNameChanged);
     phoneController.addListener(_onNameChanged);
