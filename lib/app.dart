@@ -21,6 +21,7 @@ import 'package:twin_app/pages/branding/landing_page.dart';
 import 'package:twin_app/pages/nocode_builder.dart';
 import 'package:twin_app/pages/roles_page.dart';
 import 'package:twin_app/pages/twin/components.dart';
+import 'package:twin_app/pages/twin/organization_page.dart';
 import 'package:twin_app/router.dart';
 import 'package:twin_app/widgets/client_snippet.dart';
 import 'package:twin_app/widgets/notifications.dart';
@@ -49,6 +50,7 @@ enum TwinAppMenu {
   twinNoCodeBuilder,
   twinFontsColors,
   twinLanding,
+  twinOrganization,
   adminUsers,
   adminClients,
   adminRoles,
@@ -703,7 +705,8 @@ class HomeScreenState extends BaseState<HomeScreen> {
         assetImage: 'images/twin.png',
         subItems: _twinSubMenuItems,
         isMenuVisible: () {
-          return !session.smallScreen && session.isAdmin();
+          return !session.smallScreen &&
+              (session.isClientAdmin() || session.isAdmin());
         },
         onMenuSelected: (ctx) async {
           return SizedBox.shrink();
@@ -716,7 +719,8 @@ class HomeScreenState extends BaseState<HomeScreen> {
         expanded: false,
         subItems: _adminSubMenuItems,
         isMenuVisible: () {
-          return !session.smallScreen && session.isAdmin();
+          return !session.smallScreen &&
+              (session.isClientAdmin() || session.isAdmin());
         },
         onMenuSelected: (ctx) async {
           return SizedBox.shrink();
@@ -764,28 +768,45 @@ class HomeScreenState extends BaseState<HomeScreen> {
           return const NocodeBuilderPage();
         },
       ),
+      if (!session.isClient())
+        session.TwinMenuItem(
+          id: TwinAppMenu.twinFontsColors,
+          text: 'Fonts & Colors',
+          icon: Icons.font_download,
+          bottomMenus: _twinBottomMenus(),
+          isMenuVisible: () {
+            return session.isAdmin();
+          },
+          onMenuSelected: (BuildContext context) async {
+            return const FontsAndColorSettingPage();
+          },
+        ),
+      if (!session.isClient())
+        session.TwinMenuItem(
+          id: TwinAppMenu.twinLanding,
+          text: 'Landing Pages',
+          icon: Icons.pages,
+          bottomMenus: _twinBottomMenus(),
+          isMenuVisible: () {
+            return session.isAdmin();
+          },
+          onMenuSelected: (BuildContext context) async {
+            return const LandingContentPage();
+          },
+        ),
+      if (session.isAdmin())
       session.TwinMenuItem(
-        id: TwinAppMenu.twinFontsColors,
-        text: 'Fonts & Colors',
-        icon: Icons.font_download,
+        id: TwinAppMenu.twinOrganization,
+        text: 'My Organization',
+        icon: Icons.business,
         bottomMenus: _twinBottomMenus(),
         isMenuVisible: () {
-          return session.isAdmin();
+          return session.isAdmin() &&
+          TwinnedSession.instance.noCodeAuthToken != null &&
+          TwinnedSession.instance.noCodeAuthToken.isNotEmpty;
         },
         onMenuSelected: (BuildContext context) async {
-          return const FontsAndColorSettingPage();
-        },
-      ),
-      session.TwinMenuItem(
-        id: TwinAppMenu.twinLanding,
-        text: 'Landing Pages',
-        icon: Icons.pages,
-        bottomMenus: _twinBottomMenus(),
-        isMenuVisible: () {
-          return session.isAdmin();
-        },
-        onMenuSelected: (BuildContext context) async {
-          return const LandingContentPage();
+          return OrganizationPage();
         },
       ),
     ];
@@ -799,36 +820,38 @@ class HomeScreenState extends BaseState<HomeScreen> {
         icon: Icons.group,
         bottomMenus: _adminBottomMenus(),
         isMenuVisible: () {
-          return session.isAdmin();
+          return (session.isAdmin() || session.isClientAdmin());
         },
         onMenuSelected: (BuildContext context) async {
           return const Users();
         },
       ),
-      session.TwinMenuItem(
-        id: TwinAppMenu.adminClients,
-        text: 'Clients',
-        icon: Icons.perm_contact_cal_outlined,
-        bottomMenus: _adminBottomMenus(),
-        isMenuVisible: () {
-          return session.isAdmin();
-        },
-        onMenuSelected: (BuildContext context) async {
-          return const Clients();
-        },
-      ),
-      session.TwinMenuItem(
-        id: TwinAppMenu.adminRoles,
-        text: 'Roles',
-        icon: Icons.key,
-        bottomMenus: _adminBottomMenus(),
-        isMenuVisible: () {
-          return session.isAdmin();
-        },
-        onMenuSelected: (BuildContext context) async {
-          return const RolesPage();
-        },
-      ),
+      if (!session.isClient())
+        session.TwinMenuItem(
+          id: TwinAppMenu.adminClients,
+          text: 'Clients',
+          icon: Icons.perm_contact_cal_outlined,
+          bottomMenus: _adminBottomMenus(),
+          isMenuVisible: () {
+            return session.isAdmin();
+          },
+          onMenuSelected: (BuildContext context) async {
+            return const Clients();
+          },
+        ),
+      if (!session.isClient())
+        session.TwinMenuItem(
+          id: TwinAppMenu.adminRoles,
+          text: 'Roles',
+          icon: Icons.key,
+          bottomMenus: _adminBottomMenus(),
+          isMenuVisible: () {
+            return session.isAdmin();
+          },
+          onMenuSelected: (BuildContext context) async {
+            return const RolesPage();
+          },
+        ),
     ];
   }
 
@@ -880,16 +903,18 @@ class HomeScreenState extends BaseState<HomeScreen> {
         icon: Icon(Icons.person, size: 30),
         label: 'Users',
       ),
-      const BottomMenuItem(
-        id: TwinAppMenu.adminClients,
-        icon: Icon(Icons.group, size: 30),
-        label: 'Clients',
-      ),
-      const BottomMenuItem(
-        id: TwinAppMenu.adminRoles,
-        icon: Icon(Icons.key, size: 30),
-        label: 'Roles',
-      ),
+      if (!session.isClient())
+        const BottomMenuItem(
+          id: TwinAppMenu.adminClients,
+          icon: Icon(Icons.group, size: 30),
+          label: 'Clients',
+        ),
+      if (!session.isClient())
+        const BottomMenuItem(
+          id: TwinAppMenu.adminRoles,
+          icon: Icon(Icons.key, size: 30),
+          label: 'Roles',
+        ),
     ];
   }
 
@@ -925,15 +950,23 @@ class HomeScreenState extends BaseState<HomeScreen> {
         icon: Icon(Icons.tablet, size: 30),
         label: 'Builder',
       ),
+      if (!session.isClient())
+        const BottomMenuItem(
+          id: TwinAppMenu.twinFontsColors,
+          icon: Icon(Icons.font_download_sharp, size: 30),
+          label: 'Fonts',
+        ),
+      if (!session.isClient())
+        const BottomMenuItem(
+          id: TwinAppMenu.twinLanding,
+          icon: Icon(Icons.pages, size: 30),
+          label: 'Landing',
+        ),
+      if (session.isAdmin())
       const BottomMenuItem(
-        id: TwinAppMenu.twinFontsColors,
-        icon: Icon(Icons.font_download_sharp, size: 30),
-        label: 'Fonts',
-      ),
-      const BottomMenuItem(
-        id: TwinAppMenu.twinLanding,
-        icon: Icon(Icons.pages, size: 30),
-        label: 'Landing',
+        id: TwinAppMenu.twinOrganization,
+        icon: Icon(Icons.business, size: 30),
+        label: 'Organization',
       ),
     ];
   }

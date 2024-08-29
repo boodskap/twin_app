@@ -1,7 +1,6 @@
 // ignore_for_file: must_be_immutable
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/pages/twin/components/widgets/device_model_add_params.dart';
 import 'package:twin_app/pages/twin/components/widgets/custom_setting_snippet.dart';
@@ -21,11 +20,15 @@ enum PickTarget { border, background }
 class DeviceModelContentPage extends StatefulWidget {
   twinned.DeviceModel? model;
   final String type;
+  final PageController? pageController;
+  int initialPage;
 
   DeviceModelContentPage({
     super.key,
     this.model,
     required this.type,
+    this.pageController,
+    required this.initialPage,
   });
 
   @override
@@ -42,7 +45,7 @@ class _DeviceModelContentPageState extends BaseState<DeviceModelContentPage> {
   final TextEditingController _modelController = TextEditingController();
   final TextEditingController _versionController = TextEditingController();
   final TextEditingController _tagsController = TextEditingController();
-  final PageController _pageController = PageController();
+  late PageController _pageController = PageController();
 
   final List<String> _imageIds = [];
   final List<Widget> _imageCards = [];
@@ -108,6 +111,11 @@ class _DeviceModelContentPageState extends BaseState<DeviceModelContentPage> {
   @override
   void initState() {
     super.initState();
+    _pageController = PageController(initialPage: widget.initialPage);
+    if (widget.initialPage == 2) {
+      _currentPage = 2;
+    }
+
     paramHeaders.add(TableRow(children: [
       Center(
         child: Text(
@@ -1272,94 +1280,52 @@ class _DeviceModelContentPageState extends BaseState<DeviceModelContentPage> {
                           ],
                         ),
                         divider(horizontal: true),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                        Column(
                           children: [
-                            Expanded(
-                              flex: 40,
-                              child: Column(
-                                children: [
-                                  Row(
-                                    children: [
-                                      DropdownButton<int>(
-                                        items: imageItems,
-                                        onChanged: (int? value) {
-                                          setState(() {
-                                            _selectedImage = value ?? -1;
-                                          });
-                                        },
-                                        value: _selectedImage,
-                                      ),
-                                      divider(horizontal: true),
-                                      PrimaryButton(
-                                        labelKey: "Upload Image",
-                                        onPressed: () {
-                                          _uploadImage();
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                  divider(horizontal: true),
-                                  if (displayCards)
-                                    SafeArea(
-                                      child: SizedBox(
-                                        height: 200,
-                                        child: GridView.builder(
-                                          itemCount: _imageCards.length,
-                                          itemBuilder: (ctx, index) {
-                                            return SizedBox(
-                                              width: 180,
-                                              height: 180,
-                                              child: _imageCards[index],
-                                            );
-                                          },
-                                          gridDelegate:
-                                              const SliverGridDelegateWithFixedCrossAxisCount(
-                                            crossAxisCount: 4,
-                                            childAspectRatio: 1.0,
-                                            crossAxisSpacing: 8,
-                                            mainAxisSpacing: 8,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                ],
-                              ),
+                            Row(
+                              children: [
+                                DropdownButton<int>(
+                                  items: imageItems,
+                                  onChanged: (int? value) {
+                                    setState(() {
+                                      _selectedImage = value ?? -1;
+                                    });
+                                  },
+                                  value: _selectedImage,
+                                ),
+                                divider(horizontal: true),
+                                PrimaryButton(
+                                  labelKey: "Upload Image",
+                                  onPressed: () {
+                                    _uploadImage();
+                                  },
+                                ),
+                              ],
                             ),
                             divider(horizontal: true),
-                            Expanded(
-                              flex: 60,
-                              child: Column(
-                                children: [
-                                  Row(
-                                    children: [
-                                      divider(horizontal: true),
-                                      Tooltip(
-                                        message: displayCards
-                                            ? 'Hide images'
-                                            : 'Show images',
-                                        child: IconButton(
-                                          onPressed: () {
-                                            setState(() {
-                                              displayCards = !displayCards;
-                                            });
-                                          },
-                                          icon: displayCards
-                                              ? const Icon(
-                                                  Icons.arrow_upward,
-                                                )
-                                              : const Icon(
-                                                  Icons.arrow_downward,
-                                                ),
-                                        ),
-                                      ),
-                                    ],
+                            if (displayCards)
+                              SafeArea(
+                                child: SizedBox(
+                                  height: 200,
+                                  child: GridView.builder(
+                                    itemCount: _imageCards.length,
+                                    itemBuilder: (ctx, index) {
+                                      return SizedBox(
+                                        width: 100,
+                                        height: 100,
+                                        child: _imageCards[index],
+                                      );
+                                    },
+                                    gridDelegate:
+                                        const SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 8,
+                                      childAspectRatio: 1.0,
+                                      crossAxisSpacing: 8,
+                                      mainAxisSpacing: 8,
+                                    ),
                                   ),
-                                  divider(),
-                                ],
+                                ),
                               ),
-                            ),
                           ],
                         ),
                         Row(

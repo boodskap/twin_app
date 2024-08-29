@@ -10,11 +10,13 @@ import 'package:twinned_api/api/twinned.swagger.dart' as tapi;
 class DashboardHistory extends StatefulWidget {
   final List<String> deviceIds;
   final List<String> assetIds;
+  final bool oldVersion;
 
   const DashboardHistory({
     super.key,
     this.deviceIds = const [],
     this.assetIds = const [],
+    this.oldVersion = false,
   });
 
   @override
@@ -97,8 +99,10 @@ class _DashboardHistoryState extends BaseState<DashboardHistory> {
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: DataGridHistorySnippet(
+                oldVersion: widget.oldVersion,
                 assetIds: widget.assetIds,
                 deviceIds: widget.deviceIds,
+                isTwin: true,
                 onPremiseTapped: (id, dd) {
                   _showDashboard(dd.premise ?? '', premiseIds: [id]);
                 },

@@ -41,6 +41,7 @@ dependencies:
   multi_select_flutter: ^4.1.3
   string_validator: ^1.1.0
   input_quantity: ^2.4.0
+  google_maps_flutter: ^2.9.0
 
 dev_dependencies:
   flutter_test:
@@ -57,7 +58,5 @@ flutter:
     - assets/images/
     - assets/.env
     - assets/.env.dev
-    - assets/.env.qa
-    - assets/.env.test
     - assets/
     - default.conf

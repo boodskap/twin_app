@@ -20,6 +20,8 @@ import 'package:twin_commons/widgets/default_deviceview.dart';
 import 'package:twinned_api/api/twinned.swagger.dart' as tapi;
 import 'package:chopper/chopper.dart' as chopper;
 
+import 'google_map.dart';
+
 class DataGridSnippet extends StatefulWidget {
   final bool autoRefresh;
   final int autoRefreshInterval;
@@ -51,6 +53,8 @@ class DataGridSnippet extends StatefulWidget {
   final bool enableGroupFiler;
   final bool enableAlarmFiler;
   final bool enableEventFiler;
+  final bool isTwin;
+  final bool oldVersion;
 
   const DataGridSnippet({
     super.key,
@@ -84,6 +88,8 @@ class DataGridSnippet extends StatefulWidget {
     this.enableGroupFiler = true,
     this.enableAlarmFiler = true,
     this.enableEventFiler = true,
+    required this.isTwin,
+    this.oldVersion = false,
   });
 
   @override
@@ -107,6 +113,9 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
   tapi.AssetGroup? _assetGroup;
   tapi.Alarm? _alarm;
   tapi.Event? _event;
+  bool _isExpanded = true;
+  bool _isTableView = true;
+  bool _isMapView = false;
 
   @override
   void initState() {
@@ -128,407 +137,948 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
     timer?.cancel();
   }
 
+  void _togglePanel() {
+    setState(() {
+      _isExpanded = !_isExpanded;
+    });
+  }
+
   Widget _buildControls() {
     double dialogWidth = (MediaQuery.of(context).size.width / 2) + 100;
     double dialogHeight = (MediaQuery.of(context).size.height / 2) + 100;
+    final ButtonStyle customButtonStyle = ElevatedButton.styleFrom(
+      backgroundColor: Colors.white, // Background color
+      foregroundColor: Colors.black, // Text color
+      side: BorderSide(color: Colors.black, width: 1), // Border color and width
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(5), // Border radius (optional)
+      ),
+    );
+    final ButtonStyle customEnabledButtonStyle = ElevatedButton.styleFrom(
+      backgroundColor: Colors.blue, // Background color
+      foregroundColor: Colors.white, // Text color
+      side: BorderSide(color: Colors.blue, width: 1), // Border color and width
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(5), // Border radius (optional)
+      ),
+    );
 
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Wrap(
-              spacing: smallScreen ? 8 : 16,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: [
-                if (widget.enableDataFiler)
-                  Tooltip(
-                    message: 'filter by data',
-                    child: InkWell(
-                      child: Icon(Icons.filter_alt_sharp,
-                          color: (null != _dataFilter || null != _fieldFilter)
-                              ? theme.getPrimaryColor()
-                              : null),
-                      onLongPress: () async {
-                        setState(() {
-                          _dataFilter = null;
-                          _fieldFilter = null;
-                        });
-                        await _load(search: _searchQuery);
-                      },
-                      onDoubleTap: () async {
-                        setState(() {
-                          _dataFilter = null;
-                          _fieldFilter = null;
-                        });
-                        await _load(search: _searchQuery);
-                      },
-                      onTap: () async {
-                        await super.alertDialog(
-                          title: 'Filter by Data',
-                          width: dialogWidth,
-                          height: dialogHeight,
-                          body: DataSearch(
-                              clientIds: null != _client ? [_client!.id] : [],
-                              onFieldFilterSelected: (entity) async {
-                                setState(() {
-                                  _fieldFilter = entity;
-                                  _client = null;
-                                  _premise = null;
-                                  _facility = null;
-                                  _floor = null;
-                                  _assetGroup = null;
-                                  _dataFilter = null;
-                                });
-                                await _load(search: _searchQuery);
-                              },
-                              onDataFilterSelected: (entity) async {
-                                setState(() {
-                                  _dataFilter = entity;
-                                  _client = null;
-                                  _premise = null;
-                                  _facility = null;
-                                  _floor = null;
-                                  _assetGroup = null;
-                                  _fieldFilter = null;
-                                });
-                                await _load(search: _searchQuery);
-                              }),
-                        );
-                      },
-                    ),
-                  ),
-                if (isAdmin() && widget.enableClintFiler)
-                  Tooltip(
-                    message: 'filter by clients',
-                    child: InkWell(
-                      child: Icon(Icons.perm_contact_cal_outlined,
-                          color:
-                              null == _client ? null : theme.getPrimaryColor()),
-                      onLongPress: () async {
-                        setState(() {
-                          _client = null;
-                          _premise = null;
-                          _facility = null;
-                          _floor = null;
-                          _assetGroup = null;
-                          _dataFilter = null;
-                          _fieldFilter = null;
-                        });
-                        await _load(search: _searchQuery);
-                      },
-                      onDoubleTap: () async {
-                        setState(() {
-                          _client = null;
-                          _premise = null;
-                          _facility = null;
-                          _floor = null;
-                          _assetGroup = null;
-                          _dataFilter = null;
-                          _fieldFilter = null;
-                        });
-                        await _load(search: _searchQuery);
-                      },
-                      onTap: () async {
-                        await super.alertDialog(
-                            title: 'Filter by Client',
-                            width: dialogWidth,
-                            height: dialogHeight,
-                            body:
-                                ClientSearch(onClientSelected: (entity) async {
-                              setState(() {
-                                _client = entity;
-                                _premise = null;
-                                _facility = null;
-                                _floor = null;
-                                _assetGroup = null;
-                                _dataFilter = null;
-                                _fieldFilter = null;
-                              });
-                              await _load(search: _searchQuery);
-                            }));
-                      },
-                    ),
-                  ),
-                if (widget.enablePremiseFiler)
-                  Tooltip(
-                    message: 'filter by premises',
-                    child: InkWell(
-                      child: Icon(Icons.home,
-                          color: null == _premise
-                              ? null
-                              : theme.getPrimaryColor()),
-                      onLongPress: () async {
-                        setState(() {
-                          _premise = null;
-                          _facility = null;
-                          _floor = null;
-                        });
-                        await _load(search: _searchQuery);
-                      },
-                      onDoubleTap: () async {
-                        setState(() {
-                          _premise = null;
-                          _facility = null;
-                          _floor = null;
-                        });
-                        await _load(search: _searchQuery);
-                      },
-                      onTap: () async {
-                        await super.alertDialog(
-                            title: 'Filter by Premise',
-                            width: dialogWidth,
-                            height: dialogHeight,
-                            body: PremiseSearch(
-                                clientIds: null != _client ? [_client!.id] : [],
-                                onPremiseSelected: (entity) async {
-                                  setState(() {
-                                    _premise = entity;
-                                    _facility = null;
-                                    _floor = null;
-                                  });
-                                  await _load(search: _searchQuery);
-                                }));
-                      },
-                    ),
-                  ),
-                if (widget.enableFacilityFiler)
-                  Tooltip(
-                    message: 'filter by facility',
-                    child: InkWell(
-                      child: Icon(Icons.business,
-                          color: null == _facility
-                              ? null
-                              : theme.getPrimaryColor()),
-                      onLongPress: () async {
-                        setState(() {
-                          _facility = null;
-                          _floor = null;
-                        });
-                        await _load(search: _searchQuery);
-                      },
-                      onDoubleTap: () async {
-                        setState(() {
-                          _facility = null;
-                          _floor = null;
-                        });
-                        await _load(search: _searchQuery);
-                      },
-                      onTap: () async {
-                        await super.alertDialog(
-                            title: 'Filter by Facility',
-                            width: dialogWidth,
-                            height: dialogHeight,
-                            body: FacilitySearch(
-                                clientIds: null != _client ? [_client!.id] : [],
-                                premiseId: _premise?.id,
-                                onFacilitySelected: (entity) async {
-                                  setState(() {
-                                    _facility = entity;
-                                    _floor = null;
-                                  });
-                                  await _load(search: _searchQuery);
-                                }));
-                      },
-                    ),
-                  ),
-                if (widget.enableFloorFiler)
-                  Tooltip(
-                    message: 'filter by floor',
-                    child: InkWell(
-                      child: Icon(Icons.cabin,
-                          color:
-                              null == _floor ? null : theme.getPrimaryColor()),
-                      onLongPress: () async {
-                        setState(() {
-                          _floor = null;
-                        });
-                        await _load(search: _searchQuery);
-                      },
-                      onDoubleTap: () async {
-                        setState(() {
-                          _floor = null;
-                        });
-                        await _load(search: _searchQuery);
-                      },
-                      onTap: () async {
-                        await super.alertDialog(
-                            title: 'Filter by Floor',
-                            width: dialogWidth,
-                            height: dialogHeight,
-                            body: FloorSearch(
-                                premiseId: _premise?.id,
-                                facilityId: _facility?.id,
-                                onFloorSelected: (entity) async {
-                                  setState(() {
-                                    _floor = entity;
-                                  });
-                                  await _load(search: _searchQuery);
-                                }));
-                      },
-                    ),
-                  ),
-                if (widget.enableGroupFiler)
-                  Tooltip(
-                    message: 'filter by group',
-                    child: InkWell(
-                      child: Icon(Icons.group_add,
-                          color: null == _assetGroup
-                              ? null
-                              : theme.getPrimaryColor()),
-                      onLongPress: () async {
-                        setState(() {
-                          _assetGroup = null;
-                        });
-                        await _load(search: _searchQuery);
-                      },
-                      onDoubleTap: () async {
-                        setState(() {
-                          _assetGroup = null;
-                        });
-                        await _load(search: _searchQuery);
-                      },
-                      onTap: () async {
-                        await super.alertDialog(
-                            title: 'Filter by Group',
-                            width: dialogWidth,
-                            height: dialogHeight,
-                            body: AssetGroupSearch(
-                                clientIds: null != _client ? [_client!.id] : [],
-                                onAssetGroupSelected: (entity) async {
-                                  setState(() {
-                                    _assetGroup = entity;
-                                  });
-                                  await _load(search: _searchQuery);
-                                }));
-                      },
-                    ),
-                  ),
-                if (widget.enableEventFiler)
-                  Tooltip(
-                    message: 'filter by event',
-                    child: InkWell(
-                      child: Icon(Icons.event_rounded,
-                          color:
-                              null == _event ? null : theme.getPrimaryColor()),
-                      onLongPress: () async {
-                        setState(() {
-                          _event = null;
-                        });
-                        await _load(search: _searchQuery);
-                      },
-                      onDoubleTap: () async {
-                        setState(() {
-                          _event = null;
-                        });
-                        await _load(search: _searchQuery);
-                      },
-                      onTap: () async {
-                        await super.alertDialog(
-                            title: 'Filter by Event',
-                            width: dialogWidth,
-                            height: dialogHeight,
-                            body: EventSearch(
-                                clientIds: null != _client ? [_client!.id] : [],
-                                onEventSelected: (entity) async {
-                                  setState(() {
-                                    _event = entity;
-                                  });
-                                  await _load(search: _searchQuery);
-                                }));
-                      },
-                    ),
-                  ),
-                if (widget.enableAlarmFiler)
-                  Tooltip(
-                    message: 'filter by alarm',
-                    child: InkWell(
-                      child: Icon(Icons.doorbell_outlined,
-                          color:
-                              null == _alarm ? null : theme.getPrimaryColor()),
-                      onLongPress: () async {
-                        setState(() {
-                          _alarm = null;
-                        });
-                        await _load(search: _searchQuery);
-                      },
-                      onDoubleTap: () async {
-                        setState(() {
-                          _alarm = null;
-                        });
-                        await _load(search: _searchQuery);
-                      },
-                      onTap: () async {
-                        await super.alertDialog(
-                            title: 'Filter by Alarm',
-                            width: dialogWidth,
-                            height: dialogHeight,
-                            body: AlarmSearch(
-                                clientIds: null != _client ? [_client!.id] : [],
-                                onAlarmSelected: (entity) async {
-                                  setState(() {
-                                    _alarm = entity;
-                                  });
-                                  await _load(search: _searchQuery);
-                                }));
-                      },
-                    ),
-                  ),
-                InkWell(
-                    onTap: () {
-                      _load();
-                    },
-                    child: Icon(Icons.refresh,
-                        color: loading ? theme.getPrimaryColor() : null)),
-                if (!smallScreen)
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-                    child: SizedBox(
-                        width: 250,
-                        height: 40,
-                        child: SearchBar(
-                          hintText: widget.searchHint,
-                          controller: _controller,
-                          trailing: [const BusyIndicator()],
-                          onChanged: (val) {
-                            if (loading) {
-                              _controller.text = _searchQuery;
-                              return;
-                            }
-                            setState(() {
-                              _searchQuery = val.trim();
-                            });
-                            _load(search: _searchQuery);
-                          },
-                        )),
-                  ),
-              ],
-            ),
-          ],
-        ),
-        if (smallScreen)
-          Padding(
-            padding: const EdgeInsets.only(top: 8.0, left: 8.0, right: 8.0),
-            child: Row(
+    return Container(
+      child: Column(
+        children: [
+          if (widget.isTwin || smallScreen)
+            Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                SizedBox(
-                    height: 40,
-                    child: SearchBar(
-                      hintText: widget.searchHint,
-                      controller: _controller,
-                      trailing: [const BusyIndicator()],
-                      onChanged: (val) {
-                        setState(() {
-                          _searchQuery = val.trim();
-                        });
-                        _load();
-                      },
-                    )),
+                Wrap(
+                  spacing: smallScreen ? 8 : 16,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    if (widget.enableDataFiler)
+                      Tooltip(
+                        message: 'filter by data',
+                        child: InkWell(
+                          child: Icon(Icons.filter_alt_sharp,
+                              color:
+                                  (null != _dataFilter || null != _fieldFilter)
+                                      ? theme.getPrimaryColor()
+                                      : null),
+                          onLongPress: () async {
+                            setState(() {
+                              _dataFilter = null;
+                              _fieldFilter = null;
+                            });
+                            await _load(search: _searchQuery);
+                          },
+                          onDoubleTap: () async {
+                            setState(() {
+                              _dataFilter = null;
+                              _fieldFilter = null;
+                            });
+                            await _load(search: _searchQuery);
+                          },
+                          onTap: () async {
+                            await super.alertDialog(
+                              title: 'Filter by Data',
+                              width: dialogWidth,
+                              height: dialogHeight,
+                              body: DataSearch(
+                                  clientIds:
+                                      null != _client ? [_client!.id] : [],
+                                  onFieldFilterSelected: (entity) async {
+                                    setState(() {
+                                      _fieldFilter = entity;
+                                      _client = null;
+                                      _premise = null;
+                                      _facility = null;
+                                      _floor = null;
+                                      _assetGroup = null;
+                                      _dataFilter = null;
+                                    });
+                                    await _load(search: _searchQuery);
+                                  },
+                                  onDataFilterSelected: (entity) async {
+                                    setState(() {
+                                      _dataFilter = entity;
+                                      _client = null;
+                                      _premise = null;
+                                      _facility = null;
+                                      _floor = null;
+                                      _assetGroup = null;
+                                      _fieldFilter = null;
+                                    });
+                                    await _load(search: _searchQuery);
+                                  }),
+                            );
+                          },
+                        ),
+                      ),
+                    if (isAdmin() && widget.enableClintFiler)
+                      Tooltip(
+                        message: 'filter by clients',
+                        textStyle: theme.getStyle(),
+                        child: InkWell(
+                          child: Icon(Icons.perm_contact_cal_outlined,
+                              color: null == _client
+                                  ? null
+                                  : theme.getPrimaryColor()),
+                          onLongPress: () async {
+                            setState(() {
+                              _client = null;
+                              _premise = null;
+                              _facility = null;
+                              _floor = null;
+                              _assetGroup = null;
+                              _dataFilter = null;
+                              _fieldFilter = null;
+                            });
+                            await _load(search: _searchQuery);
+                          },
+                          onDoubleTap: () async {
+                            setState(() {
+                              _client = null;
+                              _premise = null;
+                              _facility = null;
+                              _floor = null;
+                              _assetGroup = null;
+                              _dataFilter = null;
+                              _fieldFilter = null;
+                            });
+                            await _load(search: _searchQuery);
+                          },
+                          onTap: () async {
+                            await super.alertDialog(
+                                title: 'Filter by Client',
+                                width: dialogWidth,
+                                height: dialogHeight,
+                                body: ClientSearch(
+                                    onClientSelected: (entity) async {
+                                  setState(() {
+                                    _client = entity;
+                                    _premise = null;
+                                    _facility = null;
+                                    _floor = null;
+                                    _assetGroup = null;
+                                    _dataFilter = null;
+                                    _fieldFilter = null;
+                                  });
+                                  await _load(search: _searchQuery);
+                                }));
+                          },
+                        ),
+                      ),
+                    if (widget.enablePremiseFiler)
+                      Tooltip(
+                        message: 'filter by premises',
+                        child: InkWell(
+                          child: Icon(Icons.home,
+                              color: null == _premise
+                                  ? null
+                                  : theme.getPrimaryColor()),
+                          onLongPress: () async {
+                            setState(() {
+                              _premise = null;
+                              _facility = null;
+                              _floor = null;
+                            });
+                            await _load(search: _searchQuery);
+                          },
+                          onDoubleTap: () async {
+                            setState(() {
+                              _premise = null;
+                              _facility = null;
+                              _floor = null;
+                            });
+                            await _load(search: _searchQuery);
+                          },
+                          onTap: () async {
+                            await super.alertDialog(
+                                title: 'Filter by Premise',
+                                width: dialogWidth,
+                                height: dialogHeight,
+                                body: PremiseSearch(
+                                    clientIds:
+                                        null != _client ? [_client!.id] : [],
+                                    onPremiseSelected: (entity) async {
+                                      setState(() {
+                                        _premise = entity;
+                                        _facility = null;
+                                        _floor = null;
+                                      });
+                                      await _load(search: _searchQuery);
+                                    }));
+                          },
+                        ),
+                      ),
+                    if (widget.enableFacilityFiler)
+                      Tooltip(
+                        message: 'filter by facility',
+                        child: InkWell(
+                          child: Icon(Icons.business,
+                              color: null == _facility
+                                  ? null
+                                  : theme.getPrimaryColor()),
+                          onLongPress: () async {
+                            setState(() {
+                              _facility = null;
+                              _floor = null;
+                            });
+                            await _load(search: _searchQuery);
+                          },
+                          onDoubleTap: () async {
+                            setState(() {
+                              _facility = null;
+                              _floor = null;
+                            });
+                            await _load(search: _searchQuery);
+                          },
+                          onTap: () async {
+                            await super.alertDialog(
+                                title: 'Filter by Facility',
+                                width: dialogWidth,
+                                height: dialogHeight,
+                                body: FacilitySearch(
+                                    clientIds:
+                                        null != _client ? [_client!.id] : [],
+                                    premiseId: _premise?.id,
+                                    onFacilitySelected: (entity) async {
+                                      setState(() {
+                                        _facility = entity;
+                                        _floor = null;
+                                      });
+                                      await _load(search: _searchQuery);
+                                    }));
+                          },
+                        ),
+                      ),
+                    if (widget.enableFloorFiler)
+                      Tooltip(
+                        message: 'filter by floor',
+                        child: InkWell(
+                          child: Icon(Icons.cabin,
+                              color: null == _floor
+                                  ? null
+                                  : theme.getPrimaryColor()),
+                          onLongPress: () async {
+                            setState(() {
+                              _floor = null;
+                            });
+                            await _load(search: _searchQuery);
+                          },
+                          onDoubleTap: () async {
+                            setState(() {
+                              _floor = null;
+                            });
+                            await _load(search: _searchQuery);
+                          },
+                          onTap: () async {
+                            await super.alertDialog(
+                                title: 'Filter by Floor',
+                                width: dialogWidth,
+                                height: dialogHeight,
+                                body: FloorSearch(
+                                    premiseId: _premise?.id,
+                                    facilityId: _facility?.id,
+                                    onFloorSelected: (entity) async {
+                                      setState(() {
+                                        _floor = entity;
+                                      });
+                                      await _load(search: _searchQuery);
+                                    }));
+                          },
+                        ),
+                      ),
+                    if (widget.enableGroupFiler)
+                      Tooltip(
+                        message: 'filter by group',
+                        child: InkWell(
+                          child: Icon(Icons.group_add,
+                              color: null == _assetGroup
+                                  ? null
+                                  : theme.getPrimaryColor()),
+                          onLongPress: () async {
+                            setState(() {
+                              _assetGroup = null;
+                            });
+                            await _load(search: _searchQuery);
+                          },
+                          onDoubleTap: () async {
+                            setState(() {
+                              _assetGroup = null;
+                            });
+                            await _load(search: _searchQuery);
+                          },
+                          onTap: () async {
+                            await super.alertDialog(
+                                title: 'Filter by Group',
+                                width: dialogWidth,
+                                height: dialogHeight,
+                                body: AssetGroupSearch(
+                                    clientIds:
+                                        null != _client ? [_client!.id] : [],
+                                    onAssetGroupSelected: (entity) async {
+                                      setState(() {
+                                        _assetGroup = entity;
+                                      });
+                                      await _load(search: _searchQuery);
+                                    }));
+                          },
+                        ),
+                      ),
+                    if (widget.enableEventFiler)
+                      Tooltip(
+                        message: 'filter by event',
+                        child: InkWell(
+                          child: Icon(Icons.event_rounded,
+                              color: null == _event
+                                  ? null
+                                  : theme.getPrimaryColor()),
+                          onLongPress: () async {
+                            setState(() {
+                              _event = null;
+                            });
+                            await _load(search: _searchQuery);
+                          },
+                          onDoubleTap: () async {
+                            setState(() {
+                              _event = null;
+                            });
+                            await _load(search: _searchQuery);
+                          },
+                          onTap: () async {
+                            await super.alertDialog(
+                                title: 'Filter by Event',
+                                width: dialogWidth,
+                                height: dialogHeight,
+                                body: EventSearch(
+                                    clientIds:
+                                        null != _client ? [_client!.id] : [],
+                                    onEventSelected: (entity) async {
+                                      setState(() {
+                                        _event = entity;
+                                      });
+                                      await _load(search: _searchQuery);
+                                    }));
+                          },
+                        ),
+                      ),
+                    if (widget.enableAlarmFiler)
+                      Tooltip(
+                        message: 'filter by alarm',
+                        child: InkWell(
+                          child: Icon(Icons.doorbell_outlined,
+                              color: null == _alarm
+                                  ? null
+                                  : theme.getPrimaryColor()),
+                          onLongPress: () async {
+                            setState(() {
+                              _alarm = null;
+                            });
+                            await _load(search: _searchQuery);
+                          },
+                          onDoubleTap: () async {
+                            setState(() {
+                              _alarm = null;
+                            });
+                            await _load(search: _searchQuery);
+                          },
+                          onTap: () async {
+                            await super.alertDialog(
+                                title: 'Filter by Alarm',
+                                width: dialogWidth,
+                                height: dialogHeight,
+                                body: AlarmSearch(
+                                    clientIds:
+                                        null != _client ? [_client!.id] : [],
+                                    onAlarmSelected: (entity) async {
+                                      setState(() {
+                                        _alarm = entity;
+                                      });
+                                      await _load(search: _searchQuery);
+                                    }));
+                          },
+                        ),
+                      ),
+                    InkWell(
+                        onTap: () {
+                          _load();
+                        },
+                        child: Icon(Icons.refresh,
+                            color: loading ? theme.getPrimaryColor() : null)),
+                    if (!smallScreen)
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                        child: SizedBox(
+                            width: 250,
+                            height: 40,
+                            child: SearchBar(
+                              hintText: widget.searchHint,
+                              controller: _controller,
+                              trailing: [const BusyIndicator()],
+                              onChanged: (val) {
+                                if (loading) {
+                                  _controller.text = _searchQuery;
+                                  return;
+                                }
+                                setState(() {
+                                  _searchQuery = val.trim();
+                                });
+                                _load(search: _searchQuery);
+                              },
+                            )),
+                      ),
+                  ],
+                ),
               ],
             ),
-          ),
-      ],
+          if (smallScreen)
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0, left: 8.0, right: 8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  SizedBox(
+                      height: 40,
+                      child: SearchBar(
+                        hintText: widget.searchHint,
+                        controller: _controller,
+                        trailing: [const BusyIndicator()],
+                        onChanged: (val) {
+                          setState(() {
+                            _searchQuery = val.trim();
+                          });
+                          _load();
+                        },
+                      )),
+                ],
+              ),
+            ),
+          if (!smallScreen && !widget.isTwin)
+            Padding(
+              padding: const EdgeInsets.only(top: 10),
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Colors.blue, // Border color
+                    width: 0.8, // Border width
+                  ),
+                  borderRadius: BorderRadius.circular(
+                      8.0), // Optional: to give rounded corners
+                ),
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      decoration: BoxDecoration(
+                        color: Colors.blue,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(6.0),
+                          topRight: Radius.circular(6.0),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'Filters',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            icon: Icon(
+                              _isExpanded
+                                  ? Icons.arrow_drop_up
+                                  : Icons.arrow_drop_down,
+                              color: Colors.white,
+                            ),
+                            onPressed: _togglePanel,
+                          ),
+                        ],
+                      ),
+                    ),
+                    if (_isExpanded)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10, bottom: 10),
+                        child: Column(
+                          children: [
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              crossAxisAlignment: WrapCrossAlignment.start,
+                              children: [
+                                if (widget.enableDataFiler)
+                                  GestureDetector(
+                                    onLongPress: () async {
+                                      setState(() {
+                                        _dataFilter = null;
+                                        _fieldFilter = null;
+                                      });
+                                      await _load(search: _searchQuery);
+                                    },
+                                    onDoubleTap: () async {
+                                      setState(() {
+                                        _dataFilter = null;
+                                        _fieldFilter = null;
+                                      });
+                                      await _load(search: _searchQuery);
+                                    },
+                                    child: ElevatedButton(
+                                      style: (null != _dataFilter ||
+                                              null != _fieldFilter)
+                                          ? customEnabledButtonStyle
+                                          : customButtonStyle,
+                                      child: Text(
+                                        'Filter by Data',
+                                        style: TextStyle(
+                                            color: (null != _dataFilter ||
+                                                    null != _fieldFilter)
+                                                ? Colors.white
+                                                : null),
+                                      ),
+                                      onPressed: () async {
+                                        await super.alertDialog(
+                                          title: 'Filter by Data',
+                                          width: dialogWidth,
+                                          height: dialogHeight,
+                                          body: DataSearch(
+                                            clientIds: null != _client
+                                                ? [_client!.id]
+                                                : [],
+                                            onFieldFilterSelected:
+                                                (entity) async {
+                                              setState(() {
+                                                _fieldFilter = entity;
+                                                _client = null;
+                                                _premise = null;
+                                                _facility = null;
+                                                _floor = null;
+                                                _assetGroup = null;
+                                                _dataFilter = null;
+                                              });
+                                              await _load(search: _searchQuery);
+                                            },
+                                            onDataFilterSelected:
+                                                (entity) async {
+                                              setState(() {
+                                                _dataFilter = entity;
+                                                _client = null;
+                                                _premise = null;
+                                                _facility = null;
+                                                _floor = null;
+                                                _assetGroup = null;
+                                                _fieldFilter = null;
+                                              });
+                                              await _load(search: _searchQuery);
+                                            },
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                if (isAdmin() && widget.enableClintFiler)
+                                  GestureDetector(
+                                    onLongPress: () async {
+                                      setState(() {
+                                        _client = null;
+                                        _premise = null;
+                                        _facility = null;
+                                        _floor = null;
+                                        _assetGroup = null;
+                                        _dataFilter = null;
+                                        _fieldFilter = null;
+                                      });
+                                      await _load(search: _searchQuery);
+                                    },
+                                    onDoubleTap: () async {
+                                      setState(() {
+                                        _client = null;
+                                        _premise = null;
+                                        _facility = null;
+                                        _floor = null;
+                                        _assetGroup = null;
+                                        _dataFilter = null;
+                                        _fieldFilter = null;
+                                      });
+                                      await _load(search: _searchQuery);
+                                    },
+                                    child: ElevatedButton(
+                                      style: null == _client
+                                          ? customButtonStyle
+                                          : customEnabledButtonStyle,
+                                      child: Text('Filter by Clients',
+                                          style: TextStyle(
+                                              color: null == _client
+                                                  ? null
+                                                  : Colors.white)),
+                                      onPressed: () async {
+                                        await super.alertDialog(
+                                            title: 'Filter by Client',
+                                            width: dialogWidth,
+                                            height: dialogHeight,
+                                            body: ClientSearch(onClientSelected:
+                                                (entity) async {
+                                              setState(() {
+                                                _client = entity;
+                                                _premise = null;
+                                                _facility = null;
+                                                _floor = null;
+                                                _assetGroup = null;
+                                                _dataFilter = null;
+                                                _fieldFilter = null;
+                                              });
+                                              await _load(search: _searchQuery);
+                                            }));
+                                      },
+                                    ),
+                                  ),
+                                if (widget.enablePremiseFiler)
+                                  GestureDetector(
+                                    onLongPress: () async {
+                                      setState(() {
+                                        _premise = null;
+                                        _facility = null;
+                                        _floor = null;
+                                      });
+                                      await _load(search: _searchQuery);
+                                    },
+                                    onDoubleTap: () async {
+                                      setState(() {
+                                        _premise = null;
+                                        _facility = null;
+                                        _floor = null;
+                                      });
+                                      await _load(search: _searchQuery);
+                                    },
+                                    child: ElevatedButton(
+                                      style: null == _premise
+                                          ? customButtonStyle
+                                          : customEnabledButtonStyle,
+                                      child: Text(
+                                        'Filter by Premises',
+                                        style: TextStyle(
+                                          color: null == _premise
+                                              ? null
+                                              : Colors.white,
+                                        ),
+                                      ),
+                                      onPressed: () async {
+                                        await super.alertDialog(
+                                            title: 'Filter by Premise',
+                                            width: dialogWidth,
+                                            height: dialogHeight,
+                                            body: PremiseSearch(
+                                                clientIds: null != _client
+                                                    ? [_client!.id]
+                                                    : [],
+                                                onPremiseSelected:
+                                                    (entity) async {
+                                                  setState(() {
+                                                    _premise = entity;
+                                                    _facility = null;
+                                                    _floor = null;
+                                                  });
+                                                  await _load(
+                                                      search: _searchQuery);
+                                                }));
+                                      },
+                                    ),
+                                  ),
+                                if (widget.enableFacilityFiler)
+                                  GestureDetector(
+                                    onLongPress: () async {
+                                      setState(() {
+                                        _facility = null;
+                                        _floor = null;
+                                      });
+                                      await _load(search: _searchQuery);
+                                    },
+                                    onDoubleTap: () async {
+                                      setState(() {
+                                        _facility = null;
+                                        _floor = null;
+                                      });
+                                      await _load(search: _searchQuery);
+                                    },
+                                    child: ElevatedButton(
+                                      style: null == _facility
+                                          ? customButtonStyle
+                                          : customEnabledButtonStyle,
+                                      child: Text(
+                                        'Filter by Facility',
+                                        style: TextStyle(
+                                            color: null == _facility
+                                                ? null
+                                                : Colors.white),
+                                      ),
+                                      onPressed: () async {
+                                        await super.alertDialog(
+                                            title: 'Filter by Facility',
+                                            width: dialogWidth,
+                                            height: dialogHeight,
+                                            body: FacilitySearch(
+                                                clientIds: null != _client
+                                                    ? [_client!.id]
+                                                    : [],
+                                                premiseId: _premise?.id,
+                                                onFacilitySelected:
+                                                    (entity) async {
+                                                  setState(() {
+                                                    _facility = entity;
+                                                    _floor = null;
+                                                  });
+                                                  await _load(
+                                                      search: _searchQuery);
+                                                }));
+                                      },
+                                    ),
+                                  ),
+                                if (widget.enableFloorFiler)
+                                  GestureDetector(
+                                    onLongPress: () async {
+                                      setState(() {
+                                        _floor = null;
+                                      });
+                                      await _load(search: _searchQuery);
+                                    },
+                                    onDoubleTap: () async {
+                                      setState(() {
+                                        _floor = null;
+                                      });
+                                      await _load(search: _searchQuery);
+                                    },
+                                    child: ElevatedButton(
+                                      style: null == _floor
+                                          ? customButtonStyle
+                                          : customEnabledButtonStyle,
+                                      child: Text(
+                                        'Filter by Floor',
+                                        style: TextStyle(
+                                            color: null == _floor
+                                                ? null
+                                                : Colors.white),
+                                      ),
+                                      onPressed: () async {
+                                        await super.alertDialog(
+                                            title: 'Filter by Floor',
+                                            width: dialogWidth,
+                                            height: dialogHeight,
+                                            body: FloorSearch(
+                                                premiseId: _premise?.id,
+                                                facilityId: _facility?.id,
+                                                onFloorSelected:
+                                                    (entity) async {
+                                                  setState(() {
+                                                    _floor = entity;
+                                                  });
+                                                  await _load(
+                                                      search: _searchQuery);
+                                                }));
+                                      },
+                                    ),
+                                  ),
+                                if (widget.enableGroupFiler)
+                                  GestureDetector(
+                                    onLongPress: () async {
+                                      setState(() {
+                                        _assetGroup = null;
+                                      });
+                                      await _load(search: _searchQuery);
+                                    },
+                                    onDoubleTap: () async {
+                                      setState(() {
+                                        _assetGroup = null;
+                                      });
+                                      await _load(search: _searchQuery);
+                                    },
+                                    child: ElevatedButton(
+                                      style: null == _assetGroup
+                                          ? customButtonStyle
+                                          : customEnabledButtonStyle,
+                                      child: Text(
+                                        'Filter by Group',
+                                        style: TextStyle(
+                                            color: null == _assetGroup
+                                                ? null
+                                                : Colors.white),
+                                      ),
+                                      onPressed: () async {
+                                        await super.alertDialog(
+                                            title: 'Filter by Group',
+                                            width: dialogWidth,
+                                            height: dialogHeight,
+                                            body: AssetGroupSearch(
+                                                clientIds: null != _client
+                                                    ? [_client!.id]
+                                                    : [],
+                                                onAssetGroupSelected:
+                                                    (entity) async {
+                                                  setState(() {
+                                                    _assetGroup = entity;
+                                                  });
+                                                  await _load(
+                                                      search: _searchQuery);
+                                                }));
+                                      },
+                                    ),
+                                  ),
+                                if (widget.enableEventFiler)
+                                  GestureDetector(
+                                    onLongPress: () async {
+                                      setState(() {
+                                        _event = null;
+                                      });
+                                      await _load(search: _searchQuery);
+                                    },
+                                    onDoubleTap: () async {
+                                      setState(() {
+                                        _event = null;
+                                      });
+                                      await _load(search: _searchQuery);
+                                    },
+                                    child: ElevatedButton(
+                                      style: null == _event
+                                          ? customButtonStyle
+                                          : customEnabledButtonStyle,
+                                      child: Text(
+                                        'Filter by Event',
+                                        style: TextStyle(
+                                            color: null == _event
+                                                ? null
+                                                : Colors.white),
+                                      ),
+                                      onPressed: () async {
+                                        await super.alertDialog(
+                                            title: 'Filter by Event',
+                                            width: dialogWidth,
+                                            height: dialogHeight,
+                                            body: EventSearch(
+                                                clientIds: null != _client
+                                                    ? [_client!.id]
+                                                    : [],
+                                                onEventSelected:
+                                                    (entity) async {
+                                                  setState(() {
+                                                    _event = entity;
+                                                  });
+                                                  await _load(
+                                                      search: _searchQuery);
+                                                }));
+                                      },
+                                    ),
+                                  ),
+                                if (widget.enableAlarmFiler)
+                                  GestureDetector(
+                                    onLongPress: () async {
+                                      setState(() {
+                                        _alarm = null;
+                                      });
+                                      await _load(search: _searchQuery);
+                                    },
+                                    onDoubleTap: () async {
+                                      setState(() {
+                                        _alarm = null;
+                                      });
+                                      await _load(search: _searchQuery);
+                                    },
+                                    child: ElevatedButton(
+                                      style: null == _alarm
+                                          ? customButtonStyle
+                                          : customEnabledButtonStyle,
+                                      child: Text(
+                                        'Filter by Alarm',
+                                        style: TextStyle(
+                                            color: null == _alarm
+                                                ? null
+                                                : Colors.white),
+                                      ),
+                                      onPressed: () async {
+                                        await super.alertDialog(
+                                            title: 'Filter by Alarm',
+                                            width: dialogWidth,
+                                            height: dialogHeight,
+                                            body: AlarmSearch(
+                                                clientIds: null != _client
+                                                    ? [_client!.id]
+                                                    : [],
+                                                onAlarmSelected:
+                                                    (entity) async {
+                                                  setState(() {
+                                                    _alarm = entity;
+                                                  });
+                                                  await _load(
+                                                      search: _searchQuery);
+                                                }));
+                                      },
+                                    ),
+                                  ),
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 5),
+                                  child: InkWell(
+                                      onTap: () {
+                                        _load();
+                                      },
+                                      child: Icon(Icons.refresh,
+                                          color: loading
+                                              ? theme.getPrimaryColor()
+                                              : null)),
+                                ),
+                                if (!smallScreen)
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        left: 8.0, right: 8.0),
+                                    child: SizedBox(
+                                        width: 250,
+                                        height: 40,
+                                        child: SearchBar(
+                                          hintText: widget.searchHint,
+                                          controller: _controller,
+                                          trailing: [const BusyIndicator()],
+                                          onChanged: (val) {
+                                            if (loading) {
+                                              _controller.text = _searchQuery;
+                                              return;
+                                            }
+                                            setState(() {
+                                              _searchQuery = val.trim();
+                                            });
+                                            _load(search: _searchQuery);
+                                          },
+                                        )),
+                                  ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      )
+                  ],
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 
@@ -553,22 +1103,86 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                           height: 100,
                           child: CircularProgressIndicator()),
                     if (!loading)
-                      Text(
-                        'No Data',
-                        style: theme.getStyle().copyWith(fontSize: 20),
+                      Center(
+                        child: Text(
+                          'No Data',
+                          style: theme.getStyle().copyWith(fontSize: 20),
+                        ),
                       ),
                   ],
                 ),
               ),
             if (!loading && _children.isNotEmpty)
-              Flexible(
-                child: SingleChildScrollView(
-                  child: Wrap(
-                    direction: Axis.vertical,
-                    children: _children,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Tooltip(
+                    message: "Grid view",
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: _isTableView
+                            ? Colors.blue[200]
+                            : Colors.transparent,
+                        shape: BoxShape.circle,
+                      ),
+                      child: IconButton(
+                        icon: Icon(
+                          Icons.grid_on,
+                          color: _isTableView
+                              ? Colors.black
+                              : theme.getPrimaryColor(),
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _isMapView = false;
+                            _isTableView = true;
+                          });
+                          _buildChildren();
+                        },
+                      ),
+                    ),
                   ),
+                  divider(horizontal: true),
+                  Tooltip(
+                    message: "Map view",
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: !_isTableView
+                            ? Colors.blue[200]
+                            : Colors.transparent,
+                        shape: BoxShape.circle,
+                      ),
+                      child: IconButton(
+                        icon: Icon(
+                          Icons.location_on,
+                          color: !_isTableView
+                              ? Colors.black
+                              : theme.getPrimaryColor(),
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _isMapView = true;
+                            _isTableView = false;
+                          });
+                          _buildChildren();
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            Flexible(
+              child: SingleChildScrollView(
+                child: Wrap(
+                  alignment: WrapAlignment.center,
+                  crossAxisAlignment: _data.length == 0
+                      ? WrapCrossAlignment.center
+                      : WrapCrossAlignment.start,
+                  direction: _isTableView ? Axis.vertical : Axis.horizontal,
+                  children: _children,
                 ),
               ),
+            ),
           ],
         ));
   }
@@ -586,88 +1200,119 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
             BoxDecoration(border: Border.all(color: theme.getPrimaryColor())),
       ),
     ));
-
+    List<tapi.GeoLocation> geoLocationList = [];
     for (tapi.DeviceData dd in _data) {
+      if (dd.geolocation != null) {
+        geoLocationList.add(dd.geolocation!);
+      }
+
       refresh(sync: () {
-        _children.add(SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              if (smallScreen)
-                Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
-                  child: AssetActionWidget(
-                    direction: Axis.vertical,
+        if (_isTableView) {
+          _children.add(SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                if (smallScreen)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: AssetActionWidget(
+                      direction: Axis.vertical,
+                      models: _models,
+                      deviceData: dd,
+                      onDeviceTapped: widget.onDeviceTapped,
+                      onAssetModelTapped: widget.onAssetModelTapped,
+                      onDeviceModelTapped: widget.onDeviceModelTapped,
+                      onTimeSeriesDoubleTapped: widget.onAnalyticsDoubleTapped,
+                      onTimeSeriesTapped: widget.onAnalyticsTapped,
+                    ),
+                  ),
+                SizedBox(
+                  width: colWidth,
+                  child: AssetInfoWidget(
                     models: _models,
                     deviceData: dd,
                     onDeviceTapped: widget.onDeviceTapped,
+                    onClientTapped: widget.onClientTapped,
+                    onAssetTapped: widget.onAssetTapped,
+                    onFacilityTapped: widget.onFacilityTapped,
+                    onPremiseTapped: widget.onPremiseTapped,
+                    onFloorTapped: widget.onFloorTapped,
                     onAssetModelTapped: widget.onAssetModelTapped,
                     onDeviceModelTapped: widget.onDeviceModelTapped,
                     onTimeSeriesDoubleTapped: widget.onAnalyticsDoubleTapped,
                     onTimeSeriesTapped: widget.onAnalyticsTapped,
                   ),
                 ),
-              SizedBox(
-                width: colWidth,
-                child: AssetInfoWidget(
+                divider(horizontal: true),
+                SizedBox(
+                  width: colWidth,
+                  child: LocationInfoWidget(
+                    deviceData: dd,
+                    onClientTapped: widget.onClientTapped,
+                    onFacilityTapped: widget.onFacilityTapped,
+                    onPremiseTapped: widget.onPremiseTapped,
+                    onFloorTapped: widget.onFloorTapped,
+                  ),
+                ),
+                divider(horizontal: true),
+                DeviceFieldWidget(
+                  deviceData: dd,
                   models: _models,
-                  deviceData: dd,
-                  onDeviceTapped: widget.onDeviceTapped,
-                  onClientTapped: widget.onClientTapped,
-                  onAssetTapped: widget.onAssetTapped,
-                  onFacilityTapped: widget.onFacilityTapped,
-                  onPremiseTapped: widget.onPremiseTapped,
-                  onFloorTapped: widget.onFloorTapped,
-                  onAssetModelTapped: widget.onAssetModelTapped,
-                  onDeviceModelTapped: widget.onDeviceModelTapped,
-                  onTimeSeriesDoubleTapped: widget.onAnalyticsDoubleTapped,
-                  onTimeSeriesTapped: widget.onAnalyticsTapped,
+                  onDeviceAnalyticsTapped: widget.onDeviceAnalyticsTapped,
+                  onDeviceAnalyticsDoubleTapped:
+                      widget.onDeviceAnalyticsDoubleTapped,
                 ),
-              ),
-              divider(horizontal: true),
-              SizedBox(
-                width: colWidth,
-                child: LocationInfoWidget(
-                  deviceData: dd,
-                  onClientTapped: widget.onClientTapped,
-                  onFacilityTapped: widget.onFacilityTapped,
-                  onPremiseTapped: widget.onPremiseTapped,
-                  onFloorTapped: widget.onFloorTapped,
-                ),
-              ),
-              divider(horizontal: true),
-              DeviceFieldWidget(
-                deviceData: dd,
-                models: _models,
-                onDeviceAnalyticsTapped: widget.onDeviceAnalyticsTapped,
-                onDeviceAnalyticsDoubleTapped:
-                    widget.onDeviceAnalyticsDoubleTapped,
-              ),
-            ],
-          ),
-        ));
+              ],
+            ),
+          ));
 
-        _children.add(Padding(
-          padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-          child: Container(
-            width: MediaQuery.of(context).size.width - 10,
-            height: 1,
-            decoration: BoxDecoration(
-                border: Border.all(color: theme.getPrimaryColor())),
-          ),
-        ));
+          _children.add(Padding(
+            padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+            child: Container(
+              width: MediaQuery.of(context).size.width - 10,
+              height: 1,
+              decoration: BoxDecoration(
+                  border: Border.all(color: theme.getPrimaryColor())),
+            ),
+          ));
+        }
       });
     }
 
-    if (_data.isEmpty) {
+    if (_isMapView) {
+      _children.add(geoLocationList.isNotEmpty
+          ? SizedBox(
+              width: MediaQuery.of(context).size.width,
+              height: widget.isTwin
+                  ? MediaQuery.of(context).size.height
+                  : MediaQuery.of(context).size.height / 1.6,
+              child: GoogleMapMultiWidget(
+                geoLocationList: geoLocationList,
+                isTwin: widget.isTwin,
+                deviceDataList: _data,
+                onAssetTapped: widget.onAssetTapped,
+                onDeviceTapped: widget.onDeviceTapped,
+              ),
+            )
+          : Center(
+              child: Text(
+                'No Data',
+                style: theme.getStyle().copyWith(fontSize: 20),
+              ),
+            ));
+    }
+
+    if ((_data.isEmpty && !loading && _isTableView)) {
       _children.add(Row(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            'No Data',
-            style: theme.getStyle().copyWith(fontSize: 20),
+          Center(
+            child: Text(
+              'No Data',
+              style: theme.getStyle().copyWith(fontSize: 20),
+            ),
           ),
         ],
       ));
@@ -743,7 +1388,7 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
             },
           if (widget.assetModelIds.isNotEmpty)
             {
-              "terms": {"assetModelId": widget.assetModelIds}
+              "terms": {"assetModelId.keyword": widget.assetModelIds}
             },
           if (widget.assetIds.isNotEmpty ||
               null != _assetGroup && _assetGroup!.assetIds.isNotEmpty)
@@ -826,5 +1471,36 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
     _buildChildren();
 
     refresh();
+  }
+
+  Future<void> _showLocationDialog(longitude, latitude) async {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text('Preview Location'),
+              IconButton(
+                icon: Icon(Icons.close),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          ),
+          content: SizedBox(
+            width: 1000,
+            child: GoogleMapWidget(
+              longitude: longitude,
+              latitude: latitude,
+              viewMode: false,
+            ),
+          ),
+        );
+      },
+    );
   }
 }

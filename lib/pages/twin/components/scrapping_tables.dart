@@ -34,6 +34,7 @@ class _ScrappingTablesState extends BaseState<ScrappingTables> {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        divider(),
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
@@ -88,11 +89,12 @@ class _ScrappingTablesState extends BaseState<ScrappingTables> {
             ],
           ),
         if (!loading && _cards.isNotEmpty)
-          SingleChildScrollView(
-            child: Wrap(
-              spacing: 0,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: _cards,
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: _cards,
+              ),
             ),
           ),
       ],
@@ -114,8 +116,8 @@ class _ScrappingTablesState extends BaseState<ScrappingTables> {
           contentVerticalPadding: 0,
           headerBorderColor: theme.getPrimaryColor(),
           headerBorderColorOpened: theme.getPrimaryColor(),
-          headerBackgroundColorOpened: theme.getSecondaryColor(),
-          headerBackgroundColor: theme.getSecondaryColor(),
+          headerBackgroundColorOpened: theme.getPrimaryColor(),
+          headerBackgroundColor: theme.getPrimaryColor(),
           contentBackgroundColor: Colors.white,
           contentBorderColor: theme.getPrimaryColor(),
           headerBorderRadius: 1.2,
@@ -136,6 +138,7 @@ class _ScrappingTablesState extends BaseState<ScrappingTables> {
                   Text(
                     e.name,
                     style: theme.getStyle().copyWith(
+                          color: Colors.white,
                           fontWeight: FontWeight.bold,
                         ),
                   ),

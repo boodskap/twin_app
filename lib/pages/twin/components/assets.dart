@@ -59,6 +59,7 @@ class _AssetsState extends BaseState<Assets> {
             SizedBox(
               width: 250,
               child: PremiseDropdown(
+                style: theme.getStyle(),
                 key: Key(const Uuid().v4()),
                 selectedItem: _selectedPremise?.id,
                 onPremiseSelected: (e) {
@@ -81,6 +82,7 @@ class _AssetsState extends BaseState<Assets> {
             SizedBox(
               width: 250,
               child: FacilityDropdown(
+                style: theme.getStyle(),
                 key: Key(const Uuid().v4()),
                 selectedItem: _selectedFacility?.id,
                 selectedPremise: _selectedPremise?.id,
@@ -101,6 +103,7 @@ class _AssetsState extends BaseState<Assets> {
             SizedBox(
               width: 250,
               child: FloorDropdown(
+                style: theme.getStyle(),
                 key: Key(const Uuid().v4()),
                 selectedItem: _selectedFloor?.id,
                 selectedPremise: _selectedPremise?.id,
@@ -121,10 +124,7 @@ class _AssetsState extends BaseState<Assets> {
                 Icons.add,
                 color: Colors.white,
               ),
-              onPressed: (_selectedPremise != null &&
-                      _selectedFacility != null &&
-                      _selectedFloor != null &&
-                      canCreate())
+              onPressed: (canCreate())
                   ? () {
                       _create();
                     }
@@ -292,34 +292,48 @@ class _AssetsState extends BaseState<Assets> {
         : null;
     await _getBasicInfo(
       context,
-      'New Floor',
+      'New Asset',
       onPressed: (name, desc, t) async {
         List<String> tags = [];
-        if (null != t) {
+        if (t != null) {
           tags = t.trim().split(' ');
         }
+
+        tapi.AssetInfo assetInfo = tapi.AssetInfo(
+          assetModelId: _selectedAssetModel!.id,
+          name: name,
+          description: desc,
+          tags: tags,
+          clientIds: clientIds,
+        );
+
+        if (_selectedPremise != null) {
+          assetInfo = assetInfo.copyWith(premiseId: _selectedPremise!.id);
+        }
+        if (_selectedFacility != null) {
+          assetInfo = assetInfo.copyWith(
+            facilityId: _selectedFacility!.id,
+          );
+        }
+        if (_selectedFloor != null) {
+          assetInfo = assetInfo.copyWith(
+            floorId: _selectedFloor!.id,
+          );
+        }
+
         var mRes = await TwinnedSession.instance.twin.createAsset(
           apikey: TwinnedSession.instance.authToken,
-          body: tapi.AssetInfo(
-            premiseId: _selectedPremise!.id,
-            facilityId: _selectedFacility!.id,
-            floorId: _selectedFloor!.id,
-            assetModelId: _selectedAssetModel!.id,
-            name: name,
-            description: desc,
-            tags: tags,
-            roles: _selectedFacility!.roles,
-            clientIds: clientIds,
-          ),
+          body: assetInfo,
         );
+        print(mRes);
         if (validateResponse(mRes)) {
           await _edit(mRes.body!.entity!);
-          alert("Floor ${mRes.body!.entity!.name}", "Saved Successfully!");
+          alert("Asset ${mRes.body!.entity!.name}", "Saved Successfully!");
         }
       },
     );
     loading = false;
-    refresh();
+    // refresh();
   }
 
   Future<void> _getBasicInfo(

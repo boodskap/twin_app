@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/pages/twin/components/widgets/database_content_page.dart';
+import 'package:twin_app/pages/twin/components/widgets/installation_database_snippet.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
-import 'package:twin_app/widgets/commons/secondary_button.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:twin_commons/core/twin_image_helper.dart';
@@ -37,89 +37,92 @@ class _InstallationDatabaseState extends BaseState<InstallationDatabase> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const SizedBox(height: 15),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            BusyIndicator(),
-            IconButton(
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          const SizedBox(height: 15),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              BusyIndicator(),
+              IconButton(
                 onPressed: () {
                   _load();
                 },
-                icon: Icon(Icons.refresh)),
-            divider(horizontal: true),
-            SizedBox(
-              width: 250,
-              child: DeviceModelDropdown(
-                  selectedItem: _selectedDeviceModel?.id,
-                  onDeviceModelSelected: (e) {
-                    setState(() {
-                      _selectedDeviceModel = e;
-                    });
-                    _load();
-                  }),
-            ),
-            divider(horizontal: true),
-            PrimaryButton(
-              labelKey: 'Create New',
-              leading: Icon(
-                Icons.add,
-                color: Colors.white,
+                icon: Icon(Icons.refresh),
               ),
-              onPressed: (canCreate() && _selectedDeviceModel != null)
-                  ? () {
-                      _create();
-                    }
-                  : null,
-            ),
-            divider(horizontal: true),
-            SizedBox(
-                height: 40,
+              divider(horizontal: true),
+              SizedBox(
                 width: 250,
-                child: SearchBar(
-                  leading: Icon(Icons.search),
-                  hintText: 'Search installation database',
-                  onChanged: (val) {
-                    _search = val.trim();
-                    _load();
-                  },
-                )),
-          ],
-        ),
-        divider(),
-        if (loading)
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'Loading...',
-                style: theme.getStyle(),
+                child: DeviceModelDropdown(
+                    style: theme.getStyle(),
+                    selectedItem: _selectedDeviceModel?.id,
+                    onDeviceModelSelected: (e) {
+                      setState(() {
+                        _selectedDeviceModel = e;
+                      });
+                      _load();
+                    }),
               ),
+              divider(horizontal: true),
+              PrimaryButton(
+                labelKey: 'Create New',
+                leading: Icon(
+                  Icons.add,
+                  color: Colors.white,
+                ),
+                onPressed: (canCreate() && _selectedDeviceModel != null)
+                    ? () =>
+                        _addEditDeviceDialog(modelId: _selectedDeviceModel!.id)
+                    : null,
+              ),
+              divider(horizontal: true),
+              SizedBox(
+                  height: 40,
+                  width: 250,
+                  child: SearchBar(
+                    leading: Icon(Icons.search),
+                    hintText: 'Search installation database',
+                    onChanged: (val) {
+                      _search = val.trim();
+                      _load();
+                    },
+                  )),
             ],
           ),
-        if (!loading && _cards.isEmpty)
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'No installations found',
-                style: theme.getStyle(),
-              ),
-            ],
-          ),
-        if (!loading && _cards.isNotEmpty)
-          Column(
-            children: [
-              Wrap(
-                spacing: 8,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: _cards,
-              ),
-            ],
-          ),
-      ],
+          divider(),
+          if (loading)
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Loading...',
+                  style: theme.getStyle(),
+                ),
+              ],
+            ),
+          if (!loading && _cards.isEmpty)
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'No installations found',
+                  style: theme.getStyle(),
+                ),
+              ],
+            ),
+          if (!loading && _cards.isNotEmpty)
+            Column(
+              children: [
+                Wrap(
+                  spacing: 8,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: _cards,
+                ),
+              ],
+            ),
+        ],
+      ),
     );
   }
 
@@ -144,17 +147,6 @@ class _InstallationDatabaseState extends BaseState<InstallationDatabase> {
           child: Stack(
             children: [
               Align(
-                alignment: Alignment.topLeft,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    e.name,
-                    style:
-                        theme.getStyle().copyWith(fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
-              Align(
                 alignment: Alignment.topRight,
                 child: Padding(
                   padding: const EdgeInsets.only(right: 8.0, top: 8.0),
@@ -162,20 +154,22 @@ class _InstallationDatabaseState extends BaseState<InstallationDatabase> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       InkWell(
-                          onTap: _canEdit
-                              ? () {
-                                  _edit(e);
-                                }
-                              : null,
-                          child: Tooltip(
-                              message:
-                                  _canEdit ? "Update" : "No Permission to Edit",
-                              child: Icon(
-                                Icons.edit,
-                                color: _canEdit
-                                    ? theme.getPrimaryColor()
-                                    : Colors.grey,
-                              ))),
+                        onTap: _canEdit
+                            ? () {
+                                _addEditDeviceDialog(device: e);
+                              }
+                            : null,
+                        child: Tooltip(
+                          message:
+                              _canEdit ? "Update" : "No Permission to Edit",
+                          child: Icon(
+                            Icons.edit,
+                            color: _canEdit
+                                ? theme.getPrimaryColor()
+                                : Colors.grey,
+                          ),
+                        ),
+                      ),
                       InkWell(
                         onTap: _canEdit
                             ? () {
@@ -197,13 +191,38 @@ class _InstallationDatabaseState extends BaseState<InstallationDatabase> {
                   ),
                 ),
               ),
-              if (null != e.images && e.images!.isNotEmpty)
-                Align(
-                  alignment: Alignment.center,
-                  child: TwinImageHelper.getCachedImage(
-                      e.domainKey, e.images!.first,
-                      width: width / 2, height: width / 2),
-                )
+              Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Align(
+                    alignment: Alignment.center,
+                    child: (null != e.images && e.images!.isNotEmpty)
+                        ? TwinImageHelper.getCachedImage(
+                            e.domainKey,
+                            e.images!.first,
+                            width: width / 2,
+                            height: width / 2,
+                          )
+                        : Icon(
+                            Icons.image,
+                            size: width / 2.5,
+                          ),
+                  ),
+                  Text(
+                    e.name,
+                    style: theme.getStyle().copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                  if (e.name != e.deviceId)
+                    Text(
+                      e.deviceId,
+                      style: theme.getStyle().copyWith(),
+                    ),
+                  divider(),
+                ],
+              ),
             ],
           ),
         ),
@@ -220,127 +239,20 @@ class _InstallationDatabaseState extends BaseState<InstallationDatabase> {
     });
   }
 
-  Future _create() async {
-    if (loading) return;
-    loading = true;
-    await _getDeviceInfo(context, 'New Device',
-        onPressed: (name, desc, hwId) async {
-      var mRes = await TwinnedSession.instance.twin.createDevice(
-          apikey: TwinnedSession.instance.authToken,
-          body: tapi.DeviceInfo(
-            name: name,
-            description: desc,
-            tags: [],
-            modelId: _selectedDeviceModel!.id,
-            deviceId: hwId!,
-            images: _selectedDeviceModel!.images,
-            selectedImage: _selectedDeviceModel!.selectedImage,
-            banners: _selectedDeviceModel!.banners,
-            selectedBanner: _selectedDeviceModel!.selectedBanner,
-            movable: _selectedDeviceModel!.movable,
-            metadata: _selectedDeviceModel!.metadata,
-            icon: _selectedDeviceModel!.icon,
-          ));
-      if (validateResponse(mRes)) {
-        await _edit(mRes.body!.entity!);
-      }
-    });
-    loading = false;
-    refresh();
-  }
-
-  Future<void> _getDeviceInfo(BuildContext context, String title,
-      {required BasicInfoCallback onPressed}) async {
-    String? nameText = _selectedDeviceModel?.name;
-    String? descText = '';
-    String? hwText = '';
-    TextEditingController nameController = TextEditingController();
-    nameController.text = nameText ?? '';
-    return showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) {
-          return AlertDialog(
-            title: Text(title),
-            content: SizedBox(
-              width: 500,
-              height: 150,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  TextField(
-                    style: theme.getStyle(),
-                    controller: nameController,
-                    onChanged: (value) {
-                      setState(() {
-                        nameText = value;
-                      });
-                    },
-                    decoration: InputDecoration(
-                        hintText: 'Name',
-                        hintStyle: theme.getStyle(),
-                        labelStyle: theme.getStyle()),
-                  ),
-                  TextField(
-                    style: theme.getStyle(),
-                    onChanged: (value) {
-                      setState(() {
-                        descText = value;
-                      });
-                    },
-                    decoration: InputDecoration(
-                        hintText: 'Description',
-                        hintStyle: theme.getStyle(),
-                        labelStyle: theme.getStyle()),
-                  ),
-                  TextField(
-                    style: theme.getStyle(),
-                    onChanged: (value) {
-                      setState(() {
-                        hwText = value;
-                      });
-                    },
-                    decoration: InputDecoration(
-                        hintText: 'Hardware ID',
-                        hintStyle: theme.getStyle(),
-                        labelStyle: theme.getStyle()),
-                  ),
-                ],
-              ),
-            ),
-            actions: <Widget>[
-              SecondaryButton(
-                labelKey: "Cancel",
-                onPressed: () {
-                  setState(() {
-                    Navigator.pop(context);
-                  });
-                },
-              ),
-              PrimaryButton(
-                minimumSize: Size(130, 50),
-                labelKey: "Ok",
-                onPressed: () {
-                  if (nameText!.length < 3) {
-                    alert('Invalid',
-                        'Name is required and should be minimum 3 characters');
-                    return;
-                  }
-                  if (hwText!.length < 3) {
-                    alert('Invalid',
-                        'Hardware ID is required and should be minimum 3 characters');
-                    return;
-                  }
-                  setState(() {
-                    onPressed(nameText!, descText, hwText);
-                    Navigator.pop(context);
-                  });
-                },
-              ),
-            ],
-          );
-        });
+  void _addEditDeviceDialog({
+    tapi.Device? device,
+    String? modelId,
+  }) async {
+    await super.alertDialog(
+      title: null == device ? 'Add New Device' : 'Update Device',
+      body: InstallationDatabaseSnippet(
+        device: device,
+        modelId: modelId,
+      ),
+      width: 750,
+      height: MediaQuery.of(context).size.height - 150,
+    );
+    _load();
   }
 
   Future _edit(tapi.Device e) async {

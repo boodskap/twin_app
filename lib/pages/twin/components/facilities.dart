@@ -52,6 +52,7 @@ class _FacilitiesState extends BaseState<Facilities> {
             SizedBox(
               width: 250,
               child: PremiseDropdown(
+                  style: theme.getStyle(),
                   selectedItem: _selectedPremise?.id,
                   onPremiseSelected: (e) {
                     setState(() {
@@ -68,7 +69,7 @@ class _FacilitiesState extends BaseState<Facilities> {
                   Icons.add,
                   color: Colors.white,
                 ),
-                onPressed: (_selectedPremise != null && canCreate())
+                onPressed: (canCreate())
                     ? () {
                         _addEditFacilityDialog();
                       }
@@ -113,6 +114,7 @@ class _FacilitiesState extends BaseState<Facilities> {
           ),
         if (!loading && _cards.isNotEmpty)
           SingleChildScrollView(
+            scrollDirection: Axis.vertical,
             child: Wrap(
               spacing: 8,
               crossAxisAlignment: WrapCrossAlignment.center,
@@ -228,18 +230,20 @@ class _FacilitiesState extends BaseState<Facilities> {
 
   void _addEditFacilityDialog({tapi.Facility? facility}) async {
     var res;
-    if (facility != null) {
+    tapi.Premise? selectedPremise;
+
+    if (facility != null && _selectedPremise != null) {
       res = await TwinnedSession.instance.twin.getPremise(
         premiseId: facility.premiseId,
         apikey: TwinnedSession.instance.authToken,
       );
+      selectedPremise = res.body?.entity;
     }
 
     await super.alertDialog(
       title: facility == null ? 'Add New Facility' : 'Update Facility',
       body: FacilitySnippet(
-        selectedPremise:
-            facility == null ? _selectedPremise! : res.body!.entity!,
+        selectedPremise: selectedPremise ?? _selectedPremise,
         facility: facility,
       ),
       width: 750,

@@ -52,6 +52,7 @@ class _FloorsState extends BaseState<Floors> {
             SizedBox(
               width: 250,
               child: PremiseDropdown(
+                style: theme.getStyle(),
                 key: Key(const Uuid().v4()),
                 selectedItem: _selectedPremise?.id,
                 onPremiseSelected: (e) {
@@ -72,6 +73,7 @@ class _FloorsState extends BaseState<Floors> {
             SizedBox(
               width: 250,
               child: FacilityDropdown(
+                style: theme.getStyle(),
                 key: Key(const Uuid().v4()),
                 selectedItem: _selectedFacility?.id,
                 selectedPremise: _selectedPremise?.id,
@@ -90,11 +92,7 @@ class _FloorsState extends BaseState<Floors> {
                 Icons.add,
                 color: Colors.white,
               ),
-              onPressed: (_selectedPremise != null &&
-                      _selectedFacility != null &&
-                      canCreate())
-                  ? _addEditFloorDialog
-                  : null,
+              onPressed: (canCreate()) ? _addEditFloorDialog : null,
             ),
             divider(horizontal: true),
             SizedBox(
@@ -134,7 +132,7 @@ class _FloorsState extends BaseState<Floors> {
           ),
         if (!loading && _cards.isNotEmpty)
           SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
+            scrollDirection: Axis.vertical,
             child: Wrap(
               spacing: 8,
               crossAxisAlignment: WrapCrossAlignment.center,
@@ -243,31 +241,35 @@ class _FloorsState extends BaseState<Floors> {
   }
 
   void _addEditFloorDialog({tapi.Floor? floor}) async {
-    var pRes;
-    if (floor != null) {
-      pRes = await TwinnedSession.instance.twin.getPremise(
+    tapi.Premise? selectedPremise;
+    tapi.Facility? selectedFacility;
+
+    if (floor != null &&( _selectedPremise != null &&
+        _selectedFacility != null)) {
+      var pRes = await TwinnedSession.instance.twin.getPremise(
         premiseId: floor.premiseId,
         apikey: TwinnedSession.instance.authToken,
       );
-    }
-    var fRes;
-    if (floor != null) {
-      fRes = await TwinnedSession.instance.twin.getFacility(
+      selectedPremise = pRes.body?.entity;
+
+      var fRes = await TwinnedSession.instance.twin.getFacility(
         facilityId: floor.facilityId,
         apikey: TwinnedSession.instance.authToken,
       );
+      selectedFacility = fRes.body?.entity;
     }
+
     await super.alertDialog(
-      title: null == floor ? 'Add New Floor' : 'Update Floor',
+      title: floor == null ? 'Add New Floor' : 'Update Floor',
       body: FloorSnippet(
-        selectedPremise: floor == null ? _selectedPremise : pRes.body!.entity!,
-        selectedFacility:
-            floor == null ? _selectedFacility : fRes.body!.entity!,
+        selectedPremise: selectedPremise ?? _selectedPremise,
+        selectedFacility: selectedFacility ?? _selectedFacility,
         floor: floor,
       ),
       width: 750,
       height: MediaQuery.of(context).size.height - 150,
     );
+
     _load();
   }
 
