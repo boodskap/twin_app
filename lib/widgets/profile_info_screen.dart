@@ -208,7 +208,7 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
                                           children: [
                                             Expanded(
                                               child: Text(
-                                                "name",
+                                                "Name",
                                                 style: theme
                                                     .getStyle()
                                                     .copyWith(
@@ -219,7 +219,7 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
                                             ),
                                             Expanded(
                                                 child: Text(
-                                              _nameController.text,
+                                              toCamelCase(_nameController.text),
                                               style: theme.getStyle().copyWith(
                                                   fontWeight: FontWeight.bold,
                                                   fontSize: 16),
@@ -414,6 +414,14 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
     return firstLetter;
   }
 
+  String toCamelCase(String text) {
+    return text.split(' ').map((word) {
+      return word.isNotEmpty
+          ? '${word[0].toUpperCase()}${word.substring(1).toLowerCase()}'
+          : '';
+    }).join(' ');
+  }
+
   Future<void> updateProfile() async {
     if (loading) return;
     loading = true;
@@ -424,7 +432,7 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
         apikey: TwinnedSession.instance.authToken,
         body: TwinUserInfo(
           email: _emailController.text,
-          name: _nameController.text,
+          name: toCamelCase(_nameController.text),
           address: _addressController.text,
           phone: _phoneController.text,
           description: _descController.text,
