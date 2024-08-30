@@ -460,7 +460,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
             ),
           if (session.orgs.length > 1) const SizedBox(width: 8),
           Text(
-            user!.name,
+            toCamelCase(user!.name),
             style: session.theme.getStyle().copyWith(color: Colors.white),
           ),
           IconButton(
@@ -600,6 +600,14 @@ class HomeScreenState extends BaseState<HomeScreen> {
     }
 
     return widget;
+  }
+
+  String toCamelCase(String text) {
+    return text.split(' ').map((word) {
+      return word.isNotEmpty
+          ? '${word[0].toUpperCase()}${word.substring(1).toLowerCase()}'
+          : '';
+    }).join(' ');
   }
 
   void showScreen(dynamic id) async {
