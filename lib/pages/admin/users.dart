@@ -8,6 +8,7 @@ import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:twin_commons/core/twin_image_helper.dart';
 import 'package:twin_commons/core/twinned_session.dart';
 import 'package:twinned_api/twinned_api.dart' as tapi;
+import 'package:twin_app/widgets/country_codes.dart';
 
 var userdefaultImage = Center(
   child: Image.asset(
@@ -243,6 +244,10 @@ class _UsersState extends BaseState<Users> {
     if (user.platformRoles!.contains("clientadmin")) {
       isClientAdmin = true;
     }
+    String? countryCode = countryCodeMap[user.countryCode];
+    String formattedPhone = user.phone != null && user.phone!.isNotEmpty
+        ? (countryCode!.isNotEmpty ? '$countryCode ${user.phone}' : user.phone!)
+        : '';
 
     return TableRow(
       children: [
@@ -256,7 +261,7 @@ class _UsersState extends BaseState<Users> {
         ),
         Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Text(user.phone.toString(), style: theme.getStyle()),
+          child: Text('${formattedPhone}', style: theme.getStyle()),
         ),
         Padding(
           padding: const EdgeInsets.all(8.0),
@@ -376,6 +381,13 @@ class _UsersState extends BaseState<Users> {
   }
 
   Widget _buildCard(tapi.TwinUser entity) {
+    String? countryCode = countryCodeMap[entity.countryCode];
+    String formattedPhone = entity.phone != null && entity.phone!.isNotEmpty
+        ? (countryCode!.isNotEmpty
+            ? '$countryCode ${entity.phone}'
+            : entity.phone!)
+        : '';
+
     return Card(
       color: Colors.transparent,
       elevation: 5,
@@ -468,7 +480,7 @@ class _UsersState extends BaseState<Users> {
                     style: theme.getStyle(),
                   ),
                   Text(
-                    'Phone : ${entity.phone}',
+                    'Phone : ${formattedPhone}',
                     style: theme.getStyle(),
                   ),
                 ],
