@@ -303,7 +303,12 @@ class _AssetLibraryContentPageState extends BaseState<AssetLibraryContentPage> {
                                                     '-',
                                                 style: theme.getStyle()),
                                             IconButton(
-                                                onPressed: () {},
+                                                onPressed: () {
+                                                  _deleteDeviceModel(widget
+                                                      .assetModel
+                                                      .allowedDeviceModels!
+                                                      .indexOf(e));
+                                                },
                                                 icon: const Icon(
                                                     Icons.delete_forever))
                                           ],
@@ -325,6 +330,16 @@ class _AssetLibraryContentPageState extends BaseState<AssetLibraryContentPage> {
         ],
       ),
     );
+  }
+
+  void _deleteDeviceModel(int index) async {
+    setState(() {
+      widget.assetModel.allowedDeviceModels!.removeAt(index);
+    });
+    await alert(
+        'Asset Model - ${widget.assetModel.name}', 'Deleted Successfully');
+
+    refresh();
   }
 
   Future _save({bool close = false}) async {
@@ -407,7 +422,7 @@ class _AssetLibraryContentPageState extends BaseState<AssetLibraryContentPage> {
     if (loading) return;
     loading = true;
 
-    execute(() async {
+    await execute(() async {
       for (var element in widget.assetModel.allowedDeviceModels!) {
         var dmRes = await TwinnedSession.instance.twin.getDeviceModel(
             apikey: TwinnedSession.instance.authToken,
@@ -421,6 +436,7 @@ class _AssetLibraryContentPageState extends BaseState<AssetLibraryContentPage> {
     });
 
     loading = false;
+    refresh();
   }
 
   @override
