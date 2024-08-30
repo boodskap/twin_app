@@ -934,6 +934,7 @@ class _AssetContentPageState extends BaseState<AssetContentPage> {
                                           alignment: Alignment.topRight,
                                           child: Column(
                                             children: [
+                                              if(!isClientAdmin())
                                               ClientDropdown(
                                                   selectedItem: selectedClient,
                                                   style: theme.getStyle(),
