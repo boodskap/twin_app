@@ -1,6 +1,7 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/pages/twin/components/widgets/custom_settings_dropdown.dart';
 import 'package:twin_app/pages/twin/components/widgets/showoverlay_widget.dart';
@@ -34,19 +35,17 @@ class _OrganizationPageState extends BaseState<OrganizationPage> {
   @override
   Widget build(BuildContext context) {
     if (null == _organization || null == _twinSysInfo) {
-      return Flexible(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Center(
-              child: Text(
-                'Loading...',
-                style: theme.getStyle(),
-              ),
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Center(
+            child: Text(
+              'Loading...',
+              style: theme.getStyle(),
             ),
-          ],
-        ),
+          ),
+        ],
       );
     }
 
@@ -139,7 +138,184 @@ class _OrganizationPageState extends BaseState<OrganizationPage> {
             ),
             divider(horizontal: true),
           ],
-        )
+        ),
+        divider(height: 50),
+        Flexible(
+            child: SingleChildScrollView(
+                child: Wrap(
+          spacing: 15,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            SizedBox(
+              width: 200,
+              height: 200,
+              child: Card(
+                color: Colors.white,
+                elevation: 10,
+                child: InkWell(
+                  onDoubleTap: () {},
+                  child: Wrap(
+                    direction: Axis.vertical,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 10,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8.0, top: 8.0),
+                        child: FaIcon(FontAwesomeIcons.appStoreIos),
+                      ),
+                      Center(
+                        child: Text(
+                          'IoS App',
+                          style: theme.getStyle().copyWith(fontSize: 16),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(
+              width: 200,
+              height: 200,
+              child: Card(
+                color: Colors.white,
+                elevation: 10,
+                child: InkWell(
+                  onDoubleTap: () {},
+                  child: Wrap(
+                    direction: Axis.vertical,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 10,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8.0, top: 8.0),
+                        child: FaIcon(FontAwesomeIcons.android),
+                      ),
+                      Center(
+                        child: Text(
+                          'Android App',
+                          style: theme.getStyle().copyWith(fontSize: 16),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(
+              width: 200,
+              height: 200,
+              child: Card(
+                color: Colors.white,
+                elevation: 10,
+                child: InkWell(
+                  onDoubleTap: () {},
+                  child: Wrap(
+                    direction: Axis.vertical,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 10,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8.0, top: 8.0),
+                        child: FaIcon(FontAwesomeIcons.apple),
+                      ),
+                      Center(
+                        child: Text(
+                          'MacOS App',
+                          style: theme.getStyle().copyWith(fontSize: 16),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(
+              width: 200,
+              height: 200,
+              child: Card(
+                color: Colors.white,
+                elevation: 10,
+                child: InkWell(
+                  onDoubleTap: () {},
+                  child: Wrap(
+                    direction: Axis.vertical,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 10,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8.0, top: 8.0),
+                        child: FaIcon(FontAwesomeIcons.microsoft),
+                      ),
+                      Center(
+                        child: Text(
+                          'Windows App',
+                          style: theme.getStyle().copyWith(fontSize: 16),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(
+              width: 200,
+              height: 200,
+              child: Card(
+                color: Colors.white,
+                elevation: 10,
+                child: InkWell(
+                  onDoubleTap: () {},
+                  child: Wrap(
+                    direction: Axis.vertical,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 10,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8.0, top: 8.0),
+                        child: FaIcon(FontAwesomeIcons.linux),
+                      ),
+                      Center(
+                        child: Text(
+                          'Linux App',
+                          style: theme.getStyle().copyWith(fontSize: 16),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(
+              width: 200,
+              height: 200,
+              child: Card(
+                color: Colors.white,
+                elevation: 10,
+                child: InkWell(
+                  onDoubleTap: () {},
+                  child: Wrap(
+                    direction: Axis.vertical,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 10,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8.0, top: 8.0),
+                        child: FaIcon(FontAwesomeIcons.chrome),
+                      ),
+                      Center(
+                        child: Text(
+                          'Browser App',
+                          style: theme.getStyle().copyWith(fontSize: 16),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ))),
       ],
     );
   }
