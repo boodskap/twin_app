@@ -806,7 +806,9 @@ class HomeScreenState extends BaseState<HomeScreen> {
                 TwinnedSession.instance.noCodeAuthToken.isNotEmpty;
           },
           onMenuSelected: (BuildContext context) async {
-            return OrganizationPage();
+            return OrganizationPage(
+              orgInfo: session.orgs[session.selectedOrg]!,
+            );
           },
         ),
     ];
