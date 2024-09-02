@@ -695,7 +695,11 @@ class _DeviceModelContentPageState extends BaseState<DeviceModelContentPage> {
     return Scaffold(
       body: Column(
         children: [
-          const TopBar(title: 'Digital Twin - Device Model'),
+          TopBar(
+            title: 'Digital Twin - Device Model',
+            style: theme.getStyle().copyWith(
+                color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+          ),
           if (null == widget.model) const SizedBox(height: 60),
           if (null != widget.model) const SizedBox(height: 10),
           if (null != widget.model)

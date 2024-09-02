@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:twin_app/widgets/change_password_alert_snippet.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
+import 'package:twin_app/widgets/country_codes.dart';
 import 'package:twin_app/widgets/subscription_snippet.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/twinned_session.dart';
@@ -64,8 +65,18 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
     _nameController.addListener(_onNameChanged);
   }
 
+  String formatPhoneNumber(String? phoneNumber, String countryCode) {
+    final countryDialCode = countryCodeMap[countryCode] ?? '';
+    return phoneNumber != null && phoneNumber.isNotEmpty
+        ? '$countryDialCode $phoneNumber'
+        : '';
+  }
+
   @override
   Widget build(BuildContext context) {
+    final formattedPhone =
+        formatPhoneNumber(_phoneController.text, countryCode);
+
     return Center(
       child: SizedBox(
         width: 900,
@@ -269,7 +280,7 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
                                             )),
                                             Expanded(
                                                 child: Text(
-                                              _phoneController.text,
+                                             formattedPhone,
                                               style: theme.getStyle().copyWith(
                                                   fontWeight: FontWeight.bold,
                                                   fontSize: 16),

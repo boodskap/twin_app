@@ -35,6 +35,7 @@ import 'package:twinned_widgets/twinned_dashboard_widget.dart';
 import 'package:uuid/uuid.dart';
 import 'package:twinned_api/twinned_api.dart' as tapi;
 import 'package:twin_app/core/session_variables.dart' as session;
+import 'package:nocode_api/api/nocode.swagger.dart' as nocode;
 
 const List<Locale> locales = [Locale("en", "US"), Locale("ta", "IN")];
 
@@ -442,19 +443,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
               }).toList(),
               onSelected: (o) async {
                 if (null != o) {
-                  session.selectedOrg = session.orgs.indexOf(o!);
-                  TwinnedSession ts = TwinnedSession.instance;
-                  TwinnedSession.instance.init(
-                    debug: ts.debug,
-                    host: ts.host,
-                    authToken: o!.twinAuthToken,
-                    domainKey: o!.twinDomainKey,
-                    orgId: o!.id,
-                    noCodeAuthToken: ts.noCodeAuthToken,
-                  );
-                  await TwinnedSession.instance.getUser();
-                  await _load();
-                  showScreen(session.homeMenu);
+                  await _switchOrg(o);
                 }
               },
             ),
@@ -608,6 +597,30 @@ class HomeScreenState extends BaseState<HomeScreen> {
           ? '${word[0].toUpperCase()}${word.substring(1).toLowerCase()}'
           : '';
     }).join(' ');
+  }
+
+  Future _switchOrg(tapi.OrgInfo o) async {
+    await execute(() async {
+      session.selectedOrg = session.orgs.indexOf(o!);
+      TwinnedSession ts = TwinnedSession.instance;
+      TwinnedSession.instance.init(
+        debug: ts.debug,
+        host: ts.host,
+        authToken: o.twinAuthToken,
+        domainKey: o.twinDomainKey,
+        orgId: o!.id,
+        noCodeAuthToken: ts.noCodeAuthToken,
+      );
+
+      var oRes = await TwinnedSession.instance.nocode.getOrgPlan(orgId: o!.id);
+      if (validateResponse(oRes)) {
+        session.orgPlan = oRes.body?.entity;
+      }
+
+      await TwinnedSession.instance.getUser();
+      await _load();
+      showScreen(session.homeMenu);
+    });
   }
 
   void showScreen(dynamic id) async {

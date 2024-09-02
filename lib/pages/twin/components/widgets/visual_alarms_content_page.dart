@@ -13,6 +13,8 @@ import 'package:twinned_widgets/core/top_bar.dart';
 import 'package:uuid/uuid.dart';
 import 'package:twin_commons/core/twin_image_helper.dart';
 import 'package:twin_commons/widgets/common/label_text_field.dart';
+import 'package:twin_app/core/session_variables.dart';
+
 
 class VisualAlarmsContentPage extends StatefulWidget {
   final tapi.DeviceModel model;
@@ -164,6 +166,8 @@ class _VisualAlarmsContentPageState extends BaseState<VisualAlarmsContentPage> {
         children: [
           TopBar(
             title: 'Alarm - ${widget.alarm.name}',
+            style: theme.getStyle().copyWith(
+                color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
           ),
           divider(),
           Row(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/widgets/buy_button.dart';
 import 'package:twin_app/widgets/change_upgrade_plan_widget.dart';
 import 'package:twin_app/widgets/choose_plans.dart';
@@ -234,8 +235,10 @@ class PlanInfoWidget extends StatelessWidget {
                           },
                           label:
                               standalone ? 'Upgrade' : 'Upgrade to $planName',
-                          fontSize: headerStyle.fontSize!,
-                          fontWeight: headerStyle.fontWeight!,
+                          style: theme.getStyle().copyWith(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
+                              ),
                           iconData: Icons.star,
                         ),
                     ],

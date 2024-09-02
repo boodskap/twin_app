@@ -68,40 +68,42 @@ class _DigitalTwinEventContentPageState
   }
 
   Future _save({bool shouldPop = false}) async {
-    busy();
-    try {
-      String name = _nameController.text.trim();
-      String description = _descController.text.trim();
-      String tags = _tagsController.text.trim();
+    if (loading) return;
+    loading = true;
 
-      if (widget.entity.conditions[0].conditions.isEmpty) {
-        alert('Missing', 'At least one condition is required');
-        return;
-      }
+    String name = _nameController.text.trim();
+    String description = _descController.text.trim();
+    String tags = _tagsController.text.trim();
 
-      if (null == _emailTemplate &&
-          null == _notificationTemplate &&
-          null == _smsTemplate &&
-          null == _voiceTemplate &&
-          null == _fcmTemplate) {
-        alert('Missing',
-            'One of Email, Notification, SMS, Voice or FCM template is required');
-        return;
-      }
+    if (widget.entity.conditions[0].conditions.isEmpty) {
+      alert('Missing', 'At least one condition is required');
+      return;
+    }
 
-      EventInfo body = EventInfo(
-          name: name,
-          description: description,
-          tags: tags.split(' '),
-          modelId: widget.entity.modelId,
-          conditions: widget.entity.conditions,
-          notificationTemplate: _notificationTemplate,
-          emailTemplate: _emailTemplate,
-          fcmTemplate: _fcmTemplate,
-          roles: widget.entity.roles,
-          smsTemplate: _smsTemplate,
-          voiceTemplate: _voiceTemplate);
+    if (null == _emailTemplate &&
+        null == _notificationTemplate &&
+        null == _smsTemplate &&
+        null == _voiceTemplate &&
+        null == _fcmTemplate) {
+      alert('Missing',
+          'One of Email, Notification, SMS, Voice or FCM template is required');
+      return;
+    }
 
+    EventInfo body = EventInfo(
+        name: name,
+        description: description,
+        tags: tags.split(' '),
+        modelId: widget.entity.modelId,
+        conditions: widget.entity.conditions,
+        notificationTemplate: _notificationTemplate,
+        emailTemplate: _emailTemplate,
+        fcmTemplate: _fcmTemplate,
+        roles: widget.entity.roles,
+        smsTemplate: _smsTemplate,
+        voiceTemplate: _voiceTemplate);
+
+    await execute(() async {
       var res = await TwinnedSession.instance.twin.updateEvent(
         apikey: TwinnedSession.instance.authToken,
         eventId: widget.entity.id,
@@ -114,11 +116,10 @@ class _DigitalTwinEventContentPageState
           _cancel();
         }
       }
-    } catch (e, s) {
-      debugPrint('$e\n$s');
-    } finally {
-      busy(busy: false);
-    }
+    });
+
+    loading = false;
+    refresh();
   }
 
   void _cancel() {
@@ -132,6 +133,8 @@ class _DigitalTwinEventContentPageState
         children: [
           TopBar(
             title: ' Event - ${widget.entity.name}',
+            style: theme.getStyle().copyWith(
+                color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
           ),
           divider(),
           Expanded(
