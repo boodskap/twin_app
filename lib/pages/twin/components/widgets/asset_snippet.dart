@@ -159,6 +159,13 @@ class _AssetSnippetState extends BaseState<AssetSnippet> {
                                   assetModelId: tankType?.id ?? '');
                             });
                           }
+                          else{
+                            setState(() {
+                              _asset = _asset.copyWith(
+                                  assetModelId: '');
+                            });
+                          }
+
                         },
                       ),
                       const SizedBox(
