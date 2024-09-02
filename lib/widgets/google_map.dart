@@ -291,7 +291,7 @@ class CustomInfoWindow extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
-                      dynamicLevelData['level'].toString(),
+                      dynamicLevelData['level'].toString() + " %",
                       style: TextStyle(fontWeight: FontWeight.bold),
                       overflow: TextOverflow.ellipsis,
                     ),

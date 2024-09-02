@@ -85,7 +85,7 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
   }
 
   bool _canLogin() {
-    return _userController.text.trim().isNotEmpty &&
+    return _userController.text.toLowerCase().trim().isNotEmpty &&
         _passwordController.text.trim().isNotEmpty;
   }
 
@@ -133,7 +133,7 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
         loggedIn = true;
 
         if (_rememberMe) {
-          TwinHelper.addStoredPassword(userId, password);
+          TwinHelper.addStoredPassword(userId.toLowerCase(), password);
         }
 
         if (loggedIn) {
@@ -145,7 +145,7 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
             await session.postLoginHook!();
           }
 
-          StreamAuthScope.of(context).signIn(userId);
+          StreamAuthScope.of(context).signIn(userId.toLowerCase());
         }
       }
     });
@@ -242,7 +242,9 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
                                       onChanged: (value) async {
                                         String password =
                                             await TwinHelper.getStoredPassword(
-                                                _userController.text.trim());
+                                                _userController.text
+                                                    .toLowerCase()
+                                                    .trim());
                                         setState(() {
                                           if (password.isNotEmpty) {
                                             _passwordController.text = password;
@@ -252,6 +254,7 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
                                     ),
                                     PasswordField(
                                       onSubmitted: (_userController.text
+                                                  .toLowerCase()
                                                   .trim()
                                                   .isEmpty ||
                                               _passwordController.text

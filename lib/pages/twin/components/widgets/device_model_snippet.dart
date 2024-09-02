@@ -85,6 +85,7 @@ class _DeviceModelSnippetState extends BaseState<DeviceModelSnippet> {
                   padding: const EdgeInsets.all(10.0),
                   child: Column(
                     children: [
+                      if(!isClientAdmin())
                       ClientDropdown(
                         key: Key(const Uuid().v4()),
                         selectedItem: (null != _deviceModelInfo.clientIds &&
