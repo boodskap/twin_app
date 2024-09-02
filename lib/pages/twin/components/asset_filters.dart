@@ -1,5 +1,6 @@
 import 'package:flutter/Material.dart';
 import 'package:flutter/material.dart';
+import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/pages/twin/components/asset_groups.dart';
 import 'package:twin_app/pages/twin/components/widgets/field_filter_snippet.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
@@ -13,7 +14,6 @@ import 'package:twinned_api/api/twinned.swagger.dart' as twinned;
 import 'package:twinned_api/twinned_api.dart' as tapi;
 import 'package:twinned_widgets/core/device_model_dropdown.dart';
 import 'package:twinned_widgets/core/top_bar.dart';
-import 'package:twin_app/core/session_variables.dart';
 
 class AssetFilterList extends StatefulWidget {
   final double cardWidth;
@@ -727,6 +727,8 @@ class _AssetFilterContentState extends BaseState<AssetFilterContent> {
         children: [
           TopBar(
             title: 'Asset Filter - ${widget.filter.name}',
+            style: theme.getStyle().copyWith(
+                color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
           ),
           divider(),
           Row(

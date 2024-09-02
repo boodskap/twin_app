@@ -1,5 +1,6 @@
 import 'package:flutter/Material.dart';
 import 'package:flutter/material.dart';
+import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/pages/twin/components/widgets/asset_device.dart';
 import 'package:twin_app/pages/twin/components/widgets/device_info_snippet.dart';
 import 'package:twin_app/pages/twin/components/widgets/roles_infrastructure_widget.dart';
@@ -11,16 +12,14 @@ import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:twin_commons/core/twin_image_helper.dart';
 import 'package:twin_commons/core/twinned_session.dart';
-import 'package:twin_commons/util/osm_location_picker.dart';
 import 'package:twin_commons/widgets/common/label_text_field.dart';
 import 'package:twinned_api/api/twinned.swagger.dart';
-import 'package:twinned_widgets/core/top_bar.dart';
-import 'package:uuid/uuid.dart';
-import 'package:twin_app/core/session_variables.dart';
 import 'package:twinned_widgets/core/client_dropdown.dart';
-import 'package:twinned_widgets/core/premise_dropdown.dart';
 import 'package:twinned_widgets/core/facility_dropdown.dart';
 import 'package:twinned_widgets/core/floor_dropdown.dart';
+import 'package:twinned_widgets/core/premise_dropdown.dart';
+import 'package:twinned_widgets/core/top_bar.dart';
+import 'package:uuid/uuid.dart';
 
 class AssetContentPage extends StatefulWidget {
   final InfraType type;
@@ -792,6 +791,8 @@ class _AssetContentPageState extends BaseState<AssetContentPage> {
         children: [
           TopBar(
             title: '$heading - $name',
+            style: theme.getStyle().copyWith(
+                color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
           ),
           divider(),
           Row(

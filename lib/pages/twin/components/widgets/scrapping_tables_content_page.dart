@@ -6,17 +6,14 @@ import 'package:twin_app/pages/twin/components/widgets/parameter_upsert_dialog.d
 import 'package:twin_app/pages/twin/components/widgets/showoverlay_widget.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:twin_commons/core/base_state.dart';
-import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:twin_commons/core/twinned_session.dart';
+import 'package:twin_commons/widgets/common/label_text_field.dart';
 import 'package:twinned_api/twinned_api.dart' as tapi;
 import 'package:twinned_widgets/core/top_bar.dart';
-import 'package:twin_commons/widgets/common/label_text_field.dart';
 
 class ScrappingTablesContentPage extends StatefulWidget {
   tapi.ScrappingTable? model;
 
-  
-  
   ScrappingTablesContentPage({super.key, this.model});
 
   @override
@@ -317,6 +314,8 @@ class _ScrappingTablesContentPageState
         children: [
           TopBar(
             title: 'Digital Twin - Setting - ${widget.model?.name}',
+            style: theme.getStyle().copyWith(
+                color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
           ),
           divider(),
           Expanded(

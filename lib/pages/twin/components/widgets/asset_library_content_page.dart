@@ -75,6 +75,8 @@ class _AssetLibraryContentPageState extends BaseState<AssetLibraryContentPage> {
         children: [
           TopBar(
             title: 'Digital Twin Asset Type  - ${widget.assetModel.name}',
+            style: theme.getStyle().copyWith(
+                color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
           ),
           divider(),
           Row(
