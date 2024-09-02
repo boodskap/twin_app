@@ -63,6 +63,8 @@ class _NocodeBuilderContentPageState
         children: [
           TopBar(
             title: 'Digital Twin - Dashboard - ${_entity.name}',
+                style: theme.getStyle().copyWith(
+                color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
           ),
           divider(),
           Row(

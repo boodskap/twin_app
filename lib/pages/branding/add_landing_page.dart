@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/pages/branding/digital_twin_menu_group_content.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:twin_app/widgets/commons/secondary_button.dart';
@@ -190,7 +191,13 @@ class _LandingWidgetTypeState extends BaseState<LandingWidgetType> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const TopBar(title: 'Landing Page'),
+            TopBar(
+              title: 'Landing Page',
+              style: theme.getStyle().copyWith(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold),
+            ),
             Row(
               children: [
                 Expanded(
