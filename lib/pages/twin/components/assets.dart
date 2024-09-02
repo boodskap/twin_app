@@ -2,6 +2,7 @@ import 'package:flutter/Material.dart';
 import 'package:flutter/material.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/pages/twin/components/widgets/asset_content_page.dart';
+import 'package:twin_app/pages/twin/components/widgets/asset_snippet.dart';
 import 'package:twin_app/pages/twin/components/widgets/asset_type_dropdown.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
@@ -126,7 +127,7 @@ class _AssetsState extends BaseState<Assets> {
               ),
               onPressed: (canCreate())
                   ? () {
-                      _create();
+                      _addEditAssetDialog();
                     }
                   : null,
             ),
@@ -234,7 +235,8 @@ class _AssetsState extends BaseState<Assets> {
                         InkWell(
                           onTap: _canEdit
                               ? () {
-                                  _edit(e);
+                                  // _edit(e);
+                                   _addEditAssetDialog(asset: e);
                                 }
                               : null,
                           child: Tooltip(
@@ -320,12 +322,11 @@ class _AssetsState extends BaseState<Assets> {
             floorId: _selectedFloor!.id,
           );
         }
-
+      
         var mRes = await TwinnedSession.instance.twin.createAsset(
           apikey: TwinnedSession.instance.authToken,
           body: assetInfo,
         );
-        print(mRes);
         if (validateResponse(mRes)) {
           await _edit(mRes.body!.entity!);
           alert("Asset ${mRes.body!.entity!.name}", "Saved Successfully!");
@@ -527,6 +528,18 @@ class _AssetsState extends BaseState<Assets> {
 
     loading = false;
     refresh();
+  }
+
+ void _addEditAssetDialog({tapi.Asset? asset}) async {
+    await super.alertDialog(
+      title: null == asset ? 'Add New Asset' : 'Update Asset',
+      body: AssetSnippet(
+        asset: asset,
+      ),
+      width: 750,
+      height: MediaQuery.of(context).size.height - 150,
+    );
+    _load();
   }
 
   @override
