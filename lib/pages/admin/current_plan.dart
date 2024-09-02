@@ -43,9 +43,10 @@ class _CurrentPlanState extends BaseState<CurrentPlan> {
               ),
               BuyButton(
                 label: 'Upgrade Plan',
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-                fontColor: Colors.blue,
+                style: theme.getStyle().copyWith(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    color: Colors.blue),
                 iconData: Icons.star,
                 onPressed: () {
                   Navigator.push(
@@ -124,8 +125,10 @@ class _CurrentPlanState extends BaseState<CurrentPlan> {
                     )),
                     DataCell(BuyButton(
                       label: 'Buy',
-                      fontSize: 12,
-                      fontWeight: FontWeight.normal,
+                      style: theme.getStyle().copyWith(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
                       onPressed: p.canBuyDataPlan!
                           ? () {
                               _buyAddon(dataPoints: 1);
@@ -155,6 +158,7 @@ class _CurrentPlanState extends BaseState<CurrentPlan> {
                     )),
                     DataCell(BuyButton(
                       label: 'Buy',
+                      style: theme.getStyle(),
                       onPressed: () {
                         _buyAddon(devices: 1);
                       },
@@ -182,8 +186,10 @@ class _CurrentPlanState extends BaseState<CurrentPlan> {
                     )),
                     DataCell(BuyButton(
                       label: 'Buy',
-                      fontSize: 12,
-                      fontWeight: FontWeight.normal,
+                      style: theme.getStyle().copyWith(
+                            fontWeight: FontWeight.normal,
+                            fontSize: 12,
+                          ),
                       onPressed: () {
                         _buyAddon(users: 1);
                       },
@@ -211,8 +217,10 @@ class _CurrentPlanState extends BaseState<CurrentPlan> {
                     )),
                     DataCell(BuyButton(
                       label: 'Buy',
-                      fontSize: 12,
-                      fontWeight: FontWeight.normal,
+                      style: theme.getStyle().copyWith(
+                            fontWeight: FontWeight.normal,
+                            fontSize: 12,
+                          ),
                       onPressed: () {
                         _buyAddon(dashboards: 1);
                       },
@@ -240,6 +248,10 @@ class _CurrentPlanState extends BaseState<CurrentPlan> {
                     )),
                     DataCell(BuyButton(
                       label: 'Buy',
+                      style: theme.getStyle().copyWith(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
                       onPressed: p.canBuyClientPlan!
                           ? () {
                               _buyAddon(clients: 1);
@@ -269,8 +281,10 @@ class _CurrentPlanState extends BaseState<CurrentPlan> {
                     )),
                     DataCell(BuyButton(
                       label: 'Buy',
-                      fontSize: 12,
-                      fontWeight: FontWeight.normal,
+                      style: theme.getStyle().copyWith(
+                            fontWeight: FontWeight.normal,
+                            fontSize: 12,
+                          ),
                       onPressed: () {
                         _buyAddon(models: 1);
                       },
@@ -298,8 +312,10 @@ class _CurrentPlanState extends BaseState<CurrentPlan> {
                     )),
                     DataCell(BuyButton(
                       label: 'Buy',
-                      fontSize: 12,
-                      fontWeight: FontWeight.normal,
+                      style: theme.getStyle().copyWith(
+                            fontWeight: FontWeight.normal,
+                            fontSize: 12,
+                          ),
                       onPressed: () {
                         _buyAddon(parameters: 1);
                       },
@@ -327,6 +343,10 @@ class _CurrentPlanState extends BaseState<CurrentPlan> {
                     )),
                     DataCell(BuyButton(
                       label: 'Buy',
+                      style: theme.getStyle().copyWith(
+                            fontWeight: FontWeight.normal,
+                            fontSize: 12,
+                          ),
                       onPressed: p.canBuyArchivalPlan!
                           ? () {
                               _buyAddon(archivals: 1);

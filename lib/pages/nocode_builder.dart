@@ -4,6 +4,7 @@ import 'package:twin_app/widgets/buy_button.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:twin_app/widgets/commons/secondary_button.dart';
 import 'package:twin_app/core/session_variables.dart';
+import 'package:twin_app/widgets/purchase_change_addon_widget.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:twin_commons/core/twinned_session.dart';
 import 'package:twinned_api/twinned_api.dart' as tapi;
@@ -24,6 +25,7 @@ class NocodeBuilderPage extends StatefulWidget {
 class _NocodeBuilderPageState extends BaseState<NocodeBuilderPage> {
   final List<Widget> _cards = [];
   final List<twinned.DashboardScreen> _entities = [];
+  bool _exhausted = true;
 
   @override
   void initState() {
@@ -32,6 +34,7 @@ class _NocodeBuilderPageState extends BaseState<NocodeBuilderPage> {
 
   @override
   void setup() {
+    _checkExhausted();
     _load();
   }
 
@@ -178,6 +181,27 @@ class _NocodeBuilderPageState extends BaseState<NocodeBuilderPage> {
       ),
     );
     await _load();
+  }
+
+  Future _buyAddon() async {
+    await showDialog(
+        context: context,
+        builder: (ctx) {
+          return AlertDialog(
+            content: PurchaseChangeAddonWidget(
+              orgId: orgs[selectedOrg].id,
+              purchase: true,
+              dashboards: 1,
+            ),
+          );
+        });
+    await _checkExhausted();
+    await _load();
+  }
+
+  Future _checkExhausted() async {
+    _exhausted = await hasDashboardsExhausted();
+    refresh();
   }
 
   Future _load({String search = '*'}) async {
@@ -359,21 +383,6 @@ class _NocodeBuilderPageState extends BaseState<NocodeBuilderPage> {
     refresh();
   }
 
-  // void _buyDashboards() async {
-  //   await showDialog(
-  //       context: context,
-  //       builder: (ctx) {
-  //         return AlertDialog(
-  //           content: PurchaseChangeAddonWidget(
-  //             orgId: UserSession().selectedOrganization!.id,
-  //             purchase: true,
-  //             dashboards: 1,
-  //           ),
-  //         );
-  //       });
-  //   refresh();
-  // }
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -394,34 +403,30 @@ class _NocodeBuilderPageState extends BaseState<NocodeBuilderPage> {
               ),
             ),
             divider(horizontal: true),
-            // if (null != UserSession().orgPlan &&
-            //     _cards.length < UserSession().orgPlan!.totalDashboardCount!)
-            Tooltip(
-              message: "",
-              // message:
-              //     'Utilized ${_cards.length} / ${UserSession().orgPlan!.totalDashboardCount} dashboards',
-              child: PrimaryButton(
-                leading: const Icon(
-                  Icons.add,
-                  color: Colors.white,
+            if (_exhausted)
+              BuyButton(
+                  label: 'Buy More License',
+                  tooltip:
+                      'Utilized ${orgPlan?.totalDashboardCount ?? '-'} licenses',
+                  style: theme.getStyle().copyWith(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: Colors.blue),
+                  onPressed: _buyAddon),
+            if (!_exhausted)
+              Tooltip(
+                message: "",
+                child: PrimaryButton(
+                  leading: const Icon(
+                    Icons.add,
+                    color: Colors.white,
+                  ),
+                  onPressed: () async {
+                    await _addNew();
+                  },
+                  labelKey: 'Add New',
                 ),
-                onPressed: () async {
-                  await _addNew();
-                },
-                labelKey: 'Add New',
               ),
-            ),
-            divider(horizontal: true),
-            // if (null != UserSession().orgPlan &&
-            //     _cards.length >= UserSession().orgPlan!.totalDashboardCount)
-            BuyButton(
-              label: 'Buy more license',
-              // tooltip:
-              //     'Utilized ${_cards.length} / ${UserSession().orgPlan!.totalDashboardCount} dashboards',
-              onPressed: () {
-                // _buyDashboards();
-              },
-            ),
             divider(horizontal: true),
             SizedBox(
               width: 250,

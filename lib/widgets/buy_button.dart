@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:twin_app/core/session_variables.dart';
 
 class BuyButton extends StatelessWidget {
   final String label;
+  final TextStyle style;
   final VoidCallback? onPressed;
-  final double fontSize;
-  final FontWeight fontWeight;
-  final Color? fontColor;
   final String? tooltip;
   final IconData iconData;
   const BuyButton(
       {super.key,
       required this.label,
-      this.tooltip,
-      this.fontSize = 14,
-      this.fontWeight = FontWeight.bold,
-      this.fontColor,
+      required this.style,
+      this.tooltip = 'Exhausted',
       this.iconData = Icons.shopping_cart,
       required this.onPressed});
 
@@ -35,10 +33,7 @@ class BuyButton extends StatelessWidget {
               ),
               Text(
                 label,
-                style: TextStyle(
-                    fontSize: fontSize,
-                    fontWeight: fontWeight,
-                    color: fontColor),
+                style: style,
               ),
             ],
           )),
