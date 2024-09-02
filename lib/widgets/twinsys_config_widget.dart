@@ -105,6 +105,7 @@ class _TwinSysConfigWidgetState extends BaseState<TwinSysConfigWidget> {
           info = info.copyWith(bannerImage: res.entity!.id);
           banner = TwinImageHelper.getCachedDomainImage(info.bannerImage!);
         });
+        await alert('Banner', 'Updated successfully');
       }
     });
 
@@ -123,6 +124,7 @@ class _TwinSysConfigWidgetState extends BaseState<TwinSysConfigWidget> {
           info = info.copyWith(logoImage: res.entity!.id);
           logo = TwinImageHelper.getCachedDomainImage(info.logoImage!);
         });
+        await alert('Logo', 'Updated successfully');
       }
     });
 

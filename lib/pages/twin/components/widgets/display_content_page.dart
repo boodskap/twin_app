@@ -282,6 +282,8 @@ class _DisplayContentStatePageState extends BaseState<DisplayContentStatePage> {
         children: [
           TopBar(
             title: 'Digital Twin - Display  - ${widget.display.name}',
+            style: theme.getStyle().copyWith(
+                color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
           ),
           vdivider,
           Expanded(

@@ -673,12 +673,20 @@ class _DeviceContentPageState extends BaseState<DeviceContentPage> {
       body: Column(
         children: [
           if (null == widget.device)
-            const TopBar(
+            TopBar(
               title: 'New Digital Twin Device',
+              style: theme.getStyle().copyWith(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold),
             ),
           if (null != widget.device)
             TopBar(
               title: 'Digital Twin Device  - ${widget.device!.name}',
+              style: theme.getStyle().copyWith(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold),
             ),
           divider(),
           Expanded(
