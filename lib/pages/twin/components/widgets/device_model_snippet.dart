@@ -104,6 +104,7 @@ class _DeviceModelSnippetState extends BaseState<DeviceModelSnippet> {
                         child: LabelTextField(
                           label: 'Name',
                           style: theme.getStyle(),
+                          labelTextStyle: theme.getStyle(),
                           controller: nameController,
                           focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
@@ -120,6 +121,7 @@ class _DeviceModelSnippetState extends BaseState<DeviceModelSnippet> {
                         child: LabelTextField(
                           label: 'Description',
                           style: theme.getStyle(),
+                          labelTextStyle: theme.getStyle(),
                           controller: descController,
                           focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
@@ -136,6 +138,7 @@ class _DeviceModelSnippetState extends BaseState<DeviceModelSnippet> {
                         child: LabelTextField(
                           label: 'Tags',
                           style: theme.getStyle(),
+                          labelTextStyle: theme.getStyle(),
                           controller: tagController,
                           focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
@@ -152,6 +155,7 @@ class _DeviceModelSnippetState extends BaseState<DeviceModelSnippet> {
                         child: LabelTextField(
                           label: 'Model',
                           style: theme.getStyle(),
+                          labelTextStyle: theme.getStyle(),
                           controller: modelController,
                           focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
@@ -168,6 +172,7 @@ class _DeviceModelSnippetState extends BaseState<DeviceModelSnippet> {
                         child: LabelTextField(
                           label: 'Version',
                           style: theme.getStyle(),
+                          labelTextStyle: theme.getStyle(),
                           controller: versionController,
                           focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
@@ -184,6 +189,7 @@ class _DeviceModelSnippetState extends BaseState<DeviceModelSnippet> {
                         child: LabelTextField(
                           label: 'Make',
                           style: theme.getStyle(),
+                          labelTextStyle: theme.getStyle(),
                           controller: makeController,
                           focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(

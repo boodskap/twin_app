@@ -60,9 +60,8 @@ class _DeviceLibraryState extends BaseState<DeviceLibrary> {
                 child: SearchBar(
                   leading: Icon(Icons.search),
                   hintText: 'Search device library',
-                  hintStyle: WidgetStateProperty.all(
-                    theme.getStyle(),
-                  ),
+                  textStyle: WidgetStatePropertyAll(theme.getStyle()),
+                  hintStyle: WidgetStatePropertyAll(theme.getStyle()),
                   onChanged: (val) {
                     _search = val.trim();
                     _load();
