@@ -78,7 +78,7 @@ class _SignUpMobilePageState extends BaseState<_SignUpMobilePage> {
       loading = false;
 
       if (validateResponse(res)) {
-        localVariables['userId'] = email;
+        localVariables['userId'] = email.toLowerCase();
         localVariables['pinToken'] = res.body!.pinToken;
 
         showDialog(
@@ -113,7 +113,7 @@ class _SignUpMobilePageState extends BaseState<_SignUpMobilePage> {
     await execute(() async {
       var fname = _fnameController.text.trim();
       var lname = _lnameController.text.trim();
-      var email = _emailController.text.trim();
+      var email = _emailController.text.toLowerCase().trim();
 
       var body = tapi.Registration(
         email: email,
@@ -131,7 +131,7 @@ class _SignUpMobilePageState extends BaseState<_SignUpMobilePage> {
       loading = false;
 
       if (validateResponse(res)) {
-        localVariables['userId'] = email;
+        localVariables['userId'] = email.toLowerCase();
         localVariables['pinToken'] = res.body!.pinToken;
 
         showDialog(
@@ -224,8 +224,8 @@ class _SignUpMobilePageState extends BaseState<_SignUpMobilePage> {
                                     onChanged: (value) {
                                       setState(() {
                                         _canSignup = _emailController.text
-                                                    .trim()
                                                     .toLowerCase()
+                                                    .trim()
                                                     .length >
                                                 0 &&
                                             _fnameController.text
@@ -253,8 +253,8 @@ class _SignUpMobilePageState extends BaseState<_SignUpMobilePage> {
                                       onChanged: (value) {
                                         setState(() {
                                           _canSignup = _emailController.text
-                                                      .trim()
                                                       .toLowerCase()
+                                                      .trim()
                                                       .length >
                                                   0 &&
                                               _fnameController.text
@@ -290,8 +290,8 @@ class _SignUpMobilePageState extends BaseState<_SignUpMobilePage> {
                                       onChanged: (value) {
                                         setState(() {
                                           _canSignup = _emailController.text
-                                                      .trim()
                                                       .toLowerCase()
+                                                      .trim()
                                                       .length >
                                                   0 &&
                                               _fnameController.text

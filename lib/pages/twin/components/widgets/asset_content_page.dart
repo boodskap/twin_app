@@ -141,6 +141,8 @@ class _AssetContentPageState extends BaseState<AssetContentPage> {
             ? widget.asset!.clientIds!.first
             : null;
         selectedPremise = widget.asset!.premiseId;
+        selectedFacility = widget.asset!.facilityId;
+        selectedFloor = widget.asset!.floorId;
         break;
     }
 
@@ -330,8 +332,8 @@ class _AssetContentPageState extends BaseState<AssetContentPage> {
   //   );
   // }
 
- // using google map
- Future<void> _pickLocation(BuildContext context) async {
+  // using google map
+  Future<void> _pickLocation(BuildContext context) async {
     double pickedLatitude =
         _pickedLocation != null ? _pickedLocation!.coordinates[1] : 39.6128;
     double pickedLongitude =
@@ -414,7 +416,7 @@ class _AssetContentPageState extends BaseState<AssetContentPage> {
       },
     );
 
-     if (result != null) {
+    if (result != null) {
       setState(() {
         _pickedLocation = GeoLocation(
             type: 'point',
@@ -424,7 +426,7 @@ class _AssetContentPageState extends BaseState<AssetContentPage> {
       });
     }
   }
-    
+
   Widget _buildFacility(Facility e) {
     int idx = e.selectedImage ?? 0;
     if (idx < 0) idx = 0;
@@ -740,15 +742,19 @@ class _AssetContentPageState extends BaseState<AssetContentPage> {
 
   Future _saveAsset() async {
     await execute(() async {
-      AssetInfo body = Utils.assetInfo(widget.asset!,
-          name: _name.text,
-          description: _desc.text,
-          tags: _tags.text.trim().split(' '),
-          selectedImage: selectedImage,
-          location: _pickedLocation,
-          roles: rolesSelected,
-          clientIds: selectedClient != null ? [selectedClient!] : null);
-
+      AssetInfo body = Utils.assetInfo(
+        widget.asset!,
+        name: _name.text,
+        description: _desc.text,
+        tags: _tags.text.trim().split(' '),
+        selectedImage: selectedImage,
+        location: _pickedLocation,
+        roles: rolesSelected,
+        clientIds: selectedClient != null ? [selectedClient!] : null,
+        premiseId: selectedPremise,
+        facilityId: selectedFacility,
+        floorId: selectedFloor,
+      );
       var res = await TwinnedSession.instance.twin.updateAsset(
           apikey: TwinnedSession.instance.authToken,
           assetId: widget.asset!.id,
@@ -934,24 +940,33 @@ class _AssetContentPageState extends BaseState<AssetContentPage> {
                                           alignment: Alignment.topRight,
                                           child: Column(
                                             children: [
-                                              ClientDropdown(
-                                                  selectedItem: selectedClient,
-                                                  style: theme.getStyle(),
-                                                  onClientSelected: (entity) {
-                                                    setState(() {
-                                                      selectedClient =
-                                                          entity?.id;
-                                                    });
-                                                  }),
+                                              if (!isClientAdmin())
+                                                ClientDropdown(
+                                                    selectedItem:
+                                                        selectedClient,
+                                                    style: theme.getStyle(),
+                                                    onClientSelected: (entity) {
+                                                      setState(() {
+                                                        if (entity == null) {
+                                                          selectedClient = null;
+                                                        } else {
+                                                          selectedClient =
+                                                              entity.id;
+                                                        }
+                                                      });
+                                                    }),
                                               PremiseDropdown(
                                                   selectedItem: selectedPremise,
                                                   style: theme.getStyle(),
                                                   onPremiseSelected: (entity) {
                                                     setState(() {
-                                                      selectedPremise =
-                                                          entity?.id;
-                                                      selectedFacility = null;
-                                                      selectedFloor = null;
+                                                      if (entity == null) {
+                                                        selectedPremise = null;
+                                                      } else {
+                                                        selectedPremise =
+                                                            entity.id;
+                                                        selectedFacility = null;
+                                                      }
                                                     });
                                                   }),
                                               FacilityDropdown(
@@ -962,9 +977,13 @@ class _AssetContentPageState extends BaseState<AssetContentPage> {
                                                       selectedPremise,
                                                   onFacilitySelected: (entity) {
                                                     setState(() {
-                                                      selectedFacility =
-                                                          entity?.id;
-                                                      selectedFloor = null;
+                                                      if (entity == null) {
+                                                        selectedFacility = null;
+                                                      } else {
+                                                        selectedFacility =
+                                                            entity.id;
+                                                        selectedFloor = null;
+                                                      }
                                                     });
                                                   }),
                                               FloorDropdown(
@@ -976,8 +995,12 @@ class _AssetContentPageState extends BaseState<AssetContentPage> {
                                                   style: theme.getStyle(),
                                                   onFloorSelected: (entity) {
                                                     setState(() {
-                                                      selectedFloor =
-                                                          entity?.id;
+                                                      if (entity == null) {
+                                                        selectedFloor = null;
+                                                      } else {
+                                                        selectedFloor =
+                                                            entity.id;
+                                                      }
                                                     });
                                                   }),
                                               Row(
