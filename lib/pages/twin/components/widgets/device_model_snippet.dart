@@ -85,19 +85,21 @@ class _DeviceModelSnippetState extends BaseState<DeviceModelSnippet> {
                   padding: const EdgeInsets.all(10.0),
                   child: Column(
                     children: [
-                      ClientDropdown(
-                        key: Key(const Uuid().v4()),
-                        selectedItem: (null != _deviceModelInfo.clientIds &&
-                                _deviceModelInfo.clientIds!.isNotEmpty)
-                            ? _deviceModelInfo.clientIds!.first
-                            : null,
-                        onClientSelected: (client) {
-                          setState(() {
-                            _deviceModelInfo = _deviceModelInfo.copyWith(
-                                clientIds: null != client ? [client!.id] : []);
-                          });
-                        },
-                      ),
+                      if (!isClientAdmin())
+                        ClientDropdown(
+                          key: Key(const Uuid().v4()),
+                          selectedItem: (null != _deviceModelInfo.clientIds &&
+                                  _deviceModelInfo.clientIds!.isNotEmpty)
+                              ? _deviceModelInfo.clientIds!.first
+                              : null,
+                          onClientSelected: (client) {
+                            setState(() {
+                              _deviceModelInfo = _deviceModelInfo.copyWith(
+                                  clientIds:
+                                      null != client ? [client!.id] : []);
+                            });
+                          },
+                        ),
                       SizedBox(
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: LabelTextField(
@@ -335,7 +337,7 @@ class _DeviceModelSnippetState extends BaseState<DeviceModelSnippet> {
         );
         if (validateResponse(cRes)) {
           _close();
-          Navigator.push(
+          await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => DeviceModelContentPage(

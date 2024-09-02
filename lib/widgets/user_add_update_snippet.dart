@@ -181,7 +181,7 @@ class _UserAddUpdateSnippetState extends BaseState<UserAddUpdateSnippet> {
                         ),
                       ),
                       if (isAdmin()) divider(height: 15),
-                      if (isAdmin())
+                      if (!isClientAdmin())
                         SizedBox(
                           width: MediaQuery.of(context).size.width / 2.5,
                           child: ClientDropdown(

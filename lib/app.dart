@@ -460,7 +460,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
             ),
           if (session.orgs.length > 1) const SizedBox(width: 8),
           Text(
-            user!.name,
+            toCamelCase(user!.name),
             style: session.theme.getStyle().copyWith(color: Colors.white),
           ),
           IconButton(
@@ -600,6 +600,14 @@ class HomeScreenState extends BaseState<HomeScreen> {
     }
 
     return widget;
+  }
+
+  String toCamelCase(String text) {
+    return text.split(' ').map((word) {
+      return word.isNotEmpty
+          ? '${word[0].toUpperCase()}${word.substring(1).toLowerCase()}'
+          : '';
+    }).join(' ');
   }
 
   void showScreen(dynamic id) async {
@@ -806,7 +814,9 @@ class HomeScreenState extends BaseState<HomeScreen> {
                 TwinnedSession.instance.noCodeAuthToken.isNotEmpty;
           },
           onMenuSelected: (BuildContext context) async {
-            return OrganizationPage();
+            return OrganizationPage(
+              orgInfo: session.orgs[session.selectedOrg]!,
+            );
           },
         ),
     ];
