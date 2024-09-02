@@ -323,7 +323,7 @@ class _EventsState extends BaseState<Events> {
               clientIds: clientIds));
       if (validateResponse(mRes)) {
         await _edit(mRes.body!.entity!);
-        alert("Event${mRes.body!.entity!.name}", "created successfully!");
+        alert("Event ${mRes.body!.entity!.name}", "created successfully!");
       }
     });
     loading = false;
