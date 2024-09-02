@@ -119,6 +119,8 @@ class _PreprocessorContentPageState extends BaseState<PreprocessorContentPage> {
         children: [
           TopBar(
             title: 'Digital Twin Preprocessor - ${widget.preprocessor!.name}',
+            style: theme.getStyle().copyWith(
+                color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
           ),
           divider(),
           Expanded(

@@ -132,6 +132,8 @@ class _DigitalTwinEventContentPageState
         children: [
           TopBar(
             title: ' Event - ${widget.entity.name}',
+            style: theme.getStyle().copyWith(
+                color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
           ),
           divider(),
           Expanded(

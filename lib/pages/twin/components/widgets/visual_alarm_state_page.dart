@@ -167,6 +167,8 @@ class _VisualAlarmStatePageState extends BaseState<VisualAlarmStatePage> {
         TopBar(
           title:
               '${widget.alarm.name} Alarm State - ${widget.group.alarmState}',
+          style: theme.getStyle().copyWith(
+              color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
         ),
         divider(height: 2),
         Row(
