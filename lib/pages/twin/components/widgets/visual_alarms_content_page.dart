@@ -15,7 +15,6 @@ import 'package:twin_commons/core/twin_image_helper.dart';
 import 'package:twin_commons/widgets/common/label_text_field.dart';
 import 'package:twin_app/core/session_variables.dart';
 
-
 class VisualAlarmsContentPage extends StatefulWidget {
   final tapi.DeviceModel model;
   final tapi.Alarm alarm;
@@ -79,6 +78,8 @@ class _VisualAlarmsContentPageState extends BaseState<VisualAlarmsContentPage> {
     await confirm(
         title: 'Warning',
         message: 'Are you sure to delete this alarm state?',
+        titleStyle: theme.getStyle().copyWith(color: Colors.red),
+        messageStyle: theme.getStyle(),
         onPressed: () async {
           await execute(() async {
             if (widget.alarm.stateIcons!.length > group) {
@@ -139,7 +140,7 @@ class _VisualAlarmsContentPageState extends BaseState<VisualAlarmsContentPage> {
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
                     'State ${group.alarmState}',
-                    style: const TextStyle(
+                    style: theme.getStyle().copyWith(
                         color: Colors.black, overflow: TextOverflow.ellipsis),
                   ),
                 ),
@@ -172,9 +173,12 @@ class _VisualAlarmsContentPageState extends BaseState<VisualAlarmsContentPage> {
           divider(),
           Row(
             children: [
+              divider(horizontal: true),
               Expanded(
                 flex: 2,
                 child: LabelTextField(
+                  labelTextStyle: theme.getStyle(),
+                  style: theme.getStyle(),
                   suffixIcon: Tooltip(
                     message: 'Copy alarm id',
                     preferBelow: false,
@@ -204,6 +208,8 @@ class _VisualAlarmsContentPageState extends BaseState<VisualAlarmsContentPage> {
               Expanded(
                   flex: 4,
                   child: LabelTextField(
+                    style: theme.getStyle(),
+                    labelTextStyle: theme.getStyle(),
                     label: 'Description',
                     controller: _descController,
                   )),
@@ -211,12 +217,15 @@ class _VisualAlarmsContentPageState extends BaseState<VisualAlarmsContentPage> {
               Expanded(
                 flex: 1,
                 child: LabelTextField(
+                  style: theme.getStyle(),
+                  labelTextStyle: theme.getStyle(),
                   textInputAction: TextInputAction.next,
                   label: 'Tags',
                   controller: _tagsController,
                 ),
               ),
               BusyIndicator(),
+              divider(horizontal: true),
             ],
           ),
           divider(),

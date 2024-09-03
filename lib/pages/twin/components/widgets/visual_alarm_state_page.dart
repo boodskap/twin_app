@@ -170,7 +170,7 @@ class _VisualAlarmStatePageState extends BaseState<VisualAlarmStatePage> {
           style: theme.getStyle().copyWith(
               color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
         ),
-        divider(height: 2),
+        divider(height: 4),
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
@@ -197,9 +197,11 @@ class _VisualAlarmStatePageState extends BaseState<VisualAlarmStatePage> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const Text(
+                Text(
                   'IF',
-                  style: TextStyle(fontSize: 24, color: Colors.blue),
+                  style: theme
+                      .getStyle()
+                      .copyWith(fontSize: 24, color: Colors.blue),
                 ),
                 divider(horizontal: true, width: 8),
                 Column(
@@ -210,12 +212,16 @@ class _VisualAlarmStatePageState extends BaseState<VisualAlarmStatePage> {
                           border: Border.all(color: Colors.blueGrey),
                           borderRadius: BorderRadius.circular(5)),
                       child: DropdownButton<tapi.Condition>(
+                        style: theme.getStyle(),
                         key: Key(Uuid().v4()),
                         padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
                         dropdownColor: Colors.white,
                         isDense: true,
                         underline: Container(),
-                        hint: const Text("Choose Condition"),
+                        hint: Text(
+                          "Choose Condition",
+                          style: theme.getStyle(),
+                        ),
                         items: _entries,
                         onChanged: (tapi.Condition? value) {
                           if (null != value) {
@@ -237,14 +243,18 @@ class _VisualAlarmStatePageState extends BaseState<VisualAlarmStatePage> {
                           itemBuilder: (context, index) {
                             return SizedBox(
                               width: 200,
-                              child: Chip(
-                                label: Text(_selected[index].name),
-                                onDeleted: () {
-                                  setState(() {
-                                    var cond = _selected.removeAt(index);
-                                    widget.group.conditions.remove(cond.id);
-                                  });
-                                },
+                              child: Padding(
+                                padding: const EdgeInsets.all(4.0),
+                                child: Chip(
+                                  labelStyle: theme.getStyle(),
+                                  label: Text(_selected[index].name),
+                                  onDeleted: () {
+                                    setState(() {
+                                      var cond = _selected.removeAt(index);
+                                      widget.group.conditions.remove(cond.id);
+                                    });
+                                  },
+                                ),
                               ),
                             );
                           }),
@@ -253,9 +263,11 @@ class _VisualAlarmStatePageState extends BaseState<VisualAlarmStatePage> {
                 ),
                 divider(horizontal: true, width: 8),
                 if (widget.group.conditions.isNotEmpty)
-                  const Text(
+                  Text(
                     'MATCHES',
-                    style: TextStyle(fontSize: 24, color: Colors.green),
+                    style: theme
+                        .getStyle()
+                        .copyWith(fontSize: 24, color: Colors.green),
                   ),
                 divider(horizontal: true, width: 16),
                 if (widget.group.conditions.isNotEmpty)
@@ -269,9 +281,11 @@ class _VisualAlarmStatePageState extends BaseState<VisualAlarmStatePage> {
                   ),
                 divider(horizontal: true, width: 16),
                 if (widget.group.conditions.isNotEmpty)
-                  const Text(
+                  Text(
                     'THEN',
-                    style: TextStyle(fontSize: 24, color: Colors.red),
+                    style: theme
+                        .getStyle()
+                        .copyWith(fontSize: 24, color: Colors.red),
                   ),
                 divider(horizontal: true, width: 16),
                 if (widget.group.conditions.isNotEmpty)
@@ -302,6 +316,8 @@ class _VisualAlarmStatePageState extends BaseState<VisualAlarmStatePage> {
                       SizedBox(
                         width: 150,
                         child: LabelTextField(
+                          style: theme.getStyle(),
+                          labelTextStyle: theme.getStyle(),
                           label: 'Tooltip',
                           controller: _tooltipController,
                         ),
@@ -311,9 +327,11 @@ class _VisualAlarmStatePageState extends BaseState<VisualAlarmStatePage> {
                 divider(horizontal: true, width: 16),
                 if (widget.group.conditions.isNotEmpty &&
                     ((widget.model.images?.length ?? 0) > 0))
-                  const Text(
+                  Text(
                     'DEVICE',
-                    style: TextStyle(fontSize: 24, color: Colors.orange),
+                    style: theme
+                        .getStyle()
+                        .copyWith(fontSize: 24, color: Colors.orange),
                   ),
                 divider(horizontal: true, width: 16),
                 if (widget.group.conditions.isNotEmpty &&
@@ -372,6 +390,7 @@ class _AlarmMatchTypeDropDownState extends State<AlarmMatchTypeDropDown> {
   @override
   Widget build(BuildContext context) {
     return DropdownButton<tapi.AlarmMatchGroupMatchType>(
+      style: theme.getStyle(),
         value: widget.selected,
         items: _items,
         onChanged: (value) {
@@ -418,6 +437,7 @@ class _NumberDropDownState extends State<NumberDropDown> {
   @override
   Widget build(BuildContext context) {
     return DropdownButton<int>(
+        style: theme.getStyle(),
         value: widget.selected,
         items: _items,
         onChanged: (value) {
