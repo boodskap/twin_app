@@ -127,7 +127,7 @@ class _CurrentPlanState extends BaseState<CurrentPlan> {
                       label: 'Buy',
                       style: theme.getStyle().copyWith(
                             fontWeight: FontWeight.bold,
-                            fontSize: 14,
+                            fontSize: 12,
                           ),
                       onPressed: p.canBuyDataPlan!
                           ? () {
@@ -158,7 +158,10 @@ class _CurrentPlanState extends BaseState<CurrentPlan> {
                     )),
                     DataCell(BuyButton(
                       label: 'Buy',
-                      style: theme.getStyle(),
+                      style: theme.getStyle().copyWith(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                          ),
                       onPressed: () {
                         _buyAddon(devices: 1);
                       },
@@ -187,7 +190,7 @@ class _CurrentPlanState extends BaseState<CurrentPlan> {
                     DataCell(BuyButton(
                       label: 'Buy',
                       style: theme.getStyle().copyWith(
-                            fontWeight: FontWeight.normal,
+                            fontWeight: FontWeight.bold,
                             fontSize: 12,
                           ),
                       onPressed: () {
@@ -218,7 +221,7 @@ class _CurrentPlanState extends BaseState<CurrentPlan> {
                     DataCell(BuyButton(
                       label: 'Buy',
                       style: theme.getStyle().copyWith(
-                            fontWeight: FontWeight.normal,
+                            fontWeight: FontWeight.bold,
                             fontSize: 12,
                           ),
                       onPressed: () {
@@ -282,7 +285,7 @@ class _CurrentPlanState extends BaseState<CurrentPlan> {
                     DataCell(BuyButton(
                       label: 'Buy',
                       style: theme.getStyle().copyWith(
-                            fontWeight: FontWeight.normal,
+                            fontWeight: FontWeight.bold,
                             fontSize: 12,
                           ),
                       onPressed: () {
@@ -313,7 +316,7 @@ class _CurrentPlanState extends BaseState<CurrentPlan> {
                     DataCell(BuyButton(
                       label: 'Buy',
                       style: theme.getStyle().copyWith(
-                            fontWeight: FontWeight.normal,
+                            fontWeight: FontWeight.bold,
                             fontSize: 12,
                           ),
                       onPressed: () {
@@ -344,7 +347,7 @@ class _CurrentPlanState extends BaseState<CurrentPlan> {
                     DataCell(BuyButton(
                       label: 'Buy',
                       style: theme.getStyle().copyWith(
-                            fontWeight: FontWeight.normal,
+                            fontWeight: FontWeight.bold,
                             fontSize: 12,
                           ),
                       onPressed: p.canBuyArchivalPlan!
