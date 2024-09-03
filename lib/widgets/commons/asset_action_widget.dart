@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_commons/widgets/default_deviceview.dart';
@@ -51,6 +53,17 @@ class _AssetActionWidgetState extends State<AssetActionWidget> {
                 message: '${dd.hardwareDeviceId} History Data',
                 child: Icon(Icons.history)),
           ),
+           SizedBox(
+          height: 8,
+        ),
+        InkWell(
+          onTap: () {
+            showDeviceDataJson(context, widget.deviceData);
+          },
+          child: Tooltip(
+              message: 'View Device Data',
+              child: Icon(Icons.remove_red_eye)),
+        ),
         SizedBox(
           height: 8,
         ),
@@ -94,4 +107,30 @@ class _AssetActionWidgetState extends State<AssetActionWidget> {
       ],
     );
   }
+
+  void showDeviceDataJson(BuildContext context, tapi.DeviceData jsonData) {
+  String prettyJson = const JsonEncoder.withIndent('  ').convert(jsonData);
+
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        backgroundColor: Colors.white,
+        title: const Text('Device Data'),
+        content: SingleChildScrollView(
+          child: Text(prettyJson),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text('Close'),
+          ),
+        ],
+      );
+    },
+  );
+}
+
 }

@@ -1189,8 +1189,7 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
 
   void _buildChildren() {
     _children.clear();
-    double colWidth = (MediaQuery.of(context).size.width / 3) / 3.5;
-
+    double colWidth = (MediaQuery.of(context).size.width / 3) / 2.87;
     _children.add(Padding(
       padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
       child: Container(
