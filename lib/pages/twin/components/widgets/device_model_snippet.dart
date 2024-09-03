@@ -323,7 +323,7 @@ class _DeviceModelSnippetState extends BaseState<DeviceModelSnippet> {
     _deviceModelInfo = _deviceModelInfo.copyWith(
       name: nameController.text.trim(),
       description: descController.text.trim(),
-      tags: [],
+      tags: tagController.text.trim().split(' '),
       make: makeController.text.trim(),
       model: modelController.text.trim(),
       version: versionController.text.trim(),
