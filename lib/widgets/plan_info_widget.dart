@@ -1,23 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:nocode_api/api/nocode.swagger.dart' as nocode;
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/widgets/buy_button.dart';
 import 'package:twin_app/widgets/change_upgrade_plan_widget.dart';
 import 'package:twin_app/widgets/choose_plans.dart';
 import 'package:twin_app/widgets/utils.dart';
 import 'package:twin_commons/core/base_state.dart';
-import 'package:nocode_api/api/nocode.swagger.dart' as nocode;
 
 typedef OnPlanChanged = void Function();
 
 class PlanInfoWidget extends StatelessWidget {
-  static const TextStyle headerStyle = TextStyle(
+  static TextStyle headerStyle = theme.getStyle().copyWith(
       color: Color(0xFF287FFF), fontSize: 20, fontWeight: FontWeight.bold);
-  static const TextStyle planStyle = TextStyle(
+  static TextStyle planStyle = theme.getStyle().copyWith(
       color: Colors.black38, fontSize: 14, fontWeight: FontWeight.bold);
-  static const TextStyle addOnStyle = TextStyle(
+  static TextStyle addOnStyle = theme.getStyle().copyWith(
       color: Colors.black45, fontSize: 14, fontWeight: FontWeight.bold);
-  static const TextStyle featureStyle =
-      TextStyle(color: Colors.black, fontSize: 12, fontWeight: FontWeight.bold);
+  static TextStyle featureStyle = theme
+      .getStyle()
+      .copyWith(color: Colors.black, fontSize: 12, fontWeight: FontWeight.bold);
 
   final nocode.Plan plan;
   final nocode.OrgPlan orgPlan;
@@ -128,7 +129,7 @@ class PlanInfoWidget extends StatelessWidget {
                                         '${currencyToSymbol(plan.currency)} ${plan.planFee}',
                                         style: headerStyle,
                                       ),
-                                      const Text(
+                                      Text(
                                         '/ month',
                                         style: planStyle,
                                       )
@@ -145,7 +146,7 @@ class PlanInfoWidget extends StatelessWidget {
                                         '${currencyToSymbol(plan.currency)} ${plan.extraDeviceFee}',
                                         style: headerStyle,
                                       ),
-                                      const Text(
+                                      Text(
                                         '/ device / month',
                                         style: planStyle,
                                       )
@@ -162,7 +163,7 @@ class PlanInfoWidget extends StatelessWidget {
                                         '${plan.defaultDevicesCount}',
                                         style: headerStyle,
                                       ),
-                                      const Text(
+                                      Text(
                                         'free device license included',
                                         style: planStyle,
                                       )
@@ -270,11 +271,11 @@ class PlanInfoWidget extends StatelessWidget {
                             '${plan.defaultDataPointsCount} Data Points',
                             style: featureStyle,
                           ),
-                          const Text(
+                          Text(
                             '/ device',
                             style: addOnStyle,
                           ),
-                          const Text(
+                          Text(
                             '/ month',
                             style: planStyle,
                           ),
@@ -451,11 +452,11 @@ class PlanInfoWidget extends StatelessWidget {
                             '${currencyToSymbol(plan.currency)} ${plan.extraUserFee}',
                             style: featureStyle,
                           ),
-                          const Text(
+                          Text(
                             '/ user',
                             style: addOnStyle,
                           ),
-                          const Text(
+                          Text(
                             '/ month',
                             style: planStyle,
                           ),
@@ -476,11 +477,11 @@ class PlanInfoWidget extends StatelessWidget {
                             '${currencyToSymbol(plan.currency)} ${plan.extraDashboardFee}',
                             style: featureStyle,
                           ),
-                          const Text(
+                          Text(
                             '/ 10 dashboards',
                             style: addOnStyle,
                           ),
-                          const Text(
+                          Text(
                             '/ month',
                             style: planStyle,
                           ),
@@ -501,11 +502,11 @@ class PlanInfoWidget extends StatelessWidget {
                             '${currencyToSymbol(plan.currency)} ${plan.extraDeviceModelFee}',
                             style: featureStyle,
                           ),
-                          const Text(
+                          Text(
                             '/ 10 device libraries',
                             style: addOnStyle,
                           ),
-                          const Text(
+                          Text(
                             '/ month',
                             style: planStyle,
                           ),
@@ -526,11 +527,11 @@ class PlanInfoWidget extends StatelessWidget {
                             '${currencyToSymbol(plan.currency)} ${plan.extraModelParametersFee}',
                             style: featureStyle,
                           ),
-                          const Text(
+                          Text(
                             '/ 10 device parameters',
                             style: addOnStyle,
                           ),
-                          const Text(
+                          Text(
                             '/ month',
                             style: planStyle,
                           ),
@@ -633,7 +634,7 @@ class PlanInfoWidget extends StatelessWidget {
                     children: [
                       if (plan.planType == nocode.PlanPlanType.basic ||
                           plan.planType == nocode.PlanPlanType.standard)
-                        const Wrap(
+                        Wrap(
                           direction: Axis.horizontal,
                           crossAxisAlignment: WrapCrossAlignment.center,
                           spacing: 8,
@@ -661,7 +662,7 @@ class PlanInfoWidget extends StatelessWidget {
                               color: headerStyle.color,
                               size: 12,
                             ),
-                            const Text(
+                            Text(
                               'Manage private cloud on AWS/Azure/GCP',
                               style: featureStyle,
                             ),
@@ -669,7 +670,7 @@ class PlanInfoWidget extends StatelessWidget {
                         ),
                       if (plan.planType == nocode.PlanPlanType.basic ||
                           plan.planType == nocode.PlanPlanType.standard)
-                        const Wrap(
+                        Wrap(
                           direction: Axis.horizontal,
                           crossAxisAlignment: WrapCrossAlignment.center,
                           spacing: 8,
@@ -697,14 +698,14 @@ class PlanInfoWidget extends StatelessWidget {
                               color: headerStyle.color,
                               size: 12,
                             ),
-                            const Text(
+                            Text(
                               'Can purchase extended archival days',
                               style: featureStyle,
                             ),
                           ],
                         ),
                       if (plan.planType == nocode.PlanPlanType.basic)
-                        const Wrap(
+                        Wrap(
                           direction: Axis.horizontal,
                           crossAxisAlignment: WrapCrossAlignment.center,
                           spacing: 8,
@@ -738,7 +739,7 @@ class PlanInfoWidget extends StatelessWidget {
                           ],
                         ),
                       if (plan.planType == nocode.PlanPlanType.basic)
-                        const Wrap(
+                        Wrap(
                           direction: Axis.horizontal,
                           crossAxisAlignment: WrapCrossAlignment.center,
                           spacing: 8,
@@ -765,14 +766,14 @@ class PlanInfoWidget extends StatelessWidget {
                               color: headerStyle.color,
                               size: 12,
                             ),
-                            const Text(
+                            Text(
                               'Can purchase additional data plans',
                               style: featureStyle,
                             ),
                           ],
                         ),
                       if (plan.planType == nocode.PlanPlanType.basic)
-                        const Wrap(
+                        Wrap(
                           direction: Axis.horizontal,
                           crossAxisAlignment: WrapCrossAlignment.center,
                           spacing: 8,
@@ -799,7 +800,7 @@ class PlanInfoWidget extends StatelessWidget {
                               color: headerStyle.color,
                               size: 12,
                             ),
-                            const Text(
+                            Text(
                               'Can purchase additional sub accounts',
                               style: featureStyle,
                             ),
@@ -831,7 +832,7 @@ class PlanInfoWidget extends StatelessWidget {
                               color: headerStyle.color,
                               size: 12,
                             ),
-                            const Text(
+                            Text(
                               'Self-service documentation',
                               style: featureStyle,
                             ),
@@ -849,7 +850,7 @@ class PlanInfoWidget extends StatelessWidget {
                               color: headerStyle.color,
                               size: 12,
                             ),
-                            const Text(
+                            Text(
                               '8 X 5 support',
                               style: featureStyle,
                             ),
@@ -867,7 +868,7 @@ class PlanInfoWidget extends StatelessWidget {
                               color: headerStyle.color,
                               size: 12,
                             ),
-                            const Text(
+                            Text(
                               '60 mins solution design call',
                               style: featureStyle,
                             ),
@@ -885,7 +886,7 @@ class PlanInfoWidget extends StatelessWidget {
                               color: headerStyle.color,
                               size: 12,
                             ),
-                            const Text(
+                            Text(
                               '8 X 7 support',
                               style: featureStyle,
                             ),
@@ -903,7 +904,7 @@ class PlanInfoWidget extends StatelessWidget {
                               color: headerStyle.color,
                               size: 12,
                             ),
-                            const Text(
+                            Text(
                               'Dedicated account manager',
                               style: featureStyle,
                             ),
@@ -921,7 +922,7 @@ class PlanInfoWidget extends StatelessWidget {
                               color: headerStyle.color,
                               size: 12,
                             ),
-                            const Text(
+                            Text(
                               'Dedicated slack channel',
                               style: featureStyle,
                             ),
@@ -939,7 +940,7 @@ class PlanInfoWidget extends StatelessWidget {
                               color: headerStyle.color,
                               size: 12,
                             ),
-                            const Text(
+                            Text(
                               '24 X 7 support*',
                               style: featureStyle,
                             ),
@@ -957,7 +958,7 @@ class PlanInfoWidget extends StatelessWidget {
                               color: headerStyle.color,
                               size: 12,
                             ),
-                            const Text(
+                            Text(
                               'Dedicated account manager',
                               style: featureStyle,
                             ),
@@ -975,7 +976,7 @@ class PlanInfoWidget extends StatelessWidget {
                               color: headerStyle.color,
                               size: 12,
                             ),
-                            const Text(
+                            Text(
                               'Dedicated slack channel',
                               style: featureStyle,
                             ),
@@ -993,7 +994,7 @@ class PlanInfoWidget extends StatelessWidget {
                               color: headerStyle.color,
                               size: 12,
                             ),
-                            const Text(
+                            Text(
                               'Dedicated phone line',
                               style: featureStyle,
                             ),
