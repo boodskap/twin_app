@@ -557,7 +557,7 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                               trailing: [const BusyIndicator()],
                               onChanged: (val) {
                                 if (loading) {
-                                  _controller.text = _searchQuery;
+                                  // _controller.text = _searchQuery;
                                   return;
                                 }
                                 setState(() {
@@ -1122,7 +1122,7 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                                           trailing: [const BusyIndicator()],
                                           onChanged: (val) {
                                             if (loading) {
-                                              _controller.text = _searchQuery;
+                                              // _controller.text = _searchQuery;
                                               return;
                                             }
                                             setState(() {
