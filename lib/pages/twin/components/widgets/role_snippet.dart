@@ -66,6 +66,7 @@ class _RolesSnippetState extends BaseState<RolesSnippet> {
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: LabelTextField(
                           label: 'Name',
+                          labelTextStyle: theme.getStyle(),
                           style: theme.getStyle(),
                           controller: nameController,
                           focusedBorder: OutlineInputBorder(
@@ -81,6 +82,7 @@ class _RolesSnippetState extends BaseState<RolesSnippet> {
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: LabelTextField(
                           label: 'Description',
+                          labelTextStyle: theme.getStyle(),
                           style: theme.getStyle(),
                           controller: descController,
                           focusedBorder: OutlineInputBorder(

@@ -7,7 +7,7 @@ import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:nocode_api/api/nocode.swagger.dart' as nocode;
 import 'dart:js' as js;
-
+import 'package:twin_app/core/session_variables.dart';
 
 class ChangeUpgradePlanWidget extends StatefulWidget {
   final nocode.Plan plan;
@@ -29,19 +29,19 @@ class ChangeUpgradePlanWidget extends StatefulWidget {
 }
 
 class _ChangeUpgradePlanWidgetState extends BaseState<ChangeUpgradePlanWidget> {
-  static const TextStyle freqencyStyle = TextStyle(
+  static TextStyle freqencyStyle = theme.getStyle().copyWith(
       color: Colors.black38, fontSize: 14, fontWeight: FontWeight.bold);
-  static const TextStyle currencyStyle = TextStyle(
+  static TextStyle currencyStyle =  theme.getStyle().copyWith(
       color: Colors.black45, fontSize: 14, fontWeight: FontWeight.bold);
-  static const TextStyle planStyle = TextStyle(
+  static  TextStyle planStyle =  theme.getStyle().copyWith(
       color: Colors.black38, fontSize: 14, fontWeight: FontWeight.bold);
-  static const TextStyle buttonStyle =
-      TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold);
-  static const TextStyle headerStyle = TextStyle(
+  static  TextStyle buttonStyle =
+      theme.getStyle().copyWith(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold);
+  static  TextStyle headerStyle =  theme.getStyle().copyWith(
       color: Color(0xFF287FFF), fontSize: 20, fontWeight: FontWeight.bold);
-  static const TextStyle featureStyle =
-      TextStyle(color: Colors.black, fontSize: 12, fontWeight: FontWeight.bold);
-  static const TextStyle addOnStyle = TextStyle(
+  static  TextStyle featureStyle =
+       theme.getStyle().copyWith(color: Colors.black, fontSize: 12, fontWeight: FontWeight.bold);
+  static  TextStyle addOnStyle =  theme.getStyle().copyWith(
       color: Colors.black45, fontSize: 14, fontWeight: FontWeight.bold);
 
   void _close() {
@@ -163,7 +163,7 @@ class _ChangeUpgradePlanWidgetState extends BaseState<ChangeUpgradePlanWidget> {
                         spacing: 10,
                         crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
-                          const Text(
+                           Text(
                             'PRICE',
                             style: headerStyle,
                           ),
@@ -375,11 +375,11 @@ class _ChangeUpgradePlanWidgetState extends BaseState<ChangeUpgradePlanWidget> {
                                   '${currencyToSymbol(widget.plan.currency)}${widget.plan.extraUserFee}',
                                   style: featureStyle,
                                 ),
-                                const Text(
+                                 Text(
                                   '/ user',
                                   style: addOnStyle,
                                 ),
-                                const Text(
+                                 Text(
                                   '/ month',
                                   style: planStyle,
                                 ),
@@ -399,11 +399,11 @@ class _ChangeUpgradePlanWidgetState extends BaseState<ChangeUpgradePlanWidget> {
                                   '${currencyToSymbol(widget.plan.currency)}${widget.plan.extraDashboardFee}',
                                   style: featureStyle,
                                 ),
-                                const Text(
+                                 Text(
                                   '/ 10 dashboards',
                                   style: addOnStyle,
                                 ),
-                                const Text(
+                                 Text(
                                   '/ month',
                                   style: planStyle,
                                 ),
@@ -423,11 +423,11 @@ class _ChangeUpgradePlanWidgetState extends BaseState<ChangeUpgradePlanWidget> {
                                   '${currencyToSymbol(widget.plan.currency)}${widget.plan.extraDeviceModelFee}',
                                   style: featureStyle,
                                 ),
-                                const Text(
+                                 Text(
                                   '/ 10 device libraries',
                                   style: addOnStyle,
                                 ),
-                                const Text(
+                                 Text(
                                   '/ month',
                                   style: planStyle,
                                 ),
@@ -447,11 +447,11 @@ class _ChangeUpgradePlanWidgetState extends BaseState<ChangeUpgradePlanWidget> {
                                   '${currencyToSymbol(widget.plan.currency)}${widget.plan.extraModelParametersFee}',
                                   style: featureStyle,
                                 ),
-                                const Text(
+                                 Text(
                                   '/ 10 device parameters',
                                   style: addOnStyle,
                                 ),
-                                const Text(
+                                 Text(
                                   '/ month',
                                   style: planStyle,
                                 ),

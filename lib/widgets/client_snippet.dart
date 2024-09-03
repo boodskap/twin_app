@@ -6,12 +6,10 @@ import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:twin_app/widgets/commons/secondary_button.dart';
 import 'package:twin_app/widgets/google_map.dart';
 import 'package:twin_commons/core/base_state.dart';
-import 'package:twin_commons/widgets/common/label_text_field.dart';
-import 'package:twin_commons/util/osm_location_picker.dart';
-import 'package:twinned_api/twinned_api.dart' as twinned;
 import 'package:twin_commons/core/twin_image_helper.dart';
 import 'package:twin_commons/core/twinned_session.dart';
-import 'package:uuid/uuid.dart';
+import 'package:twin_commons/widgets/common/label_text_field.dart';
+import 'package:twinned_api/twinned_api.dart' as twinned;
 
 class ClientSnippet extends StatefulWidget {
   final twinned.Client? client;
@@ -93,6 +91,7 @@ class _ClientSnippetState extends BaseState<ClientSnippet> {
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: LabelTextField(
                           label: 'Name',
+                          labelTextStyle: theme.getStyle(),
                           style: theme.getStyle(),
                           controller: nameController,
                           focusedBorder: OutlineInputBorder(
@@ -108,6 +107,7 @@ class _ClientSnippetState extends BaseState<ClientSnippet> {
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: LabelTextField(
                           label: 'Description',
+                          labelTextStyle: theme.getStyle(),
                           style: theme.getStyle(),
                           controller: descController,
                           focusedBorder: OutlineInputBorder(
@@ -123,6 +123,7 @@ class _ClientSnippetState extends BaseState<ClientSnippet> {
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: LabelTextField(
                           label: 'Address',
+                          labelTextStyle: theme.getStyle(),
                           style: theme.getStyle(),
                           controller: addressController,
                           focusedBorder: OutlineInputBorder(
@@ -139,6 +140,7 @@ class _ClientSnippetState extends BaseState<ClientSnippet> {
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: LabelTextField(
                           label: 'Email',
+                          labelTextStyle: theme.getStyle(),
                           style: theme.getStyle(),
                           controller: emailController,
                           focusedBorder: OutlineInputBorder(
@@ -153,6 +155,7 @@ class _ClientSnippetState extends BaseState<ClientSnippet> {
                       SizedBox(
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: IntlPhoneField(
+                            style: theme.getStyle(),
                             controller: phoneController,
                             keyboardType: TextInputType.phone,
                             initialCountryCode: countryCode,
@@ -161,6 +164,8 @@ class _ClientSnippetState extends BaseState<ClientSnippet> {
                             ],
                             decoration: InputDecoration(
                               labelText: 'Enter Phone Number',
+                              labelStyle: theme.getStyle(),
+                              hintStyle: theme.getStyle(),
                               counterText: "",
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(4.0),
@@ -271,12 +276,12 @@ class _ClientSnippetState extends BaseState<ClientSnippet> {
                                   //       )
                                   //     : const Center(
                                   //         child: Text('No location selected')),
-                                   _client.location != null
+                                  _client.location != null
                                       ? GoogleMapWidget(
-                                          longitude: _client
-                                              .location!.coordinates[0],
-                                          latitude: _client
-                                              .location!.coordinates[1],
+                                          longitude:
+                                              _client.location!.coordinates[0],
+                                          latitude:
+                                              _client.location!.coordinates[1],
                                           viewMode: false,
                                         )
                                       : Center(
@@ -464,94 +469,102 @@ class _ClientSnippetState extends BaseState<ClientSnippet> {
   //   );
   // }
 
- /// using google map
-Future<void> _showLocationDialog(BuildContext context) async {
-  double pickedLatitude = _client.location != null ? _client.location!.coordinates[1] : 39.6128;
-  double pickedLongitude = _client.location != null ? _client.location!.coordinates[0] : -101.5382;
+  /// using google map
+  Future<void> _showLocationDialog(BuildContext context) async {
+    double pickedLatitude =
+        _client.location != null ? _client.location!.coordinates[1] : 39.6128;
+    double pickedLongitude =
+        _client.location != null ? _client.location!.coordinates[0] : -101.5382;
 
-  final result = await showDialog<Map<String, double>>(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        backgroundColor: Colors.white,
-        content: SingleChildScrollView(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxHeight: MediaQuery.of(context).size.height * 0.97,
-            ),
-            child: StatefulBuilder(
-              builder: (BuildContext context, StateSetter setState) {
-                return Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SizedBox(
-                      width: 1000,
-                      height: MediaQuery.of(context).size.height * 0.85,
-                      child: GoogleMapWidget(
-                        longitude: pickedLongitude,
-                        latitude: pickedLatitude,
-                        saveLocation: (pickedData) {
-                          setState(() {
-                            pickedLatitude = double.parse(pickedData.latitude.toStringAsFixed(4));
-                            pickedLongitude = double.parse(pickedData.longitude.toStringAsFixed(4));
-                          });
-                        },
-                        viewMode: true,
+    final result = await showDialog<Map<String, double>>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          content: SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.97,
+              ),
+              child: StatefulBuilder(
+                builder: (BuildContext context, StateSetter setState) {
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(
+                        width: 1000,
+                        height: MediaQuery.of(context).size.height * 0.85,
+                        child: GoogleMapWidget(
+                          longitude: pickedLongitude,
+                          latitude: pickedLatitude,
+                          saveLocation: (pickedData) {
+                            setState(() {
+                              pickedLatitude = double.parse(
+                                  pickedData.latitude.toStringAsFixed(4));
+                              pickedLongitude = double.parse(
+                                  pickedData.longitude.toStringAsFixed(4));
+                            });
+                          },
+                          viewMode: true,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Latitude: ${pickedLatitude.toStringAsFixed(4)}',
-                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                        ),
-                        const SizedBox(width: 5),
-                        Text(
-                          'Longitude: ${pickedLongitude.toStringAsFixed(4)}',
-                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                        ),
-                        const Spacer(),
-                        SecondaryButton(
-                          labelKey: 'Cancel',
-                          onPressed: () {
-                            Navigator.of(context).pop(); // Close without saving
-                          },
-                        ),
-                        SizedBox(width:5),
-                        PrimaryButton(
-                          labelKey: 'Select',
-                          onPressed: () {
-                            Navigator.of(context).pop({
-                              'latitude': pickedLatitude,
-                              'longitude': pickedLongitude,
-                            }); 
-                          },
-                        ),
-                      ],
-                    ),
-                  ],
-                );
-              },
+                      const SizedBox(height: 12),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Latitude: ${pickedLatitude.toStringAsFixed(4)}',
+                            style: theme.getStyle().copyWith(
+                                fontSize: 16, fontWeight: FontWeight.w600),
+                          ),
+                          const SizedBox(width: 5),
+                          Text(
+                            'Longitude: ${pickedLongitude.toStringAsFixed(4)}',
+                            style: theme.getStyle().copyWith(
+                                fontSize: 16, fontWeight: FontWeight.w600),
+                          ),
+                          const Spacer(),
+                          SecondaryButton(
+                            labelKey: 'Cancel',
+                            onPressed: () {
+                              Navigator.of(context)
+                                  .pop(); // Close without saving
+                            },
+                          ),
+                          SizedBox(width: 5),
+                          PrimaryButton(
+                            labelKey: 'Select',
+                            onPressed: () {
+                              Navigator.of(context).pop({
+                                'latitude': pickedLatitude,
+                                'longitude': pickedLongitude,
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  );
+                },
+              ),
             ),
           ),
-        ),
-      );
-    },
-  );
+        );
+      },
+    );
 
-  if (result != null) {
-    setState(() {
-      _client = _client.copyWith(
-        location: twinned.GeoLocation(coordinates: [
-          result['longitude']!,
-          result['latitude']!,
-        ]),
-      );
-    });
+    if (result != null) {
+      setState(() {
+        _client = _client.copyWith(
+          location: twinned.GeoLocation(coordinates: [
+            result['longitude']!,
+            result['latitude']!,
+          ]),
+        );
+      });
+    }
   }
-}
+
   @override
   void setup() {}
 }

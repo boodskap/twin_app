@@ -150,7 +150,7 @@ class _ClientsState extends BaseState<Clients> {
                   if (!_exhausted)
                     PrimaryButton(
                       minimumSize: Size(130, 40),
-                      labelKey: 'New Client',
+                      labelKey: 'Add Client',
                       leading: const Icon(
                         Icons.add,
                         color: Colors.white,
@@ -218,6 +218,9 @@ class _ClientsState extends BaseState<Clients> {
 
   void _addEditClientDialog({tapi.Client? client}) async {
     await super.alertDialog(
+        titleStyle: theme
+            .getStyle()
+            .copyWith(fontWeight: FontWeight.bold, fontSize: 20),
         title: null == client ? 'Add New Client' : 'Update Client',
         body: ClientSnippet(
           client: client,

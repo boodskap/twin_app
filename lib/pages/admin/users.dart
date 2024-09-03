@@ -294,8 +294,10 @@ class _UsersState extends BaseState<Users> {
                             ? "Are you sure you want to assign this person as administrator?"
                             : "Are you sure you want to remove administrative privilege from this person?",
                         titleStyle: theme.getStyle(),
-                        messageStyle:
-                            const TextStyle(fontWeight: FontWeight.bold),
+                        messageStyle: theme
+                            .getStyle()
+                            .copyWith(fontWeight: FontWeight.bold),
+                        // const TextStyle(fontWeight: FontWeight.bold),
                         onPressed: () async {
                           await execute(() async {
                             if (isAdmin) {
@@ -336,8 +338,9 @@ class _UsersState extends BaseState<Users> {
                               ? "Are you sure you want to assign this person as client administrator?"
                               : "Are you sure you want to remove client administrative privilege from this person?",
                           titleStyle: theme.getStyle(),
-                          messageStyle:
-                              const TextStyle(fontWeight: FontWeight.bold),
+                          messageStyle: theme
+                              .getStyle()
+                              .copyWith(fontWeight: FontWeight.bold),
                           onPressed: () async {
                             await execute(() async {
                               if (isClientAdmin) {
@@ -508,6 +511,7 @@ class _UsersState extends BaseState<Users> {
 
   void _addUpdateUserDialog({tapi.TwinUser? twinUser}) async {
     await super.alertDialog(
+      titleStyle: theme.getStyle().copyWith(fontWeight: FontWeight.bold,fontSize: 20),
       title: null == twinUser ? 'Add New User' : 'Update User',
       body: UserAddUpdateSnippet(
         twinUser: twinUser,
@@ -675,7 +679,7 @@ class TableHeader extends StatelessWidget {
       child: Center(
         child: Text(
           title,
-          style: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
+          style: theme.getStyle().copyWith(fontWeight: FontWeight.bold,fontSize: 16),
         ),
       ),
     );
