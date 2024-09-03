@@ -135,7 +135,7 @@ class _DeviceFieldWidgetState extends BaseState<DeviceFieldWidget> {
               deviceData: dd),
       ],
     );
-    ;
+    
   }
 
   void _padding(List<Widget> children) {

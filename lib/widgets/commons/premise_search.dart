@@ -41,6 +41,8 @@ class _PremiseSearchState extends BaseState<PremiseSearch> {
               Expanded(
                 child: SearchBar(
                   hintText: 'Search Premises',
+                  hintStyle: WidgetStatePropertyAll(theme.getStyle()),
+                  textStyle: WidgetStatePropertyAll(theme.getStyle()),
                   trailing: [const BusyIndicator()],
                   onChanged: (value) async {
                     await _load(search: value);

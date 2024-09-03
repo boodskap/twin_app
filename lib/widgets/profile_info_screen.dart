@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/widgets/change_password_alert_snippet.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:twin_app/widgets/country_codes.dart';
@@ -8,8 +9,6 @@ import 'package:twin_app/widgets/subscription_snippet.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/twinned_session.dart';
 import 'package:twinned_api/api/twinned.swagger.dart';
-import 'package:twin_app/core/session_variables.dart';
-import 'package:twinned_api/api/twinned.swagger.dart' as digital;
 
 class ProfileInfoScreen extends StatefulWidget {
   final int selectedTab;
@@ -280,7 +279,7 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
                                             )),
                                             Expanded(
                                                 child: Text(
-                                             formattedPhone,
+                                              formattedPhone,
                                               style: theme.getStyle().copyWith(
                                                   fontWeight: FontWeight.bold,
                                                   fontSize: 16),
@@ -584,6 +583,7 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
                       field = Column(
                         children: [
                           IntlPhoneField(
+                              style: theme.getStyle(),
                               controller: controller,
                               keyboardType: TextInputType.phone,
                               initialCountryCode: countryCode,
@@ -591,19 +591,19 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
                                 FilteringTextInputFormatter.digitsOnly,
                               ],
                               decoration: InputDecoration(
-                                labelText: 'Enter Phone Number',
-                                counterText: "",
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(4.0),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(4.0),
-                                  borderSide: BorderSide(
-                                    color: theme.getPrimaryColor(),
+                                  labelText: 'Enter Phone Number',
+                                  counterText: "",
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(4.0),
                                   ),
-                                ),
-                                labelStyle: theme.getStyle(),
-                              ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(4.0),
+                                    borderSide: BorderSide(
+                                      color: theme.getPrimaryColor(),
+                                    ),
+                                  ),
+                                  labelStyle: theme.getStyle(),
+                                  hintStyle: theme.getStyle()),
                               validator: (phone) {
                                 if (phone == null || phone.number.isEmpty) {
                                   return 'Enter a valid phone number';

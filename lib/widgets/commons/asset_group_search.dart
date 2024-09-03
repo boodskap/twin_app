@@ -42,6 +42,8 @@ class _AssetGroupSearchState extends BaseState<AssetGroupSearch> {
               Expanded(
                 child: SearchBar(
                   hintText: 'Search Group Filters',
+                  hintStyle: WidgetStatePropertyAll(theme.getStyle()),
+                  textStyle: WidgetStatePropertyAll(theme.getStyle()),
                   trailing: [const BusyIndicator()],
                   onChanged: (value) async {
                     await _load(search: value);

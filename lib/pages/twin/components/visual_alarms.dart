@@ -74,6 +74,8 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
               height: 40,
               width: 250,
               child: SearchBar(
+                hintStyle: WidgetStatePropertyAll(theme.getStyle()),
+                textStyle: WidgetStatePropertyAll(theme.getStyle()),
                 leading: Icon(Icons.search),
                 hintText: 'Search Alarms',
                 onChanged: (val) {
@@ -246,6 +248,7 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
         barrierDismissible: false,
         builder: (context) {
           return AlertDialog(
+            titleTextStyle: theme.getStyle(),
             title: Text(title),
             content: SizedBox(
               width: 500,
@@ -255,29 +258,43 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   TextField(
+                    style: theme.getStyle(),
                     onChanged: (value) {
                       setState(() {
                         nameText = value;
                       });
                     },
-                    decoration: const InputDecoration(hintText: 'Name'),
+                    decoration: InputDecoration(
+                      hintText: 'Name',
+                      hintStyle: theme.getStyle(),
+                      labelStyle: theme.getStyle(),
+                    ),
                   ),
                   TextField(
+                    style: theme.getStyle(),
                     onChanged: (value) {
                       setState(() {
                         descText = value;
                       });
                     },
-                    decoration: const InputDecoration(hintText: 'Description'),
+                    decoration: InputDecoration(
+                      hintText: 'Description',
+                      hintStyle: theme.getStyle(),
+                      labelStyle: theme.getStyle(),
+                    ),
                   ),
                   TextField(
+                    style: theme.getStyle(),
                     onChanged: (value) {
                       setState(() {
                         tagsText = value;
                       });
                     },
-                    decoration: const InputDecoration(
-                        hintText: 'Tags (space separated)'),
+                    decoration: InputDecoration(
+                      hintText: 'Tags (space separated)',
+                      hintStyle: theme.getStyle(),
+                      labelStyle: theme.getStyle(),
+                    ),
                   ),
                 ],
               ),

@@ -1,8 +1,9 @@
-import 'package:flutter/material.dart';
 import 'package:accordion/accordion.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:twin_commons/widgets/common/label_text_field.dart';
+import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_commons/core/base_state.dart';
+import 'package:twin_commons/widgets/common/label_text_field.dart';
 
 class Orders extends StatefulWidget {
   const Orders({super.key});
@@ -17,14 +18,19 @@ class _OrdersState extends BaseState<Orders> {
     return Column(
       children: [
         divider(),
-        Align(
-          alignment: Alignment.topRight,
-          child: SizedBox(
-            width: 250,
-            height: 30,
-            child: SearchBar(
-              onChanged: (value) {},
-              hintText: "Search Orders",
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Align(
+            alignment: Alignment.topRight,
+            child: SizedBox(
+              width: 250,
+              height: 40,
+              child: SearchBar(
+                hintStyle: WidgetStatePropertyAll(theme.getStyle()),
+                textStyle: WidgetStatePropertyAll(theme.getStyle()),
+                onChanged: (value) {},
+                hintText: "Search Orders",
+              ),
             ),
           ),
         ),
@@ -111,6 +117,8 @@ class _AccordionPageState extends State<AccordionPage> {
                 width: 150,
                 child: LabelTextField(
                   label: 'Plan Name',
+                  labelTextStyle: theme.getStyle(),
+                  style: theme.getStyle(),
                   controller: planNameController,
                   readOnlyVal: true,
                 ),
@@ -119,6 +127,8 @@ class _AccordionPageState extends State<AccordionPage> {
                 width: 150,
                 child: LabelTextField(
                   label: 'Plan Price',
+                  labelTextStyle: theme.getStyle(),
+                  style: theme.getStyle(),
                   controller: planPriceController,
                   readOnlyVal: true,
                 ),
@@ -127,6 +137,8 @@ class _AccordionPageState extends State<AccordionPage> {
                 width: 150,
                 child: LabelTextField(
                   label: 'Order Amount',
+                  labelTextStyle: theme.getStyle(),
+                  style: theme.getStyle(),
                   controller: orderAmountController,
                   readOnlyVal: true,
                 ),
@@ -135,6 +147,8 @@ class _AccordionPageState extends State<AccordionPage> {
                 width: 150,
                 child: LabelTextField(
                   label: 'Order Status',
+                  labelTextStyle: theme.getStyle(),
+                  style: theme.getStyle(),
                   controller: orderStatusController,
                 ),
               ),
@@ -144,9 +158,9 @@ class _AccordionPageState extends State<AccordionPage> {
                     backgroundColor: Colors.indigo,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(5))),
-                child: const Text(
+                child: Text(
                   'Pay',
-                  style: TextStyle(color: Colors.white),
+                  style: theme.getStyle().copyWith(color: Colors.white),
                 ),
               ),
             ],
@@ -167,6 +181,8 @@ class _AccordionPageState extends State<AccordionPage> {
                             width: 150,
                             child: LabelTextField(
                               label: 'Data Points Count',
+                              labelTextStyle: theme.getStyle(),
+                              style: theme.getStyle(),
                               controller: dataPointsController,
                               readOnlyVal: !isEditable,
                               keyboardType: TextInputType.number,
@@ -184,6 +200,8 @@ class _AccordionPageState extends State<AccordionPage> {
                             width: 150,
                             child: LabelTextField(
                               label: 'Devices Count',
+                              labelTextStyle: theme.getStyle(),
+                              style: theme.getStyle(),
                               controller: devicesController,
                               readOnlyVal: !isEditable,
                               keyboardType: TextInputType.number,
@@ -201,6 +219,8 @@ class _AccordionPageState extends State<AccordionPage> {
                             width: 150,
                             child: LabelTextField(
                               label: 'Device Libraries Count',
+                              labelTextStyle: theme.getStyle(),
+                              style: theme.getStyle(),
                               controller: deviceLibrariesController,
                               readOnlyVal: !isEditable,
                               keyboardType: TextInputType.number,
@@ -218,6 +238,8 @@ class _AccordionPageState extends State<AccordionPage> {
                             width: 150,
                             child: LabelTextField(
                               label: 'Device Parameters Count',
+                              labelTextStyle: theme.getStyle(),
+                              style: theme.getStyle(),
                               controller: deviceParametersController,
                               readOnlyVal: !isEditable,
                               keyboardType: TextInputType.number,
@@ -235,6 +257,8 @@ class _AccordionPageState extends State<AccordionPage> {
                             width: 150,
                             child: LabelTextField(
                               label: 'Users Count',
+                              labelTextStyle: theme.getStyle(),
+                              style: theme.getStyle(),
                               controller: usersController,
                               readOnlyVal: !isEditable,
                               keyboardType: TextInputType.number,
@@ -252,6 +276,8 @@ class _AccordionPageState extends State<AccordionPage> {
                             width: 150,
                             child: LabelTextField(
                               label: 'Clients Count',
+                              labelTextStyle: theme.getStyle(),
+                              style: theme.getStyle(),
                               controller: clientsController,
                               readOnlyVal: !isEditable,
                               keyboardType: TextInputType.number,
@@ -269,6 +295,8 @@ class _AccordionPageState extends State<AccordionPage> {
                             width: 150,
                             child: LabelTextField(
                               label: 'Dashboards Count',
+                              labelTextStyle: theme.getStyle(),
+                              style: theme.getStyle(),
                               controller: dashboardsController,
                               readOnlyVal: !isEditable,
                               keyboardType: TextInputType.number,
@@ -286,6 +314,8 @@ class _AccordionPageState extends State<AccordionPage> {
                             width: 150,
                             child: LabelTextField(
                               label: 'Archivals Count',
+                              labelTextStyle: theme.getStyle(),
+                              style: theme.getStyle(),
                               controller: archivalController,
                               readOnlyVal: !isEditable,
                               keyboardType: TextInputType.number,
@@ -306,6 +336,8 @@ class _AccordionPageState extends State<AccordionPage> {
                           width: 150,
                           child: LabelTextField(
                             label: 'Data Points Price',
+                            labelTextStyle: theme.getStyle(),
+                            style: theme.getStyle(),
                             controller: dataPointsPriceController,
                             readOnlyVal: true,
                           ),
@@ -314,6 +346,8 @@ class _AccordionPageState extends State<AccordionPage> {
                           width: 150,
                           child: LabelTextField(
                             label: 'Devices Price',
+                            labelTextStyle: theme.getStyle(),
+                            style: theme.getStyle(),
                             controller: devicesPriceController,
                             readOnlyVal: true,
                           ),
@@ -322,6 +356,8 @@ class _AccordionPageState extends State<AccordionPage> {
                           width: 150,
                           child: LabelTextField(
                             label: 'Device Libraries Price',
+                            labelTextStyle: theme.getStyle(),
+                            style: theme.getStyle(),
                             controller: deviceLibrariesPriceController,
                             readOnlyVal: true,
                           ),
@@ -330,6 +366,8 @@ class _AccordionPageState extends State<AccordionPage> {
                           width: 150,
                           child: LabelTextField(
                             label: 'Device Parameters Price',
+                            labelTextStyle: theme.getStyle(),
+                            style: theme.getStyle(),
                             controller: deviceParametersPriceController,
                             readOnlyVal: true,
                           ),
@@ -338,6 +376,8 @@ class _AccordionPageState extends State<AccordionPage> {
                           width: 150,
                           child: LabelTextField(
                             label: 'Users Price',
+                            labelTextStyle: theme.getStyle(),
+                            style: theme.getStyle(),
                             controller: usersPriceController,
                             readOnlyVal: true,
                           ),
@@ -346,6 +386,8 @@ class _AccordionPageState extends State<AccordionPage> {
                           width: 150,
                           child: LabelTextField(
                             label: 'Clients Price',
+                            labelTextStyle: theme.getStyle(),
+                            style: theme.getStyle(),
                             controller: clientsPriceController,
                             readOnlyVal: true,
                           ),
@@ -354,6 +396,8 @@ class _AccordionPageState extends State<AccordionPage> {
                           width: 150,
                           child: LabelTextField(
                             label: 'Dashboards Price',
+                            labelTextStyle: theme.getStyle(),
+                            style: theme.getStyle(),
                             controller: dashboardsPriceController,
                             readOnlyVal: true,
                           ),
@@ -362,6 +406,8 @@ class _AccordionPageState extends State<AccordionPage> {
                           width: 150,
                           child: LabelTextField(
                             label: 'Archivals Price',
+                            labelTextStyle: theme.getStyle(),
+                            style: theme.getStyle(),
                             controller: archivalPriceController,
                             readOnlyVal: true,
                           ),
@@ -387,9 +433,9 @@ class _AccordionPageState extends State<AccordionPage> {
                           backgroundColor: Colors.indigo,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(5))),
-                      child: const Text(
+                      child: Text(
                         'Edit Orders',
-                        style: TextStyle(color: Colors.white),
+                        style: theme.getStyle().copyWith(color: Colors.white),
                       ),
                     ),
                     const SizedBox(
@@ -401,9 +447,9 @@ class _AccordionPageState extends State<AccordionPage> {
                           backgroundColor: Colors.indigo,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(5))),
-                      child: const Text(
+                      child: Text(
                         'Cancel',
-                        style: TextStyle(color: Colors.white),
+                        style: theme.getStyle().copyWith(color: Colors.white),
                       ),
                     ),
                     const SizedBox(
@@ -417,9 +463,9 @@ class _AccordionPageState extends State<AccordionPage> {
                           backgroundColor: Colors.indigo,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(5))),
-                      child: const Text(
+                      child: Text(
                         'Save',
-                        style: TextStyle(color: Colors.white),
+                        style: theme.getStyle().copyWith(color: Colors.white),
                       ),
                     ),
                   ],

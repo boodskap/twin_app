@@ -95,8 +95,10 @@ class _InstallationDatabaseState extends BaseState<InstallationDatabase> {
                   height: 40,
                   width: 250,
                   child: SearchBar(
+                    hintStyle: WidgetStatePropertyAll(theme.getStyle()),
+                    textStyle: WidgetStatePropertyAll(theme.getStyle()),
                     leading: Icon(Icons.search),
-                    hintText: 'Search installation database',
+                    hintText: 'Search Installation Database',
                     onChanged: (val) {
                       _search = val.trim();
                       _load();
@@ -258,6 +260,8 @@ class _InstallationDatabaseState extends BaseState<InstallationDatabase> {
     String? modelId,
   }) async {
     await super.alertDialog(
+      titleStyle:
+          theme.getStyle().copyWith(fontSize: 20, fontWeight: FontWeight.bold),
       title: null == device ? 'Add New Device' : 'Update Device',
       body: InstallationDatabaseSnippet(
         device: device,

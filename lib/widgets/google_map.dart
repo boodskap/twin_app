@@ -156,7 +156,6 @@ class _GoogleMapMultiWidgetState extends State<GoogleMapMultiWidget> {
   void _showCustomInfoWindow(
       BuildContext context, int index, tapi.GeoLocation location) {
     setState(() {
-     
       selectedDeviceData = widget.deviceDataList[index];
       final screenSize = MediaQuery.of(context).size;
       customInfoWindowPosition = Offset(
@@ -251,9 +250,10 @@ class CustomInfoWindow extends StatelessWidget {
                         deviceData.asset != ""
                             ? deviceData.asset.toString()
                             : deviceData.deviceName.toString(),
-                        style: TextStyle(
-                          color:theme.getPrimaryColor(),
-                            fontWeight: FontWeight.bold, fontSize: 16),
+                        style: theme.getStyle().copyWith(
+                            color: theme.getPrimaryColor(),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -274,10 +274,12 @@ class CustomInfoWindow extends StatelessWidget {
                   Text(
                     "Hardware Device Id",
                     overflow: TextOverflow.ellipsis,
+                    style: theme.getStyle(),
                   ),
                   Text(
                     deviceData.hardwareDeviceId.toString(),
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    style:
+                        theme.getStyle().copyWith(fontWeight: FontWeight.bold),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
@@ -289,10 +291,11 @@ class CustomInfoWindow extends StatelessWidget {
                     Text(
                       "Level",
                       overflow: TextOverflow.ellipsis,
+                      style: theme.getStyle(),
                     ),
                     Text(
                       dynamicLevelData['level'].toString() + " %",
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      style: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],
@@ -303,6 +306,7 @@ class CustomInfoWindow extends StatelessWidget {
                   Text(
                     "Reported Time",
                     overflow: TextOverflow.ellipsis,
+                    style: theme.getStyle(),
                   ),
                   Text(
                     deviceData.updatedStamp != 0
@@ -310,7 +314,7 @@ class CustomInfoWindow extends StatelessWidget {
                                 deviceData.updatedStamp)
                             .toString()
                         : '-',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    style: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],

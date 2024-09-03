@@ -2,6 +2,7 @@ import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/widgets/buy_button.dart';
+import 'package:twin_app/widgets/commons/secondary_button.dart';
 import 'package:twin_app/widgets/utils.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:nocode_api/api/nocode.swagger.dart' as nocode;
@@ -43,16 +44,16 @@ class PurchaseChangeAddonWidget extends StatefulWidget {
 
 class _PurchaseChangeAddonWidgetState
     extends BaseState<PurchaseChangeAddonWidget> {
-  static const TextStyle headerStyle =
-      TextStyle(fontSize: 22, fontWeight: FontWeight.bold);
-  static const TextStyle tableHeaderStyle =
-      TextStyle(fontSize: 16, fontWeight: FontWeight.bold);
-  static const TextStyle tableRowStyle =
-      TextStyle(fontSize: 16, fontWeight: FontWeight.normal);
-  static const TextStyle priceRowStyle =
-      TextStyle(fontSize: 16, fontWeight: FontWeight.bold);
-  static const TextStyle totalPriceStyle =
-      TextStyle(fontSize: 20, fontWeight: FontWeight.bold);
+  static TextStyle headerStyle =
+      theme.getStyle().copyWith(fontSize: 22, fontWeight: FontWeight.bold);
+  static TextStyle tableHeaderStyle =
+      theme.getStyle().copyWith(fontSize: 16, fontWeight: FontWeight.bold);
+  static TextStyle tableRowStyle =
+      theme.getStyle().copyWith(fontSize: 16, fontWeight: FontWeight.normal);
+  static TextStyle priceRowStyle =
+      theme.getStyle().copyWith(fontSize: 16, fontWeight: FontWeight.bold);
+  static TextStyle totalPriceStyle =
+      theme.getStyle().copyWith(fontSize: 20, fontWeight: FontWeight.bold);
 
   nocode.OrgPlan? _orgPlan;
   nocode.Plan? _plan;
@@ -122,7 +123,7 @@ class _PurchaseChangeAddonWidgetState
         height: 650,
         child: Column(
           children: [
-            const Row(
+            Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
@@ -141,7 +142,7 @@ class _PurchaseChangeAddonWidgetState
                     columnSpacing: 12,
                     horizontalMargin: 12,
                     minWidth: 600,
-                    columns: const [
+                    columns: [
                       DataColumn2(
                         label: Text(
                           'Add On',
@@ -179,7 +180,7 @@ class _PurchaseChangeAddonWidgetState
                     ],
                     rows: [
                       DataRow(cells: [
-                        const DataCell(Text(
+                        DataCell(Text(
                           'Devices',
                           style: tableRowStyle,
                         )),
@@ -197,7 +198,7 @@ class _PurchaseChangeAddonWidgetState
                           '${currencyToSymbol(_plan!.currency)} ${_plan!.extraDeviceFee}',
                           style: tableRowStyle,
                         )),
-                        const DataCell(Text(
+                        DataCell(Text(
                           '1',
                           style: tableRowStyle,
                         )),
@@ -207,7 +208,7 @@ class _PurchaseChangeAddonWidgetState
                         )),
                       ]),
                       DataRow(cells: [
-                        const DataCell(Text(
+                        DataCell(Text(
                           'Users',
                           style: tableRowStyle,
                         )),
@@ -225,7 +226,7 @@ class _PurchaseChangeAddonWidgetState
                           '${currencyToSymbol(_plan!.currency)} ${_plan!.extraUserFee}',
                           style: tableRowStyle,
                         )),
-                        const DataCell(Text(
+                        DataCell(Text(
                           '1',
                           style: tableRowStyle,
                         )),
@@ -235,7 +236,7 @@ class _PurchaseChangeAddonWidgetState
                         )),
                       ]),
                       DataRow(cells: [
-                        const DataCell(Text(
+                        DataCell(Text(
                           'Dashboards',
                           style: tableRowStyle,
                         )),
@@ -253,7 +254,7 @@ class _PurchaseChangeAddonWidgetState
                           '${currencyToSymbol(_plan!.currency)} ${_plan!.extraDashboardFee}',
                           style: tableRowStyle,
                         )),
-                        const DataCell(Text(
+                        DataCell(Text(
                           '10',
                           style: tableRowStyle,
                         )),
@@ -263,7 +264,7 @@ class _PurchaseChangeAddonWidgetState
                         )),
                       ]),
                       DataRow(cells: [
-                        const DataCell(Text(
+                        DataCell(Text(
                           'Device Libraries',
                           style: tableRowStyle,
                         )),
@@ -281,7 +282,7 @@ class _PurchaseChangeAddonWidgetState
                           '${currencyToSymbol(_plan!.currency)} ${_plan!.extraDeviceModelFee}',
                           style: tableRowStyle,
                         )),
-                        const DataCell(Text(
+                        DataCell(Text(
                           '10',
                           style: tableRowStyle,
                         )),
@@ -291,7 +292,7 @@ class _PurchaseChangeAddonWidgetState
                         )),
                       ]),
                       DataRow(cells: [
-                        const DataCell(Text(
+                        DataCell(Text(
                           'Device Parameters',
                           style: tableRowStyle,
                         )),
@@ -309,7 +310,7 @@ class _PurchaseChangeAddonWidgetState
                           '${currencyToSymbol(_plan!.currency)} ${_plan!.extraModelParametersFee}',
                           style: tableRowStyle,
                         )),
-                        const DataCell(Text(
+                        DataCell(Text(
                           '10',
                           style: tableRowStyle,
                         )),
@@ -326,7 +327,7 @@ class _PurchaseChangeAddonWidgetState
                                   : null,
                             ))),
                         if (!(_orgPlan?.canBuyDataPlan ?? false))
-                          const DataCell(Text(
+                          DataCell(Text(
                             '-',
                             style: tableRowStyle,
                           )),
@@ -345,7 +346,7 @@ class _PurchaseChangeAddonWidgetState
                           '${currencyToSymbol(_plan!.currency)} ${_plan!.extraDataPointsFee}',
                           style: tableRowStyle,
                         )),
-                        const DataCell(Text(
+                        DataCell(Text(
                           '50,000',
                           style: tableRowStyle,
                         )),
@@ -362,7 +363,7 @@ class _PurchaseChangeAddonWidgetState
                                   : null,
                             ))),
                         if (!(_orgPlan?.canBuyClientPlan ?? false))
-                          const DataCell(Text(
+                          DataCell(Text(
                             '-',
                             style: tableRowStyle,
                           )),
@@ -381,7 +382,7 @@ class _PurchaseChangeAddonWidgetState
                           '${currencyToSymbol(_plan!.currency)} ${_plan!.extraClientFee}',
                           style: tableRowStyle,
                         )),
-                        const DataCell(Text(
+                        DataCell(Text(
                           '1',
                           style: tableRowStyle,
                         )),
@@ -398,7 +399,7 @@ class _PurchaseChangeAddonWidgetState
                                   : null,
                             ))),
                         if (!(_orgPlan?.canBuyArchivalPlan ?? false))
-                          const DataCell(Text(
+                          DataCell(Text(
                             '-',
                             style: tableRowStyle,
                           )),
@@ -417,7 +418,7 @@ class _PurchaseChangeAddonWidgetState
                           '${currencyToSymbol(_plan!.currency)} ${_plan!.extraArchivalFee}',
                           style: tableRowStyle,
                         )),
-                        const DataCell(Text(
+                        DataCell(Text(
                           '1 Year',
                           style: tableRowStyle,
                         )),
@@ -427,15 +428,15 @@ class _PurchaseChangeAddonWidgetState
                         )),
                       ]),
                       DataRow(cells: [
-                        const DataCell(Text(
+                        DataCell(Text(
                           '',
                           style: tableRowStyle,
                         )),
-                        const DataCell(Text(
+                        DataCell(Text(
                           '',
                           style: tableRowStyle,
                         )),
-                        const DataCell(Text(
+                        DataCell(Text(
                           '',
                           style: tableRowStyle,
                         )),

@@ -63,6 +63,8 @@ class _AssetLibraryState extends BaseState<AssetLibrary> {
                 height: 40,
                 width: 250,
                 child: SearchBar(
+                  hintStyle: WidgetStatePropertyAll(theme.getStyle()),
+                  textStyle: WidgetStatePropertyAll(theme.getStyle()),
                   leading: Icon(Icons.search),
                   hintText: 'Search Asset Library',
                   onChanged: (val) {
@@ -208,6 +210,8 @@ class _AssetLibraryState extends BaseState<AssetLibrary> {
 
   Future _create() async {
     await super.alertDialog(
+      titleStyle:
+          theme.getStyle().copyWith(fontSize: 20, fontWeight: FontWeight.bold),
       title: 'New Asset Type',
       width: MediaQuery.of(context).size.width / 2 + 100,
       height: MediaQuery.of(context).size.height / 2 + 100,

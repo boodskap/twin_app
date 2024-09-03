@@ -36,8 +36,7 @@ class _CustomParametersDropDownState
           value: element,
           child: Text(
             element.name,
-            style:
-                theme.getStyle().copyWith(color: Colors.black),
+            style: theme.getStyle().copyWith(color: Colors.black),
           ),
         );
         _entries.add(me);
@@ -59,8 +58,11 @@ class _CustomParametersDropDownState
   Widget build(BuildContext context) {
     return DropdownButtonHideUnderline(
       child: DropdownButtonFormField2<Parameter>(
+        style: theme.getStyle(),
         isExpanded: true,
         decoration: InputDecoration(
+          labelStyle: theme.getStyle(),
+          hintStyle: theme.getStyle(),
           contentPadding: const EdgeInsets.only(
             left: 1,
             right: 3,
@@ -75,7 +77,10 @@ class _CustomParametersDropDownState
           padding: EdgeInsets.only(left: 0, right: 3),
         ),
         isDense: true,
-        hint: const Text("Select Field"),
+        hint: Text(
+          "Select Field",
+          style: theme.getStyle(),
+        ),
         items: _entries,
         value: _selected,
         validator: (value) {
