@@ -200,6 +200,8 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                           onTap: () async {
                             await super.alertDialog(
                               title: 'Filter by Data',
+                              titleStyle: theme.getStyle().copyWith(
+                                  fontWeight: FontWeight.bold, fontSize: 20),
                               width: dialogWidth,
                               height: dialogHeight,
                               body: DataSearch(
@@ -269,6 +271,8 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                           onTap: () async {
                             await super.alertDialog(
                                 title: 'Filter by Client',
+                                titleStyle: theme.getStyle().copyWith(
+                                    fontWeight: FontWeight.bold, fontSize: 20),
                                 width: dialogWidth,
                                 height: dialogHeight,
                                 body: ClientSearch(
@@ -314,6 +318,8 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                           onTap: () async {
                             await super.alertDialog(
                                 title: 'Filter by Premise',
+                                titleStyle: theme.getStyle().copyWith(
+                                    fontWeight: FontWeight.bold, fontSize: 20),
                                 width: dialogWidth,
                                 height: dialogHeight,
                                 body: PremiseSearch(
@@ -355,6 +361,8 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                           onTap: () async {
                             await super.alertDialog(
                                 title: 'Filter by Facility',
+                                titleStyle: theme.getStyle().copyWith(
+                                    fontWeight: FontWeight.bold, fontSize: 20),
                                 width: dialogWidth,
                                 height: dialogHeight,
                                 body: FacilitySearch(
@@ -394,6 +402,8 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                           onTap: () async {
                             await super.alertDialog(
                                 title: 'Filter by Floor',
+                                titleStyle: theme.getStyle().copyWith(
+                                    fontWeight: FontWeight.bold, fontSize: 20),
                                 width: dialogWidth,
                                 height: dialogHeight,
                                 body: FloorSearch(
@@ -431,6 +441,8 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                           onTap: () async {
                             await super.alertDialog(
                                 title: 'Filter by Group',
+                                titleStyle: theme.getStyle().copyWith(
+                                    fontWeight: FontWeight.bold, fontSize: 20),
                                 width: dialogWidth,
                                 height: dialogHeight,
                                 body: AssetGroupSearch(
@@ -468,6 +480,8 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                           onTap: () async {
                             await super.alertDialog(
                                 title: 'Filter by Event',
+                                titleStyle: theme.getStyle().copyWith(
+                                    fontWeight: FontWeight.bold, fontSize: 20),
                                 width: dialogWidth,
                                 height: dialogHeight,
                                 body: EventSearch(
@@ -505,6 +519,8 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                           onTap: () async {
                             await super.alertDialog(
                                 title: 'Filter by Alarm',
+                                titleStyle: theme.getStyle().copyWith(
+                                    fontWeight: FontWeight.bold, fontSize: 20),
                                 width: dialogWidth,
                                 height: dialogHeight,
                                 body: AlarmSearch(
@@ -532,12 +548,16 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                             width: 250,
                             height: 40,
                             child: SearchBar(
+                              hintStyle:
+                                  WidgetStatePropertyAll(theme.getStyle()),
+                              textStyle:
+                                  WidgetStatePropertyAll(theme.getStyle()),
                               hintText: widget.searchHint,
                               controller: _controller,
                               trailing: [const BusyIndicator()],
                               onChanged: (val) {
                                 if (loading) {
-                                  _controller.text = _searchQuery;
+                                  // _controller.text = _searchQuery;
                                   return;
                                 }
                                 setState(() {
@@ -561,6 +581,8 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                       height: 40,
                       child: SearchBar(
                         hintText: widget.searchHint,
+                        hintStyle: WidgetStatePropertyAll(theme.getStyle()),
+                        textStyle: WidgetStatePropertyAll(theme.getStyle()),
                         controller: _controller,
                         trailing: [const BusyIndicator()],
                         onChanged: (val) {
@@ -601,10 +623,10 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                           Expanded(
                             child: Text(
                               'Filters',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
+                              style: theme.getStyle().copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
                             ),
                           ),
                           IconButton(
@@ -652,7 +674,7 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                                           : customButtonStyle,
                                       child: Text(
                                         'Filter by Data',
-                                        style: TextStyle(
+                                        style: theme.getStyle().copyWith(
                                             color: (null != _dataFilter ||
                                                     null != _fieldFilter)
                                                 ? Colors.white
@@ -661,6 +683,9 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                                       onPressed: () async {
                                         await super.alertDialog(
                                           title: 'Filter by Data',
+                                          titleStyle: theme.getStyle().copyWith(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 20),
                                           width: dialogWidth,
                                           height: dialogHeight,
                                           body: DataSearch(
@@ -729,13 +754,18 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                                           ? customButtonStyle
                                           : customEnabledButtonStyle,
                                       child: Text('Filter by Clients',
-                                          style: TextStyle(
+                                          style: theme.getStyle().copyWith(
                                               color: null == _client
                                                   ? null
                                                   : Colors.white)),
                                       onPressed: () async {
                                         await super.alertDialog(
                                             title: 'Filter by Client',
+                                            titleStyle: theme
+                                                .getStyle()
+                                                .copyWith(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 20),
                                             width: dialogWidth,
                                             height: dialogHeight,
                                             body: ClientSearch(onClientSelected:
@@ -778,15 +808,20 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                                           : customEnabledButtonStyle,
                                       child: Text(
                                         'Filter by Premises',
-                                        style: TextStyle(
-                                          color: null == _premise
-                                              ? null
-                                              : Colors.white,
-                                        ),
+                                        style: theme.getStyle().copyWith(
+                                              color: null == _premise
+                                                  ? null
+                                                  : Colors.white,
+                                            ),
                                       ),
                                       onPressed: () async {
                                         await super.alertDialog(
                                             title: 'Filter by Premise',
+                                            titleStyle: theme
+                                                .getStyle()
+                                                .copyWith(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 20),
                                             width: dialogWidth,
                                             height: dialogHeight,
                                             body: PremiseSearch(
@@ -828,7 +863,7 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                                           : customEnabledButtonStyle,
                                       child: Text(
                                         'Filter by Facility',
-                                        style: TextStyle(
+                                        style: theme.getStyle().copyWith(
                                             color: null == _facility
                                                 ? null
                                                 : Colors.white),
@@ -836,6 +871,11 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                                       onPressed: () async {
                                         await super.alertDialog(
                                             title: 'Filter by Facility',
+                                            titleStyle: theme
+                                                .getStyle()
+                                                .copyWith(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 20),
                                             width: dialogWidth,
                                             height: dialogHeight,
                                             body: FacilitySearch(
@@ -875,7 +915,7 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                                           : customEnabledButtonStyle,
                                       child: Text(
                                         'Filter by Floor',
-                                        style: TextStyle(
+                                        style: theme.getStyle().copyWith(
                                             color: null == _floor
                                                 ? null
                                                 : Colors.white),
@@ -883,6 +923,11 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                                       onPressed: () async {
                                         await super.alertDialog(
                                             title: 'Filter by Floor',
+                                            titleStyle: theme
+                                                .getStyle()
+                                                .copyWith(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 20),
                                             width: dialogWidth,
                                             height: dialogHeight,
                                             body: FloorSearch(
@@ -919,7 +964,7 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                                           : customEnabledButtonStyle,
                                       child: Text(
                                         'Filter by Group',
-                                        style: TextStyle(
+                                        style: theme.getStyle().copyWith(
                                             color: null == _assetGroup
                                                 ? null
                                                 : Colors.white),
@@ -927,6 +972,11 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                                       onPressed: () async {
                                         await super.alertDialog(
                                             title: 'Filter by Group',
+                                            titleStyle: theme
+                                                .getStyle()
+                                                .copyWith(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 20),
                                             width: dialogWidth,
                                             height: dialogHeight,
                                             body: AssetGroupSearch(
@@ -964,7 +1014,7 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                                           : customEnabledButtonStyle,
                                       child: Text(
                                         'Filter by Event',
-                                        style: TextStyle(
+                                        style: theme.getStyle().copyWith(
                                             color: null == _event
                                                 ? null
                                                 : Colors.white),
@@ -972,6 +1022,11 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                                       onPressed: () async {
                                         await super.alertDialog(
                                             title: 'Filter by Event',
+                                            titleStyle: theme
+                                                .getStyle()
+                                                .copyWith(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 20),
                                             width: dialogWidth,
                                             height: dialogHeight,
                                             body: EventSearch(
@@ -1009,7 +1064,7 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                                           : customEnabledButtonStyle,
                                       child: Text(
                                         'Filter by Alarm',
-                                        style: TextStyle(
+                                        style: theme.getStyle().copyWith(
                                             color: null == _alarm
                                                 ? null
                                                 : Colors.white),
@@ -1017,6 +1072,11 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                                       onPressed: () async {
                                         await super.alertDialog(
                                             title: 'Filter by Alarm',
+                                            titleStyle: theme
+                                                .getStyle()
+                                                .copyWith(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 20),
                                             width: dialogWidth,
                                             height: dialogHeight,
                                             body: AlarmSearch(
@@ -1053,12 +1113,16 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                                         width: 250,
                                         height: 40,
                                         child: SearchBar(
+                                          hintStyle: WidgetStatePropertyAll(
+                                              theme.getStyle()),
+                                          textStyle: WidgetStatePropertyAll(
+                                              theme.getStyle()),
                                           hintText: widget.searchHint,
                                           controller: _controller,
                                           trailing: [const BusyIndicator()],
                                           onChanged: (val) {
                                             if (loading) {
-                                              _controller.text = _searchQuery;
+                                              // _controller.text = _searchQuery;
                                               return;
                                             }
                                             setState(() {
@@ -1477,11 +1541,14 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          titleTextStyle: theme
+              .getStyle()
+              .copyWith(fontWeight: FontWeight.bold, fontSize: 20),
           backgroundColor: Colors.white,
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Preview Location'),
+               Text('Preview Location',style: theme.getStyle(),),
               IconButton(
                 icon: Icon(Icons.close),
                 onPressed: () {

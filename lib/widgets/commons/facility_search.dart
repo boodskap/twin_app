@@ -43,6 +43,8 @@ class _FacilitySearchState extends BaseState<FacilitySearch> {
               Expanded(
                 child: SearchBar(
                   hintText: 'Search Facilities',
+                  hintStyle: WidgetStatePropertyAll(theme.getStyle()),
+                  textStyle: WidgetStatePropertyAll(theme.getStyle()),
                   trailing: [const BusyIndicator()],
                   onChanged: (value) async {
                     await _load(search: value);
