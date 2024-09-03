@@ -21,7 +21,7 @@ void main() async {
 
   start(
     appTitle: 'My Twin App',
-    flavour: 'prod',
+    flavour: 'dev',
     homeMenu: TwinAppMenu.home,
     homeMenuTitle: 'Home',
     disableTwinApp: false,
