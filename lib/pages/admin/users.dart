@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:twin_app/core/session_variables.dart';
+import 'package:twin_app/widgets/buy_button.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:twin_app/widgets/commons/secondary_button.dart';
+import 'package:twin_app/widgets/purchase_change_addon_widget.dart';
 import 'package:twin_app/widgets/user_add_update_snippet.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
@@ -35,6 +37,7 @@ class _UsersState extends BaseState<Users> {
   bool _isCardView = false;
   List<String> rolesSelected = [];
   List<String> clientSelected = [];
+  bool _exhausted = true;
 
   @override
   Widget build(BuildContext context) {
@@ -118,15 +121,26 @@ class _UsersState extends BaseState<Users> {
                   ),
                 ),
                 divider(horizontal: true),
-                PrimaryButton(
-                  minimumSize: const Size(130, 40),
-                  leading: const Icon(
-                    Icons.add,
-                    color: Colors.white,
+                if (_exhausted)
+                  BuyButton(
+                      label: 'Buy More License',
+                      tooltip:
+                          'Utilized ${orgPlan?.totalUserCount ?? '-'} licenses',
+                      style: theme.getStyle().copyWith(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: Colors.blue),
+                      onPressed: _buyAddon),
+                if (!_exhausted)
+                  PrimaryButton(
+                    minimumSize: const Size(130, 40),
+                    leading: const Icon(
+                      Icons.add,
+                      color: Colors.white,
+                    ),
+                    labelKey: 'Add User',
+                    onPressed: _addUpdateUserDialog,
                   ),
-                  labelKey: 'Add User',
-                  onPressed: _addUpdateUserDialog,
-                ),
                 divider(horizontal: true),
                 SizedBox(
                   width: 250,
@@ -579,7 +593,28 @@ class _UsersState extends BaseState<Users> {
     refresh();
   }
 
-  void _load() async {
+  Future _buyAddon() async {
+    await showDialog(
+        context: context,
+        builder: (ctx) {
+          return AlertDialog(
+            content: PurchaseChangeAddonWidget(
+              orgId: orgs[selectedOrg].id,
+              purchase: true,
+              users: 1,
+            ),
+          );
+        });
+    await _checkExhausted();
+    await _load();
+  }
+
+  Future _checkExhausted() async {
+    _exhausted = await hasUsersExhausted();
+    refresh();
+  }
+
+  Future _load() async {
     if (loading) return;
     loading = true;
 
@@ -624,6 +659,7 @@ class _UsersState extends BaseState<Users> {
 
   @override
   void setup() {
+    _checkExhausted();
     _load();
   }
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:twin_app/widgets/buy_button.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:twin_app/widgets/commons/secondary_button.dart';
+import 'package:twin_app/widgets/purchase_change_addon_widget.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:twin_commons/core/twinned_session.dart';
@@ -20,6 +22,7 @@ class _ClientsState extends BaseState<Clients> {
   String _search = '*';
   final List<Widget> _cards = [];
   final List<tapi.Client> _clientList = [];
+  bool _exhausted = true;
 
   int totalCount = 0;
 
@@ -128,22 +131,34 @@ class _ClientsState extends BaseState<Clients> {
                     child: IconButton(
                         onPressed: () {
                           _search = '*';
+                          _checkExhausted();
                           _load();
                         },
                         icon: const Icon(Icons.refresh)),
                   ),
                   divider(horizontal: true),
-                  PrimaryButton(
-                    minimumSize: Size(130, 40),
-                    labelKey: 'New Client',
-                    leading: const Icon(
-                      Icons.add,
-                      color: Colors.white,
+                  if (_exhausted && canBuyClientPlan())
+                    BuyButton(
+                        label: 'Buy More License',
+                        tooltip:
+                            'Utilized ${orgPlan?.totalClientCount ?? '-'} licenses',
+                        style: theme.getStyle().copyWith(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: Colors.blue),
+                        onPressed: _buyAddon),
+                  if (!_exhausted)
+                    PrimaryButton(
+                      minimumSize: Size(130, 40),
+                      labelKey: 'New Client',
+                      leading: const Icon(
+                        Icons.add,
+                        color: Colors.white,
+                      ),
+                      onPressed: () {
+                        _addEditClientDialog();
+                      },
                     ),
-                    onPressed: () {
-                      _addEditClientDialog();
-                    },
-                  ),
                   divider(horizontal: true),
                   SizedBox(
                     width: 250,
@@ -287,6 +302,27 @@ class _ClientsState extends BaseState<Clients> {
     refresh();
   }
 
+  Future _buyAddon() async {
+    await showDialog(
+        context: context,
+        builder: (ctx) {
+          return AlertDialog(
+            content: PurchaseChangeAddonWidget(
+              orgId: orgs[selectedOrg].id,
+              purchase: true,
+              clients: 1,
+            ),
+          );
+        });
+    await _checkExhausted();
+    await _load();
+  }
+
+  Future _checkExhausted() async {
+    _exhausted = await hasClientsExhausted();
+    refresh();
+  }
+
   Future _load() async {
     if (loading) return;
     loading = true;
@@ -316,6 +352,7 @@ class _ClientsState extends BaseState<Clients> {
 
   @override
   void setup() {
+    _checkExhausted();
     _load();
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:twin_app/app.dart';
+import 'package:twin_app/core/twin_helper.dart';
 import 'package:twin_app/core/twin_theme.dart';
 import 'package:twin_app/flavors/config_values.dart';
 import 'package:twin_app/router.dart';
@@ -52,6 +53,7 @@ bool setDrawerOpen = false;
 PostLoginHook? postLoginHook;
 PostSignUpHook? postSignUpHook;
 nocode.Profile? profile;
+nocode.OrgPlan? orgPlan;
 int selectedOrg = 0;
 final List<twin.OrgInfo> orgs = [];
 final List<twin.DashboardScreen> screens = [];
@@ -80,6 +82,106 @@ bool isOrgOwner() {
 
 Future<List<String>> getClientIds() async {
   return await TwinnedSession.instance.getClientIds();
+}
+
+Future<bool> hasDeviceLibrariesExhausted() async {
+  bool exhausted = true;
+  if (null != orgPlan) {
+    await TwinHelper.execute(() async {
+      var r = await TwinnedSession.instance.twin
+          .countDeviceModels(apikey: TwinnedSession.instance.authToken);
+      if (TwinHelper.validateResponse(r)) {
+        debugPrint(
+            'Utilized Models: ${r.body?.total} / ${orgPlan?.totalDeviceModelCount}');
+        exhausted = r.body!.total >= (orgPlan?.totalDeviceModelCount ?? 0);
+      }
+    });
+  }
+  return exhausted;
+}
+
+bool hasDeviceParametersExhausted(int total) {
+  bool exhausted = true;
+  if (null != orgPlan) {
+    exhausted = total >= (orgPlan?.totalModelParametersCount ?? 0);
+  }
+  return exhausted;
+}
+
+Future<bool> hasDevicesExhausted() async {
+  bool exhausted = true;
+  if (null != orgPlan) {
+    await TwinHelper.execute(() async {
+      var r = await TwinnedSession.instance.twin
+          .countDevices(apikey: TwinnedSession.instance.authToken);
+      if (TwinHelper.validateResponse(r)) {
+        debugPrint(
+            'Utilized Devices: ${r.body?.total} / ${orgPlan?.totalDevicesCount}');
+        exhausted = r.body!.total >= (orgPlan?.totalDevicesCount ?? 0);
+      }
+    });
+  }
+  return exhausted;
+}
+
+Future<bool> hasDashboardsExhausted() async {
+  bool exhausted = true;
+  if (null != orgPlan) {
+    await TwinHelper.execute(() async {
+      var r = await TwinnedSession.instance.twin
+          .countDashboards(apikey: TwinnedSession.instance.authToken);
+      if (TwinHelper.validateResponse(r)) {
+        debugPrint(
+            'Utilized Dashboards: ${r.body?.total} / ${orgPlan?.totalDashboardCount}');
+        exhausted = r.body!.total >= (orgPlan?.totalDashboardCount ?? 0);
+      }
+    });
+  }
+  return exhausted;
+}
+
+Future<bool> hasUsersExhausted() async {
+  bool exhausted = true;
+  if (null != orgPlan) {
+    await TwinHelper.execute(() async {
+      var r = await TwinnedSession.instance.twin
+          .countTwinUsers(apikey: TwinnedSession.instance.authToken);
+      if (TwinHelper.validateResponse(r)) {
+        debugPrint(
+            'Utilized Users: ${r.body?.total} / ${orgPlan?.totalUserCount}');
+        exhausted = r.body!.total >= (orgPlan?.totalUserCount ?? 0);
+      }
+    });
+  }
+  return exhausted;
+}
+
+Future<bool> hasClientsExhausted() async {
+  bool exhausted = true;
+  if (null != orgPlan) {
+    await TwinHelper.execute(() async {
+      var r = await TwinnedSession.instance.twin
+          .countClients(apikey: TwinnedSession.instance.authToken);
+      if (TwinHelper.validateResponse(r)) {
+        debugPrint(
+            'Utilized Clients: ${r.body?.total} / ${orgPlan?.totalClientCount}');
+        exhausted = r.body!.total >= (orgPlan?.totalClientCount ?? 0);
+      }
+    });
+  }
+  return exhausted;
+}
+
+bool canBuyArchivalPlan() {
+  return orgPlan!.canBuyArchivalPlan ?? false;
+}
+
+bool canBuyDataPlan() {
+  return orgPlan!.canBuyDataPlan ?? false;
+}
+
+bool canBuyClientPlan() {
+  return orgPlan!.canBuyClientPlan ?? false;
 }
 
 class TwinMenuItem {

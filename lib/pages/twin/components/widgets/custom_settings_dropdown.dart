@@ -22,31 +22,29 @@ class _CustomSettingsDropdownState extends State<CustomSettingsDropdown> {
               Icons.settings_suggest,
               color: Colors.black,
             ),
-            items: MenuDataItems.customItems
-                .asMap()
-                .entries
-                .map((entry) {
-                  final index = entry.key;
-                  final item = entry.value;
-                  final addBorder = index == MenuDataItems.customItems.indexOf(MenuDataItems.purge);
-                  return DropdownMenuItem<MenuDataItem>(
-                    value: item,
-                    child: Container(
-                      decoration: addBorder
-                          ? const BoxDecoration(
-                              border: Border(
-                                top: BorderSide(color: Colors.black,width:1.5),
-                              ),
-                            )
-                          : null,
-                      child: Padding(
-                        padding: addBorder? EdgeInsets.only(top:7) : EdgeInsets.zero,
-                        child: MenuDataItems.buildItem(item),
-                      ),
-                    ),
-                  );
-                })
-                .toList(),
+            items: MenuDataItems.customItems.asMap().entries.map((entry) {
+              final index = entry.key;
+              final item = entry.value;
+              final addBorder = index ==
+                  MenuDataItems.customItems.indexOf(MenuDataItems.purge);
+              return DropdownMenuItem<MenuDataItem>(
+                value: item,
+                child: Container(
+                  decoration: addBorder
+                      ? const BoxDecoration(
+                          border: Border(
+                            top: BorderSide(color: Colors.black, width: 1.5),
+                          ),
+                        )
+                      : null,
+                  child: Padding(
+                    padding:
+                        addBorder ? EdgeInsets.only(top: 7) : EdgeInsets.zero,
+                    child: MenuDataItems.buildItem(item),
+                  ),
+                ),
+              );
+            }).toList(),
             onChanged: (value) {
               if (widget.onChanged != null) {
                 widget.onChanged!(value as MenuDataItem);
@@ -73,7 +71,6 @@ class _CustomSettingsDropdownState extends State<CustomSettingsDropdown> {
   }
 }
 
-
 class MenuDataItem {
   const MenuDataItem({
     required this.text,
@@ -83,9 +80,9 @@ class MenuDataItem {
 }
 
 class MenuDataItems {
-  static const elasticEmail = MenuDataItem(text: 'Elastic Email config');
-  static const twillio = MenuDataItem(text: 'Twillio Config');
-  static const textLocal = MenuDataItem(text: 'Text Local Config');
+  static const elasticEmail = MenuDataItem(text: 'Pulse Email');
+  static const twillio = MenuDataItem(text: 'Pulse SMS');
+  static const textLocal = MenuDataItem(text: 'Pulse Voice');
   static const geoAPI = MenuDataItem(text: 'Geo API Config');
   static const purge = MenuDataItem(text: 'Purge All Data');
   static const wipe = MenuDataItem(text: 'Wipe All Data');
@@ -99,7 +96,9 @@ class MenuDataItems {
     wipe
   ];
 
-  static Widget buildItem(MenuDataItem item,) {
+  static Widget buildItem(
+    MenuDataItem item,
+  ) {
     Color backgroundColor = Colors.white;
     if (item == purge) {
       backgroundColor = Colors.orange;
@@ -112,9 +111,8 @@ class MenuDataItems {
     } else if (item == textLocal) {
       backgroundColor = Colors.grey;
     } else {
-      backgroundColor =  const Color(0XFFf2c2c8);
+      backgroundColor = const Color(0XFFf2c2c8);
     }
-
 
     return Container(
       color: backgroundColor,
@@ -122,8 +120,8 @@ class MenuDataItems {
       child: Row(
         children: [
           Text(item.text,
-              style: theme.getStyle()
-                  .copyWith(color: Colors.white, fontSize: 12)),
+              style:
+                  theme.getStyle().copyWith(color: Colors.white, fontSize: 12)),
         ],
       ),
     );

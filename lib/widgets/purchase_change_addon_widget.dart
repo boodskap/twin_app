@@ -1,5 +1,6 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
+import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/widgets/buy_button.dart';
 import 'package:twin_app/widgets/utils.dart';
 import 'package:twin_commons/core/base_state.dart';
@@ -438,13 +439,13 @@ class _PurchaseChangeAddonWidgetState
                           '',
                           style: tableRowStyle,
                         )),
-                        const DataCell(Text(
-                          'Total',
+                        DataCell(Text(
+                          'Total / Month',
                           style: tableRowStyle,
                         )),
                         DataCell(Text(
-                          '${currencyToSymbol(_plan!.currency)} $total / month',
-                          style: totalPriceStyle,
+                          '${currencyToSymbol(_plan!.currency)} $total',
+                          style: priceRowStyle,
                         )),
                       ]),
                     ]),
@@ -466,7 +467,10 @@ class _PurchaseChangeAddonWidgetState
                 if (null != _plan)
                   BuyButton(
                     label: 'BUY',
-                    fontSize: 16,
+                    style: theme.getStyle().copyWith(
+                          fontWeight: FontWeight.normal,
+                          fontSize: 16,
+                        ),
                     onPressed: total <= 0
                         ? null
                         : () async {
