@@ -84,7 +84,7 @@ class _InstallationDatabaseState extends BaseState<InstallationDatabase> {
                     hintStyle: WidgetStatePropertyAll(theme.getStyle()),
                     textStyle: WidgetStatePropertyAll(theme.getStyle()),
                     leading: Icon(Icons.search),
-                    hintText: 'Search installation database',
+                    hintText: 'Search Installation Database',
                     onChanged: (val) {
                       _search = val.trim();
                       _load();

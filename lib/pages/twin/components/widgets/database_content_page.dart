@@ -441,6 +441,7 @@ class _DeviceContentPageState extends BaseState<DeviceContentPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          contentTextStyle: theme.getStyle(),
           content: SizedBox(
             width: 1000,
             child: OSMLocationPicker(
@@ -620,12 +621,22 @@ class _DeviceContentPageState extends BaseState<DeviceContentPage> {
   @override
   Widget build(BuildContext context) {
     List<DropdownMenuItem<int>> imageItems = [
-      const DropdownMenuItem<int>(value: -1, child: Text('Selected Image'))
+      DropdownMenuItem<int>(
+          value: -1,
+          child: Text(
+            'Selected Image',
+            style: theme.getStyle(),
+          ))
     ];
 
     for (int i = 0; i < _imageIds.length; i++) {
-      imageItems.add(
-          DropdownMenuItem<int>(value: i, child: Center(child: Text('$i'))));
+      imageItems.add(DropdownMenuItem<int>(
+          value: i,
+          child: Center(
+              child: Text(
+            '$i',
+            style: theme.getStyle(),
+          ))));
     }
 
     if (_selectedImage == -1 && _imageIds.isNotEmpty) {
@@ -653,17 +664,36 @@ class _DeviceContentPageState extends BaseState<DeviceContentPage> {
                     ),
                   ),
                 const SizedBox(width: 5),
-                Text(param.name),
+                Text(
+                  param.name,
+                  style: theme.getStyle(),
+                ),
               ],
             )),
         Align(
-            alignment: Alignment.center, child: Text(param.description ?? '')),
-        Align(alignment: Alignment.center, child: Text(param.label ?? '')),
+            alignment: Alignment.center,
+            child: Text(
+              param.description ?? '',
+              style: theme.getStyle(),
+            )),
         Align(
             alignment: Alignment.center,
-            child: Text(param.parameterType.value!)),
+            child: Text(
+              param.label ?? '',
+              style: theme.getStyle(),
+            )),
         Align(
-            alignment: Alignment.center, child: Text(param.defaultValue ?? '')),
+            alignment: Alignment.center,
+            child: Text(
+              param.parameterType.value!,
+              style: theme.getStyle(),
+            )),
+        Align(
+            alignment: Alignment.center,
+            child: Text(
+              param.defaultValue ?? '',
+              style: theme.getStyle(),
+            )),
         Checkbox(value: param.required, onChanged: (value) {}),
       ]);
       rows.add(row);
@@ -703,6 +733,8 @@ class _DeviceContentPageState extends BaseState<DeviceContentPage> {
                         Expanded(
                           flex: 20,
                           child: LabelTextField(
+                            style: theme.getStyle(),
+                            labelTextStyle: theme.getStyle(),
                             suffixIcon: Tooltip(
                               message: 'Copy device id',
                               preferBelow: false,
@@ -732,6 +764,8 @@ class _DeviceContentPageState extends BaseState<DeviceContentPage> {
                         Expanded(
                           flex: 15,
                           child: LabelTextField(
+                              style: theme.getStyle(),
+                              labelTextStyle: theme.getStyle(),
                               label: 'Hardware Device ID',
                               controller: _idController),
                         ),
@@ -739,6 +773,8 @@ class _DeviceContentPageState extends BaseState<DeviceContentPage> {
                         Expanded(
                             flex: 15,
                             child: LabelTextField(
+                              style: theme.getStyle(),
+                              labelTextStyle: theme.getStyle(),
                               label: 'Tags',
                               controller: _tagsController,
                             )),
@@ -746,6 +782,8 @@ class _DeviceContentPageState extends BaseState<DeviceContentPage> {
                         Expanded(
                             flex: 15,
                             child: LabelTextField(
+                              style: theme.getStyle(),
+                              labelTextStyle: theme.getStyle(),
                               label: 'Description',
                               controller: _descController,
                             )),
@@ -755,10 +793,13 @@ class _DeviceContentPageState extends BaseState<DeviceContentPage> {
                           Expanded(
                             flex: 20,
                             child: TextFormField(
+                              style: theme.getStyle(),
                               readOnly: true,
                               obscureText: _obscureText,
                               initialValue: widget.device!.apiKey,
                               decoration: InputDecoration(
+                                hintStyle: theme.getStyle(),
+                                labelStyle: theme.getStyle(),
                                 labelText: 'Api Key',
                                 suffixIcon: Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
@@ -921,6 +962,7 @@ class _DeviceContentPageState extends BaseState<DeviceContentPage> {
                                   Row(
                                     children: [
                                       DropdownButton<int>(
+                                        style: theme.getStyle(),
                                         items: imageItems,
                                         onChanged: (int? value) {
                                           setState(() {
