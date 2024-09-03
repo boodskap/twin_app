@@ -141,9 +141,9 @@ class _TwinSysConfigWidgetState extends BaseState<TwinSysConfigWidget> {
           apikey: TwinnedSession.instance.authToken, body: info);
       if (validateResponse(res)) {
         await alert('Twin Settings', 'Updated successfully');
-        // if (close) {
-        //   // _close();
-        // }
+        if (close) {
+          _close();
+        }
       }
     });
 

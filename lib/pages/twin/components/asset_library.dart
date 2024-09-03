@@ -63,6 +63,8 @@ class _AssetLibraryState extends BaseState<AssetLibrary> {
                 height: 40,
                 width: 250,
                 child: SearchBar(
+                  hintStyle: WidgetStatePropertyAll(theme.getStyle()),
+                  textStyle: WidgetStatePropertyAll(theme.getStyle()),
                   leading: Icon(Icons.search),
                   hintText: 'Search Asset Library',
                   onChanged: (val) {
@@ -162,23 +164,23 @@ class _AssetLibraryState extends BaseState<AssetLibrary> {
                           ),
                         ),
                       ),
-                      // Tooltip(
-                      //   message:
-                      //       _canEdit ? "Delete" : "No Permission to Delete",
-                      //   child: InkWell(
-                      //     onTap: _canEdit
-                      //         ? () {
-                      //             _confirmDeletionDialog(context, e);
-                      //           }
-                      //         : null,
-                      //     child: Icon(
-                      //       Icons.delete_forever_rounded,
-                      //       color: _canEdit
-                      //           ? theme.getPrimaryColor()
-                      //           : Colors.grey,
-                      //     ),
-                      //   ),
-                      // ),
+                      Tooltip(
+                        message:
+                            _canEdit ? "Delete" : "No Permission to Delete",
+                        child: InkWell(
+                          onTap: _canEdit
+                              ? () {
+                                  _confirmDeletionDialog(context, e);
+                                }
+                              : null,
+                          child: Icon(
+                            Icons.delete_forever_rounded,
+                            color: _canEdit
+                                ? theme.getPrimaryColor()
+                                : Colors.grey,
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -206,83 +208,9 @@ class _AssetLibraryState extends BaseState<AssetLibrary> {
     });
   }
 
-  Future<void> _getBasicInfo(BuildContext context, String title,
-      {required BasicInfoCallback onPressed}) async {
-    String? nameText = '';
-    String? descText = '';
-    String? tagsText = '';
-    return showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) {
-          return AlertDialog(
-            title: Text(title),
-            content: SizedBox(
-              width: 500,
-              height: 150,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  TextField(
-                    onChanged: (value) {
-                      setState(() {
-                        nameText = value;
-                      });
-                    },
-                    decoration: const InputDecoration(hintText: 'Name'),
-                  ),
-                  TextField(
-                    onChanged: (value) {
-                      setState(() {
-                        descText = value;
-                      });
-                    },
-                    decoration: const InputDecoration(hintText: 'Description'),
-                  ),
-                  TextField(
-                    onChanged: (value) {
-                      setState(() {
-                        tagsText = value;
-                      });
-                    },
-                    decoration: const InputDecoration(
-                        hintText: 'Tags (space separated)'),
-                  ),
-                ],
-              ),
-            ),
-            actions: <Widget>[
-              SecondaryButton(
-                labelKey: 'Cancel',
-                onPressed: () {
-                  setState(() {
-                    Navigator.pop(context);
-                  });
-                },
-              ),
-              PrimaryButton(
-                labelKey: 'Ok',
-                onPressed: () {
-                  if (nameText!.length < 3) {
-                    alert('Invalid',
-                        'Name is required and should be minimum 3 characters');
-                    return;
-                  }
-                  setState(() {
-                    onPressed(nameText!, descText, tagsText);
-                    Navigator.pop(context);
-                  });
-                },
-              ),
-            ],
-          );
-        });
-  }
-
   Future _create() async {
     await super.alertDialog(
-      title: 'New Tank Type',
+      title: 'New Asset Type',
       width: MediaQuery.of(context).size.width / 2 + 100,
       height: MediaQuery.of(context).size.height / 2 + 100,
       body: const CreateEditAssetLibrary(),
@@ -301,52 +229,52 @@ class _AssetLibraryState extends BaseState<AssetLibrary> {
     await _load();
   }
 
-  // _confirmDeletionDialog(BuildContext context, tapi.AssetModel e) {
-  //   Widget cancelButton = SecondaryButton(
-  //     labelKey: 'Cancel',
-  //     onPressed: () {
-  //       Navigator.pop(context);
-  //     },
-  //   );
-  //   Widget continueButton = PrimaryButton(
-  //     labelKey: 'Delete',
-  //     onPressed: () {
-  //       Navigator.pop(context);
-  //       _delete(e);
-  //     },
-  //   );
-  //   AlertDialog alert = AlertDialog(
-  //     title: Text(
-  //       "WARNING",
-  //       style: theme.getStyle(),
-  //     ),
-  //     content: Text(
-  //       "Deleting a Asset Library can not be undone.\nYou will loose all of the premise data, history, etc.\n\nAre you sure you want to delete?",
-  //       style: theme.getStyle(),
-  //       maxLines: 10,
-  //     ),
-  //     actions: [
-  //       cancelButton,
-  //       continueButton,
-  //     ],
-  //   );
+  _confirmDeletionDialog(BuildContext context, tapi.AssetModel e) {
+    Widget cancelButton = SecondaryButton(
+      labelKey: 'Cancel',
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
+    Widget continueButton = PrimaryButton(
+      labelKey: 'Delete',
+      onPressed: () {
+        Navigator.pop(context);
+        _delete(e);
+      },
+    );
+    AlertDialog alert = AlertDialog(
+      title: Text(
+        "WARNING",
+        style: theme.getStyle(),
+      ),
+      content: Text(
+        "Deleting a Asset Library can not be undone.\nYou will loose all of the premise data, history, etc.\n\nAre you sure you want to delete?",
+        style: theme.getStyle(),
+        maxLines: 10,
+      ),
+      actions: [
+        cancelButton,
+        continueButton,
+      ],
+    );
 
-  //   showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return alert;
-  //     },
-  //   );
-  // }
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
 
-  // Future _delete(tapi.AssetModel e) async {
-  //   await execute(() async {
-  //     var res = await TwinnedSession.instance.twin.deleteAssetModel(
-  //         apikey: TwinnedSession.instance.authToken, assetModelId: e.id);
-  //     validateResponse(res);
-  //     await _load();
-  //   });
-  // }
+  Future _delete(tapi.AssetModel e) async {
+    await execute(() async {
+      var res = await TwinnedSession.instance.twin.deleteAssetModel(
+          apikey: TwinnedSession.instance.authToken, assetModelId: e.id);
+      validateResponse(res);
+      await _load();
+    });
+  }
 
   Future _load() async {
     if (loading) return;

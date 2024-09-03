@@ -85,25 +85,27 @@ class _DeviceModelSnippetState extends BaseState<DeviceModelSnippet> {
                   padding: const EdgeInsets.all(10.0),
                   child: Column(
                     children: [
-                      if(!isClientAdmin())
-                      ClientDropdown(
-                        key: Key(const Uuid().v4()),
-                        selectedItem: (null != _deviceModelInfo.clientIds &&
-                                _deviceModelInfo.clientIds!.isNotEmpty)
-                            ? _deviceModelInfo.clientIds!.first
-                            : null,
-                        onClientSelected: (client) {
-                          setState(() {
-                            _deviceModelInfo = _deviceModelInfo.copyWith(
-                                clientIds: null != client ? [client!.id] : []);
-                          });
-                        },
-                      ),
+                      if (!isClientAdmin())
+                        ClientDropdown(
+                          key: Key(const Uuid().v4()),
+                          selectedItem: (null != _deviceModelInfo.clientIds &&
+                                  _deviceModelInfo.clientIds!.isNotEmpty)
+                              ? _deviceModelInfo.clientIds!.first
+                              : null,
+                          onClientSelected: (client) {
+                            setState(() {
+                              _deviceModelInfo = _deviceModelInfo.copyWith(
+                                  clientIds:
+                                      null != client ? [client!.id] : []);
+                            });
+                          },
+                        ),
                       SizedBox(
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: LabelTextField(
                           label: 'Name',
                           style: theme.getStyle(),
+                          labelTextStyle: theme.getStyle(),
                           controller: nameController,
                           focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
@@ -120,6 +122,7 @@ class _DeviceModelSnippetState extends BaseState<DeviceModelSnippet> {
                         child: LabelTextField(
                           label: 'Description',
                           style: theme.getStyle(),
+                          labelTextStyle: theme.getStyle(),
                           controller: descController,
                           focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
@@ -136,6 +139,7 @@ class _DeviceModelSnippetState extends BaseState<DeviceModelSnippet> {
                         child: LabelTextField(
                           label: 'Tags',
                           style: theme.getStyle(),
+                          labelTextStyle: theme.getStyle(),
                           controller: tagController,
                           focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
@@ -152,6 +156,7 @@ class _DeviceModelSnippetState extends BaseState<DeviceModelSnippet> {
                         child: LabelTextField(
                           label: 'Model',
                           style: theme.getStyle(),
+                          labelTextStyle: theme.getStyle(),
                           controller: modelController,
                           focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
@@ -168,6 +173,7 @@ class _DeviceModelSnippetState extends BaseState<DeviceModelSnippet> {
                         child: LabelTextField(
                           label: 'Version',
                           style: theme.getStyle(),
+                          labelTextStyle: theme.getStyle(),
                           controller: versionController,
                           focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
@@ -184,6 +190,7 @@ class _DeviceModelSnippetState extends BaseState<DeviceModelSnippet> {
                         child: LabelTextField(
                           label: 'Make',
                           style: theme.getStyle(),
+                          labelTextStyle: theme.getStyle(),
                           controller: makeController,
                           focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
@@ -322,7 +329,7 @@ class _DeviceModelSnippetState extends BaseState<DeviceModelSnippet> {
     _deviceModelInfo = _deviceModelInfo.copyWith(
       name: nameController.text.trim(),
       description: descController.text.trim(),
-      tags: [],
+      tags: tagController.text.trim().split(' '),
       make: makeController.text.trim(),
       model: modelController.text.trim(),
       version: versionController.text.trim(),
@@ -336,7 +343,7 @@ class _DeviceModelSnippetState extends BaseState<DeviceModelSnippet> {
         );
         if (validateResponse(cRes)) {
           _close();
-          Navigator.push(
+          await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => DeviceModelContentPage(

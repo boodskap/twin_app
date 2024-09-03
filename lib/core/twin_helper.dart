@@ -1,12 +1,14 @@
 import 'dart:convert';
 
 import 'package:flutter/Material.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:twin_app/app.dart';
-import 'package:verification_api/api/verification.swagger.dart' as vapi;
-import 'package:nocode_api/api/nocode.swagger.dart' as ncapi;
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_commons/util/nocode_utils.dart';
 import 'package:twin_commons/core/storage.dart';
+import 'package:twinned_api/twinned_api.dart' as tapi;
+import 'package:verification_api/api/verification.swagger.dart' as vapi;
+import 'package:nocode_api/api/nocode.swagger.dart' as ncapi;
 import 'package:chopper/chopper.dart' as chopper;
 
 class TwinHelper {
@@ -141,5 +143,34 @@ class TwinHelper {
     });
 
     return entity;
+  }
+
+  static Future<tapi.DeviceModel?> getDeviceModel(String id) async {
+    tapi.DeviceModel? entity;
+
+    await execute(() async {
+      var res = await config.twinned
+          .getDeviceModel(apikey: session?.authToken, modelId: id);
+      if (TwinUtils.validateResponse(res)) {
+        entity = res.body?.entity;
+      }
+    });
+
+    return entity;
+  }
+
+  static Future<List<tapi.ScrappingTable>> getScrappingTables(
+      List<String> ids) async {
+    List<tapi.ScrappingTable> entities = [];
+
+    await execute(() async {
+      var res = await config.twinned.getScrappingTables(
+          apikey: session?.authToken, body: tapi.GetReq(ids: ids));
+      if (TwinUtils.validateResponse(res)) {
+        entities.addAll(res.body?.values ?? []);
+      }
+    });
+
+    return entities;
   }
 }

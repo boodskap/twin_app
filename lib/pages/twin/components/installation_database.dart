@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/pages/twin/components/widgets/database_content_page.dart';
 import 'package:twin_app/pages/twin/components/widgets/installation_database_snippet.dart';
+import 'package:twin_app/widgets/buy_button.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
+import 'package:twin_app/widgets/purchase_change_addon_widget.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:twin_commons/core/twin_image_helper.dart';
@@ -28,6 +30,7 @@ class _InstallationDatabaseState extends BaseState<InstallationDatabase> {
   tapi.DeviceModel? _selectedDeviceModel;
   bool _canEdit = false;
   Map<String, bool> _editable = Map<String, bool>();
+  bool _exhausted = true;
 
   @override
   void initState() {
@@ -65,24 +68,37 @@ class _InstallationDatabaseState extends BaseState<InstallationDatabase> {
                     }),
               ),
               divider(horizontal: true),
-              PrimaryButton(
-                labelKey: 'Create New',
-                leading: Icon(
-                  Icons.add,
-                  color: Colors.white,
+              if (_exhausted)
+                BuyButton(
+                    label: 'Buy More License',
+                    tooltip:
+                        'Utilized ${orgPlan?.totalDevicesCount ?? '-'} licenses',
+                    style: theme.getStyle().copyWith(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Colors.blue),
+                    onPressed: _buyAddon),
+              if (!_exhausted)
+                PrimaryButton(
+                  labelKey: 'Create New',
+                  leading: Icon(
+                    Icons.add,
+                    color: Colors.white,
+                  ),
+                  onPressed: (canCreate() && _selectedDeviceModel != null)
+                      ? () => _addEditDeviceDialog(
+                          modelId: _selectedDeviceModel!.id)
+                      : null,
                 ),
-                onPressed: (canCreate() && _selectedDeviceModel != null)
-                    ? () =>
-                        _addEditDeviceDialog(modelId: _selectedDeviceModel!.id)
-                    : null,
-              ),
               divider(horizontal: true),
               SizedBox(
                   height: 40,
                   width: 250,
                   child: SearchBar(
+                    hintStyle: WidgetStatePropertyAll(theme.getStyle()),
+                    textStyle: WidgetStatePropertyAll(theme.getStyle()),
                     leading: Icon(Icons.search),
-                    hintText: 'Search installation database',
+                    hintText: 'Search Installation Database',
                     onChanged: (val) {
                       _search = val.trim();
                       _load();
@@ -244,6 +260,8 @@ class _InstallationDatabaseState extends BaseState<InstallationDatabase> {
     String? modelId,
   }) async {
     await super.alertDialog(
+      titleStyle:
+          theme.getStyle().copyWith(fontSize: 20, fontWeight: FontWeight.bold),
       title: null == device ? 'Add New Device' : 'Update Device',
       body: InstallationDatabaseSnippet(
         device: device,
@@ -301,6 +319,22 @@ class _InstallationDatabaseState extends BaseState<InstallationDatabase> {
     refresh();
   }
 
+  Future _buyAddon() async {
+    await showDialog(
+        context: context,
+        builder: (ctx) {
+          return AlertDialog(
+            content: PurchaseChangeAddonWidget(
+              orgId: orgs[selectedOrg].id,
+              purchase: true,
+              devices: 1,
+            ),
+          );
+        });
+    await _checkExhausted();
+    await _load();
+  }
+
   Future _load() async {
     if (loading) return;
     loading = true;
@@ -345,8 +379,14 @@ class _InstallationDatabaseState extends BaseState<InstallationDatabase> {
     refresh();
   }
 
+  Future _checkExhausted() async {
+    _exhausted = await hasDeviceLibrariesExhausted();
+    refresh();
+  }
+
   @override
   void setup() async {
+    _checkExhausted();
     _load();
   }
 }
