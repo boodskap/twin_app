@@ -73,6 +73,7 @@ class _CreateEditAssetLibraryState extends BaseState<CreateEditAssetLibrary>
         children: [
           LabelTextField(
             label: 'Name',
+            labelTextStyle: theme.getStyle(),
             style: theme.getStyle(),
             controller: _nameController,
             onChanged: (val) {
@@ -85,6 +86,7 @@ class _CreateEditAssetLibraryState extends BaseState<CreateEditAssetLibrary>
           LabelTextField(
             label: 'Description',
             style: theme.getStyle(),
+            labelTextStyle: theme.getStyle(),
             controller: _descController,
             onChanged: (val) {
               setState(() {
@@ -94,6 +96,7 @@ class _CreateEditAssetLibraryState extends BaseState<CreateEditAssetLibrary>
           ),
           divider(),
           MultiDeviceModelDropdown(
+              style: theme.getStyle(),
               selectedItems: _assetModelInfo.allowedDeviceModels?.map((d) {
                     return d.deviceModelId;
                   }).toList() ??
