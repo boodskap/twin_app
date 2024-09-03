@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:twin_app/core/session_variables.dart';
+import 'package:twin_app/widgets/commons/secondary_button.dart';
 import 'package:twin_commons/widgets/default_deviceview.dart';
 import 'package:twinned_api/api/twinned.swagger.dart' as tapi;
 
@@ -53,7 +54,7 @@ class _AssetActionWidgetState extends State<AssetActionWidget> {
                 message: '${dd.hardwareDeviceId} History Data',
                 child: Icon(Icons.history)),
           ),
-           SizedBox(
+        SizedBox(
           height: 8,
         ),
         InkWell(
@@ -61,8 +62,7 @@ class _AssetActionWidgetState extends State<AssetActionWidget> {
             showDeviceDataJson(context, widget.deviceData);
           },
           child: Tooltip(
-              message: 'View Device Data',
-              child: Icon(Icons.remove_red_eye)),
+              message: 'View Device Data', child: Icon(Icons.remove_red_eye)),
         ),
         SizedBox(
           height: 8,
@@ -109,28 +109,33 @@ class _AssetActionWidgetState extends State<AssetActionWidget> {
   }
 
   void showDeviceDataJson(BuildContext context, tapi.DeviceData jsonData) {
-  String prettyJson = const JsonEncoder.withIndent('  ').convert(jsonData);
+    String prettyJson = const JsonEncoder.withIndent('  ').convert(jsonData);
 
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        backgroundColor: Colors.white,
-        title: const Text('Device Data'),
-        content: SingleChildScrollView(
-          child: Text(prettyJson),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: const Text('Close'),
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          titleTextStyle: theme
+              .getStyle()
+              .copyWith(fontWeight: FontWeight.bold, fontSize: 20),
+          title: const Text('Device Data'),
+          content: SingleChildScrollView(
+            child: Text(
+              prettyJson,
+              style: theme.getStyle(),
+            ),
           ),
-        ],
-      );
-    },
-  );
-}
-
+          actions: [
+            SecondaryButton(
+              labelKey: 'Close',
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 }
