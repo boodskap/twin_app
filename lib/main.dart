@@ -114,5 +114,10 @@ Future _loadCustomDashboards() async {
       session.screens.addAll(sRes.body?.values ?? []);
       debugPrint('FOUND ${session.screens.length} dashboards');
     }
+    var oRes = await TwinnedSession.instance.nocode
+        .getOrgPlan(orgId: session.orgs[session.selectedOrg]!.id);
+    if (TwinHelper.validateResponse(oRes)) {
+      session.orgPlan = oRes.body?.entity;
+    }
   });
 }

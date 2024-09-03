@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/pages/twin/components/widgets/device_model_content_page.dart';
 import 'package:twin_app/pages/twin/components/widgets/device_model_snippet.dart';
+import 'package:twin_app/widgets/buy_button.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
+import 'package:twin_app/widgets/purchase_change_addon_widget.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:twin_commons/core/twin_image_helper.dart';
@@ -23,6 +25,7 @@ class _DeviceLibraryState extends BaseState<DeviceLibrary> {
   String _search = '';
   bool _canEdit = false;
   Map<String, bool> _editable = Map<String, bool>();
+  bool _exhausted = true;
 
   @override
   void initState() {
@@ -45,14 +48,25 @@ class _DeviceLibraryState extends BaseState<DeviceLibrary> {
                 },
                 icon: Icon(Icons.refresh)),
             divider(horizontal: true),
-            PrimaryButton(
-              labelKey: 'Create New',
-              leading: Icon(
-                Icons.add,
-                color: Colors.white,
+            if (_exhausted)
+              BuyButton(
+                  label: 'Buy More License',
+                  tooltip:
+                      'Utilized ${orgPlan?.totalDeviceModelCount ?? '-'} licenses',
+                  style: theme.getStyle().copyWith(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: Colors.blue),
+                  onPressed: _buyAddon),
+            if (!_exhausted)
+              PrimaryButton(
+                labelKey: 'Create New',
+                leading: Icon(
+                  Icons.add,
+                  color: Colors.white,
+                ),
+                onPressed: (canCreate()) ? _create : null,
               ),
-              onPressed: (canCreate()) ? _create : null,
-            ),
             divider(horizontal: true),
             SizedBox(
                 height: 40,
@@ -174,6 +188,22 @@ class _DeviceLibraryState extends BaseState<DeviceLibrary> {
     );
   }
 
+  Future _buyAddon() async {
+    await showDialog(
+        context: context,
+        builder: (ctx) {
+          return AlertDialog(
+            content: PurchaseChangeAddonWidget(
+              orgId: orgs[selectedOrg].id,
+              purchase: true,
+              deviceModels: 1,
+            ),
+          );
+        });
+    await _checkExhausted();
+    await _load();
+  }
+
   Future<void> _checkCanEdit() async {
     List<String> clientIds = await getClientIds();
     bool canEditResult = await canEdit(clientIds: clientIds);
@@ -183,7 +213,7 @@ class _DeviceLibraryState extends BaseState<DeviceLibrary> {
     });
   }
 
-  void _addEditDeviceModelDialog({tapi.DeviceModel? deviceModel}) async {
+  Future _addEditDeviceModelDialog({tapi.DeviceModel? deviceModel}) async {
     await super.alertDialog(
       titleStyle:
           theme.getStyle().copyWith(fontWeight: FontWeight.bold, fontSize: 20),
@@ -195,7 +225,8 @@ class _DeviceLibraryState extends BaseState<DeviceLibrary> {
       width: 750,
       height: MediaQuery.of(context).size.height - 150,
     );
-    _load();
+    await _checkExhausted();
+    await _load();
   }
 
   Future _openDeviceModel(tapi.DeviceModel e, String type) async {
@@ -236,7 +267,7 @@ class _DeviceLibraryState extends BaseState<DeviceLibrary> {
   }
 
   Future _create() async {
-    _addEditDeviceModelDialog();
+    await _addEditDeviceModelDialog();
   }
 
   Future _edit(tapi.DeviceModel e, String type) async {
@@ -269,8 +300,14 @@ class _DeviceLibraryState extends BaseState<DeviceLibrary> {
     refresh();
   }
 
+  Future _checkExhausted() async {
+    _exhausted = await hasDeviceLibrariesExhausted();
+    refresh();
+  }
+
   @override
   void setup() async {
+    _checkExhausted();
     _load();
   }
 }

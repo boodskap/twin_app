@@ -17,6 +17,9 @@ class _SubscriptionsPageState extends BaseState<SubscriptionsPage> {
   List<Widget> _rows = [];
   List<Event> _events = [];
   List<EventRegistration> _eventRegistrations = [];
+  bool _emailSupported = false;
+  bool _smsSupported = false;
+  bool _voiceSupported = false;
 
   EventRegistration dummy = const EventRegistration(
     domainKey: '',
@@ -47,9 +50,15 @@ class _SubscriptionsPageState extends BaseState<SubscriptionsPage> {
   }
 
   void _load() async {
-    busy();
+    if (loading) return;
+    loading = true;
 
-    try {
+    var user = await TwinnedSession.instance.getUser();
+    _emailSupported = user?.email.isNotEmpty ?? false;
+    _smsSupported = user?.phone?.isNotEmpty ?? false;
+    _voiceSupported = _smsSupported;
+
+    await execute(() async {
       await _loadEvents();
       await _loadEventRegistrations();
 
@@ -67,13 +76,10 @@ class _SubscriptionsPageState extends BaseState<SubscriptionsPage> {
 
         _buildRow(er, i + 1);
       }
+    });
 
-      refresh();
-    } catch (e) {
-      alert('Error', e.toString());
-    }
-
-    busy(busy: false);
+    loading = false;
+    refresh();
   }
 
   Future<void> _loadEvents() async {
@@ -103,7 +109,7 @@ class _SubscriptionsPageState extends BaseState<SubscriptionsPage> {
     }
   }
 
-  void _upsertEventRegistration(
+  Future _upsertEventRegistration(
     String key,
     bool value,
     String id,
@@ -118,6 +124,8 @@ class _SubscriptionsPageState extends BaseState<SubscriptionsPage> {
     bool isEmail = false;
     bool isSms = false;
     bool isVoice = false;
+
+    TwinUser? user = await TwinnedSession.instance.getUser();
 
     try {
       switch (key) {
@@ -137,16 +145,18 @@ class _SubscriptionsPageState extends BaseState<SubscriptionsPage> {
       if (id.isNotEmpty) {
         evInfo = EventRegistrationInfo(
           eventId: eventId,
-          email: isEmail ? value : eventRegistration.email,
-          sms: isSms ? value : eventRegistration.sms,
-          voice: isVoice ? value : eventRegistration.voice,
-          notification: eventRegistration.notification,
-          fcm: eventRegistration.fcm,
+          email: isEmail,
+          sms: isSms,
+          voice: isVoice,
+          notification: false,
+          fcm: false,
           emailId: eventRegistration.emailId,
           phoneNumber: eventRegistration.phoneNumber,
           name: eventRegistration.name,
           targetDeviceIds: eventRegistration.targetDeviceIds,
           tags: eventRegistration.tags,
+          clientIds: eventRegistration.clientIds,
+          roles: eventRegistration.roles,
         );
 
         res = await TwinnedSession.instance.twin.updateEventRegistration(
@@ -157,17 +167,23 @@ class _SubscriptionsPageState extends BaseState<SubscriptionsPage> {
       } else {
         evInfo = EventRegistrationInfo(
           eventId: eventId,
-          email: isEmail ? value : false,
-          sms: isSms ? value : false,
-          voice: isVoice ? value : false,
+          email: isEmail,
+          sms: isSms,
+          voice: isVoice,
           notification: false,
           fcm: false,
-          emailId: "TwinnedSession.instance.loginResponse!.user.email",
-          phoneNumber: '0000000000',
+          emailId: user?.email,
+          phoneNumber: '${user?.countryCode ?? ''}${user?.phone ?? ''}',
           name: 'name',
           targetDeviceIds: [],
           tags: [],
+          roles: [],
+          clientIds: [],
         );
+
+        if (isClient()) {
+          evInfo = evInfo.copyWith(clientIds: await getClientIds());
+        }
 
         res = await TwinnedSession.instance.twin.createEventRegistration(
           body: evInfo,
@@ -269,26 +285,28 @@ class _SubscriptionsPageState extends BaseState<SubscriptionsPage> {
                           const SizedBox(width: 10),
                           Checkbox(
                             value: email,
-                            onChanged: (value) {
-                              setState(() {
-                                email = value!;
-                              });
+                            onChanged: !_emailSupported
+                                ? null
+                                : (value) {
+                                    setState(() {
+                                      email = value!;
+                                    });
 
-                              bool isNotEmpty = email || sms || voice;
+                                    bool isNotEmpty = email || sms || voice;
 
-                              if (isNotEmpty) {
-                                _upsertEventRegistration(
-                                  'email',
-                                  email,
-                                  er.eventRegistration!.id,
-                                  er.event!.id,
-                                  er.eventRegistration!,
-                                );
-                              } else {
-                                _removeEventRegistration(
-                                    er.eventRegistration!.id);
-                              }
-                            },
+                                    if (isNotEmpty) {
+                                      _upsertEventRegistration(
+                                        'email',
+                                        email,
+                                        er.eventRegistration!.id,
+                                        er.event!.id,
+                                        er.eventRegistration!,
+                                      );
+                                    } else {
+                                      _removeEventRegistration(
+                                          er.eventRegistration!.id);
+                                    }
+                                  },
                           ),
                         ],
                       ),
@@ -305,26 +323,28 @@ class _SubscriptionsPageState extends BaseState<SubscriptionsPage> {
                           const SizedBox(width: 10),
                           Checkbox(
                             value: sms,
-                            onChanged: (value) {
-                              setState(() {
-                                sms = value!;
-                              });
+                            onChanged: !_smsSupported
+                                ? null
+                                : (value) {
+                                    setState(() {
+                                      sms = value!;
+                                    });
 
-                              bool isNotEmpty = email || sms || voice;
+                                    bool isNotEmpty = email || sms || voice;
 
-                              if (isNotEmpty) {
-                                _upsertEventRegistration(
-                                  'sms',
-                                  sms,
-                                  er.eventRegistration!.id,
-                                  er.event!.id,
-                                  er.eventRegistration!,
-                                );
-                              } else {
-                                _removeEventRegistration(
-                                    er.eventRegistration!.id);
-                              }
-                            },
+                                    if (isNotEmpty) {
+                                      _upsertEventRegistration(
+                                        'sms',
+                                        sms,
+                                        er.eventRegistration!.id,
+                                        er.event!.id,
+                                        er.eventRegistration!,
+                                      );
+                                    } else {
+                                      _removeEventRegistration(
+                                          er.eventRegistration!.id);
+                                    }
+                                  },
                           ),
                         ],
                       ),
@@ -341,26 +361,28 @@ class _SubscriptionsPageState extends BaseState<SubscriptionsPage> {
                           const SizedBox(width: 10),
                           Checkbox(
                             value: voice,
-                            onChanged: (value) {
-                              setState(() {
-                                voice = value!;
-                              });
+                            onChanged: !_voiceSupported
+                                ? null
+                                : (value) {
+                                    setState(() {
+                                      voice = value!;
+                                    });
 
-                              bool isNotEmpty = email || sms || voice;
+                                    bool isNotEmpty = email || sms || voice;
 
-                              if (isNotEmpty) {
-                                _upsertEventRegistration(
-                                  'voice',
-                                  voice,
-                                  er.eventRegistration!.id,
-                                  er.event!.id,
-                                  er.eventRegistration!,
-                                );
-                              } else {
-                                _removeEventRegistration(
-                                    er.eventRegistration!.id);
-                              }
-                            },
+                                    if (isNotEmpty) {
+                                      _upsertEventRegistration(
+                                        'voice',
+                                        voice,
+                                        er.eventRegistration!.id,
+                                        er.event!.id,
+                                        er.eventRegistration!,
+                                      );
+                                    } else {
+                                      _removeEventRegistration(
+                                          er.eventRegistration!.id);
+                                    }
+                                  },
                           ),
                         ],
                       ),
