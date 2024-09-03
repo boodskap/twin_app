@@ -228,7 +228,7 @@ class _DigitalTwinEventContentPageState
                         children: [
                           SizedBox(
                             height: 425,
-                            width: 350,
+                            width: 400,
                             child: MatchGroupWidget(
                               deviceModel: widget.model,
                               event: widget.entity,
@@ -249,19 +249,19 @@ class _DigitalTwinEventContentPageState
                             ),
                           ),
                           divider(),
-                          Expanded(
-                            flex: 45,
-                            child: SizedBox(
-                              height: 425,
-                              child: NotificationTemplateSnippet(
-                                  notificationTemplate:
-                                      widget.entity.notificationTemplate,
-                                  onNotificationTemplateSaved:
-                                      (NotificationTemplate? value) {
-                                    _notificationTemplate = value;
-                                  }),
-                            ),
-                          ),
+                          // Expanded(
+                          //   flex: 45,
+                          //   child: SizedBox(
+                          //     height: 425,
+                          //     child: NotificationTemplateSnippet(
+                          //         notificationTemplate:
+                          //             widget.entity.notificationTemplate,
+                          //         onNotificationTemplateSaved:
+                          //             (NotificationTemplate? value) {
+                          //           _notificationTemplate = value;
+                          //         }),
+                          //   ),
+                          // ),
                         ],
                       ),
                     ),
@@ -286,14 +286,14 @@ class _DigitalTwinEventContentPageState
                             ),
                           ),
                           divider(horizontal: true),
-                          Expanded(
-                              child: FcmTemplateSnippet(
-                            fcmTemplate: widget.entity.fcmTemplate,
-                            onFcmTemplateSaved: (FCMTemplate? value) {
-                              _fcmTemplate = value;
-                            },
-                          )),
-                          RolesWidget(roles: widget.entity.roles!),
+                          // Expanded(
+                          //     child: FcmTemplateSnippet(
+                          //   fcmTemplate: widget.entity.fcmTemplate,
+                          //   onFcmTemplateSaved: (FCMTemplate? value) {
+                          //     _fcmTemplate = value;
+                          //   },
+                          // )),
+                          // RolesWidget(roles: widget.entity.roles!),
                         ],
                       ),
                     ),

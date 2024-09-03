@@ -228,12 +228,12 @@ class _ChangePasswordSnippetState extends BaseState<ChangePasswordSnippet> {
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              SecondaryButton(
-                labelKey: "Cancel",
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
+              // SecondaryButton(
+              //   labelKey: "Cancel",
+              //   onPressed: () {
+              //     Navigator.of(context).pop();
+              //   },
+              // ),
               const SizedBox(width: 8),
               PrimaryButton(
                 labelKey: "Change",

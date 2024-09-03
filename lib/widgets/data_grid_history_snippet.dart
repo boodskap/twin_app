@@ -210,6 +210,8 @@ class DataGridHistorySnippetState extends BaseState<DataGridHistorySnippet> {
                         onTap: () async {
                           await super.alertDialog(
                             title: 'Filter by Data',
+                            titleStyle: theme.getStyle().copyWith(
+                                fontWeight: FontWeight.bold, fontSize: 20),
                             width: dialogWidth,
                             height: dialogHeight,
                             body: DataSearch(
@@ -329,6 +331,8 @@ class DataGridHistorySnippetState extends BaseState<DataGridHistorySnippet> {
                           width: 250,
                           height: 40,
                           child: SearchBar(
+                            hintStyle: WidgetStatePropertyAll(theme.getStyle()),
+                            textStyle: WidgetStatePropertyAll(theme.getStyle()),
                             hintText: widget.searchHint,
                             controller: _controller,
                             trailing: [const BusyIndicator()],
@@ -358,6 +362,8 @@ class DataGridHistorySnippetState extends BaseState<DataGridHistorySnippet> {
                     height: 40,
                     child: SearchBar(
                       hintText: widget.searchHint,
+                      hintStyle: WidgetStatePropertyAll(theme.getStyle()),
+                      textStyle: WidgetStatePropertyAll(theme.getStyle()),
                       controller: _controller,
                       trailing: [const BusyIndicator()],
                       onChanged: (val) {
@@ -734,6 +740,12 @@ class DataGridHistorySnippetState extends BaseState<DataGridHistorySnippet> {
                                                 height: 40,
                                                 child: SearchBar(
                                                   hintText: widget.searchHint,
+                                                  hintStyle:
+                                                      WidgetStatePropertyAll(
+                                                          theme.getStyle()),
+                                                  textStyle:
+                                                      WidgetStatePropertyAll(
+                                                          theme.getStyle()),
                                                   controller: _controller,
                                                   trailing: [
                                                     const BusyIndicator()

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twinned_api/api/twinned.swagger.dart' as twinned;
 
@@ -125,7 +126,7 @@ class _EvaluatedDisplaySnippetState extends BaseState<EvaluatedDisplaySnippet> {
       text: TextSpan(children: [
         TextSpan(
           text: values[0],
-          style: TextStyle(
+          style: theme.getStyle().copyWith(
               fontFamily: cond.prefixFont!,
               fontSize: cond.prefixFontSize!,
               color: Color(cond.prefixFontColor!)),
@@ -136,7 +137,7 @@ class _EvaluatedDisplaySnippetState extends BaseState<EvaluatedDisplaySnippet> {
         )),
         TextSpan(
           text: values[1],
-          style: TextStyle(
+          style: theme.getStyle().copyWith(
               fontFamily: cond.font,
               fontSize: cond.fontSize,
               color: Color(cond.fontColor)),
@@ -147,7 +148,7 @@ class _EvaluatedDisplaySnippetState extends BaseState<EvaluatedDisplaySnippet> {
         )),
         TextSpan(
           text: values[2],
-          style: TextStyle(
+          style: theme.getStyle().copyWith(
               fontFamily: cond.suffixFont!,
               fontSize: cond.suffixFontSize!,
               color: Color(cond.suffixFontColor!)),

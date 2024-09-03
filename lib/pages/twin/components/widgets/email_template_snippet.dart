@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:twin_app/core/session_variables.dart';
+import 'package:twin_app/widgets/commons/email_template.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twinned_api/api/twinned.swagger.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
 typedef EmailTemplateSaved = void Function(EmailTemplate? emailTemplate);
 
@@ -20,6 +22,7 @@ class EmailTemplateSnippet extends StatefulWidget {
 class _EmailTemplateSnippetState extends BaseState<EmailTemplateSnippet> {
   final TextEditingController _subjectController = TextEditingController();
   final TextEditingController _contentController = TextEditingController();
+  FocusNode _focusNode = FocusNode();
   @override
   void initState() {
     super.initState();
@@ -27,7 +30,17 @@ class _EmailTemplateSnippetState extends BaseState<EmailTemplateSnippet> {
     if (null != widget.emailTemplate) {
       _subjectController.text = widget.emailTemplate!.subject;
       _contentController.text = widget.emailTemplate!.content;
+    } else {
+      _contentController.text = emailTemplateHtml;
     }
+     final RegExp regExp = RegExp(r'{{');
+      final Match? match = regExp.firstMatch(_contentController.text);
+      Future.delayed(Duration(seconds: 1), () {
+        FocusScope.of(context).requestFocus(_focusNode);
+        _contentController.selection = TextSelection.fromPosition(
+          TextPosition(offset: (match!.start + 2)),
+        );
+      });
   }
 
   void _validateAndFire() {
@@ -37,7 +50,7 @@ class _EmailTemplateSnippetState extends BaseState<EmailTemplateSnippet> {
       widget.onEmailTemplateSaved(null);
     } else {
       widget.onEmailTemplateSaved(
-          EmailTemplate(subject: subject, content: content));
+          EmailTemplate(subject: subject, content: content, isHtml: true));
     }
   }
 
@@ -55,12 +68,25 @@ class _EmailTemplateSnippetState extends BaseState<EmailTemplateSnippet> {
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
-            Text(
-              'Email Template',
-              style: theme.getStyle().copyWith(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Email Template',
+                  style: theme.getStyle().copyWith(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+                InkWell(
+                  onTap: () {
+                    previewEmailTemplate(context, _contentController.text);
+                  },
+                  child: Tooltip(
+                      message: 'Preview Email Template',
+                      child: Icon(Icons.remove_red_eye)),
+                ),
+              ],
             ),
             divider(),
             TextFormField(
@@ -93,6 +119,7 @@ class _EmailTemplateSnippetState extends BaseState<EmailTemplateSnippet> {
                   //setState(() {});
                   _validateAndFire();
                 },
+                focusNode: _focusNode,
                 maxLines: null,
                 expands: true,
                 style: theme.getStyle(),
@@ -115,6 +142,31 @@ class _EmailTemplateSnippetState extends BaseState<EmailTemplateSnippet> {
           ],
         ),
       ),
+    );
+  }
+
+  void previewEmailTemplate(BuildContext context, emailContent) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          title: const Text('Preview Email Template'),
+          content: SingleChildScrollView(
+              child: SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.5,
+                  height: 400,
+                  child: HtmlWidget(emailContent))),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
     );
   }
 
