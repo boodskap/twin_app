@@ -92,6 +92,75 @@ class _OrganizationPageState extends BaseState<OrganizationPage> {
                           .copyWith(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     IconButton(onPressed: _editName, icon: Icon(Icons.edit)),
+                    InkWell(
+                      onTap: () {
+                        Clipboard.setData(
+                          ClipboardData(
+                            text: _organization!.id,
+                          ),
+                        );
+
+                        OverlayWidget.showOverlay(
+                            context: context,
+                            topPosition: 170,
+                            rightPosition: 300,
+                            message: " Organization ID Copied!");
+                      },
+                      child: const Tooltip(
+                        message: "Copy Organization ID",
+                        child: Icon(
+                          Icons.copy,
+                          size: 20,
+                          color: Colors.green,
+                        ),
+                      ),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        Clipboard.setData(
+                          ClipboardData(
+                            text: _organization!.settings?.twinDomainKey ?? '',
+                          ),
+                        );
+
+                        OverlayWidget.showOverlay(
+                            context: context,
+                            topPosition: 170,
+                            rightPosition: 300,
+                            message: " Domain Key Copied!");
+                      },
+                      child: const Tooltip(
+                        message: "Copy Domain Key",
+                        child: Icon(
+                          Icons.copy,
+                          size: 20,
+                          color: Colors.blue,
+                        ),
+                      ),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        Clipboard.setData(
+                          ClipboardData(
+                            text: TwinnedSession.instance.authToken,
+                          ),
+                        );
+
+                        OverlayWidget.showOverlay(
+                            context: context,
+                            topPosition: 170,
+                            rightPosition: 300,
+                            message: " API Key Copied!");
+                      },
+                      child: const Tooltip(
+                        message: "Copy API Key",
+                        child: Icon(
+                          Icons.copy,
+                          size: 20,
+                          color: Colors.red,
+                        ),
+                      ),
+                    ),
                   ],
                 ),
                 divider(),
