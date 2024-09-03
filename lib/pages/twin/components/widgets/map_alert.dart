@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twinned_api/api/twinned.swagger.dart';
 import 'package:twin_commons/core/twinned_session.dart';
@@ -21,6 +22,8 @@ class _MapAlertState extends BaseState<MapAlert> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      titleTextStyle: theme.getStyle(),
+      contentTextStyle: theme.getStyle(),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -34,7 +37,10 @@ class _MapAlertState extends BaseState<MapAlert> {
                   });
                 },
               ),
-              const Text(' Geo-Reverse Mapping'),
+              Text(
+                ' Geo-Reverse Mapping',
+                style: theme.getStyle(),
+              ),
             ],
           ),
           SizedBox(
@@ -43,12 +49,13 @@ class _MapAlertState extends BaseState<MapAlert> {
             child: OSMLocationPicker(
               onPicked: (pickedData) async {
                 try {
-                  var res = await TwinnedSession.instance.twin.sendDeviceLocationData(
-                      lon: pickedData.longitude,
-                      lat: pickedData.latitude,
-                      apikey: widget.device.apiKey,
-                      hardwareDeviceId: widget.device.deviceId,
-                      geocode: includeGeoReverse);
+                  var res = await TwinnedSession.instance.twin
+                      .sendDeviceLocationData(
+                          lon: pickedData.longitude,
+                          lat: pickedData.latitude,
+                          apikey: widget.device.apiKey,
+                          hardwareDeviceId: widget.device.deviceId,
+                          geocode: includeGeoReverse);
 
                   if (validateResponse(res)) {}
                 } catch (e, s) {

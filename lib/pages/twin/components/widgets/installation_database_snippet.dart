@@ -111,6 +111,7 @@ class _InstallationDatabaseSnippetState
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: LabelTextField(
                           label: 'Name',
+                          labelTextStyle: theme.getStyle(),
                           style: theme.getStyle(),
                           controller: nameController,
                           focusedBorder: OutlineInputBorder(
@@ -128,6 +129,7 @@ class _InstallationDatabaseSnippetState
                         child: LabelTextField(
                           label: 'Device Hardware ID',
                           style: theme.getStyle(),
+                          labelTextStyle: theme.getStyle(),
                           controller: hardwareIdController,
                           focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
@@ -143,6 +145,7 @@ class _InstallationDatabaseSnippetState
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: LabelTextField(
                           label: 'Description',
+                          labelTextStyle: theme.getStyle(),
                           style: theme.getStyle(),
                           controller: descController,
                           focusedBorder: OutlineInputBorder(
@@ -159,6 +162,7 @@ class _InstallationDatabaseSnippetState
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: LabelTextField(
                           label: 'Tags',
+                          labelTextStyle: theme.getStyle(),
                           style: theme.getStyle(),
                           controller: tagController,
                           focusedBorder: OutlineInputBorder(

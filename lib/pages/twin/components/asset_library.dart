@@ -63,6 +63,8 @@ class _AssetLibraryState extends BaseState<AssetLibrary> {
                 height: 40,
                 width: 250,
                 child: SearchBar(
+                  hintStyle: WidgetStatePropertyAll(theme.getStyle()),
+                  textStyle: WidgetStatePropertyAll(theme.getStyle()),
                   leading: Icon(Icons.search),
                   hintText: 'Search Asset Library',
                   onChanged: (val) {

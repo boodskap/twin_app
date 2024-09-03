@@ -4,8 +4,6 @@ import 'package:twinned_api/api/twinned.swagger.dart';
 import 'package:twin_commons/core/twinned_session.dart';
 import 'package:twin_app/core/session_variables.dart';
 
-
-
 class PreprocessorDropDown extends StatefulWidget {
   final void Function(Preprocessor?) valueChanged;
   final String? selected;
@@ -41,8 +39,7 @@ class _PreprocessorDropDownState extends BaseState<PreprocessorDropDown> {
             value: element,
             child: Text(
               element.name,
-              style:
-                  theme.getStyle(),
+              style: theme.getStyle(),
             ),
           );
           _entries.add(me);
@@ -78,11 +75,15 @@ class _PreprocessorDropDownState extends BaseState<PreprocessorDropDown> {
           border: Border.all(color: Colors.blueGrey),
           borderRadius: BorderRadius.circular(5)),
       child: DropdownButton<Preprocessor>(
+        style: theme.getStyle(),
         padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
         dropdownColor: Colors.white,
         isDense: true,
         underline: Container(),
-        hint: const Text("Select Preprocessor"),
+        hint: Text(
+          "Select Preprocessor",
+          style: theme.getStyle(),
+        ),
         items: _entries,
         value: selected,
         onChanged: (Preprocessor? value) {

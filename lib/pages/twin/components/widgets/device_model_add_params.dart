@@ -4,6 +4,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:twin_app/widgets/commons/secondary_button.dart';
 import 'package:twin_commons/core/base_state.dart';
@@ -118,7 +119,10 @@ class _ParameterUpsertDialogState extends BaseState<ParameterUpsertDialog> {
     const vDivider = SizedBox(height: 8);
 
     return AlertDialog(
-      title: const Text('Parameter Info'),
+      title: Text(
+        'Parameter Info',
+        style: theme.getStyle(),
+      ),
       content: SizedBox(
         width: MediaQuery.of(context).size.width * 0.35,
         child: Table(
@@ -137,6 +141,8 @@ class _ParameterUpsertDialogState extends BaseState<ParameterUpsertDialog> {
                             padding:
                                 const EdgeInsets.symmetric(horizontal: 8.0),
                             child: LabelTextField(
+                              style: theme.getStyle(),
+                              labelTextStyle: theme.getStyle(),
                               label: 'Name',
                               controller: widget.paramName,
                               inputFormatters: [
@@ -167,6 +173,8 @@ class _ParameterUpsertDialogState extends BaseState<ParameterUpsertDialog> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: LabelTextField(
+                        style: theme.getStyle(),
+                        labelTextStyle: theme.getStyle(),
                         label: 'Description',
                         controller: widget.paramDesc,
                       ),
@@ -175,7 +183,10 @@ class _ParameterUpsertDialogState extends BaseState<ParameterUpsertDialog> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: TextFormField(
-                        decoration: const InputDecoration(
+                        style: theme.getStyle(),
+                        decoration: InputDecoration(
+                          hintStyle: theme.getStyle(),
+                          labelStyle: theme.getStyle(),
                           labelText: 'Label',
                           border: OutlineInputBorder(),
                           focusedBorder: OutlineInputBorder(
@@ -204,6 +215,7 @@ class _ParameterUpsertDialogState extends BaseState<ParameterUpsertDialog> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: DropdownButton<twinned.ParameterParameterType>(
+                        style: theme.getStyle(),
                         isExpanded: true,
                         items: const [
                           DropdownMenuItem<twinned.ParameterParameterType>(
@@ -238,6 +250,8 @@ class _ParameterUpsertDialogState extends BaseState<ParameterUpsertDialog> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: LabelTextField(
+                        style: theme.getStyle(),
+                        labelTextStyle: theme.getStyle(),
                         label: 'Default Value',
                         controller: widget.paramValue,
                       ),
@@ -247,7 +261,10 @@ class _ParameterUpsertDialogState extends BaseState<ParameterUpsertDialog> {
                       spacing: 8,
                       children: [
                         CheckboxListTile(
-                          title: const Text('Required'),
+                          title: Text(
+                            'Required',
+                            style: theme.getStyle(),
+                          ),
                           controlAffinity: ListTileControlAffinity.leading,
                           contentPadding: EdgeInsets.zero,
                           value: widget.paramRequired.value,
@@ -258,7 +275,10 @@ class _ParameterUpsertDialogState extends BaseState<ParameterUpsertDialog> {
                           },
                         ),
                         CheckboxListTile(
-                          title: const Text('Enable Trend'),
+                          title: Text(
+                            'Enable Trend',
+                            style: theme.getStyle(),
+                          ),
                           controlAffinity: ListTileControlAffinity.leading,
                           contentPadding: EdgeInsets.zero,
                           value: widget.enableTrend.value,
@@ -269,7 +289,10 @@ class _ParameterUpsertDialogState extends BaseState<ParameterUpsertDialog> {
                           },
                         ),
                         CheckboxListTile(
-                          title: const Text('Enable Time Series'),
+                          title: Text(
+                            'Enable Time Series',
+                            style: theme.getStyle(),
+                          ),
                           controlAffinity: ListTileControlAffinity.leading,
                           contentPadding: EdgeInsets.zero,
                           value: widget.enableTimeSeries.value,
@@ -289,7 +312,10 @@ class _ParameterUpsertDialogState extends BaseState<ParameterUpsertDialog> {
                         padding: const EdgeInsets.all(8.0),
                         child: Row(
                           children: [
-                            const Text('Widget'),
+                            Text(
+                              'Widget',
+                              style: theme.getStyle(),
+                            ),
                             divider(horizontal: true),
                             SensorTypesDropdown(
                                 selected: selectedWidgetType,

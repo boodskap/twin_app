@@ -397,6 +397,7 @@ class _DeviceModelContentPageState extends BaseState<DeviceModelContentPage> {
         titleStyle: theme.getStyle().copyWith(
               color: Colors.red,
             ),
+        messageStyle: theme.getStyle(),
         message: 'Are you sure you want to delete this image?',
         onPressed: () async {
           busy();
@@ -680,12 +681,12 @@ class _DeviceModelContentPageState extends BaseState<DeviceModelContentPage> {
   @override
   Widget build(BuildContext context) {
     List<DropdownMenuItem<int>> imageItems = [
-      const DropdownMenuItem<int>(value: -1, child: Text('Selected Image'))
+       DropdownMenuItem<int>(value: -1, child: Text('Selected Image',style: theme.getStyle(),))
     ];
 
     for (int i = 0; i < _imageIds.length; i++) {
       imageItems.add(
-          DropdownMenuItem<int>(value: i, child: Center(child: Text('$i'))));
+          DropdownMenuItem<int>(value: i, child: Center(child: Text('$i',style: theme.getStyle(),))));
     }
 
     if (_selectedImage == -1 && _imageIds.isNotEmpty) {
