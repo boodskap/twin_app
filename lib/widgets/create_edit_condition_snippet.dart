@@ -177,6 +177,7 @@ class _CreateEditConditionSnippetState
               child: Center(
                 child: Text(
                   param.name,
+                  style: theme.getStyle(),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -520,6 +521,7 @@ class _CreateEditConditionSnippetState
             child: SizedBox(
               width: 250,
               child: DeviceModelDropdown(
+                  style: theme.getStyle(),
                   selectedItem: _selectedModel?.id,
                   onDeviceModelSelected: (dm) {
                     setState(() {
@@ -555,6 +557,7 @@ class _CreateEditConditionSnippetState
             child: SizedBox(
               width: 250,
               child: DropdownButton<tapi.Parameter>(
+                style: theme.getStyle(),
                 items: _parameterItems,
                 value: _selectedParameter,
                 isDense: false,
@@ -578,6 +581,7 @@ class _CreateEditConditionSnippetState
               width: 400,
               child: Center(
                 child: DropdownButton<tapi.ConditionCondition>(
+                  style: theme.getStyle(),
                   iconSize: 0.0,
                   isDense: false,
                   isExpanded: true,
@@ -611,6 +615,8 @@ class _CreateEditConditionSnippetState
             SizedBox(
               width: 150,
               child: LabelTextField(
+                style: theme.getStyle(),
+                labelTextStyle: theme.getStyle(),
                 label: 'Enter Value',
                 controller: _valueController,
               ),
@@ -622,6 +628,8 @@ class _CreateEditConditionSnippetState
                 SizedBox(
                   width: 200,
                   child: LabelTextField(
+                    style: theme.getStyle(),
+                    labelTextStyle: theme.getStyle(),
                     label: 'Enter Left Value',
                     controller: _lvalueController,
                   ),
@@ -629,6 +637,8 @@ class _CreateEditConditionSnippetState
                 SizedBox(
                   width: 200,
                   child: LabelTextField(
+                    style: theme.getStyle(),
+                    labelTextStyle: theme.getStyle(),
                     label: 'Enter Right Value',
                     controller: _rvalueController,
                   ),
@@ -640,6 +650,7 @@ class _CreateEditConditionSnippetState
               child: SizedBox(
                 width: 200,
                 child: LabelTextField(
+                  labelTextStyle: theme.getStyle(),
                   controller: _valuesController,
                   textAlign: TextAlign.center,
                   style: theme.getStyle().copyWith(
@@ -667,6 +678,7 @@ class _CreateEditConditionSnippetState
           SizedBox(
             width: 300,
             child: TextField(
+              style: theme.getStyle(),
               controller: _nameController,
               decoration: InputDecoration(
                 labelText: 'Condition Name',

@@ -73,6 +73,8 @@ class _ConditionRulesState extends BaseState<ConditionRules> {
                 height: 40,
                 width: 250,
                 child: SearchBar(
+                  hintStyle: WidgetStatePropertyAll(theme.getStyle()),
+                  textStyle: WidgetStatePropertyAll(theme.getStyle()),
                   leading: Icon(Icons.search),
                   hintText: 'Search Conditions',
                   onChanged: (val) {
@@ -303,6 +305,7 @@ class _ConditionRulesState extends BaseState<ConditionRules> {
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16.0),
                           child: LabelTextField(
+                            style: theme.getStyle(),
                             label: 'Value',
                             controller: valueController,
                             readOnlyVal: true,

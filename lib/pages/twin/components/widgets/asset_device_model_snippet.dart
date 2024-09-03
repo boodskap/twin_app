@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_commons/widgets/common/label_text_field.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twinned_api/api/twinned.swagger.dart' as tapi;
@@ -62,6 +63,8 @@ class _AssetDeviceModelSnippetState extends BaseState<AssetDeviceModelSnippet> {
           params.add(SizedBox(
             width: 250,
             child: LabelTextField(
+              style: theme.getStyle(),
+              labelTextStyle: theme.getStyle(),
               label: '${p.label} - [${p.name}]',
               controller: controller,
               onChanged: (value) {
@@ -80,10 +83,11 @@ class _AssetDeviceModelSnippetState extends BaseState<AssetDeviceModelSnippet> {
             children: [
               Text(
                 '${config.scrappingTableName} (${config.lookupName})',
-                style: const TextStyle(fontWeight: FontWeight.bold),
+                style:  theme.getStyle().copyWith(fontWeight: FontWeight.bold),
               ),
               divider(horizontal: true),
               DropdownButton<tapi.ScrappingTable>(
+                style: theme.getStyle(),
                   value: _selectedTables[lookupName],
                   onChanged: (selected) {
                     setState(() {
@@ -119,12 +123,11 @@ class _AssetDeviceModelSnippetState extends BaseState<AssetDeviceModelSnippet> {
 
   void _save(String lookupName) {
     tapi.ScrappingTable scrappingTable = _selectedTables[lookupName]!;
-    tapi.AssetScrappingTable assetScrappingTable =
-        tapi.AssetScrappingTable(
-            lookupName: lookupName,
-            scrappingTableId: scrappingTable.id,
-            scrappingTableName: scrappingTable.name,
-            attributes: scrappingTable.attributes);
+    tapi.AssetScrappingTable assetScrappingTable = tapi.AssetScrappingTable(
+        lookupName: lookupName,
+        scrappingTableId: scrappingTable.id,
+        scrappingTableName: scrappingTable.name,
+        attributes: scrappingTable.attributes);
 
     widget.assetDeviceModel.scrappingTables!
         .removeWhere((element) => element.lookupName == lookupName);
@@ -153,7 +156,7 @@ class _AssetDeviceModelSnippetState extends BaseState<AssetDeviceModelSnippet> {
         _scrappingTableConfigs[e.lookupName] = e;
 
         var sRes = await TwinnedSession.instance.twin.getScrappingTables(
-            apikey:TwinnedSession.instance.authToken,
+            apikey: TwinnedSession.instance.authToken,
             body: tapi.GetReq(ids: e.scrappingTableIds));
 
         if (validateResponse(sRes)) {
