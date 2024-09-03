@@ -154,9 +154,7 @@ class _ScrappingTablesState extends BaseState<ScrappingTables> {
                               : null,
                           child: Icon(
                             Icons.edit,
-                            color: _canEdit
-                                ? theme.getPrimaryColor()
-                                : Colors.grey,
+                            color: _canEdit ? Colors.white : Colors.grey,
                           ),
                         ),
                       ),
@@ -171,9 +169,7 @@ class _ScrappingTablesState extends BaseState<ScrappingTables> {
                               : null,
                           child: Icon(
                             Icons.delete_forever_rounded,
-                            color: _canEdit
-                                ? theme.getPrimaryColor()
-                                : Colors.grey,
+                            color: _canEdit ? Colors.white : Colors.grey,
                           ),
                         ),
                       ),
