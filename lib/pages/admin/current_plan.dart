@@ -1,14 +1,14 @@
+import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
+import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/widgets/buy_button.dart';
 import 'package:twin_app/widgets/choose_plans.dart';
 import 'package:twin_app/widgets/purchase_change_addon_widget.dart';
-import 'package:twinned_api/twinned_api.dart' as tapi;
 import 'package:twin_commons/core/base_state.dart';
-import 'package:data_table_2/data_table_2.dart';
-import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:twin_commons/core/twinned_session.dart';
+import 'package:twinned_api/twinned_api.dart' as tapi;
 
 class CurrentPlan extends StatefulWidget {
   const CurrentPlan({super.key});
@@ -36,7 +36,7 @@ class _CurrentPlanState extends BaseState<CurrentPlan> {
             children: [
               Text(
                 '${p.planType} Plan',
-                style: BaseState.labelTextStyle.copyWith(
+                style: theme.getStyle().copyWith(
                     color: Colors.teal,
                     fontSize: 16,
                     fontWeight: FontWeight.bold),
@@ -73,32 +73,32 @@ class _CurrentPlanState extends BaseState<CurrentPlan> {
                   DataColumn2(
                     label: Text(
                       'Component',
-                      style: BaseState.labelTextStyle.copyWith(fontSize: 16),
+                      style: theme.getStyle().copyWith(fontSize: 16),
                     ),
                     size: ColumnSize.L,
                   ),
                   DataColumn2(
                     label: Text(
                       'Count',
-                      style: BaseState.labelTextStyle.copyWith(fontSize: 16),
+                      style: theme.getStyle().copyWith(fontSize: 16),
                     ),
                   ),
                   DataColumn2(
                     label: Text(
                       'Add On (Qty)',
-                      style: BaseState.labelTextStyle.copyWith(fontSize: 16),
+                      style: theme.getStyle().copyWith(fontSize: 16),
                     ),
                   ),
                   DataColumn2(
                     label: Text(
                       'Total',
-                      style: BaseState.labelTextStyle.copyWith(fontSize: 16),
+                      style: theme.getStyle().copyWith(fontSize: 16),
                     ),
                   ),
                   DataColumn2(
                     label: Text(
                       '',
-                      style: BaseState.labelTextStyle.copyWith(fontSize: 16),
+                      style: theme.getStyle().copyWith(fontSize: 16),
                     ),
                   ),
                 ],
@@ -106,21 +106,21 @@ class _CurrentPlanState extends BaseState<CurrentPlan> {
                   DataRow2(cells: [
                     DataCell(Text(
                       'Data Points',
-                      style: BaseState.labelTextStyle.copyWith(fontSize: 14),
+                      style: theme.getStyle().copyWith(fontSize: 14),
                     )),
                     DataCell(Text(
                       '${p.dataPointsCount}',
-                      style: BaseState.labelTextStyle.copyWith(
+                      style: theme.getStyle().copyWith(
                           fontSize: 14, fontWeight: FontWeight.normal),
                     )),
                     DataCell(Text(
                       '${p.purchasedDataPoints}',
-                      style: BaseState.labelTextStyle.copyWith(
+                      style: theme.getStyle().copyWith(
                           fontSize: 14, fontWeight: FontWeight.normal),
                     )),
                     DataCell(Text(
                       '${(p.dataPointsCount * p.totalDevicesCount) + (p.purchasedDataPoints * 50000)}',
-                      style: BaseState.labelTextStyle.copyWith(
+                      style: theme.getStyle().copyWith(
                           fontSize: 14, fontWeight: FontWeight.normal),
                     )),
                     DataCell(BuyButton(
@@ -139,21 +139,21 @@ class _CurrentPlanState extends BaseState<CurrentPlan> {
                   DataRow2(cells: [
                     DataCell(Text(
                       'Devices',
-                      style: BaseState.labelTextStyle.copyWith(fontSize: 14),
+                      style: theme.getStyle().copyWith(fontSize: 14),
                     )),
                     DataCell(Text(
                       '${p.devicesCount}',
-                      style: BaseState.labelTextStyle.copyWith(
+                      style: theme.getStyle().copyWith(
                           fontSize: 14, fontWeight: FontWeight.normal),
                     )),
                     DataCell(Text(
                       '${p.purchasedDevices}',
-                      style: BaseState.labelTextStyle.copyWith(
+                      style: theme.getStyle().copyWith(
                           fontSize: 14, fontWeight: FontWeight.normal),
                     )),
                     DataCell(Text(
                       '${p.totalDevicesCount}',
-                      style: BaseState.labelTextStyle.copyWith(
+                      style: theme.getStyle().copyWith(
                           fontSize: 14, fontWeight: FontWeight.normal),
                     )),
                     DataCell(BuyButton(
@@ -167,21 +167,21 @@ class _CurrentPlanState extends BaseState<CurrentPlan> {
                   DataRow2(cells: [
                     DataCell(Text(
                       'Users',
-                      style: BaseState.labelTextStyle.copyWith(fontSize: 14),
+                      style: theme.getStyle().copyWith(fontSize: 14),
                     )),
                     DataCell(Text(
                       '${p.userCount}',
-                      style: BaseState.labelTextStyle.copyWith(
+                      style: theme.getStyle().copyWith(
                           fontSize: 14, fontWeight: FontWeight.normal),
                     )),
                     DataCell(Text(
                       '${p.purchasedUsers}',
-                      style: BaseState.labelTextStyle.copyWith(
+                      style: theme.getStyle().copyWith(
                           fontSize: 14, fontWeight: FontWeight.normal),
                     )),
                     DataCell(Text(
                       '${p.totalUserCount}',
-                      style: BaseState.labelTextStyle.copyWith(
+                      style: theme.getStyle().copyWith(
                           fontSize: 14, fontWeight: FontWeight.normal),
                     )),
                     DataCell(BuyButton(
@@ -198,21 +198,21 @@ class _CurrentPlanState extends BaseState<CurrentPlan> {
                   DataRow2(cells: [
                     DataCell(Text(
                       'Dashboards',
-                      style: BaseState.labelTextStyle.copyWith(fontSize: 14),
+                      style: theme.getStyle().copyWith(fontSize: 14),
                     )),
                     DataCell(Text(
                       '${p.dashboardCount}',
-                      style: BaseState.labelTextStyle.copyWith(
+                      style: theme.getStyle().copyWith(
                           fontSize: 14, fontWeight: FontWeight.normal),
                     )),
                     DataCell(Text(
                       '${p.purchasedDashboards}',
-                      style: BaseState.labelTextStyle.copyWith(
+                      style: theme.getStyle().copyWith(
                           fontSize: 14, fontWeight: FontWeight.normal),
                     )),
                     DataCell(Text(
                       '${p.totalDashboardCount}',
-                      style: BaseState.labelTextStyle.copyWith(
+                      style: theme.getStyle().copyWith(
                           fontSize: 14, fontWeight: FontWeight.normal),
                     )),
                     DataCell(BuyButton(
@@ -229,21 +229,21 @@ class _CurrentPlanState extends BaseState<CurrentPlan> {
                   DataRow2(cells: [
                     DataCell(Text(
                       'Clients',
-                      style: BaseState.labelTextStyle.copyWith(fontSize: 14),
+                      style: theme.getStyle().copyWith(fontSize: 14),
                     )),
                     DataCell(Text(
                       '${p.clientCount}',
-                      style: BaseState.labelTextStyle.copyWith(
+                      style: theme.getStyle().copyWith(
                           fontSize: 14, fontWeight: FontWeight.normal),
                     )),
                     DataCell(Text(
                       '${p.purchasedClients}',
-                      style: BaseState.labelTextStyle.copyWith(
+                      style: theme.getStyle().copyWith(
                           fontSize: 14, fontWeight: FontWeight.normal),
                     )),
                     DataCell(Text(
                       '${p.totalClientCount}',
-                      style: BaseState.labelTextStyle.copyWith(
+                      style: theme.getStyle().copyWith(
                           fontSize: 14, fontWeight: FontWeight.normal),
                     )),
                     DataCell(BuyButton(
@@ -262,21 +262,21 @@ class _CurrentPlanState extends BaseState<CurrentPlan> {
                   DataRow2(cells: [
                     DataCell(Text(
                       'Device Libraries',
-                      style: BaseState.labelTextStyle.copyWith(fontSize: 14),
+                      style: theme.getStyle().copyWith(fontSize: 14),
                     )),
                     DataCell(Text(
                       '${p.deviceModelCount}',
-                      style: BaseState.labelTextStyle.copyWith(
+                      style: theme.getStyle().copyWith(
                           fontSize: 14, fontWeight: FontWeight.normal),
                     )),
                     DataCell(Text(
                       '${p.purchasedModels}',
-                      style: BaseState.labelTextStyle.copyWith(
+                      style: theme.getStyle().copyWith(
                           fontSize: 14, fontWeight: FontWeight.normal),
                     )),
                     DataCell(Text(
                       '${p.totalDeviceModelCount}',
-                      style: BaseState.labelTextStyle.copyWith(
+                      style: theme.getStyle().copyWith(
                           fontSize: 14, fontWeight: FontWeight.normal),
                     )),
                     DataCell(BuyButton(
@@ -293,21 +293,21 @@ class _CurrentPlanState extends BaseState<CurrentPlan> {
                   DataRow2(cells: [
                     DataCell(Text(
                       'Device Parameters',
-                      style: BaseState.labelTextStyle.copyWith(fontSize: 14),
+                      style: theme.getStyle().copyWith(fontSize: 14),
                     )),
                     DataCell(Text(
                       '${p.modelParametersCount}',
-                      style: BaseState.labelTextStyle.copyWith(
+                      style: theme.getStyle().copyWith(
                           fontSize: 14, fontWeight: FontWeight.normal),
                     )),
                     DataCell(Text(
                       '${p.purchasedParameters}',
-                      style: BaseState.labelTextStyle.copyWith(
+                      style: theme.getStyle().copyWith(
                           fontSize: 14, fontWeight: FontWeight.normal),
                     )),
                     DataCell(Text(
                       '${p.totalModelParametersCount}',
-                      style: BaseState.labelTextStyle.copyWith(
+                      style: theme.getStyle().copyWith(
                           fontSize: 14, fontWeight: FontWeight.normal),
                     )),
                     DataCell(BuyButton(
@@ -324,21 +324,21 @@ class _CurrentPlanState extends BaseState<CurrentPlan> {
                   DataRow2(cells: [
                     DataCell(Text(
                       'Archival',
-                      style: BaseState.labelTextStyle.copyWith(fontSize: 14),
+                      style: theme.getStyle().copyWith(fontSize: 14),
                     )),
                     DataCell(Text(
                       '${p.archivalYearsCount} year(s)',
-                      style: BaseState.labelTextStyle.copyWith(
+                      style: theme.getStyle().copyWith(
                           fontSize: 14, fontWeight: FontWeight.normal),
                     )),
                     DataCell(Text(
                       '${p.purchasedArchivals}',
-                      style: BaseState.labelTextStyle.copyWith(
+                      style: theme.getStyle().copyWith(
                           fontSize: 14, fontWeight: FontWeight.normal),
                     )),
                     DataCell(Text(
                       '${p.totalArchivalYearsCount} year(s)',
-                      style: BaseState.labelTextStyle.copyWith(
+                      style: theme.getStyle().copyWith(
                           fontSize: 14, fontWeight: FontWeight.normal),
                     )),
                     DataCell(BuyButton(
@@ -403,11 +403,13 @@ class _CurrentPlanState extends BaseState<CurrentPlan> {
         padding: const EdgeInsets.only(left: 25.0, right: 25),
         child: Column(
           children: [
-            const Align(
+            Align(
               alignment: Alignment.centerLeft,
               child: Text(
                 'Utilization',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: theme
+                    .getStyle()
+                    .copyWith(fontSize: 20, fontWeight: FontWeight.bold),
               ),
             ),
             divider(height: 25),
@@ -417,11 +419,11 @@ class _CurrentPlanState extends BaseState<CurrentPlan> {
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Align(
+                    Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
                         'Data Points',
-                        style: TextStyle(
+                        style: theme.getStyle().copyWith(
                             fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -454,11 +456,11 @@ class _CurrentPlanState extends BaseState<CurrentPlan> {
                   Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Align(
+                      Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
                           'Pooled Data Points',
-                          style: TextStyle(
+                          style: theme.getStyle().copyWith(
                               fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                       ),
@@ -490,11 +492,11 @@ class _CurrentPlanState extends BaseState<CurrentPlan> {
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Align(
+                    Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
                         'Devices',
-                        style: TextStyle(
+                        style: theme.getStyle().copyWith(
                             fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -525,11 +527,11 @@ class _CurrentPlanState extends BaseState<CurrentPlan> {
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Align(
+                    Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
                         'Users',
-                        style: TextStyle(
+                        style: theme.getStyle().copyWith(
                             fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -560,11 +562,11 @@ class _CurrentPlanState extends BaseState<CurrentPlan> {
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Align(
+                    Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
                         'Clients',
-                        style: TextStyle(
+                        style: theme.getStyle().copyWith(
                             fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -595,11 +597,11 @@ class _CurrentPlanState extends BaseState<CurrentPlan> {
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Align(
+                    Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
                         'Dashboards',
-                        style: TextStyle(
+                        style: theme.getStyle().copyWith(
                             fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -631,11 +633,11 @@ class _CurrentPlanState extends BaseState<CurrentPlan> {
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Align(
+                    Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
                         'Device Libraries',
-                        style: TextStyle(
+                        style: theme.getStyle().copyWith(
                             fontSize: 16, fontWeight: FontWeight.bold),
                       ),
                     ),
