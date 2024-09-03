@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:twin_app/core/constants.dart';
+import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/pages/twin/components/widgets/device_data_simulator.dart';
 import 'package:twin_app/pages/twin/components/widgets/map_alert.dart';
+import 'package:twin_app/widgets/commons/secondary_button.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/twinned_session.dart';
 import 'package:twinned_api/api/twinned.swagger.dart';
@@ -68,16 +70,16 @@ class _DeviceViewDefaultState extends BaseState<DeviceViewDefault> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Row(
+                    Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Text(
                           "Mqtt / Http settings",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xff000000),
-                          ),
+                          style: theme.getStyle().copyWith(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xff000000),
+                              ),
                         ),
                       ],
                     ),
@@ -85,6 +87,7 @@ class _DeviceViewDefaultState extends BaseState<DeviceViewDefault> {
                       children: [
                         Expanded(
                           child: TextField(
+                            style: theme.getStyle(),
                             controller: textEditingController,
                             readOnly: true,
                             maxLines: null,
@@ -96,6 +99,7 @@ class _DeviceViewDefaultState extends BaseState<DeviceViewDefault> {
                         ),
                       ],
                     ),
+                    divider(),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -110,17 +114,8 @@ class _DeviceViewDefaultState extends BaseState<DeviceViewDefault> {
                             },
                           ),
                         ),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            // backgroundColor: primaryColor,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(3),
-                            ),
-                          ),
-                          child: Text(
-                            "Cancel",
-                            // style: UserSession.getLabelTextStyle(),
-                          ),
+                        SecondaryButton(
+                          labelKey: 'Cancel',
                           onPressed: () {
                             Navigator.of(context).pop(); // Close the dialog
                           },
@@ -210,7 +205,10 @@ class _DeviceViewDefaultState extends BaseState<DeviceViewDefault> {
                     context: context,
                     builder: (BuildContext context) {
                       return AlertDialog(
-                        title: const Text('Simulate Device Data'),
+                        title: Text(
+                          'Simulate Device Data',
+                          style: theme.getStyle(),
+                        ),
                         content: SingleChildScrollView(
                           child: DeviceDataSimulator(
                             apiKey: widget.device.apiKey,

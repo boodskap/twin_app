@@ -74,9 +74,8 @@ class _DeviceLibraryState extends BaseState<DeviceLibrary> {
                 child: SearchBar(
                   leading: Icon(Icons.search),
                   hintText: 'Search device library',
-                  hintStyle: WidgetStateProperty.all(
-                    theme.getStyle(),
-                  ),
+                  textStyle: WidgetStatePropertyAll(theme.getStyle()),
+                  hintStyle: WidgetStatePropertyAll(theme.getStyle()),
                   onChanged: (val) {
                     _search = val.trim();
                     _load();
@@ -216,6 +215,8 @@ class _DeviceLibraryState extends BaseState<DeviceLibrary> {
 
   Future _addEditDeviceModelDialog({tapi.DeviceModel? deviceModel}) async {
     await super.alertDialog(
+      titleStyle:
+          theme.getStyle().copyWith(fontWeight: FontWeight.bold, fontSize: 20),
       title:
           null == deviceModel ? 'Add New Device Model' : 'Update Device Model',
       body: DeviceModelSnippet(

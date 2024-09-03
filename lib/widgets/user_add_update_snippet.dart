@@ -108,6 +108,7 @@ class _UserAddUpdateSnippetState extends BaseState<UserAddUpdateSnippet> {
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: LabelTextField(
                           label: 'Name',
+                          labelTextStyle: theme.getStyle(),
                           style: theme.getStyle(),
                           controller: nameController,
                           focusedBorder: OutlineInputBorder(
@@ -121,6 +122,7 @@ class _UserAddUpdateSnippetState extends BaseState<UserAddUpdateSnippet> {
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: LabelTextField(
                           label: 'Email',
+                          labelTextStyle: theme.getStyle(),
                           style: theme.getStyle(),
                           controller: emailController,
                           focusedBorder: OutlineInputBorder(
@@ -141,6 +143,8 @@ class _UserAddUpdateSnippetState extends BaseState<UserAddUpdateSnippet> {
                           ],
                           decoration: InputDecoration(
                             labelText: 'Enter Phone Number',
+                            hintStyle: theme.getStyle(),
+                            labelStyle: theme.getStyle(),
                             counterText: "",
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(4.0),
