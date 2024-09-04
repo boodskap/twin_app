@@ -144,7 +144,6 @@ class _VisualDisplaysState extends BaseState<VisualDisplays> {
           }
         },
         child: Tooltip(
-          textStyle: theme.getStyle().copyWith(color: Colors.white),
           message: '${e.name}\n${e.description ?? ""}',
           child: Card(
             elevation: 8,
@@ -267,6 +266,7 @@ class _VisualDisplaysState extends BaseState<VisualDisplays> {
         barrierDismissible: false,
         builder: (context) {
           return AlertDialog(
+            titleTextStyle: theme.getStyle().copyWith(fontSize: 20,fontWeight: FontWeight.bold),
             title: Text(title),
             content: SizedBox(
               width: 500,
@@ -276,29 +276,43 @@ class _VisualDisplaysState extends BaseState<VisualDisplays> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   TextField(
+                    style: theme.getStyle(),
                     onChanged: (value) {
                       setState(() {
                         nameText = value;
                       });
                     },
-                    decoration: const InputDecoration(hintText: 'Name'),
+                    decoration: InputDecoration(
+                      hintText: 'Name',
+                      hintStyle: theme.getStyle(),
+                      labelStyle: theme.getStyle(),
+                    ),
                   ),
                   TextField(
+                    style: theme.getStyle(),
                     onChanged: (value) {
                       setState(() {
                         descText = value;
                       });
                     },
-                    decoration: const InputDecoration(hintText: 'Description'),
+                    decoration: InputDecoration(
+                      hintText: 'Description',
+                      hintStyle: theme.getStyle(),
+                      labelStyle: theme.getStyle(),
+                    ),
                   ),
                   TextField(
+                    style: theme.getStyle(),
                     onChanged: (value) {
                       setState(() {
                         tagsText = value;
                       });
                     },
-                    decoration: const InputDecoration(
-                        hintText: 'Tags (space separated)'),
+                    decoration: InputDecoration(
+                      hintText: 'Tags (space separated)',
+                      hintStyle: theme.getStyle(),
+                      labelStyle: theme.getStyle(),
+                    ),
                   ),
                 ],
               ),
