@@ -30,7 +30,7 @@ class _ConditonDropdownState extends BaseState<ConditonDropdown> {
       child: widget.conditionList.isNotEmpty
           ? MultiSelectDialogField(
               closeSearchIcon: Icon(Icons.close),
-              searchHint: 'conditions',
+              searchHint: 'Conditions',
               cancelText: Text('Cancel',
                   style: theme.getStyle().copyWith(color: Colors.red)),
               confirmText: Text('Ok',

@@ -299,8 +299,8 @@ class _InstallationDatabaseState extends BaseState<InstallationDatabase> {
       title: 'Warning',
       message:
           'Deleting is unrecoverable\nIt may also delete all the related models and components\n\nDo you want to proceed?',
-      titleStyle: const TextStyle(color: Colors.red),
-      messageStyle: const TextStyle(fontWeight: FontWeight.bold),
+      titleStyle: theme.getStyle().copyWith(color: Colors.red),
+      messageStyle: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
       onPressed: () async {
         await execute(() async {
           int index = _entities.indexWhere((element) => element.id == e.id);

@@ -523,11 +523,7 @@ class _ConditionRulesState extends BaseState<ConditionRules> {
       ),
       content: Text(
         "Deleting a Condition Rule can not be undone.\nYou will lose all of the Condition Rule data, history, etc.\n\nAre you sure you want to delete?",
-        style: theme.getStyle().copyWith(
-              color: Colors.red,
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-            ),
+        style: theme.getStyle(),
         maxLines: 10,
       ),
       actions: [

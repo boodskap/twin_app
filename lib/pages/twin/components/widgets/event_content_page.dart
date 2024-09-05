@@ -6,6 +6,7 @@ import 'package:twin_app/pages/twin/components/widgets/fcm_template_snippet.dart
 import 'package:twin_app/pages/twin/components/widgets/match_group_widget.dart';
 import 'package:twin_app/pages/twin/components/widgets/notification_template.dart';
 import 'package:twin_app/pages/twin/components/widgets/roles_widget.dart';
+import 'package:twin_app/pages/twin/components/widgets/showoverlay_widget.dart';
 import 'package:twin_app/pages/twin/components/widgets/sms_template_snippet.dart';
 import 'package:twin_app/pages/twin/components/widgets/voice_template_snippet.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
@@ -162,12 +163,12 @@ class _DigitalTwinEventContentPageState
                                       text: widget.entity.id,
                                     ),
                                   );
-                                  // OverlayWidget.showOverlay(
-                                  //   context: context,
-                                  //   topPosition: 140,
-                                  //   leftPosition: 250,
-                                  //   message: 'Event id copied!',
-                                  // );
+                                  OverlayWidget.showOverlay(
+                                    context: context,
+                                    topPosition: 140,
+                                    leftPosition: 250,
+                                    message: 'Event id copied!',
+                                  );
                                 },
                                 child: const Icon(
                                   Icons.content_copy,
