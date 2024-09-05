@@ -248,7 +248,7 @@ class _AssetLibraryState extends BaseState<AssetLibrary> {
     AlertDialog alert = AlertDialog(
       title: Text(
         "WARNING",
-        style: theme.getStyle(),
+        style: theme.getStyle().copyWith(color: Colors.red),
       ),
       content: Text(
         "Deleting a Asset Library can not be undone.\nYou will loose all of the premise data, history, etc.\n\nAre you sure you want to delete?",

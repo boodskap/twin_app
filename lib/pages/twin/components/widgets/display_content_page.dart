@@ -231,7 +231,7 @@ class _DisplayContentStatePageState extends BaseState<DisplayContentStatePage> {
       ),
       content: Text(
         "Deleting a display state can not be undone.\nYou will loose all of the display state data, history, etc.\n\nAre you sure you want to delete?",
-        style: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
+        style: theme.getStyle(),
         maxLines: 10,
       ),
       actions: [

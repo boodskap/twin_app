@@ -88,8 +88,8 @@ class _MatchGroupWidgetState extends BaseState<MatchGroupWidget> {
         decoration: BoxDecoration(
             color: Colors.white,
             border: Border.all(color: Colors.transparent
-              // color: Colors.black,
-            ),
+                // color: Colors.black,
+                ),
             borderRadius: const BorderRadius.all(Radius.circular(15))),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -104,6 +104,7 @@ class _MatchGroupWidgetState extends BaseState<MatchGroupWidget> {
             Row(
               children: [
                 DropdownButton<twin.MatchGroupMatchType>(
+                    style: theme.getStyle(),
                     value: _selectedMatchType,
                     items: _matchTypeItems,
                     onChanged: (value) {
@@ -112,29 +113,48 @@ class _MatchGroupWidgetState extends BaseState<MatchGroupWidget> {
                       });
                     }),
                 Expanded(
-                  child: DropdownSearch<ConditionModel>(
-                    onChanged: (selected) {
-                      setState(() {
-                        _selectedModel = selected;
-                      });
-                    },
-                    asyncItems: (String filter) async {
-                      List<ConditionModel> list = [];
-                      var res = await TwinnedSession.instance.twin
-                          .searchConditions(
-                              apikey: TwinnedSession.instance.authToken,
-                              modelId: widget.deviceModel.id,
-                              body: twin.SearchReq(
-                                  search: filter, page: 0, size: 10000));
-                      if (res.body!.ok) {
-                        for (var condition in res.body!.values!) {
-                          list.add(ConditionModel(condition: condition));
-                        }
+                    child: DropdownSearch<ConditionModel>(
+                  onChanged: (selected) {
+                    setState(() {
+                      _selectedModel = selected;
+                    });
+                  },
+                  asyncItems: (String filter) async {
+                    List<ConditionModel> list = [];
+                    var res = await TwinnedSession.instance.twin
+                        .searchConditions(
+                            apikey: TwinnedSession.instance.authToken,
+                            modelId: widget.deviceModel.id,
+                            body: twin.SearchReq(
+                                search: filter, page: 0, size: 10000));
+                    if (res.body!.ok) {
+                      for (var condition in res.body!.values!) {
+                        list.add(ConditionModel(condition: condition));
                       }
-                      return list;
+                    }
+                    return list;
+                  },
+                  dropdownBuilder: (context, ConditionModel? selectedItem) {
+                    return Text(
+                      selectedItem?.condition.name ?? "Select a condition",
+                      style: theme
+                          .getStyle()
+                          .copyWith(fontSize: 16, fontWeight: FontWeight.w500),
+                    );
+                  },
+                  popupProps: PopupProps.menu(
+                    itemBuilder:
+                        (context, ConditionModel item, bool isSelected) {
+                      return ListTile(
+                        title: Text(
+                          item.condition.name,
+                          style: theme.getStyle().copyWith(
+                              fontSize: 14, fontWeight: FontWeight.w400),
+                        ),
+                      );
                     },
                   ),
-                ),
+                )),
                 if (null != _selectedModel)
                   IconButton(
                     onPressed: () {
