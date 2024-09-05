@@ -91,6 +91,9 @@ class _ConfigChildPaletteState extends BaseState<ConfigChildPalette> {
             IconButton(
                 onPressed: () {
                   alertDialog(
+                      titleStyle: theme
+                          .getStyle()
+                          .copyWith(fontWeight: FontWeight.bold, fontSize: 18),
                       title: '${builder.getPaletteName()} - Parameters',
                       width: MediaQuery.of(context).size.width - 200,
                       height: MediaQuery.of(context).size.height - 150,
@@ -112,6 +115,9 @@ class _ConfigChildPaletteState extends BaseState<ConfigChildPalette> {
             IconButton(
                 onPressed: () async {
                   await alertDialog(
+                      titleStyle: theme
+                          .getStyle()
+                          .copyWith(fontWeight: FontWeight.bold, fontSize: 18),
                       title: 'Configuration',
                       width: MediaQuery.of(context).size.width / 2 + 100,
                       height: MediaQuery.of(context).size.height - 250,
@@ -119,7 +125,14 @@ class _ConfigChildPaletteState extends BaseState<ConfigChildPalette> {
                         children: [
                           Expanded(
                               child: SingleChildScrollView(
-                                  child: CodeField(controller: controller))),
+                                  child: CodeField(
+                            controller: controller,
+                            textStyle: theme.getStyle(),
+                            lineNumberStyle:
+                                GutterStyle(textStyle: theme.getStyle()),
+                            gutterStyle:
+                                GutterStyle(textStyle: theme.getStyle()),
+                          ))),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
@@ -193,6 +206,7 @@ class _ConfigChildPaletteState extends BaseState<ConfigChildPalette> {
               height: 45,
               child: IntrinsicWidth(
                 child: SpinBox(
+                  textStyle: theme.getStyle(),
                   min: 1,
                   max: 4096,
                   value: _child.width ?? 200,
@@ -225,6 +239,7 @@ class _ConfigChildPaletteState extends BaseState<ConfigChildPalette> {
               height: 45,
               child: IntrinsicWidth(
                 child: SpinBox(
+                  textStyle: theme.getStyle(),
                   min: 1,
                   max: 4096,
                   value: _child.height ?? 200,
@@ -282,6 +297,7 @@ class _ConfigChildPaletteState extends BaseState<ConfigChildPalette> {
                 height: 45,
                 child: IntrinsicWidth(
                   child: SpinBox(
+                    textStyle: theme.getStyle(),
                     min: 1,
                     max: 100,
                     value: (_child.flex ?? 1).toDouble(),
@@ -311,11 +327,12 @@ class _ConfigChildPaletteState extends BaseState<ConfigChildPalette> {
                   fontWeight: FontWeight.bold),
             ),
             DropdownButton<AlignmentConfig>(
+                style: theme.getStyle(),
                 value: _child.alignment ??
                     const AlignmentConfig(
                         alignment:
                             AlignmentConfigAlignment.swaggerGeneratedUnknown),
-                items: const [
+                items: [
                   DropdownMenuItem<AlignmentConfig>(
                       value: AlignmentConfig(
                           alignment:
@@ -369,12 +386,14 @@ class _ConfigChildPaletteState extends BaseState<ConfigChildPalette> {
         ),
         divider(),
         BorderConfigWidget(
+            style: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
             borderConfig: _child.childBorderConfig,
             onBorderConfigured: (border) {
               _onBorderConfigured(border);
             }),
         divider(),
         PaddingConfigWidget(
+            style: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
             title: 'Padding',
             paddingConfig: _child.paddingConfig,
             onPaddingConfigSaved: (paddingConfig) {
@@ -382,6 +401,7 @@ class _ConfigChildPaletteState extends BaseState<ConfigChildPalette> {
             }),
         divider(),
         PaddingConfigWidget(
+            style: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
             title: 'Margin',
             paddingConfig: _child.marginConfig,
             onPaddingConfigSaved: (paddingConfig) {
@@ -481,6 +501,10 @@ class _ConfigChildPaletteState extends BaseState<ConfigChildPalette> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          contentTextStyle: theme.getStyle().copyWith(color: Colors.black),
+          titleTextStyle: theme
+              .getStyle()
+              .copyWith(fontWeight: FontWeight.bold, fontSize: 18),
           title: const Text('Pick a color'),
           content: SingleChildScrollView(
             child: ColorPicker(
@@ -499,7 +523,10 @@ class _ConfigChildPaletteState extends BaseState<ConfigChildPalette> {
           ),
           actions: <Widget>[
             TextButton(
-              child: const Text('Done'),
+              child: Text(
+                'Done',
+                style: theme.getStyle().copyWith(fontSize: 16),
+              ),
               onPressed: () {
                 widget.onChildSaved(
                     widget.rowIndex, widget.columnIndex, _child);
