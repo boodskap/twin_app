@@ -19,7 +19,7 @@ class AlarmsNotificationsGrid extends StatefulWidget {
 
 class _AlarmsNotificationsGridState extends BaseState<AlarmsNotificationsGrid> {
   int _currentPage = 0;
-  static const int _itemsPerPage = 5;
+  static const int _itemsPerPage = 25;
   String _selectedFilter = 'Recent';
   DateTimeRange? _selectedDateRange;
   bool _isEmailView = true;
