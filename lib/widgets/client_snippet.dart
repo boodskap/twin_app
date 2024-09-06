@@ -162,7 +162,9 @@ class _ClientSnippetState extends BaseState<ClientSnippet> {
                             inputFormatters: [
                               FilteringTextInputFormatter.digitsOnly,
                             ],
+                            dropdownTextStyle: theme.getStyle(),
                             decoration: InputDecoration(
+                              errorStyle: theme.getStyle(),
                               labelText: 'Enter Phone Number',
                               labelStyle: theme.getStyle(),
                               hintStyle: theme.getStyle(),
