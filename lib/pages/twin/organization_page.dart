@@ -1,20 +1,16 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:nocode_api/api/nocode.swagger.dart' as nocode;
 import 'package:twin_app/core/session_variables.dart';
-import 'package:twin_app/pages/twin/components/widgets/custom_settings_dropdown.dart';
 import 'package:twin_app/pages/twin/components/widgets/showoverlay_widget.dart';
 import 'package:twin_app/pages/twin/components/widgets/single_value_input.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
-import 'package:twin_app/widgets/commons/secondary_button.dart';
-import 'package:twin_app/widgets/purchase_change_addon_widget.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:twin_commons/core/twin_image_helper.dart';
 import 'package:twin_commons/core/twinned_session.dart';
 import 'package:twinned_api/api/twinned.swagger.dart' as tapi;
-import 'package:nocode_api/api/nocode.swagger.dart' as nocode;
 
 class OrganizationPage extends StatefulWidget {
   final tapi.OrgInfo orgInfo;
@@ -409,6 +405,9 @@ class _OrganizationPageState extends BaseState<OrganizationPage> {
 
   Future _editName() async {
     super.alertDialog(
+        titleStyle: theme
+            .getStyle()
+            .copyWith(fontWeight: FontWeight.bold, fontSize: 20),
         height: 150,
         title: 'Edit Organization',
         body: SingleValueInput(
@@ -432,6 +431,9 @@ class _OrganizationPageState extends BaseState<OrganizationPage> {
 
   Future _editDescription() async {
     super.alertDialog(
+        titleStyle: theme
+            .getStyle()
+            .copyWith(fontWeight: FontWeight.bold, fontSize: 20),
         height: 150,
         title: 'Edit Organization',
         body: SingleValueInput(
@@ -455,6 +457,9 @@ class _OrganizationPageState extends BaseState<OrganizationPage> {
 
   Future _editEmailApi() async {
     super.alertDialog(
+        titleStyle: theme
+            .getStyle()
+            .copyWith(fontWeight: FontWeight.bold, fontSize: 20),
         height: 150,
         title: 'Email Api',
         body: SingleValueInput(
@@ -477,6 +482,9 @@ class _OrganizationPageState extends BaseState<OrganizationPage> {
     super.alertDialog(
         height: 150,
         title: 'SMS Api',
+        titleStyle: theme
+            .getStyle()
+            .copyWith(fontWeight: FontWeight.bold, fontSize: 20),
         body: SingleValueInput(
             value: _twinSysInfo!.pulseSmsKey,
             label: 'Pulse Key',
@@ -495,6 +503,9 @@ class _OrganizationPageState extends BaseState<OrganizationPage> {
 
   Future _editVoiceApi() async {
     super.alertDialog(
+        titleStyle: theme
+            .getStyle()
+            .copyWith(fontWeight: FontWeight.bold, fontSize: 20),
         height: 150,
         title: 'Voicemail Api',
         body: SingleValueInput(

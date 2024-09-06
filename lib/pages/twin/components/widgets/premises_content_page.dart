@@ -255,6 +255,8 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
 
   Future _delete() async {
     await confirm(
+        titleStyle: theme.getStyle().copyWith(color: Colors.red, fontSize: 20),
+        messageStyle: theme.getStyle(),
         title: 'Are you sure?',
         message: 'you want to delete this image?',
         onPressed: () async {
@@ -285,6 +287,21 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
             }
           });
         });
+  }
+
+  String _getSearchHint(InfraType type) {
+    switch (type) {
+      case InfraType.premise:
+        return 'Search Premises';
+      case InfraType.facility:
+        return 'Search Facilities';
+      case InfraType.floor:
+        return 'Search Floors';
+      case InfraType.asset:
+        return 'Search Assets';
+      default:
+        return 'Search';
+    }
   }
 
   // Future<void> _pickLocation() async {
@@ -358,13 +375,13 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
                         children: [
                           Text(
                             'Latitude: ${pickedLatitude.toStringAsFixed(4)}',
-                            style: const TextStyle(
+                            style: theme.getStyle().copyWith(
                                 fontSize: 16, fontWeight: FontWeight.w600),
                           ),
                           const SizedBox(width: 5),
                           Text(
                             'Longitude: ${pickedLongitude.toStringAsFixed(4)}',
-                            style: const TextStyle(
+                            style: theme.getStyle().copyWith(
                                 fontSize: 16, fontWeight: FontWeight.w600),
                           ),
                           const Spacer(),
@@ -973,6 +990,14 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
                                                   .size
                                                   .width,
                                               child: SearchBar(
+                                                  hintText: _getSearchHint(
+                                                      widget.type),
+                                                  hintStyle:
+                                                      WidgetStatePropertyAll(
+                                                          theme.getStyle()),
+                                                  textStyle:
+                                                      WidgetStatePropertyAll(
+                                                          theme.getStyle()),
                                                   leading:
                                                       const Icon(Icons.search),
                                                   onChanged: (value) async {
