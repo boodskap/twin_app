@@ -14,12 +14,10 @@ class WrapperPage extends StatelessWidget {
         leading: const BackButton(
           color: Color(0XFFFFFFFF),
         ),
-        title: Text(
-          title,
-          style: const TextStyle(
-            color: Color(0XFFFFFFFF),
-          ),
-        ),
+        title: Text(title,
+            style: theme.getStyle().copyWith(
+                  color: Color(0XFFFFFFFF),
+                )),
       ),
       body: Column(
         children: [

@@ -135,13 +135,16 @@ class _UserAddUpdateSnippetState extends BaseState<UserAddUpdateSnippet> {
                       SizedBox(
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: IntlPhoneField(
+                          style: theme.getStyle(),
                           controller: phoneController,
                           keyboardType: TextInputType.phone,
                           initialCountryCode: countryCode,
                           inputFormatters: [
                             FilteringTextInputFormatter.digitsOnly,
                           ],
+                          dropdownTextStyle: theme.getStyle(),
                           decoration: InputDecoration(
+                            errorStyle: theme.getStyle(),
                             labelText: 'Enter Phone Number',
                             hintStyle: theme.getStyle(),
                             labelStyle: theme.getStyle(),
@@ -189,6 +192,7 @@ class _UserAddUpdateSnippetState extends BaseState<UserAddUpdateSnippet> {
                         SizedBox(
                           width: MediaQuery.of(context).size.width / 2.5,
                           child: ClientDropdown(
+                            style: theme.getStyle(),
                             selectedItem: (_twinUserInfo.clientIds!.isNotEmpty)
                                 ? _twinUserInfo.clientIds!.first
                                 : null,
@@ -204,6 +208,7 @@ class _UserAddUpdateSnippetState extends BaseState<UserAddUpdateSnippet> {
                       SizedBox(
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: MultiRoleDropdown(
+                          style: theme.getStyle(),
                           selectedItems: _twinUserInfo.roles ?? [],
                           onRolesSelected: (e) {
                             setState(() {

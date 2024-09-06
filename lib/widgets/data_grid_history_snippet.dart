@@ -1044,7 +1044,7 @@ class DataGridHistorySnippetState extends BaseState<DataGridHistorySnippet> {
               null != _assetGroup && _assetGroup!.assetIds.isNotEmpty)
             {
               "terms": {
-                widget.oldVersion ? 'assetId' : 'assetId.keyword':
+                !widget.oldVersion ? 'assetId' : 'assetId.keyword':
                     null != _assetGroup
                         ? _assetGroup!.assetIds
                         : widget.assetIds
