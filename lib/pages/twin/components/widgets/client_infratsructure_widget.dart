@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:twin_commons/core/twinned_session.dart';
-
+import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twinned_api/api/twinned.swagger.dart';
 
@@ -90,13 +90,17 @@ class _ClientInfrastructeWidgetState
           builder: (context, setState) {
             return _entities.isNotEmpty
                 ? AlertDialog(
+                    titleTextStyle: theme.getStyle().copyWith(fontSize: 20),
                     title: Text('Select Clients'),
                     content: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         TextField(
+                          style: theme.getStyle(),
                           controller: _searchController,
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
+                            hintStyle: theme.getStyle(),
+                            labelStyle: theme.getStyle(),
                             hintText: 'Search',
                           ),
                           onChanged: (value) {
@@ -115,7 +119,7 @@ class _ClientInfrastructeWidgetState
                         onPressed: () {
                           Navigator.of(context).pop();
                         },
-                        child: Text('Close'),
+                        child: Text('Close', style: theme.getStyle()),
                       ),
                       if (widget.isSave) ...[
                         SizedBox(width: 4),
@@ -123,17 +127,19 @@ class _ClientInfrastructeWidgetState
                           onPressed: () {
                             widget.saveConfirm(selectedOptions);
                           },
-                          child: const Text('Save'),
+                          child: Text('Save', style: theme.getStyle()),
                         ),
                       ]
                     ],
                   )
                 : AlertDialog(
-                    content: const SingleChildScrollView(
+                    content: SingleChildScrollView(
                       child: Column(
                         children: [
                           SizedBox(height: 20),
-                          Center(child: Text("No Clients Found")),
+                          Center(
+                              child: Text("No Clients Found",
+                                  style: theme.getStyle())),
                         ],
                       ),
                     ),
@@ -142,7 +148,7 @@ class _ClientInfrastructeWidgetState
                         onPressed: () {
                           Navigator.of(context).pop();
                         },
-                        child: Text('Close'),
+                        child: Text('Close', style: theme.getStyle()),
                       ),
                     ],
                   );
@@ -181,9 +187,9 @@ class _ClientInfrastructeWidgetState
 
       if (filteredOptions.isEmpty) {
         return [
-          const Padding(
+          Padding(
             padding: EdgeInsets.all(8.0),
-            child: Text('No clients found'),
+            child: Text('No clients found', style: theme.getStyle()),
           ),
         ];
       }
@@ -236,7 +242,7 @@ class _OptionCheckboxState extends State<OptionCheckbox> {
   @override
   Widget build(BuildContext context) {
     return CheckboxListTile(
-      title: Text(widget.option),
+      title: Text(widget.option, style: theme.getStyle()),
       value: _isSelected,
       onChanged: (value) {
         setState(() {

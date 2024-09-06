@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:twin_commons/core/twinned_session.dart';
-
+import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twinned_api/api/twinned.swagger.dart';
 
@@ -72,6 +72,7 @@ class _RolesInfrastructeWidgetState extends BaseState<RolesInfrastructeWidget> {
       builder: (BuildContext context) {
         return _entities.isNotEmpty
             ? AlertDialog(
+                titleTextStyle: theme.getStyle().copyWith(fontSize: 20),
                 title: Text('Select Roles'),
                 content: SingleChildScrollView(
                   child: Column(
@@ -99,7 +100,7 @@ class _RolesInfrastructeWidgetState extends BaseState<RolesInfrastructeWidget> {
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
-                    child: Text('Close'),
+                    child: Text('Close', style: theme.getStyle()),
                   ),
                   if (widget.isSave) ...[
                     SizedBox(width: 4),
@@ -107,17 +108,21 @@ class _RolesInfrastructeWidgetState extends BaseState<RolesInfrastructeWidget> {
                       onPressed: () {
                         widget.saveConfirm(selectedOptions);
                       },
-                      child: const Text('Save'),
+                      child: Text('Save', style: theme.getStyle()),
                     ),
                   ]
                 ],
               )
             : AlertDialog(
-                content: const SingleChildScrollView(
+                content: SingleChildScrollView(
                   child: Column(
                     children: [
                       SizedBox(height: 20),
-                      Center(child: Text("No Roles Found")),
+                      Center(
+                          child: Text(
+                        "No Roles Found",
+                        style: theme.getStyle(),
+                      )),
                     ],
                   ),
                 ),
@@ -126,7 +131,7 @@ class _RolesInfrastructeWidgetState extends BaseState<RolesInfrastructeWidget> {
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
-                    child: Text('Close'),
+                    child: Text('Close', style: theme.getStyle()),
                   ),
                 ],
               );
@@ -162,7 +167,10 @@ class _OptionCheckboxState extends State<OptionCheckbox> {
   @override
   Widget build(BuildContext context) {
     return CheckboxListTile(
-      title: Text(widget.option),
+      title: Text(
+        widget.option,
+        style: theme.getStyle(),
+      ),
       value: _isSelected,
       onChanged: (value) {
         setState(() {

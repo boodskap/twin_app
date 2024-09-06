@@ -59,6 +59,8 @@ class _PremisesState extends BaseState<Premises> {
                 height: 40,
                 width: 250,
                 child: SearchBar(
+                  hintStyle: WidgetStatePropertyAll(theme.getStyle()),
+                  textStyle: WidgetStatePropertyAll(theme.getStyle()),
                   leading: Icon(Icons.search),
                   hintText: 'Search Premises',
                   onChanged: (val) {
@@ -232,7 +234,7 @@ class _PremisesState extends BaseState<Premises> {
     AlertDialog alert = AlertDialog(
       title: Text(
         "WARNING",
-        style: theme.getStyle(),
+        style: theme.getStyle().copyWith(color: Colors.red),
       ),
       content: Text(
         "Deleting a Premise can not be undone.\nYou will loose all of the premise data, history, etc.\n\nAre you sure you want to delete?",
@@ -300,6 +302,8 @@ class _PremisesState extends BaseState<Premises> {
 
   void _addEditPremiseDialog({tapi.Premise? premise}) async {
     await super.alertDialog(
+      titleStyle:
+          theme.getStyle().copyWith(fontSize: 20, fontWeight: FontWeight.bold),
       title: null == premise ? 'Add New Premise' : 'Update Premise',
       body: PremiseSnippet(
         premise: premise,
