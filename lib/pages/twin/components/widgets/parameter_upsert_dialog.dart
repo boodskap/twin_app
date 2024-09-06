@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:twin_app/core/session_variables.dart';
 import 'package:twinned_api/api/twinned.swagger.dart' as tapi;
 import 'package:twin_commons/widgets/common/label_text_field.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:twin_app/widgets/commons/secondary_button.dart';
+import 'package:twin_commons/core/base_state.dart';
 
 typedef AddRow = void Function();
 
@@ -59,6 +61,8 @@ class _ParameterUpsertDialogSettingsState
 
     return AlertDialog(
       backgroundColor: Colors.white,
+      titleTextStyle:
+          theme.getStyle().copyWith(fontSize: 20, fontWeight: FontWeight.bold),
       title: const Text('Parameter Info'),
       content: Form(
         key: _formKey,
@@ -71,7 +75,10 @@ class _ParameterUpsertDialogSettingsState
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: TextFormField(
-                  decoration: const InputDecoration(
+                  style: theme.getStyle(),
+                  decoration: InputDecoration(
+                    hintStyle: theme.getStyle(),
+                    labelStyle: theme.getStyle(),
                     hintText: 'Name',
                     labelText: 'Name',
                     border: OutlineInputBorder(),
@@ -92,6 +99,8 @@ class _ParameterUpsertDialogSettingsState
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: LabelTextField(
+                  labelTextStyle: theme.getStyle(),
+                  style: theme.getStyle(),
                   label: 'Description',
                   controller: widget.paramDesc,
                 ),
@@ -100,6 +109,8 @@ class _ParameterUpsertDialogSettingsState
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: LabelTextField(
+                  style: theme.getStyle(),
+                  labelTextStyle: theme.getStyle(),
                   label: 'Label',
                   controller: widget.paramLabel,
                 ),
@@ -110,6 +121,7 @@ class _ParameterUpsertDialogSettingsState
                 child: DropdownButtonHideUnderline(
                   child: DropdownButtonFormField2<tapi.AttributeAttributeType>(
                     isExpanded: true,
+                    style: theme.getStyle(),
                     decoration: InputDecoration(
                       contentPadding: const EdgeInsets.only(
                         left: 1,
@@ -158,7 +170,10 @@ class _ParameterUpsertDialogSettingsState
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: TextFormField(
-                  decoration: const InputDecoration(
+                  style: theme.getStyle(),
+                  decoration: InputDecoration(
+                    hintStyle: theme.getStyle(),
+                    labelStyle: theme.getStyle(),
                     hintText: 'Value',
                     labelText: 'Value',
                     border: OutlineInputBorder(),
@@ -177,7 +192,7 @@ class _ParameterUpsertDialogSettingsState
                 spacing: 8,
                 children: [
                   CheckboxListTile(
-                    title: const Text('Editable'),
+                    title: Text('Editable', style: theme.getStyle()),
                     controlAffinity: ListTileControlAffinity.leading,
                     contentPadding: EdgeInsets.zero,
                     value: widget.paramEditable.value,
@@ -204,20 +219,26 @@ class _ParameterUpsertDialogSettingsState
               color: Colors.grey,
               thickness: 1,
             ),
-            const SizedBox(height: 5),
+            divider(),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-               SecondaryButton(labelKey: 'Cancel', onPressed: () {
+                SecondaryButton(
+                  labelKey: 'Cancel',
+                  onPressed: () {
                     Navigator.pop(context);
-                  },),
-                const SizedBox(width: 10),
-                PrimaryButton(labelKey: 'Add Parameter', onPressed: () {
+                  },
+                ),
+                divider(horizontal: true),
+                PrimaryButton(
+                  labelKey: 'Add Parameter',
+                  onPressed: () {
                     if (_formKey.currentState!.validate()) {
                       widget.addRow();
                       Navigator.pop(context);
                     }
-                  },),
+                  },
+                ),
               ],
             ),
           ],
