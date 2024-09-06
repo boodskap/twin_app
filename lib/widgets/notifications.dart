@@ -30,7 +30,7 @@ class _AlarmsNotificationsGridState extends BaseState<AlarmsNotificationsGrid> {
   final List<TriggeredEvent> _twinNotifications = [];
   String _searchQuery = '*';
   bool isShowAll = true;
-
+  TwinUser? user;
   @override
   void initState() {
     super.initState();
@@ -248,8 +248,9 @@ class _AlarmsNotificationsGridState extends BaseState<AlarmsNotificationsGrid> {
               if ((TwinnedSession.instance.isClientAdmin() ||
                   TwinnedSession.instance.isAdmin())) ...[
                 Padding(
-                  padding: const EdgeInsets.only(top:4),
+                  padding: const EdgeInsets.only(top: 4),
                   child: Checkbox(
+                    activeColor: theme.getPrimaryColor(),
                     value: isShowAll,
                     onChanged: (bool? value) {
                       setState(() {
@@ -259,7 +260,7 @@ class _AlarmsNotificationsGridState extends BaseState<AlarmsNotificationsGrid> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(top:9,right:2),
+                  padding: const EdgeInsets.only(top: 9, right: 2),
                   child: Text("Show All"),
                 ),
               ],
@@ -288,7 +289,9 @@ class _AlarmsNotificationsGridState extends BaseState<AlarmsNotificationsGrid> {
                           setState(() {
                             _searchQuery = '*${value.trim()}*';
                           });
-                          _load();
+                          Future.delayed(Duration(milliseconds: 500), () {
+                            _load();
+                          });
                         },
                       )),
                 ),
@@ -448,10 +451,21 @@ class _AlarmsNotificationsGridState extends BaseState<AlarmsNotificationsGrid> {
                 expandedCrossAxisAlignment: CrossAxisAlignment.start,
                 childrenPadding: EdgeInsets.zero,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: HtmlWidget(event.emailContent!),
-                  )
+                  if (_isEmailView)
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: HtmlWidget(event.emailContent!),
+                    ),
+                  if (_isSMSView)
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: HtmlWidget(event.smsMessage!),
+                    ),
+                  if (_isVoiceView)
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: HtmlWidget(event.voiceMessage!),
+                    ),
                 ],
               ),
             );
@@ -538,7 +552,9 @@ class _AlarmsNotificationsGridState extends BaseState<AlarmsNotificationsGrid> {
     if (loading) return;
     loading = true;
     _twinNotifications.clear();
-
+    await execute(() async {
+      user = await TwinnedSession.instance.getUser();
+    });
     await execute(() async {
       var qres = await TwinnedSession.instance.twin.queryTriggeredEqlEvent(
         apikey: TwinnedSession.instance.authToken,
@@ -573,7 +589,10 @@ class _AlarmsNotificationsGridState extends BaseState<AlarmsNotificationsGrid> {
                     : (_isVoiceView ? 'VOICE' : (_isSMSView ? 'SMS' : ''))
               },
             },
-           
+            if (!isShowAll && user != null)
+              {
+                "match_phrase": {"userId": user!.email},
+              },
           ],
         ),
       );
