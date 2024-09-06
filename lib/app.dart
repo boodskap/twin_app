@@ -22,6 +22,7 @@ import 'package:twin_app/pages/branding/fonts_colors.dart';
 import 'package:twin_app/pages/branding/landing_page.dart';
 import 'package:twin_app/pages/dashboard.dart';
 import 'package:twin_app/pages/nocode_builder.dart';
+import 'package:twin_app/pages/query_console.dart';
 import 'package:twin_app/pages/roles_page.dart';
 import 'package:twin_app/pages/twin/components.dart';
 import 'package:twin_app/pages/twin/organization_page.dart';
@@ -54,6 +55,7 @@ enum TwinAppMenu {
   adminUsers,
   adminClients,
   adminRoles,
+  adminQueryconsole,
   billingCurrentPlan,
   billingInvoices,
   billingOrders,
@@ -874,6 +876,19 @@ class HomeScreenState extends BaseState<HomeScreen> {
             return const RolesPage();
           },
         ),
+          if (!session.isClient())
+        session.TwinMenuItem(
+          id: TwinAppMenu.adminQueryconsole,
+          text: 'Query Console',
+          icon: Icons.wysiwyg,
+          bottomMenus: _adminBottomMenus(),
+          isMenuVisible: () {
+            return session.isAdmin();
+          },
+          onMenuSelected: (BuildContext context) async {
+            return  QueryConsole();
+          },
+        ),
     ];
   }
 
@@ -936,6 +951,12 @@ class HomeScreenState extends BaseState<HomeScreen> {
           id: TwinAppMenu.adminRoles,
           icon: Icon(Icons.key, size: 30),
           label: 'Roles',
+        ),
+         if (session.isAdmin())
+        const BottomMenuItem(
+          id: TwinAppMenu.adminQueryconsole,
+          icon: Icon(Icons.wysiwyg, size: 30),
+          label: 'Query',
         ),
     ];
   }
