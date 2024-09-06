@@ -1,5 +1,6 @@
 import 'package:flutter/Material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl_phone_field/country_picker_dialog.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:twin_app/widgets/commons/secondary_button.dart';
@@ -101,6 +102,7 @@ class _PremiseSnippetState extends BaseState<PremiseSnippet> {
                         child: LabelTextField(
                           label: 'Name',
                           style: theme.getStyle(),
+                          labelTextStyle: theme.getStyle(),
                           controller: nameController,
                           focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
@@ -109,14 +111,13 @@ class _PremiseSnippetState extends BaseState<PremiseSnippet> {
                           ),
                         ),
                       ),
-                      const SizedBox(
-                        height: 15,
-                      ),
+                      divider(height: 15),
                       SizedBox(
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: LabelTextField(
                           label: 'Description',
                           style: theme.getStyle(),
+                          labelTextStyle: theme.getStyle(),
                           controller: descController,
                           focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
@@ -125,14 +126,13 @@ class _PremiseSnippetState extends BaseState<PremiseSnippet> {
                           ),
                         ),
                       ),
-                      const SizedBox(
-                        height: 15,
-                      ),
+                      divider(height: 15),
                       SizedBox(
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: LabelTextField(
                           label: 'Address',
                           style: theme.getStyle(),
+                          labelTextStyle: theme.getStyle(),
                           controller: addressController,
                           focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
@@ -142,14 +142,13 @@ class _PremiseSnippetState extends BaseState<PremiseSnippet> {
                           maxLines: 5,
                         ),
                       ),
-                      const SizedBox(
-                        height: 15,
-                      ),
+                      divider(height: 15),
                       SizedBox(
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: LabelTextField(
                           label: 'Email',
                           style: theme.getStyle(),
+                          labelTextStyle: theme.getStyle(),
                           controller: emailController,
                           focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
@@ -158,12 +157,20 @@ class _PremiseSnippetState extends BaseState<PremiseSnippet> {
                           ),
                         ),
                       ),
-                      const SizedBox(
-                        height: 15,
-                      ),
+                      divider(height: 15),
                       SizedBox(
                           width: MediaQuery.of(context).size.width / 2.5,
                           child: IntlPhoneField(
+                              style: theme.getStyle(),
+                              dropdownTextStyle: theme.getStyle(),
+                              pickerDialogStyle: PickerDialogStyle(
+                                  searchFieldInputDecoration: InputDecoration(
+                                    hintText: 'Search Country',
+                                    hintStyle: theme.getStyle(),
+                                  ),
+                                  countryCodeStyle:
+                                      theme.getStyle().copyWith(fontSize: 14),
+                                  countryNameStyle: theme.getStyle()),
                               controller: phoneController,
                               keyboardType: TextInputType.phone,
                               initialCountryCode: countryCode,
@@ -171,6 +178,9 @@ class _PremiseSnippetState extends BaseState<PremiseSnippet> {
                                 FilteringTextInputFormatter.digitsOnly,
                               ],
                               decoration: InputDecoration(
+                                errorStyle: theme.getStyle(),
+                                labelStyle: theme.getStyle(),
+                                hintStyle: theme.getStyle(),
                                 labelText: 'Enter Phone Number',
                                 counterText: "",
                                 border: OutlineInputBorder(
@@ -210,9 +220,7 @@ class _PremiseSnippetState extends BaseState<PremiseSnippet> {
                                   );
                                 });
                               })),
-                      const SizedBox(
-                        height: 15,
-                      ),
+                      divider(height: 15),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
@@ -274,27 +282,12 @@ class _PremiseSnippetState extends BaseState<PremiseSnippet> {
                               ),
                               child: Stack(
                                 children: [
-                                  // _premise.location != null
-                                  //     ? OSMLocationPicker(
-                                  //         key: Key(const Uuid().v4()),
-                                  //         viewMode: true,
-                                  //         longitude: _premise
-                                  //             ?.location?.coordinates[0],
-                                  //         latitude: _premise
-                                  //             ?.location?.coordinates[1],
-                                  //         onPicked: (_) {},
-                                  //       )
-                                  //     : Center(
-                                  //         child: Text(
-                                  //         'No location selected',
-                                  //         style: theme.getStyle(),
-                                  //       )),
-                                         _premise.location != null
+                                  _premise.location != null
                                       ? GoogleMapWidget(
-                                          longitude: _premise
-                                              .location!.coordinates[0],
-                                          latitude: _premise
-                                              .location!.coordinates[1],
+                                          longitude:
+                                              _premise.location!.coordinates[0],
+                                          latitude:
+                                              _premise.location!.coordinates[1],
                                           viewMode: false,
                                         )
                                       : Center(
@@ -488,94 +481,102 @@ class _PremiseSnippetState extends BaseState<PremiseSnippet> {
   //   );
   // }
 
-    /// using google map
-Future<void> _showLocationDialog(BuildContext context) async {
-  double pickedLatitude = _premise.location != null ? _premise.location!.coordinates[1] : 39.6128;
-  double pickedLongitude = _premise.location != null ? _premise.location!.coordinates[0] : -101.5382;
+  /// using google map
+  Future<void> _showLocationDialog(BuildContext context) async {
+    double pickedLatitude =
+        _premise.location != null ? _premise.location!.coordinates[1] : 39.6128;
+    double pickedLongitude = _premise.location != null
+        ? _premise.location!.coordinates[0]
+        : -101.5382;
 
-  final result = await showDialog<Map<String, double>>(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        backgroundColor: Colors.white,
-        content: SingleChildScrollView(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxHeight: MediaQuery.of(context).size.height * 0.97,
-            ),
-            child: StatefulBuilder(
-              builder: (BuildContext context, StateSetter setState) {
-                return Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SizedBox(
-                      width: 1000,
-                      height: MediaQuery.of(context).size.height * 0.85,
-                      child: GoogleMapWidget(
-                        longitude: pickedLongitude,
-                        latitude: pickedLatitude,
-                        saveLocation: (pickedData) {
-                          setState(() {
-                            pickedLatitude = double.parse(pickedData.latitude.toStringAsFixed(4));
-                            pickedLongitude = double.parse(pickedData.longitude.toStringAsFixed(4));
-                          });
-                        },
-                        viewMode: true,
+    final result = await showDialog<Map<String, double>>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          content: SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.97,
+              ),
+              child: StatefulBuilder(
+                builder: (BuildContext context, StateSetter setState) {
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(
+                        width: 1000,
+                        height: MediaQuery.of(context).size.height * 0.85,
+                        child: GoogleMapWidget(
+                          longitude: pickedLongitude,
+                          latitude: pickedLatitude,
+                          saveLocation: (pickedData) {
+                            setState(() {
+                              pickedLatitude = double.parse(
+                                  pickedData.latitude.toStringAsFixed(4));
+                              pickedLongitude = double.parse(
+                                  pickedData.longitude.toStringAsFixed(4));
+                            });
+                          },
+                          viewMode: true,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Latitude: ${pickedLatitude.toStringAsFixed(4)}',
-                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                        ),
-                        const SizedBox(width: 5),
-                        Text(
-                          'Longitude: ${pickedLongitude.toStringAsFixed(4)}',
-                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                        ),
-                        const Spacer(),
-                        SecondaryButton(
-                          labelKey: 'Cancel',
-                          onPressed: () {
-                            Navigator.of(context).pop(); // Close without saving
-                          },
-                        ),
-                        SizedBox(width:5),
-                        PrimaryButton(
-                          labelKey: 'Select',
-                          onPressed: () {
-                            Navigator.of(context).pop({
-                              'latitude': pickedLatitude,
-                              'longitude': pickedLongitude,
-                            }); 
-                          },
-                        ),
-                      ],
-                    ),
-                  ],
-                );
-              },
+                      const SizedBox(height: 12),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Latitude: ${pickedLatitude.toStringAsFixed(4)}',
+                            style: const TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.w600),
+                          ),
+                          const SizedBox(width: 5),
+                          Text(
+                            'Longitude: ${pickedLongitude.toStringAsFixed(4)}',
+                            style: const TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.w600),
+                          ),
+                          const Spacer(),
+                          SecondaryButton(
+                            labelKey: 'Cancel',
+                            onPressed: () {
+                              Navigator.of(context)
+                                  .pop(); // Close without saving
+                            },
+                          ),
+                          SizedBox(width: 5),
+                          PrimaryButton(
+                            labelKey: 'Select',
+                            onPressed: () {
+                              Navigator.of(context).pop({
+                                'latitude': pickedLatitude,
+                                'longitude': pickedLongitude,
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  );
+                },
+              ),
             ),
           ),
-        ),
-      );
-    },
-  );
+        );
+      },
+    );
 
-  if (result != null) {
-    setState(() {
-      _premise = _premise.copyWith(
-        location: tapi.GeoLocation(coordinates: [
-          result['longitude']!,
-          result['latitude']!,
-        ]),
-      );
-    });
+    if (result != null) {
+      setState(() {
+        _premise = _premise.copyWith(
+          location: tapi.GeoLocation(coordinates: [
+            result['longitude']!,
+            result['latitude']!,
+          ]),
+        );
+      });
+    }
   }
-}
 
   @override
   void setup() {
