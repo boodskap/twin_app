@@ -253,6 +253,9 @@ class _PreprocessorsState extends BaseState<Preprocessors> {
         barrierDismissible: false,
         builder: (context) {
           return AlertDialog(
+            titleTextStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 20, fontWeight: FontWeight.bold),
             title: Text(title),
             content: SizedBox(
               width: 500,
@@ -341,7 +344,7 @@ class _PreprocessorsState extends BaseState<Preprocessors> {
       message:
           'Deleting is unrecoverable\nIt may also delete all the related models and components\n\nDo you want to proceed?',
       titleStyle: theme.getStyle().copyWith(color: Colors.red),
-      messageStyle: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
+      messageStyle: theme.getStyle().copyWith(),
       onPressed: () async {
         await execute(() async {
           int index = _entities.indexWhere((element) => element.id == e.id);
