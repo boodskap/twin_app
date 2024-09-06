@@ -248,7 +248,8 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
         barrierDismissible: false,
         builder: (context) {
           return AlertDialog(
-            titleTextStyle: theme.getStyle(),
+            titleTextStyle:
+                theme.getStyle().copyWith(fontSize: 20, fontWeight: FontWeight.bold),
             title: Text(title),
             content: SizedBox(
               width: 500,
@@ -393,7 +394,7 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
     AlertDialog alert = AlertDialog(
       title: Text(
         "WARNING",
-        style: theme.getStyle(),
+        style: theme.getStyle().copyWith(color: Colors.red),
       ),
       content: Text(
         "Deleting a Alarm can not be undone.\nYou will loose all of the premise data, history, etc.\n\nAre you sure you want to delete?",

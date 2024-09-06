@@ -36,7 +36,6 @@ class ConfigRowPalette extends StatefulWidget {
 }
 
 class _ConfigRowPaletteState extends BaseState<ConfigRowPalette> {
-
   static final InputDecorationTheme dropdownDecoration = InputDecorationTheme(
     isDense: true,
     contentPadding: const EdgeInsets.symmetric(horizontal: 16),
@@ -60,8 +59,10 @@ class _ConfigRowPaletteState extends BaseState<ConfigRowPalette> {
   Widget build(BuildContext context) {
     return FoldableCard(
       title: 'Row Properties',
-      headerStyle: theme.getStyle().copyWith(fontSize: 18, fontWeight: FontWeight.bold),
-      labelStyle: theme.getStyle().copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+      headerStyle:
+          theme.getStyle().copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+      labelStyle:
+          theme.getStyle().copyWith(fontSize: 18, fontWeight: FontWeight.bold),
       collapsed: collapsed,
       children: [
         Row(
@@ -100,6 +101,7 @@ class _ConfigRowPaletteState extends BaseState<ConfigRowPalette> {
               height: 35,
               child: IntrinsicWidth(
                 child: SpinBox(
+                  textStyle: theme.getStyle(),
                   min: 0.0,
                   max: 500,
                   value: _row.spacing ?? 10,
@@ -155,6 +157,7 @@ class _ConfigRowPaletteState extends BaseState<ConfigRowPalette> {
               height: 45,
               child: IntrinsicWidth(
                 child: SpinBox(
+                  textStyle: theme.getStyle(),
                   min: 1,
                   max: 4096,
                   value: _row.height ?? 200,
@@ -183,6 +186,7 @@ class _ConfigRowPaletteState extends BaseState<ConfigRowPalette> {
                   fontWeight: FontWeight.bold),
             ),
             DropdownMenu<MainAxisAlignment>(
+                textStyle: theme.getStyle(),
                 initialSelection: MainAxisAlignment.values.byName(
                     _row.mainAxisAlignment ?? MainAxisAlignment.start.name),
                 inputDecorationTheme: dropdownDecoration,
@@ -194,20 +198,35 @@ class _ConfigRowPaletteState extends BaseState<ConfigRowPalette> {
                   });
                   widget.onRowSaved(widget.index, _row);
                 },
-                dropdownMenuEntries: const [
+                dropdownMenuEntries: [
                   DropdownMenuEntry<MainAxisAlignment>(
-                      value: MainAxisAlignment.start, label: 'Start'),
+                      style: ButtonStyle(
+                          textStyle: WidgetStatePropertyAll(theme.getStyle())),
+                      value: MainAxisAlignment.start,
+                      label: 'Start'),
                   DropdownMenuEntry<MainAxisAlignment>(
-                      value: MainAxisAlignment.center, label: 'Center'),
+                      style: ButtonStyle(
+                          textStyle: WidgetStatePropertyAll(theme.getStyle())),
+                      value: MainAxisAlignment.center,
+                      label: 'Center'),
                   DropdownMenuEntry<MainAxisAlignment>(
-                      value: MainAxisAlignment.end, label: 'End'),
+                      style: ButtonStyle(
+                          textStyle: WidgetStatePropertyAll(theme.getStyle())),
+                      value: MainAxisAlignment.end,
+                      label: 'End'),
                   DropdownMenuEntry<MainAxisAlignment>(
+                      style: ButtonStyle(
+                          textStyle: WidgetStatePropertyAll(theme.getStyle())),
                       value: MainAxisAlignment.spaceEvenly,
                       label: 'Space Evenly'),
                   DropdownMenuEntry<MainAxisAlignment>(
+                      style: ButtonStyle(
+                          textStyle: WidgetStatePropertyAll(theme.getStyle())),
                       value: MainAxisAlignment.spaceBetween,
                       label: 'Space Between'),
                   DropdownMenuEntry<MainAxisAlignment>(
+                      style: ButtonStyle(
+                          textStyle: WidgetStatePropertyAll(theme.getStyle())),
                       value: MainAxisAlignment.spaceAround,
                       label: 'Space Around'),
                 ]),
@@ -226,6 +245,7 @@ class _ConfigRowPaletteState extends BaseState<ConfigRowPalette> {
                   fontWeight: FontWeight.bold),
             ),
             DropdownMenu<CrossAxisAlignment>(
+                textStyle: theme.getStyle(),
                 initialSelection: CrossAxisAlignment.values.byName(
                     _row.crossAxisAlignment ?? CrossAxisAlignment.start.name),
                 inputDecorationTheme: dropdownDecoration,
@@ -237,17 +257,32 @@ class _ConfigRowPaletteState extends BaseState<ConfigRowPalette> {
                   });
                   widget.onRowSaved(widget.index, _row);
                 },
-                dropdownMenuEntries: const [
+                dropdownMenuEntries: [
                   DropdownMenuEntry<CrossAxisAlignment>(
-                      value: CrossAxisAlignment.start, label: 'Start'),
+                      style: ButtonStyle(
+                          textStyle: WidgetStatePropertyAll(theme.getStyle())),
+                      value: CrossAxisAlignment.start,
+                      label: 'Start'),
                   DropdownMenuEntry<CrossAxisAlignment>(
-                      value: CrossAxisAlignment.center, label: 'Center'),
+                      style: ButtonStyle(
+                          textStyle: WidgetStatePropertyAll(theme.getStyle())),
+                      value: CrossAxisAlignment.center,
+                      label: 'Center'),
                   DropdownMenuEntry<CrossAxisAlignment>(
-                      value: CrossAxisAlignment.end, label: 'End'),
+                      style: ButtonStyle(
+                          textStyle: WidgetStatePropertyAll(theme.getStyle())),
+                      value: CrossAxisAlignment.end,
+                      label: 'End'),
                   DropdownMenuEntry<CrossAxisAlignment>(
-                      value: CrossAxisAlignment.stretch, label: 'Stretch'),
+                      style: ButtonStyle(
+                          textStyle: WidgetStatePropertyAll(theme.getStyle())),
+                      value: CrossAxisAlignment.stretch,
+                      label: 'Stretch'),
                   // DropdownMenuEntry<CrossAxisAlignment>(
-                  //     value: CrossAxisAlignment.baseline, label: 'Baseline'),
+                  //     style: ButtonStyle(
+                  //         textStyle: WidgetStatePropertyAll(theme.getStyle())),
+                  //     value: CrossAxisAlignment.baseline,
+                  //     label: 'Baseline'),
                 ]),
           ],
         ),
@@ -264,6 +299,7 @@ class _ConfigRowPaletteState extends BaseState<ConfigRowPalette> {
                   fontWeight: FontWeight.bold),
             ),
             DropdownMenu<MainAxisSize>(
+                textStyle: theme.getStyle(),
                 initialSelection: MainAxisSize.values
                     .byName(_row.mainAxisSize ?? MainAxisSize.max.name),
                 inputDecorationTheme: dropdownDecoration,
@@ -274,11 +310,17 @@ class _ConfigRowPaletteState extends BaseState<ConfigRowPalette> {
                   });
                   widget.onRowSaved(widget.index, _row);
                 },
-                dropdownMenuEntries: const [
+                dropdownMenuEntries: [
                   DropdownMenuEntry<MainAxisSize>(
-                      value: MainAxisSize.min, label: 'Min'),
+                      style: ButtonStyle(
+                          textStyle: WidgetStatePropertyAll(theme.getStyle())),
+                      value: MainAxisSize.min,
+                      label: 'Min'),
                   DropdownMenuEntry<MainAxisSize>(
-                      value: MainAxisSize.max, label: 'Max'),
+                      style: ButtonStyle(
+                          textStyle: WidgetStatePropertyAll(theme.getStyle())),
+                      value: MainAxisSize.max,
+                      label: 'Max'),
                 ]),
           ],
         ),
@@ -295,6 +337,7 @@ class _ConfigRowPaletteState extends BaseState<ConfigRowPalette> {
                   fontWeight: FontWeight.bold),
             ),
             DropdownMenu<String>(
+                textStyle: theme.getStyle(),
                 initialSelection: _row.scrollDirection ?? 'none',
                 inputDecorationTheme: dropdownDecoration,
                 onSelected: (value) {
@@ -304,16 +347,27 @@ class _ConfigRowPaletteState extends BaseState<ConfigRowPalette> {
                   widget.onRowSaved(widget.index, _row);
                 },
                 dropdownMenuEntries: [
-                  const DropdownMenuEntry<String>(value: 'none', label: 'None'),
                   DropdownMenuEntry<String>(
-                      value: Axis.vertical.name, label: 'Vertical'),
+                      style: ButtonStyle(
+                          textStyle: WidgetStatePropertyAll(theme.getStyle())),
+                      value: 'none',
+                      label: 'None'),
                   DropdownMenuEntry<String>(
-                      value: Axis.horizontal.name, label: 'Horizontal'),
+                      style: ButtonStyle(
+                          textStyle: WidgetStatePropertyAll(theme.getStyle())),
+                      value: Axis.vertical.name,
+                      label: 'Vertical'),
+                  DropdownMenuEntry<String>(
+                      style: ButtonStyle(
+                          textStyle: WidgetStatePropertyAll(theme.getStyle())),
+                      value: Axis.horizontal.name,
+                      label: 'Horizontal'),
                 ]),
           ],
         ),
         divider(),
         BorderConfigWidget(
+            style: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
             borderConfig: _row.rowBorderConfig,
             onBorderConfigured: (border) {
               _onBorderConfigured(border);
@@ -321,6 +375,7 @@ class _ConfigRowPaletteState extends BaseState<ConfigRowPalette> {
         divider(),
         PaddingConfigWidget(
             title: 'Padding',
+            style: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
             paddingConfig: _row.paddingConfig,
             onPaddingConfigSaved: (paddingConfig) {
               _onPaddingConfigSaved(paddingConfig);
@@ -328,6 +383,7 @@ class _ConfigRowPaletteState extends BaseState<ConfigRowPalette> {
         divider(),
         PaddingConfigWidget(
             title: 'Margin',
+            style: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
             paddingConfig: _row.marginConfig,
             onPaddingConfigSaved: (paddingConfig) {
               _onMarginConfigSaved(paddingConfig);
@@ -429,10 +485,15 @@ class _ConfigRowPaletteState extends BaseState<ConfigRowPalette> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          contentTextStyle: theme.getStyle().copyWith(color: Colors.black),
+          titleTextStyle: theme
+              .getStyle()
+              .copyWith(fontWeight: FontWeight.bold, fontSize: 18),
           title: const Text('Pick a color'),
           content: SingleChildScrollView(
             child: ColorPicker(
               hexInputBar: true,
+              // labelTextStyle: theme.getStyle(),
               labelTypes: [],
               pickerColor: Color(_row.bgColor ?? Colors.white.value),
               onColorChanged: (color) {
@@ -447,7 +508,10 @@ class _ConfigRowPaletteState extends BaseState<ConfigRowPalette> {
           ),
           actions: <Widget>[
             TextButton(
-              child: const Text('Done'),
+              child: Text(
+                'Done',
+                style: theme.getStyle().copyWith(fontSize: 16),
+              ),
               onPressed: () {
                 widget.onRowSaved(widget.index, _row);
                 Navigator.of(context).pop();
