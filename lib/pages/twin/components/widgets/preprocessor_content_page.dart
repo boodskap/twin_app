@@ -191,6 +191,7 @@ class _PreprocessorContentPageState extends BaseState<PreprocessorContentPage> {
                         Navigator.pop(context);
                       },
                     ),
+                    divider(horizontal: true),
                   ],
                 ),
                 divider(),

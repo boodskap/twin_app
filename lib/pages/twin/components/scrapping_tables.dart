@@ -58,6 +58,8 @@ class _ScrappingTablesState extends BaseState<ScrappingTables> {
                 height: 40,
                 width: 250,
                 child: SearchBar(
+                  hintStyle: WidgetStatePropertyAll(theme.getStyle()),
+                  textStyle: WidgetStatePropertyAll(theme.getStyle()),
                   leading: Icon(Icons.search),
                   hintText: 'Search Scrapping Table',
                   onChanged: (val) {
@@ -192,7 +194,8 @@ class _ScrappingTablesState extends BaseState<ScrappingTables> {
                         children: [
                           Text(
                             "Parameter Info",
-                            style: theme.getStyle().copyWith(fontSize: 24),
+                            style: theme.getStyle().copyWith(
+                                fontSize: 24, fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),
@@ -218,42 +221,42 @@ class _ScrappingTablesState extends BaseState<ScrappingTables> {
               child: Text(
             'Name',
             style: theme.getStyle().copyWith(
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w700,
                 ),
           )),
           Center(
               child: Text(
             'Description',
             style: theme.getStyle().copyWith(
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w700,
                 ),
           )),
           Center(
               child: Text(
             'Label',
             style: theme.getStyle().copyWith(
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w700,
                 ),
           )),
           Center(
               child: Text(
             'Type',
             style: theme.getStyle().copyWith(
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w700,
                 ),
           )),
           Center(
               child: Text(
             'Value',
             style: theme.getStyle().copyWith(
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w700,
                 ),
           )),
           Center(
               child: Text(
             'Editable',
             style: theme.getStyle().copyWith(
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w700,
                 ),
           )),
         ],
@@ -266,28 +269,44 @@ class _ScrappingTablesState extends BaseState<ScrappingTables> {
           children: [
             Align(
               alignment: Alignment.center,
-              child: Text(parameter.name),
+              child: Text(
+                parameter.name,
+                style: theme.getStyle().copyWith(fontWeight: FontWeight.w200),
+              ),
             ),
             Align(
               alignment: Alignment.center,
-              child: Text(parameter.description ?? ''),
+              child: Text(
+                parameter.description ?? '',
+                style: theme.getStyle(),
+              ),
             ),
             Align(
               alignment: Alignment.center,
-              child: Text(parameter.label ?? ''),
+              child: Text(
+                parameter.label ?? '',
+                style: theme.getStyle(),
+              ),
             ),
             Align(
               alignment: Alignment.center,
-              child: Text(parameter.attributeType.name),
+              child: Text(
+                parameter.attributeType.name,
+                style: theme.getStyle(),
+              ),
             ),
             Align(
               alignment: Alignment.center,
-              child: Text(parameter.$value),
+              child: Text(
+                parameter.$value,
+                style: theme.getStyle(),
+              ),
             ),
             Align(
               alignment: Alignment.center,
               child: Text(
                 parameter.editable.toString(),
+                style: theme.getStyle(),
               ),
             ),
           ],
@@ -350,7 +369,7 @@ class _ScrappingTablesState extends BaseState<ScrappingTables> {
     AlertDialog alert = AlertDialog(
       title: Text(
         "WARNING",
-        style: theme.getStyle(),
+        style: theme.getStyle().copyWith(color: Colors.red),
       ),
       content: Text(
         "Deleting a Scrapping Table can not be undone.\nAre you sure you want to delete?",
@@ -384,6 +403,7 @@ class _ScrappingTablesState extends BaseState<ScrappingTables> {
         await _load();
         _entities.removeAt(index);
         _cards.removeAt(index);
+        alert("Success", "Scrapping Table ${e.name} Deleted Successfully!");
       }
     });
     loading = false;
