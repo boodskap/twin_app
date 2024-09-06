@@ -584,6 +584,7 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
                         children: [
                           IntlPhoneField(
                               style: theme.getStyle(),
+                              dropdownTextStyle: theme.getStyle(),
                               controller: controller,
                               keyboardType: TextInputType.phone,
                               initialCountryCode: countryCode,
@@ -591,6 +592,7 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
                                 FilteringTextInputFormatter.digitsOnly,
                               ],
                               decoration: InputDecoration(
+                                  errorStyle: theme.getStyle(),
                                   labelText: 'Enter Phone Number',
                                   counterText: "",
                                   border: OutlineInputBorder(

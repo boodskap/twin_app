@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/pages/branding/digital_twin_menu_group_content.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
@@ -90,24 +89,19 @@ class _LandingWidgetTypeState extends BaseState<LandingWidgetType> {
     lineFont = info.labelFont ?? lineFont;
     lineFontColor = Color(info.labelFontColor ?? lineFontColor.value);
     lineFontSize = info.labelFontSize ?? lineFontSize;
+    headerStyle = theme.getStyle().copyWith(
+          fontSize: headerFontSize.toDouble(),
+          color: headerFontColor,
+        );
 
-    headerStyle = GoogleFonts.getFont(
-      headerFont,
-      fontSize: headerFontSize.toDouble(),
-      color: headerFontColor,
-    );
-
-    subHeaderStyle = GoogleFonts.getFont(
-      subHeaderFont,
-      fontSize: subHeaderFontSize.toDouble(),
-      color: subHeaderFontColor,
-    );
-
-    lineStyle = GoogleFonts.getFont(
-      lineFont,
-      fontSize: lineFontSize.toDouble(),
-      color: lineFontColor,
-    );
+    subHeaderStyle = theme.getStyle().copyWith(
+          fontSize: subHeaderFontSize.toDouble(),
+          color: subHeaderFontColor,
+        );
+    lineStyle = theme.getStyle().copyWith(
+          fontSize: lineFontSize.toDouble(),
+          color: lineFontColor,
+        );
 
     _heading.text = widget.landingPage.heading ?? '';
     _subHeading.text = widget.landingPage.subHeading ?? '';
