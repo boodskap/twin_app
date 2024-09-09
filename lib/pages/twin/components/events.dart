@@ -367,7 +367,7 @@ class _EventsState extends BaseState<Events> {
           body = tapi.EventInfo(
             name: event.name,
             conditions: event.conditions,
-            asswtId: event.asswtId,
+            assetId: event.assetId,
             clientIds: event.clientIds,
             description: event.description,
             deviceId: event.deviceId,

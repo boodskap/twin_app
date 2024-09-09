@@ -104,7 +104,7 @@ class _DigitalTwinEventContentPageState
       smsTemplate: _smsTemplate,
       voiceTemplate: _voiceTemplate,
       icon: widget.entity.icon,
-      asswtId: widget.entity.asswtId,
+      assetId: widget.entity.assetId,
       clientIds: widget.entity.clientIds,
       deviceId: widget.entity.deviceId,
       facilityId: widget.entity.facilityId,
