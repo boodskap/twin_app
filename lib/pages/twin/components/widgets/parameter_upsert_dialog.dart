@@ -77,6 +77,7 @@ class _ParameterUpsertDialogSettingsState
                 child: TextFormField(
                   style: theme.getStyle(),
                   decoration: InputDecoration(
+                    errorStyle: theme.getStyle(),
                     hintStyle: theme.getStyle(),
                     labelStyle: theme.getStyle(),
                     hintText: 'Name',
@@ -172,6 +173,7 @@ class _ParameterUpsertDialogSettingsState
                 child: TextFormField(
                   style: theme.getStyle(),
                   decoration: InputDecoration(
+                    errorStyle: theme.getStyle(),
                     hintStyle: theme.getStyle(),
                     labelStyle: theme.getStyle(),
                     hintText: 'Value',

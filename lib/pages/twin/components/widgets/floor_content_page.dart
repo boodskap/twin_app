@@ -257,6 +257,8 @@ class _FloorContentPageState extends BaseState<FloorContentPage> {
     await confirm(
         title: 'Are you sure?',
         message: 'you want to delete this image?',
+        titleStyle: theme.getStyle().copyWith(color: Colors.red, fontSize: 20),
+        messageStyle: theme.getStyle(),
         onPressed: () async {
           await execute(() async {
             var res = await TwinnedSession.instance.twin.deleteImage(
@@ -287,6 +289,35 @@ class _FloorContentPageState extends BaseState<FloorContentPage> {
         });
   }
 
+  String _getSearchHint(InfraType type) {
+    switch (type) {
+      case InfraType.premise:
+        return 'Search Facilities';
+      case InfraType.facility:
+        return 'Search Floors';
+      case InfraType.floor:
+        return 'Search Assets';
+      case InfraType.asset:
+        return 'Search Devices';
+      default:
+        return 'Search';
+    }
+  }
+
+  String _getLabelName(InfraType type) {
+    switch (type) {
+      case InfraType.premise:
+        return 'Premise Name';
+      case InfraType.facility:
+        return 'Facility Name';
+      case InfraType.floor:
+        return 'Floor Name';
+      case InfraType.asset:
+        return 'Asset Name';
+      default:
+        return 'Name';
+    }
+  }
   // Future<void> _pickLocation() async {
   //   return showDialog(
   //     context: context,
@@ -358,21 +389,20 @@ class _FloorContentPageState extends BaseState<FloorContentPage> {
                         children: [
                           Text(
                             'Latitude: ${pickedLatitude.toStringAsFixed(4)}',
-                            style: const TextStyle(
+                            style: theme.getStyle().copyWith(
                                 fontSize: 16, fontWeight: FontWeight.w600),
                           ),
                           const SizedBox(width: 5),
                           Text(
                             'Longitude: ${pickedLongitude.toStringAsFixed(4)}',
-                            style: const TextStyle(
+                            style: theme.getStyle().copyWith(
                                 fontSize: 16, fontWeight: FontWeight.w600),
                           ),
                           const Spacer(),
                           SecondaryButton(
                             labelKey: 'Cancel',
                             onPressed: () {
-                              Navigator.of(context)
-                                  .pop(); // Close without saving
+                              Navigator.of(context).pop();
                             },
                           ),
                           SizedBox(width: 5),
@@ -456,16 +486,13 @@ class _FloorContentPageState extends BaseState<FloorContentPage> {
                         Text(
                           e.name,
                           style: theme.getStyle().copyWith(
-                                fontSize: 20,
+                                fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
                         ),
                         Text(
                           e.description ?? "",
-                          style: theme.getStyle().copyWith(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
+                          style: theme.getStyle().copyWith(fontSize: 16),
                         ),
                       ],
                     ),
@@ -526,16 +553,13 @@ class _FloorContentPageState extends BaseState<FloorContentPage> {
                         Text(
                           e.name,
                           style: theme.getStyle().copyWith(
-                                fontSize: 20,
+                                fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
                         ),
                         Text(
                           e.description ?? "",
-                          style: theme.getStyle().copyWith(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
+                          style: theme.getStyle().copyWith(fontSize: 16),
                         ),
                       ],
                     ),
@@ -597,16 +621,13 @@ class _FloorContentPageState extends BaseState<FloorContentPage> {
                         Text(
                           e.name,
                           style: theme.getStyle().copyWith(
-                                fontSize: 20,
+                                fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
                         ),
                         Text(
                           e.description ?? "",
-                          style: theme.getStyle().copyWith(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
+                          style: theme.getStyle().copyWith(fontSize: 16),
                         ),
                       ],
                     ),
@@ -781,7 +802,7 @@ class _FloorContentPageState extends BaseState<FloorContentPage> {
                 child: LabelTextField(
                   style: theme.getStyle(),
                   labelTextStyle: theme.getStyle(),
-                  label: 'Floor Name',
+                  label: _getLabelName(widget.type),
                   controller: _name,
                 ),
               ),
@@ -975,6 +996,14 @@ class _FloorContentPageState extends BaseState<FloorContentPage> {
                                               child: SearchBar(
                                                   leading:
                                                       const Icon(Icons.search),
+                                                  hintText: _getSearchHint(
+                                                      widget.type),
+                                                  hintStyle:
+                                                      WidgetStatePropertyAll(
+                                                          theme.getStyle()),
+                                                  textStyle:
+                                                      WidgetStatePropertyAll(
+                                                          theme.getStyle()),
                                                   onChanged: (value) async {
                                                     search = value;
                                                     await _load();
