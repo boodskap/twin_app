@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:twin_app/widgets/commons/secondary_button.dart';
 import 'package:twin_commons/widgets/common/label_text_field.dart';
+import 'package:twin_app/core/session_variables.dart';
 
 class SingleValueInput extends StatefulWidget {
   final String? value;
@@ -35,6 +36,8 @@ class _SingleValueInputState extends State<SingleValueInput> {
       child: Column(
         children: [
           LabelTextField(
+            style: theme.getStyle(),
+            labelTextStyle: theme.getStyle(),
             label: widget.label,
             controller: _controller,
           ),

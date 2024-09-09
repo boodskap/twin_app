@@ -158,7 +158,7 @@ class _RolesPageState extends BaseState<RolesPage> {
                   divider(horizontal: true),
                   PrimaryButton(
                     minimumSize: Size(130, 40),
-                    labelKey: 'New Role',
+                    labelKey: 'Add Role',
                     leading: const Icon(
                       Icons.add,
                       color: Colors.white,
@@ -228,6 +228,9 @@ class _RolesPageState extends BaseState<RolesPage> {
 
   void _addEditRoleDialog({tapi.Role? role}) async {
     await super.alertDialog(
+        titleStyle: theme
+            .getStyle()
+            .copyWith(fontWeight: FontWeight.bold, fontSize: 20),
         title: null == role ? 'Add New Role' : 'Update Role',
         body: RolesSnippet(
           roles: role,

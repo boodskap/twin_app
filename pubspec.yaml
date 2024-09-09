@@ -17,6 +17,11 @@ dependencies:
   #    path:
   #      twin_commons
 
+  pulse_admin_api:
+    git:
+      url: https://github.com/boodskap/pulse_admin_api.git
+      ref: main
+
   curved_navigation_bar: ^1.0.6
   badges: ^2.0.3
   flutter_dotenv: ^5.0.2

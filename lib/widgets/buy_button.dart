@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
-import 'package:twin_app/core/session_variables.dart';
 
 class BuyButton extends StatelessWidget {
   final String label;

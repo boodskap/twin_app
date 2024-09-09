@@ -108,6 +108,7 @@ class _UserAddUpdateSnippetState extends BaseState<UserAddUpdateSnippet> {
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: LabelTextField(
                           label: 'Name',
+                          labelTextStyle: theme.getStyle(),
                           style: theme.getStyle(),
                           controller: nameController,
                           focusedBorder: OutlineInputBorder(
@@ -121,6 +122,7 @@ class _UserAddUpdateSnippetState extends BaseState<UserAddUpdateSnippet> {
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: LabelTextField(
                           label: 'Email',
+                          labelTextStyle: theme.getStyle(),
                           style: theme.getStyle(),
                           controller: emailController,
                           focusedBorder: OutlineInputBorder(
@@ -133,14 +135,19 @@ class _UserAddUpdateSnippetState extends BaseState<UserAddUpdateSnippet> {
                       SizedBox(
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: IntlPhoneField(
+                          style: theme.getStyle(),
                           controller: phoneController,
                           keyboardType: TextInputType.phone,
                           initialCountryCode: countryCode,
                           inputFormatters: [
                             FilteringTextInputFormatter.digitsOnly,
                           ],
+                          dropdownTextStyle: theme.getStyle(),
                           decoration: InputDecoration(
+                            errorStyle: theme.getStyle(),
                             labelText: 'Enter Phone Number',
+                            hintStyle: theme.getStyle(),
+                            labelStyle: theme.getStyle(),
                             counterText: "",
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(4.0),
@@ -185,6 +192,7 @@ class _UserAddUpdateSnippetState extends BaseState<UserAddUpdateSnippet> {
                         SizedBox(
                           width: MediaQuery.of(context).size.width / 2.5,
                           child: ClientDropdown(
+                            style: theme.getStyle(),
                             selectedItem: (_twinUserInfo.clientIds!.isNotEmpty)
                                 ? _twinUserInfo.clientIds!.first
                                 : null,
@@ -200,6 +208,7 @@ class _UserAddUpdateSnippetState extends BaseState<UserAddUpdateSnippet> {
                       SizedBox(
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: MultiRoleDropdown(
+                          style: theme.getStyle(),
                           selectedItems: _twinUserInfo.roles ?? [],
                           onRolesSelected: (e) {
                             setState(() {

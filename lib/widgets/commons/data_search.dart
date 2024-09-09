@@ -44,6 +44,8 @@ class _DataSearchState extends BaseState<DataSearch> {
             children: [
               Expanded(
                 child: SearchBar(
+                  hintStyle: WidgetStatePropertyAll(theme.getStyle()),
+                  textStyle: WidgetStatePropertyAll(theme.getStyle()),
                   hintText: 'Search Data Filters',
                   trailing: [const BusyIndicator()],
                   onChanged: (value) async {

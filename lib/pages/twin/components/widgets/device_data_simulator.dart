@@ -178,7 +178,9 @@ class _DeviceDataSimulatorState extends BaseState<DeviceDataSimulator> {
     return TextField(
       style: theme.getStyle(),
       controller: controller,
-      decoration: const InputDecoration(
+      decoration: InputDecoration(
+        hintStyle: theme.getStyle(),
+        labelStyle: theme.getStyle(),
         border: OutlineInputBorder(),
         hintText: 'Numbers',
       ),
@@ -198,9 +200,12 @@ class _DeviceDataSimulatorState extends BaseState<DeviceDataSimulator> {
 
     controller.text = _parameters[name]!.defaultValue ?? '';
 
-    return TextField(style: theme.getStyle(),
+    return TextField(
+      style: theme.getStyle(),
       controller: controller,
-      decoration: const InputDecoration(
+      decoration: InputDecoration(
+        hintStyle: theme.getStyle(),
+        labelStyle: theme.getStyle(),
         border: OutlineInputBorder(),
         hintText: 'Decimal',
       ),
@@ -242,8 +247,11 @@ class _DeviceDataSimulatorState extends BaseState<DeviceDataSimulator> {
     controller.text = _parameters[name]!.defaultValue ?? '';
 
     return TextField(
+      style: theme.getStyle(),
       controller: controller,
-      decoration: const InputDecoration(
+      decoration: InputDecoration(
+        hintStyle: theme.getStyle(),
+        labelStyle: theme.getStyle(),
         border: OutlineInputBorder(),
         hintText: 'Text',
       ),
@@ -268,7 +276,10 @@ class _DeviceDataSimulatorState extends BaseState<DeviceDataSimulator> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: const Text('Device Simulated Data'),
+            title: Text(
+              'Device Simulated Data',
+              style: theme.getStyle(),
+            ),
             content: Container(
               color: const Color(0xffffffff),
               child:

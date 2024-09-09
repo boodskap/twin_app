@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:twin_app/core/session_variables.dart';
-import 'package:twin_app/core/twin_theme.dart';
 import 'package:twin_app/pages/twin/components/widgets/border_dropdown.dart';
 import 'package:twin_app/pages/twin/components/widgets/card_layout.dart';
 import 'package:twin_app/pages/twin/components/widgets/condition_dropdown.dart';
@@ -183,10 +182,6 @@ class _DisplayStateSectionState extends BaseState<DisplayStateSection> {
             widget.deviceModel.domainKey,
             widget.deviceModel.images![widget.deviceModel.selectedImage!],
             fit: BoxFit.fill);
-        // selectedDisplayImage = NetworkImage(UserSession.twinImageUrl(
-        // baseUrl(),
-        //     widget.deviceModel.domainKey,
-        //     widget.deviceModel.images![widget.deviceModel.selectedImage!]));
       }
     }
     loadConditions(widget.deviceModel.id);
@@ -321,6 +316,9 @@ class _DisplayStateSectionState extends BaseState<DisplayStateSection> {
         context: context,
         builder: (ctx) {
           return AlertDialog(
+            titleTextStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 20, fontWeight: FontWeight.bold),
             title: const Text('Pick a Color'),
             content: SingleChildScrollView(
               child: ColorPicker(
@@ -387,6 +385,9 @@ class _DisplayStateSectionState extends BaseState<DisplayStateSection> {
         builder: (ctx) {
           return SizedBox(
             child: AlertDialog(
+              titleTextStyle: theme
+                  .getStyle()
+                  .copyWith(fontSize: 20, fontWeight: FontWeight.bold),
               title: const Text('Font Size'),
               content: SizedBox(
                 height: 100,
@@ -448,6 +449,9 @@ class _DisplayStateSectionState extends BaseState<DisplayStateSection> {
         builder: (ctx) {
           return SizedBox(
             child: AlertDialog(
+              titleTextStyle: theme
+                  .getStyle()
+                  .copyWith(fontSize: 20, fontWeight: FontWeight.bold),
               title: const Text('Padding'),
               content: SizedBox(
                 height: 100,
@@ -591,9 +595,6 @@ class _DisplayStateSectionState extends BaseState<DisplayStateSection> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Tooltip(
-                                  textStyle: theme
-                                      .getStyle()
-                                      .copyWith(color: Colors.white),
                                   message: "Choose value text color",
                                   child: IconButton(
                                       onPressed: () {
@@ -604,9 +605,6 @@ class _DisplayStateSectionState extends BaseState<DisplayStateSection> {
                                           size: iconSize)),
                                 ),
                                 Tooltip(
-                                  textStyle: theme
-                                      .getStyle()
-                                      .copyWith(color: Colors.white),
                                   message: "Enter value text size",
                                   child: IconButton(
                                       onPressed: () {
@@ -714,7 +712,6 @@ class _DisplayStateSectionState extends BaseState<DisplayStateSection> {
                                   child: BorderDropdown(
                                     selectedValue: _borderType,
                                     onChanged: (String? value) {
-                                      // selectedborderValue = value;
                                       _borderType = value;
                                       _refresh();
                                     },
@@ -722,9 +719,6 @@ class _DisplayStateSectionState extends BaseState<DisplayStateSection> {
                                 ),
                                 hdivider,
                                 Tooltip(
-                                    textStyle: theme
-                                        .getStyle()
-                                        .copyWith(color: Colors.white),
                                     message: 'Choose border color',
                                     child: IconButton(
                                         onPressed: () {
@@ -742,9 +736,6 @@ class _DisplayStateSectionState extends BaseState<DisplayStateSection> {
                                         ))),
                                 hdivider,
                                 Tooltip(
-                                    textStyle: theme
-                                        .getStyle()
-                                        .copyWith(color: Colors.white),
                                     message: 'Choose background color',
                                     child: IconButton(
                                         onPressed: () {
@@ -770,10 +761,7 @@ class _DisplayStateSectionState extends BaseState<DisplayStateSection> {
                                   style: theme.getStyle(),
                                   maxLines: null,
                                   controller: _tooltipValue,
-                                  onSubmitted: (value) {
-                                    // _value = value;
-                                    // _refresh();
-                                  },
+                                  onSubmitted: (value) {},
                                   decoration: InputDecoration(
                                     hintStyle: theme.getStyle(),
                                     labelStyle: theme.getStyle(),
@@ -927,9 +915,6 @@ class _DisplayStateSectionState extends BaseState<DisplayStateSection> {
                                             MainAxisAlignment.spaceBetween,
                                         children: [
                                           Tooltip(
-                                            textStyle: theme
-                                                .getStyle()
-                                                .copyWith(color: Colors.white),
                                             message: "Choose right text color",
                                             child: IconButton(
                                                 onPressed: () {
@@ -943,9 +928,6 @@ class _DisplayStateSectionState extends BaseState<DisplayStateSection> {
                                                 )),
                                           ),
                                           Tooltip(
-                                            textStyle: theme
-                                                .getStyle()
-                                                .copyWith(color: Colors.white),
                                             message: "Enter right text size",
                                             child: IconButton(
                                                 onPressed: () {
@@ -960,9 +942,6 @@ class _DisplayStateSectionState extends BaseState<DisplayStateSection> {
                                                 )),
                                           ),
                                           Tooltip(
-                                            textStyle: theme
-                                                .getStyle()
-                                                .copyWith(color: Colors.white),
                                             message:
                                                 "Enter right padding value",
                                             child: IconButton(
@@ -1022,9 +1001,6 @@ class _DisplayStateSectionState extends BaseState<DisplayStateSection> {
                                             MainAxisAlignment.spaceBetween,
                                         children: [
                                           Tooltip(
-                                            textStyle: theme
-                                                .getStyle()
-                                                .copyWith(color: Colors.white),
                                             message: "Choose left text color",
                                             child: IconButton(
                                                 onPressed: () {
@@ -1037,9 +1013,6 @@ class _DisplayStateSectionState extends BaseState<DisplayStateSection> {
                                                 )),
                                           ),
                                           Tooltip(
-                                            textStyle: theme
-                                                .getStyle()
-                                                .copyWith(color: Colors.white),
                                             message: "Enter left text size",
                                             child: IconButton(
                                                 onPressed: () {
@@ -1053,9 +1026,6 @@ class _DisplayStateSectionState extends BaseState<DisplayStateSection> {
                                                 )),
                                           ),
                                           Tooltip(
-                                            textStyle: theme
-                                                .getStyle()
-                                                .copyWith(color: Colors.white),
                                             message: "Enter left padding value",
                                             child: IconButton(
                                                 onPressed: () {
@@ -1112,9 +1082,6 @@ class _DisplayStateSectionState extends BaseState<DisplayStateSection> {
                                             MainAxisAlignment.spaceBetween,
                                         children: [
                                           Tooltip(
-                                            textStyle: theme
-                                                .getStyle()
-                                                .copyWith(color: Colors.white),
                                             message: "Choose bottom text color",
                                             child: IconButton(
                                                 onPressed: () {
@@ -1128,9 +1095,6 @@ class _DisplayStateSectionState extends BaseState<DisplayStateSection> {
                                                 )),
                                           ),
                                           Tooltip(
-                                            textStyle: theme
-                                                .getStyle()
-                                                .copyWith(color: Colors.white),
                                             message: "Enter bottom text size",
                                             child: IconButton(
                                                 onPressed: () {
@@ -1145,9 +1109,6 @@ class _DisplayStateSectionState extends BaseState<DisplayStateSection> {
                                                 )),
                                           ),
                                           Tooltip(
-                                            textStyle: theme
-                                                .getStyle()
-                                                .copyWith(color: Colors.white),
                                             message:
                                                 "Enter bottom padding value",
                                             child: IconButton(
@@ -1206,9 +1167,6 @@ class _DisplayStateSectionState extends BaseState<DisplayStateSection> {
                                             MainAxisAlignment.spaceBetween,
                                         children: [
                                           Tooltip(
-                                            textStyle: theme
-                                                .getStyle()
-                                                .copyWith(color: Colors.white),
                                             message: "Choose top text color",
                                             child: IconButton(
                                                 onPressed: () {
@@ -1221,9 +1179,6 @@ class _DisplayStateSectionState extends BaseState<DisplayStateSection> {
                                                 )),
                                           ),
                                           Tooltip(
-                                            textStyle: theme
-                                                .getStyle()
-                                                .copyWith(color: Colors.white),
                                             message: "Enter top text size",
                                             child: IconButton(
                                                 onPressed: () {
@@ -1236,9 +1191,6 @@ class _DisplayStateSectionState extends BaseState<DisplayStateSection> {
                                                 )),
                                           ),
                                           Tooltip(
-                                            textStyle: theme
-                                                .getStyle()
-                                                .copyWith(color: Colors.white),
                                             message: "Enter top padding value",
                                             child: IconButton(
                                                 onPressed: () {

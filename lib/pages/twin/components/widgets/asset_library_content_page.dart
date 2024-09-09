@@ -84,6 +84,8 @@ class _AssetLibraryContentPageState extends BaseState<AssetLibraryContentPage> {
               Expanded(
                 flex: 30,
                 child: LabelTextField(
+                  style: theme.getStyle(),
+                  labelTextStyle: theme.getStyle(),
                   suffixIcon: Tooltip(
                     message: 'Copy asset library id',
                     preferBelow: false,
@@ -115,6 +117,8 @@ class _AssetLibraryContentPageState extends BaseState<AssetLibraryContentPage> {
               Expanded(
                 flex: 30,
                 child: LabelTextField(
+                  style: theme.getStyle(),
+                  labelTextStyle: theme.getStyle(),
                   label: 'Description',
                   controller: _desc,
                 ),
@@ -125,6 +129,8 @@ class _AssetLibraryContentPageState extends BaseState<AssetLibraryContentPage> {
               Expanded(
                 flex: 40,
                 child: LabelTextField(
+                  style: theme.getStyle(),
+                  labelTextStyle: theme.getStyle(),
                   label: 'Tags',
                   controller: _tags,
                 ),
@@ -144,6 +150,7 @@ class _AssetLibraryContentPageState extends BaseState<AssetLibraryContentPage> {
                   await _save(close: true);
                 },
               ),
+              divider(horizontal: true),
             ],
           ),
           divider(),
@@ -227,9 +234,9 @@ class _AssetLibraryContentPageState extends BaseState<AssetLibraryContentPage> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
-                                  const Text(
+                                   Text(
                                     'Device Models',
-                                    style: TextStyle(
+                                    style: theme.getStyle().copyWith(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 14),
                                   ),
@@ -239,6 +246,7 @@ class _AssetLibraryContentPageState extends BaseState<AssetLibraryContentPage> {
                                   SizedBox(
                                     width: 200,
                                     child: DeviceModelDropdown(
+                                        style: theme.getStyle(),
                                         onDeviceModelSelected: (sm) {
                                           _changeModel(sm);
                                         },
@@ -259,9 +267,9 @@ class _AssetLibraryContentPageState extends BaseState<AssetLibraryContentPage> {
                                 ],
                               ),
                               divider(),
-                              const Text(
+                               Text(
                                 'Allowed Device Models',
-                                style: TextStyle(
+                                style: theme.getStyle().copyWith(
                                     fontWeight: FontWeight.bold, fontSize: 16),
                               ),
                               divider(

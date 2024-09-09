@@ -6,6 +6,7 @@ import 'package:twin_app/pages/twin/components/widgets/fcm_template_snippet.dart
 import 'package:twin_app/pages/twin/components/widgets/match_group_widget.dart';
 import 'package:twin_app/pages/twin/components/widgets/notification_template.dart';
 import 'package:twin_app/pages/twin/components/widgets/roles_widget.dart';
+import 'package:twin_app/pages/twin/components/widgets/showoverlay_widget.dart';
 import 'package:twin_app/pages/twin/components/widgets/sms_template_snippet.dart';
 import 'package:twin_app/pages/twin/components/widgets/voice_template_snippet.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
@@ -162,12 +163,12 @@ class _DigitalTwinEventContentPageState
                                       text: widget.entity.id,
                                     ),
                                   );
-                                  // OverlayWidget.showOverlay(
-                                  //   context: context,
-                                  //   topPosition: 140,
-                                  //   leftPosition: 250,
-                                  //   message: 'Event id copied!',
-                                  // );
+                                  OverlayWidget.showOverlay(
+                                    context: context,
+                                    topPosition: 140,
+                                    leftPosition: 250,
+                                    message: 'Event id copied!',
+                                  );
                                 },
                                 child: const Icon(
                                   Icons.content_copy,
@@ -228,7 +229,7 @@ class _DigitalTwinEventContentPageState
                         children: [
                           SizedBox(
                             height: 425,
-                            width: 350,
+                            width: 400,
                             child: MatchGroupWidget(
                               deviceModel: widget.model,
                               event: widget.entity,
@@ -249,19 +250,19 @@ class _DigitalTwinEventContentPageState
                             ),
                           ),
                           divider(),
-                          Expanded(
-                            flex: 45,
-                            child: SizedBox(
-                              height: 425,
-                              child: NotificationTemplateSnippet(
-                                  notificationTemplate:
-                                      widget.entity.notificationTemplate,
-                                  onNotificationTemplateSaved:
-                                      (NotificationTemplate? value) {
-                                    _notificationTemplate = value;
-                                  }),
-                            ),
-                          ),
+                          // Expanded(
+                          //   flex: 45,
+                          //   child: SizedBox(
+                          //     height: 425,
+                          //     child: NotificationTemplateSnippet(
+                          //         notificationTemplate:
+                          //             widget.entity.notificationTemplate,
+                          //         onNotificationTemplateSaved:
+                          //             (NotificationTemplate? value) {
+                          //           _notificationTemplate = value;
+                          //         }),
+                          //   ),
+                          // ),
                         ],
                       ),
                     ),
@@ -286,14 +287,14 @@ class _DigitalTwinEventContentPageState
                             ),
                           ),
                           divider(horizontal: true),
-                          Expanded(
-                              child: FcmTemplateSnippet(
-                            fcmTemplate: widget.entity.fcmTemplate,
-                            onFcmTemplateSaved: (FCMTemplate? value) {
-                              _fcmTemplate = value;
-                            },
-                          )),
-                          RolesWidget(roles: widget.entity.roles!),
+                          // Expanded(
+                          //     child: FcmTemplateSnippet(
+                          //   fcmTemplate: widget.entity.fcmTemplate,
+                          //   onFcmTemplateSaved: (FCMTemplate? value) {
+                          //     _fcmTemplate = value;
+                          //   },
+                          // )),
+                          // RolesWidget(roles: widget.entity.roles!),
                         ],
                       ),
                     ),

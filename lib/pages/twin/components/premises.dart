@@ -59,6 +59,8 @@ class _PremisesState extends BaseState<Premises> {
                 height: 40,
                 width: 250,
                 child: SearchBar(
+                  hintStyle: WidgetStatePropertyAll(theme.getStyle()),
+                  textStyle: WidgetStatePropertyAll(theme.getStyle()),
                   leading: Icon(Icons.search),
                   hintText: 'Search Premises',
                   onChanged: (val) {
@@ -116,74 +118,77 @@ class _PremisesState extends BaseState<Premises> {
       child: SizedBox(
         width: width,
         height: width,
-        child: Card(
-          elevation: 8,
-          color: Colors.white,
-          child: Stack(
-            children: [
-              Align(
-                alignment: Alignment.topLeft,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    e.name,
-                    style:
-                        theme.getStyle().copyWith(fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
-              Align(
-                alignment: Alignment.topRight,
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 8.0, top: 8.0),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Tooltip(
-                        message: _canEdit ? "Update" : "No Permission to Edit",
-                        child: InkWell(
-                          onTap: _canEdit
-                              ? () {
-                                  _addEditPremiseDialog(premise: e);
-                                }
-                              : null,
-                          child: Icon(
-                            Icons.edit,
-                            color: _canEdit
-                                ? theme.getPrimaryColor()
-                                : Colors.grey,
-                          ),
-                        ),
-                      ),
-                      Tooltip(
-                        message:
-                            _canEdit ? "Delete" : "No Permission to Delete",
-                        child: InkWell(
-                          onTap: _canEdit
-                              ? () {
-                                  _confirmDeletionDialog(context, e);
-                                }
-                              : null,
-                          child: Icon(
-                            Icons.delete_forever_rounded,
-                            color: _canEdit
-                                ? theme.getPrimaryColor()
-                                : Colors.grey,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              if (null != e.images && e.images!.isNotEmpty)
+        child: Tooltip(
+          message: '${e.name}\n${e.description ?? ""}',
+          child: Card(
+            elevation: 8,
+            color: Colors.white,
+            child: Stack(
+              children: [
                 Align(
-                  alignment: Alignment.center,
-                  child: TwinImageHelper.getCachedImage(
-                      e.domainKey, e.images!.first,
-                      width: width / 2, height: width / 2),
-                )
-            ],
+                  alignment: Alignment.topLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      e.name,
+                      style:
+                          theme.getStyle().copyWith(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ),
+                Align(
+                  alignment: Alignment.topRight,
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 8.0, top: 8.0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Tooltip(
+                          message: _canEdit ? "Update" : "No Permission to Edit",
+                          child: InkWell(
+                            onTap: _canEdit
+                                ? () {
+                                    _addEditPremiseDialog(premise: e);
+                                  }
+                                : null,
+                            child: Icon(
+                              Icons.edit,
+                              color: _canEdit
+                                  ? theme.getPrimaryColor()
+                                  : Colors.grey,
+                            ),
+                          ),
+                        ),
+                        Tooltip(
+                          message:
+                              _canEdit ? "Delete" : "No Permission to Delete",
+                          child: InkWell(
+                            onTap: _canEdit
+                                ? () {
+                                    _confirmDeletionDialog(context, e);
+                                  }
+                                : null,
+                            child: Icon(
+                              Icons.delete_forever_rounded,
+                              color: _canEdit
+                                  ? theme.getPrimaryColor()
+                                  : Colors.grey,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                if (null != e.images && e.images!.isNotEmpty)
+                  Align(
+                    alignment: Alignment.center,
+                    child: TwinImageHelper.getCachedImage(
+                        e.domainKey, e.images!.first,
+                        width: width / 2, height: width / 2),
+                  )
+              ],
+            ),
           ),
         ),
       ),
@@ -232,7 +237,7 @@ class _PremisesState extends BaseState<Premises> {
     AlertDialog alert = AlertDialog(
       title: Text(
         "WARNING",
-        style: theme.getStyle(),
+        style: theme.getStyle().copyWith(color: Colors.red),
       ),
       content: Text(
         "Deleting a Premise can not be undone.\nYou will loose all of the premise data, history, etc.\n\nAre you sure you want to delete?",
@@ -266,6 +271,7 @@ class _PremisesState extends BaseState<Premises> {
       if (validateResponse(res)) {
         _entities.removeAt(index);
         _cards.removeAt(index);
+        alert('Success', 'Premise ${e.name} deleted!');
       }
     });
     loading = false;
@@ -300,6 +306,8 @@ class _PremisesState extends BaseState<Premises> {
 
   void _addEditPremiseDialog({tapi.Premise? premise}) async {
     await super.alertDialog(
+      titleStyle:
+          theme.getStyle().copyWith(fontSize: 20, fontWeight: FontWeight.bold),
       title: null == premise ? 'Add New Premise' : 'Update Premise',
       body: PremiseSnippet(
         premise: premise,

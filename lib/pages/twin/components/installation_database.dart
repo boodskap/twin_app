@@ -95,8 +95,10 @@ class _InstallationDatabaseState extends BaseState<InstallationDatabase> {
                   height: 40,
                   width: 250,
                   child: SearchBar(
+                    hintStyle: WidgetStatePropertyAll(theme.getStyle()),
+                    textStyle: WidgetStatePropertyAll(theme.getStyle()),
                     leading: Icon(Icons.search),
-                    hintText: 'Search installation database',
+                    hintText: 'Search Installation Database',
                     onChanged: (val) {
                       _search = val.trim();
                       _load();
@@ -258,6 +260,8 @@ class _InstallationDatabaseState extends BaseState<InstallationDatabase> {
     String? modelId,
   }) async {
     await super.alertDialog(
+      titleStyle:
+          theme.getStyle().copyWith(fontSize: 20, fontWeight: FontWeight.bold),
       title: null == device ? 'Add New Device' : 'Update Device',
       body: InstallationDatabaseSnippet(
         device: device,
@@ -295,8 +299,8 @@ class _InstallationDatabaseState extends BaseState<InstallationDatabase> {
       title: 'Warning',
       message:
           'Deleting is unrecoverable\nIt may also delete all the related models and components\n\nDo you want to proceed?',
-      titleStyle: const TextStyle(color: Colors.red),
-      messageStyle: const TextStyle(fontWeight: FontWeight.bold),
+      titleStyle: theme.getStyle().copyWith(color: Colors.red),
+      messageStyle: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
       onPressed: () async {
         await execute(() async {
           int index = _entities.indexWhere((element) => element.id == e.id);

@@ -77,6 +77,8 @@ class _EventsState extends BaseState<Events> {
                 height: 40,
                 width: 250,
                 child: SearchBar(
+                  hintStyle: WidgetStatePropertyAll(theme.getStyle()),
+                  textStyle: WidgetStatePropertyAll(theme.getStyle()),
                   leading: Icon(Icons.search),
                   hintText: 'Search Events',
                   onChanged: (val) {
@@ -225,6 +227,9 @@ class _EventsState extends BaseState<Events> {
         barrierDismissible: false,
         builder: (context) {
           return AlertDialog(
+            titleTextStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 20, fontWeight: FontWeight.bold),
             title: Text(title),
             content: SizedBox(
               width: 500,
@@ -242,6 +247,7 @@ class _EventsState extends BaseState<Events> {
                       },
                       decoration: InputDecoration(
                         hintText: 'Name',
+                        labelStyle: theme.getStyle(),
                         hintStyle: theme.getStyle(),
                       )),
                   TextField(
@@ -253,6 +259,7 @@ class _EventsState extends BaseState<Events> {
                     style: theme.getStyle(),
                     decoration: InputDecoration(
                       hintText: 'Description',
+                      labelStyle: theme.getStyle(),
                       hintStyle: theme.getStyle(),
                     ),
                   ),
@@ -265,6 +272,7 @@ class _EventsState extends BaseState<Events> {
                     style: theme.getStyle(),
                     decoration: InputDecoration(
                       hintText: 'Tags (space separated)',
+                      labelStyle: theme.getStyle(),
                       hintStyle: theme.getStyle(),
                     ),
                   ),
@@ -354,7 +362,7 @@ class _EventsState extends BaseState<Events> {
         message:
             'Deleting is unrecoverable\nIt may also delete all the related models and components\n\nDo you want to proceed?',
         titleStyle: theme.getStyle().copyWith(color: Colors.red),
-        messageStyle: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
+        messageStyle: theme.getStyle(),
         onPressed: () async {
           await execute(() async {
             int index = _entities.indexWhere((element) => element.id == e.id);

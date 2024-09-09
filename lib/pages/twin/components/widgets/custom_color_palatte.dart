@@ -43,7 +43,7 @@ class _CustomColorPaletteState extends State<CustomColorPalette> {
         context: context,
         builder: (ctx) {
           return AlertDialog(
-            title: const Text('Pick a Color'),
+            title:  Text('Pick a Color',style: theme.getStyle(),),
             content: SingleChildScrollView(
               child: ColorPicker(
                 hexInputBar: true,

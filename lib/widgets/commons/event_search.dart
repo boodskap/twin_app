@@ -42,6 +42,8 @@ class _EventSearchState extends BaseState<EventSearch> {
               Expanded(
                 child: SearchBar(
                   hintText: 'Search Events',
+                  hintStyle: WidgetStatePropertyAll(theme.getStyle()),
+                  textStyle: WidgetStatePropertyAll(theme.getStyle()),
                   trailing: [const BusyIndicator()],
                   onChanged: (value) async {
                     await _load(search: value);

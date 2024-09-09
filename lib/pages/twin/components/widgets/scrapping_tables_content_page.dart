@@ -137,19 +137,26 @@ class _ScrappingTablesContentPageState
 
   void _buildRow(var param) {
     TableRow row = TableRow(children: [
-      Align(alignment: Alignment.center, child: Text(param.name)),
+      Align(
+          alignment: Alignment.center,
+          child: Text(
+            param.name,
+            style: theme.getStyle(),
+          )),
       Align(
         alignment: Alignment.center,
-        child: Text(param.description ?? ''),
+        child: Text(param.description ?? '', style: theme.getStyle()),
       ),
-      Align(alignment: Alignment.center, child: Text(param.label ?? '')),
+      Align(
+          alignment: Alignment.center,
+          child: Text(param.label ?? '', style: theme.getStyle())),
       Align(
         alignment: Alignment.center,
-        child: Text(param.attributeType.value!),
+        child: Text(param.attributeType.value!, style: theme.getStyle()),
       ),
       Align(
         alignment: Alignment.center,
-        child: Text(param.$value ?? ''),
+        child: Text(param.$value ?? '', style: theme.getStyle()),
       ),
       Checkbox(
         value: param.editable,
@@ -296,8 +303,8 @@ class _ScrappingTablesContentPageState
         setState(() {
           widget.model = res.body!.entity;
         });
-        await alert(
-            'Scrapping Table ${_nameController.text} saved successfully', '');
+        await alert('Success ',
+            'Scrapping Table ${_nameController.text} saved successfully');
         Navigator.pop(context);
       }
     } catch (e, s) {
@@ -328,20 +335,12 @@ class _ScrappingTablesContentPageState
                     divider(),
                     Row(
                       children: [
-                        SizedBox(
-                          height: 32,
-                          width: 32,
-                          child: MouseRegion(
-                            cursor: SystemMouseCursors.click,
-                            child: GestureDetector(
-                                // onTap: () {}, child: _modelIcon,
-                                ),
-                          ),
-                        ),
-                        divider(),
+                        divider(horizontal: true),
                         Expanded(
                           flex: 25,
                           child: LabelTextField(
+                            style: theme.getStyle(),
+                            labelTextStyle: theme.getStyle(),
                             suffixIcon: Tooltip(
                               message: 'Copy Scrapping Table id',
                               preferBelow: false,
@@ -367,20 +366,25 @@ class _ScrappingTablesContentPageState
                             controller: _nameController,
                           ),
                         ),
-                        divider(),
+                        divider(horizontal: true),
                         Expanded(
                             flex: 50,
                             child: LabelTextField(
+                              style: theme.getStyle(),
+                              labelTextStyle: theme.getStyle(),
                               label: 'Description',
                               controller: _descController,
                             )),
-                        divider(),
+                        divider(horizontal: true),
                         Expanded(
                             flex: 30,
                             child: LabelTextField(
+                              style: theme.getStyle(),
+                              labelTextStyle: theme.getStyle(),
                               label: 'Tags',
                               controller: _tagsController,
                             )),
+                        divider(horizontal: true),
                       ],
                     ),
                     divider(),

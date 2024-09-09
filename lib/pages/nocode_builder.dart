@@ -49,7 +49,12 @@ class _NocodeBuilderPageState extends BaseState<NocodeBuilderPage> {
         barrierDismissible: false,
         builder: (context) {
           return AlertDialog(
-            title: Text(title),
+            title: Text(
+              title,
+              style: theme
+                  .getStyle()
+                  .copyWith(fontWeight: FontWeight.bold, fontSize: 20),
+            ),
             content: SizedBox(
               width: 500,
               height: 200,

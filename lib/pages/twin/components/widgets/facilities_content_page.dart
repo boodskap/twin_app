@@ -257,6 +257,8 @@ class _FacilityContentPageState extends BaseState<FacilityContentPage> {
     await confirm(
         title: 'Are you sure?',
         message: 'you want to delete this image?',
+        titleStyle: theme.getStyle().copyWith(fontSize: 20, color: Colors.red),
+        messageStyle: theme.getStyle(),
         onPressed: () async {
           await execute(() async {
             var res = await TwinnedSession.instance.twin.deleteImage(
@@ -286,6 +288,36 @@ class _FacilityContentPageState extends BaseState<FacilityContentPage> {
           });
         });
   }
+
+  String _getSearchHint(InfraType type) {
+    switch (type) {
+      case InfraType.premise:
+        return 'Search Facilities';
+      case InfraType.facility:
+        return 'Search Floors';
+      case InfraType.floor:
+        return 'Search Assets';
+      case InfraType.asset:
+        return 'Search Devices';
+      default:
+        return 'Search';
+    }
+  }
+
+    String _getLabelName(InfraType type) {
+  switch (type) {
+    case InfraType.premise:
+      return 'Premise Name';
+    case InfraType.facility:
+      return 'Faciliy Name';
+    case InfraType.floor:
+      return 'Floor Name';
+    case InfraType.asset:
+      return 'Asset Name';
+    default:
+      return 'Name';
+  }
+}
 
   // Future<void> _pickLocation() async {
   //   return showDialog(
@@ -695,6 +727,8 @@ class _FacilityContentPageState extends BaseState<FacilityContentPage> {
 
       if (validateResponse(res)) {
         _close();
+        alert('Success',
+            'Facility ${res.body!.entity!.name} saved successfully!');
       }
     });
   }
@@ -781,7 +815,7 @@ class _FacilityContentPageState extends BaseState<FacilityContentPage> {
                 child: LabelTextField(
                   style: theme.getStyle(),
                   labelTextStyle: theme.getStyle(),
-                  label: 'Facility Name',
+                  label: _getLabelName(widget.type),
                   controller: _name,
                 ),
               ),
@@ -973,6 +1007,14 @@ class _FacilityContentPageState extends BaseState<FacilityContentPage> {
                                                   .size
                                                   .width,
                                               child: SearchBar(
+                                                  hintText: _getSearchHint(
+                                                      widget.type),
+                                                  hintStyle:
+                                                      WidgetStatePropertyAll(
+                                                          theme.getStyle()),
+                                                  textStyle:
+                                                      WidgetStatePropertyAll(
+                                                          theme.getStyle()),
                                                   leading:
                                                       const Icon(Icons.search),
                                                   onChanged: (value) async {
