@@ -78,7 +78,7 @@ class _WidgetPaletteState extends BaseState<WidgetPalette> {
                 Text(
                   val.value.getPaletteName(),
                   style: theme.getStyle().copyWith(
-                      fontSize: 12,
+                      fontSize: 13,
                       fontWeight: FontWeight.bold,
                       overflow: TextOverflow.ellipsis),
                 ),
@@ -118,7 +118,7 @@ class _WidgetPaletteState extends BaseState<WidgetPalette> {
               'Charts & Graphs',
               style: theme.getStyle().copyWith(
                   color: Colors.black,
-                  fontSize: 14,
+                  fontSize: 13,
                   fontWeight: FontWeight.normal),
             ),
             Wrap(

@@ -24,9 +24,6 @@ class ConfigDashboardPalette extends StatefulWidget {
 }
 
 class _ConfigDashboardPaletteState extends BaseState<ConfigDashboardPalette> {
-  // static const labelStyle =
-  //     TextStyle(color: Colors.black, fontSize: 12, fontWeight: FontWeight.bold);
-
   static final InputDecorationTheme dropdownDecoration = InputDecorationTheme(
     isDense: true,
     contentPadding: const EdgeInsets.symmetric(horizontal: 16),
@@ -63,7 +60,7 @@ class _ConfigDashboardPaletteState extends BaseState<ConfigDashboardPalette> {
               'Row Spacing',
               style: theme.getStyle().copyWith(
                   color: Colors.black,
-                  fontSize: 12,
+                  fontSize: 13,
                   fontWeight: FontWeight.bold),
             ),
             SizedBox(
@@ -95,7 +92,7 @@ class _ConfigDashboardPaletteState extends BaseState<ConfigDashboardPalette> {
               'Background Color',
               style: theme.getStyle().copyWith(
                   color: Colors.black,
-                  fontSize: 12,
+                  fontSize: 13,
                   fontWeight: FontWeight.bold),
             ),
             IconButton(
@@ -119,7 +116,7 @@ class _ConfigDashboardPaletteState extends BaseState<ConfigDashboardPalette> {
               'Main Axis Alignment',
               style: theme.getStyle().copyWith(
                   color: Colors.black,
-                  fontSize: 12,
+                  fontSize: 13,
                   fontWeight: FontWeight.bold),
             ),
             DropdownMenu<MainAxisAlignment>(
@@ -178,7 +175,7 @@ class _ConfigDashboardPaletteState extends BaseState<ConfigDashboardPalette> {
               'Cross Axis Alignment',
               style: theme.getStyle().copyWith(
                   color: Colors.black,
-                  fontSize: 12,
+                  fontSize: 13,
                   fontWeight: FontWeight.bold),
             ),
             DropdownMenu<CrossAxisAlignment>(
@@ -230,7 +227,7 @@ class _ConfigDashboardPaletteState extends BaseState<ConfigDashboardPalette> {
               'Main Axis Size',
               style: theme.getStyle().copyWith(
                   color: Colors.black,
-                  fontSize: 12,
+                  fontSize: 13,
                   fontWeight: FontWeight.bold),
             ),
             DropdownMenu<MainAxisSize>(
@@ -268,7 +265,7 @@ class _ConfigDashboardPaletteState extends BaseState<ConfigDashboardPalette> {
               'Scroll Direction',
               style: theme.getStyle().copyWith(
                   color: Colors.black,
-                  fontSize: 12,
+                  fontSize: 13,
                   fontWeight: FontWeight.bold),
             ),
             DropdownMenu<Axis>(
@@ -306,7 +303,7 @@ class _ConfigDashboardPaletteState extends BaseState<ConfigDashboardPalette> {
               'Banner Image',
               style: theme.getStyle().copyWith(
                   color: Colors.black,
-                  fontSize: 12,
+                  fontSize: 13,
                   fontWeight: FontWeight.bold),
             ),
             Wrap(
@@ -342,7 +339,7 @@ class _ConfigDashboardPaletteState extends BaseState<ConfigDashboardPalette> {
                 'Banner Height',
                 style: theme.getStyle().copyWith(
                     color: Colors.black,
-                    fontSize: 12,
+                    fontSize: 13,
                     fontWeight: FontWeight.bold),
               ),
               SizedBox(
@@ -375,7 +372,7 @@ class _ConfigDashboardPaletteState extends BaseState<ConfigDashboardPalette> {
                 'Banner Fit',
                 style: theme.getStyle().copyWith(
                     color: Colors.black,
-                    fontSize: 12,
+                    fontSize: 13,
                     fontWeight: FontWeight.bold),
               ),
               DropdownMenu<BoxFit>(
@@ -441,7 +438,9 @@ class _ConfigDashboardPaletteState extends BaseState<ConfigDashboardPalette> {
           ),
         divider(),
         BorderConfigWidget(
-            style: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
+            style: theme
+                .getStyle()
+                .copyWith(fontWeight: FontWeight.bold, fontSize: 13),
             borderConfig: _screen.screenBorderConfig,
             onBorderConfigured: (border) {
               _onBorderConfigured(border);
@@ -449,7 +448,9 @@ class _ConfigDashboardPaletteState extends BaseState<ConfigDashboardPalette> {
         divider(),
         PaddingConfigWidget(
             title: 'Padding',
-            style: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
+            style: theme
+                .getStyle()
+                .copyWith(fontWeight: FontWeight.bold, fontSize: 13),
             paddingConfig: _screen.paddingConfig,
             onPaddingConfigSaved: (paddingConfig) {
               _onPaddingConfigSaved(paddingConfig);
@@ -457,7 +458,9 @@ class _ConfigDashboardPaletteState extends BaseState<ConfigDashboardPalette> {
         divider(),
         PaddingConfigWidget(
             title: 'Margin',
-            style: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
+            style: theme
+                .getStyle()
+                .copyWith(fontWeight: FontWeight.bold, fontSize: 13),
             paddingConfig: _screen.marginConfig,
             onPaddingConfigSaved: (paddingConfig) {
               _onMarginConfigSaved(paddingConfig);
@@ -472,7 +475,7 @@ class _ConfigDashboardPaletteState extends BaseState<ConfigDashboardPalette> {
                 'Background Image',
                 style: theme.getStyle().copyWith(
                     color: Colors.black,
-                    fontSize: 12,
+                    fontSize: 13,
                     fontWeight: FontWeight.bold),
               ),
               IconButton(
