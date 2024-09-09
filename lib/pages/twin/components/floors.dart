@@ -99,6 +99,8 @@ class _FloorsState extends BaseState<Floors> {
               height: 40,
               width: 250,
               child: SearchBar(
+                textStyle: WidgetStatePropertyAll(theme.getStyle()),
+                hintStyle: WidgetStatePropertyAll(theme.getStyle()),
                 leading: Icon(Icons.search),
                 hintText: 'Search Floors',
                 onChanged: (val) {
@@ -158,73 +160,76 @@ class _FloorsState extends BaseState<Floors> {
             _edit(e);
           }
         },
-        child: Card(
-          elevation: 8,
-          color: Colors.white,
-          child: Stack(
-            children: [
-              Align(
-                alignment: Alignment.topLeft,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    e.name,
-                    style:
-                        theme.getStyle().copyWith(fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
-              Align(
-                alignment: Alignment.topRight,
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 8.0, top: 8.0),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Tooltip(
-                        message: _canEdit ? "Update" : "No Permission to Edit",
-                        child: InkWell(
-                          onTap: _canEdit
-                              ? () {
-                                  _addEditFloorDialog(floor: e);
-                                }
-                              : null,
-                          child: Icon(
-                            Icons.edit,
-                            color: _canEdit ? theme.getPrimaryColor() : null,
-                          ),
-                        ),
-                      ),
-                      Tooltip(
-                        message:
-                            _canEdit ? "Delete" : "No Permission to Delete",
-                        child: InkWell(
-                          onTap: _canEdit
-                              ? () {
-                                  _delete(e);
-                                }
-                              : null,
-                          child: Icon(
-                            Icons.delete,
-                            color: _canEdit ? theme.getPrimaryColor() : null,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              if (null != e.floorPlan && e.floorPlan!.isNotEmpty)
+        child: Tooltip(
+          message: '${e.name}\n${e.description ?? ""}',
+          child: Card(
+            elevation: 8,
+            color: Colors.white,
+            child: Stack(
+              children: [
                 Align(
-                  alignment: Alignment.center,
-                  child: TwinImageHelper.getCachedImage(
-                    e.domainKey,
-                    e.floorPlan!,
-                    width: width / 2,
-                    height: width / 2,
+                  alignment: Alignment.topLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      e.name,
+                      style:
+                          theme.getStyle().copyWith(fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ),
-            ],
+                Align(
+                  alignment: Alignment.topRight,
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 8.0, top: 8.0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Tooltip(
+                          message: _canEdit ? "Update" : "No Permission to Edit",
+                          child: InkWell(
+                            onTap: _canEdit
+                                ? () {
+                                    _addEditFloorDialog(floor: e);
+                                  }
+                                : null,
+                            child: Icon(
+                              Icons.edit,
+                              color: _canEdit ? theme.getPrimaryColor() : null,
+                            ),
+                          ),
+                        ),
+                        Tooltip(
+                          message:
+                              _canEdit ? "Delete" : "No Permission to Delete",
+                          child: InkWell(
+                            onTap: _canEdit
+                                ? () {
+                                    _delete(e);
+                                  }
+                                : null,
+                            child: Icon(
+                              Icons.delete,
+                              color: _canEdit ? theme.getPrimaryColor() : null,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                if (null != e.floorPlan && e.floorPlan!.isNotEmpty)
+                  Align(
+                    alignment: Alignment.center,
+                    child: TwinImageHelper.getCachedImage(
+                      e.domainKey,
+                      e.floorPlan!,
+                      width: width / 2,
+                      height: width / 2,
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
       ),
@@ -244,8 +249,8 @@ class _FloorsState extends BaseState<Floors> {
     tapi.Premise? selectedPremise;
     tapi.Facility? selectedFacility;
 
-    if (floor != null &&( _selectedPremise != null &&
-        _selectedFacility != null)) {
+    if (floor != null &&
+        (_selectedPremise != null && _selectedFacility != null)) {
       var pRes = await TwinnedSession.instance.twin.getPremise(
         premiseId: floor.premiseId,
         apikey: TwinnedSession.instance.authToken,
@@ -261,6 +266,8 @@ class _FloorsState extends BaseState<Floors> {
 
     await super.alertDialog(
       title: floor == null ? 'Add New Floor' : 'Update Floor',
+      titleStyle:
+          theme.getStyle().copyWith(fontSize: 20, fontWeight: FontWeight.bold),
       body: FloorSnippet(
         selectedPremise: selectedPremise ?? _selectedPremise,
         selectedFacility: selectedFacility ?? _selectedFacility,
@@ -295,8 +302,8 @@ class _FloorsState extends BaseState<Floors> {
         title: 'Warning',
         message:
             'Deleting is unrecoverable\nIt may also delete all the related models and components\n\nDo you want to proceed?',
-        titleStyle: const TextStyle(color: Colors.red),
-        messageStyle: const TextStyle(fontWeight: FontWeight.bold),
+        titleStyle: theme.getStyle().copyWith(color: Colors.red),
+        messageStyle: theme.getStyle(),
         onPressed: () async {
           await execute(() async {
             int index = _entities.indexWhere((element) => element.id == e.id);

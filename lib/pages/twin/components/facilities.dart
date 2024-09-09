@@ -142,7 +142,6 @@ class _FacilitiesState extends BaseState<Facilities> {
           }
         },
         child: Tooltip(
-          textStyle: theme.getStyle().copyWith(color: Colors.white),
           message: '${e.name}\n${e.description ?? ""}',
           child: Card(
             elevation: 8,
@@ -241,6 +240,8 @@ class _FacilitiesState extends BaseState<Facilities> {
     }
 
     await super.alertDialog(
+      titleStyle:
+          theme.getStyle().copyWith(fontSize: 20, fontWeight: FontWeight.bold),
       title: facility == null ? 'Add New Facility' : 'Update Facility',
       body: FacilitySnippet(
         selectedPremise: selectedPremise ?? _selectedPremise,
@@ -279,7 +280,7 @@ class _FacilitiesState extends BaseState<Facilities> {
         message:
             'Deleting is unrecoverable\nIt may also delete all the related models and components\n\nDo you want to proceed?',
         titleStyle: theme.getStyle().copyWith(color: Colors.red),
-        messageStyle: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
+        messageStyle: theme.getStyle().copyWith(),
         onPressed: () async {
           await execute(() async {
             int index = _entities.indexWhere((element) => element.id == e.id);

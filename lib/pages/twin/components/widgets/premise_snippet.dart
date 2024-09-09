@@ -163,14 +163,6 @@ class _PremiseSnippetState extends BaseState<PremiseSnippet> {
                           child: IntlPhoneField(
                               style: theme.getStyle(),
                               dropdownTextStyle: theme.getStyle(),
-                              pickerDialogStyle: PickerDialogStyle(
-                                  searchFieldInputDecoration: InputDecoration(
-                                    hintText: 'Search Country',
-                                    hintStyle: theme.getStyle(),
-                                  ),
-                                  countryCodeStyle:
-                                      theme.getStyle().copyWith(fontSize: 14),
-                                  countryNameStyle: theme.getStyle()),
                               controller: phoneController,
                               keyboardType: TextInputType.phone,
                               initialCountryCode: countryCode,
