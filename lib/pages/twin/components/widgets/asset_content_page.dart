@@ -274,6 +274,8 @@ class _AssetContentPageState extends BaseState<AssetContentPage> {
     await confirm(
         title: 'Are you sure?',
         message: 'you want to delete this image?',
+        titleStyle: theme.getStyle().copyWith(color: Colors.red, fontSize: 20),
+        messageStyle: theme.getStyle(),
         onPressed: () async {
           await execute(() async {
             var res = await TwinnedSession.instance.twin.deleteImage(
@@ -474,16 +476,13 @@ class _AssetContentPageState extends BaseState<AssetContentPage> {
                         Text(
                           e.name,
                           style: theme.getStyle().copyWith(
-                                fontSize: 20,
+                                fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
                         ),
                         Text(
                           e.description ?? "",
-                          style: theme.getStyle().copyWith(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
+                          style: theme.getStyle().copyWith(fontSize: 16),
                         ),
                       ],
                     ),
@@ -544,16 +543,13 @@ class _AssetContentPageState extends BaseState<AssetContentPage> {
                         Text(
                           e.name,
                           style: theme.getStyle().copyWith(
-                                fontSize: 20,
+                                fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
                         ),
                         Text(
                           e.description ?? "",
-                          style: theme.getStyle().copyWith(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
+                          style: theme.getStyle().copyWith(fontSize: 16),
                         ),
                       ],
                     ),
@@ -615,16 +611,13 @@ class _AssetContentPageState extends BaseState<AssetContentPage> {
                         Text(
                           e.name,
                           style: theme.getStyle().copyWith(
-                                fontSize: 20,
+                                fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
                         ),
                         Text(
                           e.description ?? "",
-                          style: theme.getStyle().copyWith(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
+                          style: theme.getStyle().copyWith(fontSize: 16),
                         ),
                       ],
                     ),
@@ -1049,6 +1042,13 @@ class _AssetContentPageState extends BaseState<AssetContentPage> {
                                                   .size
                                                   .width,
                                               child: SearchBar(
+                                                  hintStyle:
+                                                      WidgetStatePropertyAll(
+                                                          theme.getStyle()),
+                                                  textStyle:
+                                                      WidgetStatePropertyAll(
+                                                          theme.getStyle()),
+                                                  hintText: 'Search Devices',
                                                   leading:
                                                       const Icon(Icons.search),
                                                   onChanged: (value) async {
