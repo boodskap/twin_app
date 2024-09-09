@@ -224,243 +224,7 @@ class QueryContentSection extends StatefulWidget {
   QueryContentSectionState createState() => QueryContentSectionState();
 }
 
-// class QueryContentSectionState extends BaseState<QueryContentSection> {
-//   late TextEditingController _controller;
-//   double jsonTextFontSize = 13;
-//   @override
-//   void initState() {
-//     super.initState();
-//     _controller = TextEditingController(
-//       text: '{}',
-//     );
-//   }
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return Padding(
-//       padding: const EdgeInsets.all(10),
-//       child: SingleChildScrollView(
-//         child: Column(
-//           crossAxisAlignment: CrossAxisAlignment.start,
-//           children: [
-//             SizedBox(height: 5),
-//             TextField(
-//               controller: widget.queryController,
-//               maxLines: null,
-//               minLines: 4,
-//               keyboardType: TextInputType.multiline,
-//               decoration: InputDecoration(
-//                 labelText: 'Query',
-//                 border: OutlineInputBorder(),
-//               ),
-//               onChanged: (String value) {
-//                 widget.onQueryChanged(value);
-//               },
-//             ),
-//             divider(),
-//             JsonView.string(
-//               widget.jsonStringData,
-//               theme: JsonViewTheme(
-//                   keyStyle: TextStyle(
-//                       color: Colors.white, fontSize: jsonTextFontSize),
-//                   doubleStyle:
-//                       TextStyle(color: Colors.red, fontSize: jsonTextFontSize),
-//                   intStyle:
-//                       TextStyle(color: Colors.red, fontSize: jsonTextFontSize),
-//                   boolStyle: TextStyle(
-//                       color: Colors.orange, fontSize: jsonTextFontSize),
-//                   stringStyle: TextStyle(
-//                       color: Colors.green, fontSize: jsonTextFontSize),
-//                   viewType: JsonViewType.collapsible),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-
-//   @override
-//   void dispose() {
-//     _controller.dispose();
-//     super.dispose();
-//   }
-
-//   @override
-//   void setup() {}
-// }
-
-//////////-
-// class QueryContentSectionState extends BaseState<QueryContentSection> {
-//   late TextEditingController _controller;
-//   double jsonTextFontSize = 13;
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     _controller = TextEditingController(
-//       text: '{}',
-//     );
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Padding(
-//       padding: const EdgeInsets.all(10),
-//       child: SingleChildScrollView(
-//         child: Column(
-//           crossAxisAlignment: CrossAxisAlignment.start,
-//           children: [
-//             SizedBox(height: 5),
-//             TextField(
-//               controller: widget.queryController,
-//               maxLines: null,
-//               minLines: 4,
-//               keyboardType: TextInputType.multiline,
-//               decoration: InputDecoration(
-//                 labelText: 'Query',
-//                 border: OutlineInputBorder(),
-//               ),
-//               onChanged: (String value) {
-//                 widget.onQueryChanged(value);
-//               },
-//             ),
-//             divider(),
-//             Row(
-//               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//               children: [
-//                 Text(
-//                   'JSON Result',
-//                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-//                 ),
-//                 IconButton(
-//                   icon: Icon(Icons.copy),
-//                   onPressed: () {
-//                     Clipboard.setData(ClipboardData(text: widget.jsonStringData));
-//                     ScaffoldMessenger.of(context).showSnackBar(
-//                       SnackBar(content: Text('Copied to clipboard')),
-//                     );
-//                   },
-//                 ),
-//               ],
-//             ),
-//             JsonView.string(
-//               widget.jsonStringData,
-//               theme: JsonViewTheme(
-//                 keyStyle: TextStyle(
-//                     color: Colors.white, fontSize: jsonTextFontSize),
-//                 doubleStyle: TextStyle(
-//                     color: Colors.red, fontSize: jsonTextFontSize),
-//                 intStyle: TextStyle(
-//                     color: Colors.red, fontSize: jsonTextFontSize),
-//                 boolStyle: TextStyle(
-//                     color: Colors.orange, fontSize: jsonTextFontSize),
-//                 stringStyle: TextStyle(
-//                     color: Colors.green, fontSize: jsonTextFontSize),
-//                 viewType: JsonViewType.collapsible,
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-
-//   @override
-//   void dispose() {
-//     _controller.dispose();
-//     super.dispose();
-//   }
-
-//   @override
-//   void setup() {}
-// }
-
-// class QueryContentSectionState extends BaseState<QueryContentSection> {
-//   late TextEditingController _controller;
-//   double jsonTextFontSize = 13;
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     _controller = TextEditingController(
-//       text: '{}',
-//     );
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Padding(
-//       padding: const EdgeInsets.all(10),
-//       child: SingleChildScrollView(
-//         child: Column(
-//           crossAxisAlignment: CrossAxisAlignment.start,
-//           children: [
-//             SizedBox(height: 5),
-//             TextField(
-//               controller: widget.queryController,
-//               maxLines: null,
-//               minLines: 4,
-//               keyboardType: TextInputType.multiline,
-//               decoration: InputDecoration(
-//                 labelText: 'Query',
-//                 border: OutlineInputBorder(),
-//               ),
-//               onChanged: (String value) {
-//                 widget.onQueryChanged(value);
-//               },
-//             ),
-//             divider(),
-//             Stack(
-//               children: [
-//                 Padding(
-//                   padding: const EdgeInsets.only(top: 35), // adjust padding to avoid overlap with the button
-//                   child: JsonView.string(
-//                     widget.jsonStringData,
-//                     theme: JsonViewTheme(
-//                       keyStyle: TextStyle(
-//                           color: Colors.white, fontSize: jsonTextFontSize),
-//                       doubleStyle: TextStyle(
-//                           color: Colors.red, fontSize: jsonTextFontSize),
-//                       intStyle: TextStyle(
-//                           color: Colors.red, fontSize: jsonTextFontSize),
-//                       boolStyle: TextStyle(
-//                           color: Colors.orange, fontSize: jsonTextFontSize),
-//                       stringStyle: TextStyle(
-//                           color: Colors.green, fontSize: jsonTextFontSize),
-//                       viewType: JsonViewType.collapsible,
-//                     ),
-//                   ),
-//                 ),
-//                 Positioned(
-//                   top: 20,
-//                   right: 0,
-//                   child: IconButton(
-//                     icon: Icon(Icons.copy, color: Colors.blue),
-//                     onPressed: () {
-//                       Clipboard.setData(ClipboardData(text: widget.jsonStringData));
-//                       ScaffoldMessenger.of(context).showSnackBar(
-//                         SnackBar(content: Text('Copied to clipboard')),
-//                       );
-//                     },
-//                   ),
-//                 ),
-//               ],
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-
-//   @override
-//   void dispose() {
-//     _controller.dispose();
-//     super.dispose();
-//   }
-
-//   @override
-//   void setup() {}
-// }
 
 class QueryContentSectionState extends BaseState<QueryContentSection> {
   late TextEditingController _controller;
@@ -475,8 +239,13 @@ class QueryContentSectionState extends BaseState<QueryContentSection> {
     );
   }
 
-  void _copyToClipboard() {
-    Clipboard.setData(ClipboardData(text: widget.jsonStringData));
+
+  void _copyPrettyJsonToClipboard() {
+  try {
+    var jsonObject = jsonDecode(widget.jsonStringData);
+    var prettyJson = JsonEncoder.withIndent('  ').convert(jsonObject);
+    Clipboard.setData(ClipboardData(text: prettyJson));
+  
     setState(() {
       _showCopiedText = true;
     });
@@ -486,7 +255,12 @@ class QueryContentSectionState extends BaseState<QueryContentSection> {
         _showCopiedText = false;
       });
     });
+  } catch (e) {
+    // ScaffoldMessenger.of(context).showSnackBar(
+    //   SnackBar(content: Text('Failed to copy: Invalid JSON format')),
+    // );
   }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -549,7 +323,7 @@ class QueryContentSectionState extends BaseState<QueryContentSection> {
                         message: 'Copy Result',
                         child: IconButton(
                           icon: Icon(Icons.copy, color: Colors.white),
-                          onPressed: _copyToClipboard,
+                          onPressed: _copyPrettyJsonToClipboard,
                         ),
                       ),
                       if (_showCopiedText)
