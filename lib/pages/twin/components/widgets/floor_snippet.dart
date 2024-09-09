@@ -123,6 +123,7 @@ class _FloorSnippetState extends BaseState<FloorSnippet> {
                         child: LabelTextField(
                           label: 'Name',
                           style: theme.getStyle(),
+                          labelTextStyle: theme.getStyle(),
                           controller: nameController,
                           focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
@@ -131,14 +132,13 @@ class _FloorSnippetState extends BaseState<FloorSnippet> {
                           ),
                         ),
                       ),
-                      const SizedBox(
-                        height: 15,
-                      ),
+                      divider(height: 15),
                       SizedBox(
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: LabelTextField(
                           label: 'Description',
                           style: theme.getStyle(),
+                          labelTextStyle: theme.getStyle(),
                           controller: descController,
                           focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
@@ -147,14 +147,13 @@ class _FloorSnippetState extends BaseState<FloorSnippet> {
                           ),
                         ),
                       ),
-                      const SizedBox(
-                        height: 15,
-                      ),
+                      divider(height: 15),
                       SizedBox(
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: LabelTextField(
                           label: 'Address',
                           style: theme.getStyle(),
+                          labelTextStyle: theme.getStyle(),
                           controller: addressController,
                           focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
@@ -164,14 +163,13 @@ class _FloorSnippetState extends BaseState<FloorSnippet> {
                           maxLines: 5,
                         ),
                       ),
-                      const SizedBox(
-                        height: 15,
-                      ),
+                      divider(height: 15),
                       SizedBox(
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: LabelTextField(
                           label: 'Email',
                           style: theme.getStyle(),
+                          labelTextStyle: theme.getStyle(),
                           controller: emailController,
                           focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
@@ -180,19 +178,22 @@ class _FloorSnippetState extends BaseState<FloorSnippet> {
                           ),
                         ),
                       ),
-                      const SizedBox(
-                        height: 15,
-                      ),
+                      divider(height: 15),
                       SizedBox(
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: IntlPhoneField(
                           controller: phoneController,
+                          style: theme.getStyle(),
+                          dropdownTextStyle: theme.getStyle(),
                           keyboardType: TextInputType.phone,
                           initialCountryCode: countryCode,
                           inputFormatters: [
                             FilteringTextInputFormatter.digitsOnly,
                           ],
                           decoration: InputDecoration(
+                            hintStyle: theme.getStyle(),
+                            errorStyle: theme.getStyle(),
+                            labelStyle: theme.getStyle(),
                             labelText: 'Enter Phone Number',
                             counterText: "",
                             border: OutlineInputBorder(
@@ -232,9 +233,7 @@ class _FloorSnippetState extends BaseState<FloorSnippet> {
                           },
                         ),
                       ),
-                      const SizedBox(
-                        height: 15,
-                      ),
+                      divider(height: 15),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
@@ -296,27 +295,12 @@ class _FloorSnippetState extends BaseState<FloorSnippet> {
                               ),
                               child: Stack(
                                 children: [
-                                  // _floor.location != null
-                                  //     ? OSMLocationPicker(
-                                  //         key: Key(const Uuid().v4()),
-                                  //         viewMode: true,
-                                  //         longitude:
-                                  //             _floor?.location?.coordinates[0],
-                                  //         latitude:
-                                  //             _floor?.location?.coordinates[1],
-                                  //         onPicked: (_) {},
-                                  //       )
-                                  //     : Center(
-                                  //         child: Text(
-                                  //         'No location selected',
-                                  //         style: theme.getStyle(),
-                                  //       )),
-                                         _floor.location != null
+                                  _floor.location != null
                                       ? GoogleMapWidget(
-                                          longitude: _floor
-                                              .location!.coordinates[0],
-                                          latitude: _floor
-                                              .location!.coordinates[1],
+                                          longitude:
+                                              _floor.location!.coordinates[0],
+                                          latitude:
+                                              _floor.location!.coordinates[1],
                                           viewMode: false,
                                         )
                                       : Center(
@@ -510,94 +494,101 @@ class _FloorSnippetState extends BaseState<FloorSnippet> {
   //   );
   // }
 
-    /// using google map
-Future<void> _showLocationDialog(BuildContext context) async {
-  double pickedLatitude = _floor.location != null ? _floor.location!.coordinates[1] : 39.6128;
-  double pickedLongitude = _floor.location != null ? _floor.location!.coordinates[0] : -101.5382;
+  /// using google map
+  Future<void> _showLocationDialog(BuildContext context) async {
+    double pickedLatitude =
+        _floor.location != null ? _floor.location!.coordinates[1] : 39.6128;
+    double pickedLongitude =
+        _floor.location != null ? _floor.location!.coordinates[0] : -101.5382;
 
-  final result = await showDialog<Map<String, double>>(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        backgroundColor: Colors.white,
-        content: SingleChildScrollView(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxHeight: MediaQuery.of(context).size.height * 0.97,
-            ),
-            child: StatefulBuilder(
-              builder: (BuildContext context, StateSetter setState) {
-                return Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SizedBox(
-                      width: 1000,
-                      height: MediaQuery.of(context).size.height * 0.85,
-                      child: GoogleMapWidget(
-                        longitude: pickedLongitude,
-                        latitude: pickedLatitude,
-                        saveLocation: (pickedData) {
-                          setState(() {
-                            pickedLatitude = double.parse(pickedData.latitude.toStringAsFixed(4));
-                            pickedLongitude = double.parse(pickedData.longitude.toStringAsFixed(4));
-                          });
-                        },
-                        viewMode: true,
+    final result = await showDialog<Map<String, double>>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          content: SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.97,
+              ),
+              child: StatefulBuilder(
+                builder: (BuildContext context, StateSetter setState) {
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(
+                        width: 1000,
+                        height: MediaQuery.of(context).size.height * 0.85,
+                        child: GoogleMapWidget(
+                          longitude: pickedLongitude,
+                          latitude: pickedLatitude,
+                          saveLocation: (pickedData) {
+                            setState(() {
+                              pickedLatitude = double.parse(
+                                  pickedData.latitude.toStringAsFixed(4));
+                              pickedLongitude = double.parse(
+                                  pickedData.longitude.toStringAsFixed(4));
+                            });
+                          },
+                          viewMode: true,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Latitude: ${pickedLatitude.toStringAsFixed(4)}',
-                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                        ),
-                        const SizedBox(width: 5),
-                        Text(
-                          'Longitude: ${pickedLongitude.toStringAsFixed(4)}',
-                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                        ),
-                        const Spacer(),
-                        SecondaryButton(
-                          labelKey: 'Cancel',
-                          onPressed: () {
-                            Navigator.of(context).pop(); // Close without saving
-                          },
-                        ),
-                        SizedBox(width:5),
-                        PrimaryButton(
-                          labelKey: 'Select',
-                          onPressed: () {
-                            Navigator.of(context).pop({
-                              'latitude': pickedLatitude,
-                              'longitude': pickedLongitude,
-                            }); 
-                          },
-                        ),
-                      ],
-                    ),
-                  ],
-                );
-              },
+                      const SizedBox(height: 12),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Latitude: ${pickedLatitude.toStringAsFixed(4)}',
+                            style: const TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.w600),
+                          ),
+                          const SizedBox(width: 5),
+                          Text(
+                            'Longitude: ${pickedLongitude.toStringAsFixed(4)}',
+                            style: const TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.w600),
+                          ),
+                          const Spacer(),
+                          SecondaryButton(
+                            labelKey: 'Cancel',
+                            onPressed: () {
+                              Navigator.of(context)
+                                  .pop(); // Close without saving
+                            },
+                          ),
+                          SizedBox(width: 5),
+                          PrimaryButton(
+                            labelKey: 'Select',
+                            onPressed: () {
+                              Navigator.of(context).pop({
+                                'latitude': pickedLatitude,
+                                'longitude': pickedLongitude,
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  );
+                },
+              ),
             ),
           ),
-        ),
-      );
-    },
-  );
+        );
+      },
+    );
 
-  if (result != null) {
-    setState(() {
-      _floor = _floor.copyWith(
-        location: tapi.GeoLocation(coordinates: [
-          result['longitude']!,
-          result['latitude']!,
-        ]),
-      );
-    });
+    if (result != null) {
+      setState(() {
+        _floor = _floor.copyWith(
+          location: tapi.GeoLocation(coordinates: [
+            result['longitude']!,
+            result['latitude']!,
+          ]),
+        );
+      });
+    }
   }
-}
 
   @override
   void setup() {
