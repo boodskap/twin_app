@@ -139,7 +139,7 @@ class _AssetsState extends BaseState<Assets> {
                   textStyle: WidgetStatePropertyAll(theme.getStyle()),
                   hintStyle: WidgetStatePropertyAll(theme.getStyle()),
                   leading: Icon(Icons.search),
-                  hintText: 'Search assets',
+                  hintText: 'Search Assets',
                   onChanged: (val) {
                     _search = val.trim();
                     _load();
