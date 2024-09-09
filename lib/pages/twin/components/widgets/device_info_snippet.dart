@@ -4,6 +4,7 @@ import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/twinned_session.dart';
 import 'package:twin_commons/core/twin_image_helper.dart';
 import 'package:twinned_api/api/twinned.swagger.dart' as twin;
+import 'package:twin_app/core/session_variables.dart';
 
 class DeviceInfoSnippet extends StatefulWidget {
   final twin.Device device;
@@ -46,7 +47,7 @@ class _DeviceInfoSnippetState extends BaseState<DeviceInfoSnippet> {
               children: [
                 Text(
                   widget.device.deviceId,
-                  style: const TextStyle(
+                  style: theme.getStyle().copyWith(
                       fontWeight: FontWeight.bold,
                       fontSize: 14,
                       overflow: TextOverflow.ellipsis),
@@ -64,7 +65,7 @@ class _DeviceInfoSnippetState extends BaseState<DeviceInfoSnippet> {
             divider(),
             Text(
               'Model: $modelName',
-              style: const TextStyle(
+              style: theme.getStyle().copyWith(
                   fontSize: 14, overflow: TextOverflow.ellipsis),
             ),
             divider(),

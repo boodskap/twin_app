@@ -127,7 +127,7 @@ class _FacilitySnippetState extends BaseState<FacilitySnippet> {
                           ),
                         ),
                       ),
-                     divider(height: 15),
+                      divider(height: 15),
                       SizedBox(
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: LabelTextField(
@@ -214,9 +214,7 @@ class _FacilitySnippetState extends BaseState<FacilitySnippet> {
                           },
                         ),
                       ),
-                      const SizedBox(
-                        height: 15,
-                      ),
+                      divider(height: 15),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
@@ -420,7 +418,6 @@ class _FacilitySnippetState extends BaseState<FacilitySnippet> {
             apikey: TwinnedSession.instance.authToken, body: _facility);
         if (validateResponse(cRes)) {
           _close();
-
           alert('Success', 'Facility ${_facility.name} created!');
         }
       } else {
@@ -431,7 +428,8 @@ class _FacilitySnippetState extends BaseState<FacilitySnippet> {
         if (validateResponse(uRes)) {
           if (!silent) {
             _close();
-            alert('Success', 'Facility ${_facility.name} updated successfully!');
+            alert(
+                'Success', 'Facility ${_facility.name} updated successfully!');
           }
         }
       }
