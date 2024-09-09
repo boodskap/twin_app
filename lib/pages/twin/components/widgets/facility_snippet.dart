@@ -103,6 +103,7 @@ class _FacilitySnippetState extends BaseState<FacilitySnippet> {
                         child: LabelTextField(
                           label: 'Facility Name',
                           style: theme.getStyle(),
+                          labelTextStyle: theme.getStyle(),
                           controller: nameController,
                           focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
@@ -111,14 +112,13 @@ class _FacilitySnippetState extends BaseState<FacilitySnippet> {
                           ),
                         ),
                       ),
-                      const SizedBox(
-                        height: 15,
-                      ),
+                      divider(height: 15),
                       SizedBox(
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: LabelTextField(
                           label: 'Description',
                           style: theme.getStyle(),
+                          labelTextStyle: theme.getStyle(),
                           controller: descController,
                           focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
@@ -127,14 +127,13 @@ class _FacilitySnippetState extends BaseState<FacilitySnippet> {
                           ),
                         ),
                       ),
-                      const SizedBox(
-                        height: 15,
-                      ),
+                     divider(height: 15),
                       SizedBox(
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: LabelTextField(
                           label: 'Address',
                           style: theme.getStyle(),
+                          labelTextStyle: theme.getStyle(),
                           controller: addressController,
                           focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
@@ -144,14 +143,13 @@ class _FacilitySnippetState extends BaseState<FacilitySnippet> {
                           maxLines: 5,
                         ),
                       ),
-                      const SizedBox(
-                        height: 15,
-                      ),
+                      divider(height: 15),
                       SizedBox(
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: LabelTextField(
                           label: 'Email',
                           style: theme.getStyle(),
+                          labelTextStyle: theme.getStyle(),
                           controller: emailController,
                           focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
@@ -160,12 +158,12 @@ class _FacilitySnippetState extends BaseState<FacilitySnippet> {
                           ),
                         ),
                       ),
-                      const SizedBox(
-                        height: 15,
-                      ),
+                      divider(height: 15),
                       SizedBox(
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: IntlPhoneField(
+                          style: theme.getStyle(),
+                          dropdownTextStyle: theme.getStyle(),
                           controller: phoneController,
                           keyboardType: TextInputType.phone,
                           initialCountryCode: countryCode,
@@ -173,6 +171,9 @@ class _FacilitySnippetState extends BaseState<FacilitySnippet> {
                             FilteringTextInputFormatter.digitsOnly,
                           ],
                           decoration: InputDecoration(
+                            hintStyle: theme.getStyle(),
+                            labelStyle: theme.getStyle(),
+                            errorStyle: theme.getStyle(),
                             labelText: 'Enter Phone Number',
                             counterText: "",
                             border: OutlineInputBorder(
@@ -292,7 +293,7 @@ class _FacilitySnippetState extends BaseState<FacilitySnippet> {
                                   //         'No location selected',
                                   //         style: theme.getStyle(),
                                   //       )),
-                                         _facility.location != null
+                                  _facility.location != null
                                       ? GoogleMapWidget(
                                           longitude: _facility
                                               .location!.coordinates[0],
@@ -420,7 +421,7 @@ class _FacilitySnippetState extends BaseState<FacilitySnippet> {
         if (validateResponse(cRes)) {
           _close();
 
-          alert('Success', 'Facility ${_facility.name} created');
+          alert('Success', 'Facility ${_facility.name} created!');
         }
       } else {
         var uRes = await TwinnedSession.instance.twin.updateFacility(
@@ -430,7 +431,7 @@ class _FacilitySnippetState extends BaseState<FacilitySnippet> {
         if (validateResponse(uRes)) {
           if (!silent) {
             _close();
-            alert('Success', 'Facility ${_facility.name} updated successfully');
+            alert('Success', 'Facility ${_facility.name} updated successfully!');
           }
         }
       }
@@ -493,93 +494,102 @@ class _FacilitySnippetState extends BaseState<FacilitySnippet> {
   // }
 
   /// using google map
-Future<void> _showLocationDialog(BuildContext context) async {
-  double pickedLatitude = _facility.location != null ? _facility.location!.coordinates[1] : 39.6128;
-  double pickedLongitude = _facility.location != null ? _facility.location!.coordinates[0] : -101.5382;
+  Future<void> _showLocationDialog(BuildContext context) async {
+    double pickedLatitude = _facility.location != null
+        ? _facility.location!.coordinates[1]
+        : 39.6128;
+    double pickedLongitude = _facility.location != null
+        ? _facility.location!.coordinates[0]
+        : -101.5382;
 
-  final result = await showDialog<Map<String, double>>(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        backgroundColor: Colors.white,
-        content: SingleChildScrollView(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxHeight: MediaQuery.of(context).size.height * 0.97,
-            ),
-            child: StatefulBuilder(
-              builder: (BuildContext context, StateSetter setState) {
-                return Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SizedBox(
-                      width: 1000,
-                      height: MediaQuery.of(context).size.height * 0.85,
-                      child: GoogleMapWidget(
-                        longitude: pickedLongitude,
-                        latitude: pickedLatitude,
-                        saveLocation: (pickedData) {
-                          setState(() {
-                            pickedLatitude = double.parse(pickedData.latitude.toStringAsFixed(4));
-                            pickedLongitude = double.parse(pickedData.longitude.toStringAsFixed(4));
-                          });
-                        },
-                        viewMode: true,
+    final result = await showDialog<Map<String, double>>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          content: SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxHeight: MediaQuery.of(context).size.height * 0.97,
+              ),
+              child: StatefulBuilder(
+                builder: (BuildContext context, StateSetter setState) {
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(
+                        width: 1000,
+                        height: MediaQuery.of(context).size.height * 0.85,
+                        child: GoogleMapWidget(
+                          longitude: pickedLongitude,
+                          latitude: pickedLatitude,
+                          saveLocation: (pickedData) {
+                            setState(() {
+                              pickedLatitude = double.parse(
+                                  pickedData.latitude.toStringAsFixed(4));
+                              pickedLongitude = double.parse(
+                                  pickedData.longitude.toStringAsFixed(4));
+                            });
+                          },
+                          viewMode: true,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Latitude: ${pickedLatitude.toStringAsFixed(4)}',
-                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                        ),
-                        const SizedBox(width: 5),
-                        Text(
-                          'Longitude: ${pickedLongitude.toStringAsFixed(4)}',
-                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                        ),
-                        const Spacer(),
-                        SecondaryButton(
-                          labelKey: 'Cancel',
-                          onPressed: () {
-                            Navigator.of(context).pop(); // Close without saving
-                          },
-                        ),
-                        SizedBox(width:5),
-                        PrimaryButton(
-                          labelKey: 'Select',
-                          onPressed: () {
-                            Navigator.of(context).pop({
-                              'latitude': pickedLatitude,
-                              'longitude': pickedLongitude,
-                            }); 
-                          },
-                        ),
-                      ],
-                    ),
-                  ],
-                );
-              },
+                      const SizedBox(height: 12),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Latitude: ${pickedLatitude.toStringAsFixed(4)}',
+                            style: theme.getStyle().copyWith(
+                                fontSize: 16, fontWeight: FontWeight.w600),
+                          ),
+                          const SizedBox(width: 5),
+                          Text(
+                            'Longitude: ${pickedLongitude.toStringAsFixed(4)}',
+                            style: theme.getStyle().copyWith(
+                                fontSize: 16, fontWeight: FontWeight.w600),
+                          ),
+                          const Spacer(),
+                          SecondaryButton(
+                            labelKey: 'Cancel',
+                            onPressed: () {
+                              Navigator.of(context)
+                                  .pop(); // Close without saving
+                            },
+                          ),
+                          SizedBox(width: 5),
+                          PrimaryButton(
+                            labelKey: 'Select',
+                            onPressed: () {
+                              Navigator.of(context).pop({
+                                'latitude': pickedLatitude,
+                                'longitude': pickedLongitude,
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  );
+                },
+              ),
             ),
           ),
-        ),
-      );
-    },
-  );
+        );
+      },
+    );
 
-  if (result != null) {
-    setState(() {
-      _facility = _facility.copyWith(
-        location: tapi.GeoLocation(coordinates: [
-          result['longitude']!,
-          result['latitude']!,
-        ]),
-      );
-    });
+    if (result != null) {
+      setState(() {
+        _facility = _facility.copyWith(
+          location: tapi.GeoLocation(coordinates: [
+            result['longitude']!,
+            result['latitude']!,
+          ]),
+        );
+      });
+    }
   }
-}
 
   @override
   void setup() {}
