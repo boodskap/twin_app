@@ -22,6 +22,10 @@ import 'package:twin_app/pages/branding/fonts_colors.dart';
 import 'package:twin_app/pages/branding/landing_page.dart';
 import 'package:twin_app/pages/dashboard.dart';
 import 'package:twin_app/pages/nocode_builder.dart';
+import 'package:twin_app/pages/pulse/admin/manage_gateways.dart';
+import 'package:twin_app/pages/pulse/email.dart';
+import 'package:twin_app/pages/pulse/sms.dart';
+import 'package:twin_app/pages/pulse/voice.dart';
 import 'package:twin_app/pages/roles_page.dart';
 import 'package:twin_app/pages/twin/components.dart';
 import 'package:twin_app/pages/twin/organization_page.dart';
@@ -46,6 +50,7 @@ enum TwinAppMenu {
   twin,
   admin,
   billing,
+  pulse,
   twinComponents,
   twinNoCodeBuilder,
   twinFontsColors,
@@ -58,6 +63,10 @@ enum TwinAppMenu {
   billingInvoices,
   billingOrders,
   customDashboard,
+  pulseEmail,
+  pulseSms,
+  pulseVoice,
+  pulseGateway,
   ;
 }
 
@@ -759,6 +768,19 @@ class HomeScreenState extends BaseState<HomeScreen> {
           return SizedBox.shrink();
         },
       ),
+      session.TwinMenuItem(
+        text: 'Pulse',
+        id: TwinAppMenu.pulse,
+        icon: Icons.monitor_heart_rounded,
+        expanded: false,
+        subItems: _pulseSubMenuItems,
+        isMenuVisible: () {
+          return !session.smallScreen && session.isAdmin();
+        },
+        onMenuSelected: (ctx) async {
+          return SizedBox.shrink();
+        },
+      ),
     ];
   }
 
@@ -918,6 +940,59 @@ class HomeScreenState extends BaseState<HomeScreen> {
     ];
   }
 
+  List<session.TwinMenuItem> get _pulseSubMenuItems {
+    return [
+      session.TwinMenuItem(
+        id: TwinAppMenu.pulseEmail,
+        text: 'Email Logs',
+        icon: Icons.email,
+        bottomMenus: _pulseBottomMenus(),
+        isMenuVisible: () {
+          return session.isAdmin();
+        },
+        onMenuSelected: (BuildContext context) async {
+          return const EmailPage();
+        },
+      ),
+      session.TwinMenuItem(
+        id: TwinAppMenu.pulseSms,
+        text: 'SMS Logs',
+        icon: Icons.sms,
+        bottomMenus: _pulseBottomMenus(),
+        isMenuVisible: () {
+          return session.isAdmin();
+        },
+        onMenuSelected: (BuildContext context) async {
+          return const SmsPage();
+        },
+      ),
+      session.TwinMenuItem(
+        id: TwinAppMenu.pulseVoice,
+        text: 'Voicemail Logs',
+        icon: Icons.voicemail,
+        bottomMenus: _pulseBottomMenus(),
+        isMenuVisible: () {
+          return session.isAdmin();
+        },
+        onMenuSelected: (BuildContext context) async {
+          return const VoicePage();
+        },
+      ),
+      session.TwinMenuItem(
+        id: TwinAppMenu.pulseGateway,
+        text: 'Gateways',
+        icon: Icons.settings,
+        bottomMenus: _pulseBottomMenus(),
+        isMenuVisible: () {
+          return session.isAdmin();
+        },
+        onMenuSelected: (BuildContext context) async {
+          return const ManageGateways();
+        },
+      ),
+    ];
+  }
+
   List<BottomMenuItem> _adminBottomMenus() {
     return [
       const BottomMenuItem(
@@ -990,6 +1065,31 @@ class HomeScreenState extends BaseState<HomeScreen> {
           icon: Icon(Icons.business, size: 30),
           label: 'Organization',
         ),
+    ];
+  }
+
+  List<BottomMenuItem> _pulseBottomMenus() {
+    return [
+      const BottomMenuItem(
+        id: TwinAppMenu.pulseEmail,
+        icon: Icon(Icons.email, size: 30),
+        label: 'Email',
+      ),
+      const BottomMenuItem(
+        id: TwinAppMenu.pulseSms,
+        icon: Icon(Icons.sms, size: 30),
+        label: 'SMS',
+      ),
+      const BottomMenuItem(
+        id: TwinAppMenu.pulseVoice,
+        icon: Icon(Icons.voicemail, size: 30),
+        label: 'Voice',
+      ),
+      const BottomMenuItem(
+        id: TwinAppMenu.pulseGateway,
+        icon: Icon(Icons.settings, size: 30),
+        label: 'Gateway',
+      ),
     ];
   }
 

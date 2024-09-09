@@ -245,12 +245,11 @@ class _DeviceContentPageState extends BaseState<DeviceContentPage> {
     if (loading) return;
     loading = true;
     try {
-      dynamic res = await TwinnedSession.instance
-        ..twin.cleanupData(
-          apikey: TwinnedSession.instance.authToken,
-          modelId: widget.deviceModel.id,
-          deviceId: widget.device!.id,
-        );
+      dynamic res = await TwinnedSession.instance.twin.cleanupData(
+        apikey: TwinnedSession.instance.authToken,
+        modelId: widget.deviceModel.id,
+        deviceId: widget.device!.id,
+      );
       if (validateResponse(res)) {
         Navigator.pop(context);
         alert(widget.device!.name, "All data wiped out successfully!");
