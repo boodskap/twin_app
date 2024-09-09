@@ -98,6 +98,7 @@ class _ConfigChildPaletteState extends BaseState<ConfigChildPalette> {
                       width: MediaQuery.of(context).size.width - 200,
                       height: MediaQuery.of(context).size.height - 150,
                       body: TwinnedConfigBuilder(
+                          style: theme.getStyle(),
                           verbose: debug,
                           config: widgetConfig,
                           parameters: config,
@@ -175,7 +176,7 @@ class _ConfigChildPaletteState extends BaseState<ConfigChildPalette> {
               'Background Color',
               style: theme.getStyle().copyWith(
                   color: Colors.black,
-                  fontSize: 12,
+                  fontSize: 13,
                   fontWeight: FontWeight.bold),
             ),
             IconButton(
@@ -199,7 +200,7 @@ class _ConfigChildPaletteState extends BaseState<ConfigChildPalette> {
               'Widget Width',
               style: theme.getStyle().copyWith(
                   color: Colors.black,
-                  fontSize: 12,
+                  fontSize: 13,
                   fontWeight: FontWeight.bold),
             ),
             SizedBox(
@@ -232,7 +233,7 @@ class _ConfigChildPaletteState extends BaseState<ConfigChildPalette> {
               'Widget Height',
               style: theme.getStyle().copyWith(
                   color: Colors.black,
-                  fontSize: 12,
+                  fontSize: 13,
                   fontWeight: FontWeight.bold),
             ),
             SizedBox(
@@ -265,7 +266,7 @@ class _ConfigChildPaletteState extends BaseState<ConfigChildPalette> {
               'Set Expanded',
               style: theme.getStyle().copyWith(
                   color: Colors.black,
-                  fontSize: 12,
+                  fontSize: 13,
                   fontWeight: FontWeight.bold),
             ),
             Checkbox(
@@ -290,7 +291,7 @@ class _ConfigChildPaletteState extends BaseState<ConfigChildPalette> {
                 'Flex',
                 style: theme.getStyle().copyWith(
                     color: Colors.black,
-                    fontSize: 12,
+                    fontSize: 13,
                     fontWeight: FontWeight.bold),
               ),
               SizedBox(
@@ -323,7 +324,7 @@ class _ConfigChildPaletteState extends BaseState<ConfigChildPalette> {
               'Alignment',
               style: theme.getStyle().copyWith(
                   color: Colors.black,
-                  fontSize: 12,
+                  fontSize: 13,
                   fontWeight: FontWeight.bold),
             ),
             DropdownButton<AlignmentConfig>(

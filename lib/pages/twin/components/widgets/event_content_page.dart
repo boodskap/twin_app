@@ -92,17 +92,25 @@ class _DigitalTwinEventContentPageState
     }
 
     EventInfo body = EventInfo(
-        name: name,
-        description: description,
-        tags: tags.split(' '),
-        modelId: widget.entity.modelId,
-        conditions: widget.entity.conditions,
-        notificationTemplate: _notificationTemplate,
-        emailTemplate: _emailTemplate,
-        fcmTemplate: _fcmTemplate,
-        roles: widget.entity.roles,
-        smsTemplate: _smsTemplate,
-        voiceTemplate: _voiceTemplate);
+      name: name,
+      description: description,
+      tags: tags.split(' '),
+      modelId: widget.entity.modelId,
+      conditions: widget.entity.conditions,
+      notificationTemplate: _notificationTemplate,
+      emailTemplate: _emailTemplate,
+      fcmTemplate: _fcmTemplate,
+      roles: widget.entity.roles,
+      smsTemplate: _smsTemplate,
+      voiceTemplate: _voiceTemplate,
+      icon: widget.entity.icon,
+      assetId: widget.entity.assetId,
+      clientIds: widget.entity.clientIds,
+      deviceId: widget.entity.deviceId,
+      facilityId: widget.entity.facilityId,
+      floorId: widget.entity.floorId,
+      premiseId: widget.entity.premiseId,
+    );
 
     await execute(() async {
       var res = await TwinnedSession.instance.twin.updateEvent(

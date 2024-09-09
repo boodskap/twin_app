@@ -94,7 +94,7 @@ class _ConfigRowPaletteState extends BaseState<ConfigRowPalette> {
               'Child Spacing',
               style: theme.getStyle().copyWith(
                   color: Colors.black,
-                  fontSize: 12,
+                  fontSize: 13,
                   fontWeight: FontWeight.bold),
             ),
             SizedBox(
@@ -126,7 +126,7 @@ class _ConfigRowPaletteState extends BaseState<ConfigRowPalette> {
               'Background Color',
               style: theme.getStyle().copyWith(
                   color: Colors.black,
-                  fontSize: 12,
+                  fontSize: 13,
                   fontWeight: FontWeight.bold),
             ),
             IconButton(
@@ -150,7 +150,7 @@ class _ConfigRowPaletteState extends BaseState<ConfigRowPalette> {
               'Row Height',
               style: theme.getStyle().copyWith(
                   color: Colors.black,
-                  fontSize: 12,
+                  fontSize: 13,
                   fontWeight: FontWeight.bold),
             ),
             SizedBox(
@@ -182,7 +182,7 @@ class _ConfigRowPaletteState extends BaseState<ConfigRowPalette> {
               'Main Axis Alignment',
               style: theme.getStyle().copyWith(
                   color: Colors.black,
-                  fontSize: 12,
+                  fontSize: 13,
                   fontWeight: FontWeight.bold),
             ),
             DropdownMenu<MainAxisAlignment>(
@@ -241,7 +241,7 @@ class _ConfigRowPaletteState extends BaseState<ConfigRowPalette> {
               'Cross Axis Alignment',
               style: theme.getStyle().copyWith(
                   color: Colors.black,
-                  fontSize: 12,
+                  fontSize: 13,
                   fontWeight: FontWeight.bold),
             ),
             DropdownMenu<CrossAxisAlignment>(
@@ -295,7 +295,7 @@ class _ConfigRowPaletteState extends BaseState<ConfigRowPalette> {
               'Main Axis Size',
               style: theme.getStyle().copyWith(
                   color: Colors.black,
-                  fontSize: 12,
+                  fontSize: 13,
                   fontWeight: FontWeight.bold),
             ),
             DropdownMenu<MainAxisSize>(
@@ -333,7 +333,7 @@ class _ConfigRowPaletteState extends BaseState<ConfigRowPalette> {
               'Scroll Direction',
               style: theme.getStyle().copyWith(
                   color: Colors.black,
-                  fontSize: 12,
+                  fontSize: 13,
                   fontWeight: FontWeight.bold),
             ),
             DropdownMenu<String>(
