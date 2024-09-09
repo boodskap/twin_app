@@ -56,6 +56,7 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
           onDoubleTap: () async {
             if (editable) {
               await alertDialog(
+                titleStyle: theme.getStyle().copyWith(fontSize: 20),
                 title: 'Generic Filter - ${group.name}',
                 body: FieldFilterSnippet(
                   fieldFilter: group,
@@ -411,7 +412,7 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
         if (validateResponse(res)) {
           await _load();
           alert(
-              'DataFilter ${res.body!.entity!.name} ', 'created successfully');
+              'DataFilter ${res.body!.entity!.name} ', 'created successfully!');
         }
       });
     });
@@ -421,7 +422,11 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
 
   Future<void> _addNewField() async {
     await alertDialog(
-        title: 'New Generic Filter', body: const FieldFilterSnippet());
+        titleStyle: theme
+            .getStyle()
+            .copyWith(fontSize: 20, fontWeight: FontWeight.bold),
+        title: 'New Generic Filter',
+        body: const FieldFilterSnippet());
     _loadFieldFilters();
   }
 
@@ -433,7 +438,7 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
         message:
             'Deleting is unrecoverable\nIt may also delete all the related models and components\n\nDo you want to proceed?',
         titleStyle: theme.getStyle().copyWith(color: Colors.red),
-        messageStyle: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
+        messageStyle: theme.getStyle(),
         onPressed: () async {
           await execute(() async {
             int index =
@@ -461,7 +466,7 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
         message:
             'Deleting is unrecoverable\nIt may also delete all the related models  and components\n\nDo you want to proceed?',
         titleStyle: theme.getStyle().copyWith(color: Colors.red),
-        messageStyle: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
+        messageStyle: theme.getStyle(),
         onPressed: () async {
           await execute(() async {
             int index =
@@ -503,6 +508,9 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
         barrierDismissible: false,
         builder: (context) {
           return AlertDialog(
+            titleTextStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 20, fontWeight: FontWeight.bold),
             title: Text(title),
             content: SizedBox(
               width: 500,
@@ -599,7 +607,7 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
 
         if (validateResponse(rRes)) {
           await _loadDataFilters();
-          alert('Filter ${rRes.body!.entity!.name} ', 'updated successfully');
+          alert('Filter ${rRes.body!.entity!.name} ', 'updated successfully!');
         }
       }
     });
@@ -634,7 +642,7 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
 
         if (validateResponse(rRes)) {
           await _loadFieldFilters();
-          alert('Filter ${rRes.body!.entity!.name} ', 'Updated successfully');
+          alert('Filter ${rRes.body!.entity!.name} ', 'Updated successfully!');
         }
       }
     });
@@ -710,7 +718,7 @@ class _AssetFilterContentState extends BaseState<AssetFilterContent> {
           ));
       if (validateResponse(res)) {
         await alert(
-            'Data Filter - ${widget.filter.name}', 'Saved successfully');
+            'Data Filter - ${widget.filter.name}', 'Saved successfully!');
         _close();
       }
     });
@@ -880,6 +888,9 @@ class _MatchGroupFilterWidgetState extends BaseState<_MatchGroupFilterWidget> {
         title: 'Confirm',
         message:
             'Deleting is non recoverable, are you sure you want to proceed?',
+        titleStyle: theme.getStyle().copyWith(
+            color: Colors.red, fontSize: 20, fontWeight: FontWeight.bold),
+        messageStyle: theme.getStyle(),
         onPressed: () async {
           widget.parent.setState(() {
             widget.filter.matchGroups.removeAt(widget.index);
@@ -910,36 +921,39 @@ class _MatchGroupFilterWidgetState extends BaseState<_MatchGroupFilterWidget> {
                   color: Colors.white,
                   child: Column(
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          divider(),
-                          if (_conditions.isNotEmpty)
-                            DropdownMenu<twinned.Condition>(
-                              initialSelection: selectedConition,
-                              dropdownMenuEntries: _conditions,
-                              enableSearch: true,
-                              onSelected: (condition) {
-                                setState(() {
-                                  selectedConition = condition;
-                                });
-                              },
-                            ),
-                          if (_conditions.isEmpty)
-                            Text('No condition found', style: theme.getStyle()),
-                          divider(horizontal: true),
-                          if (_conditions.isNotEmpty &&
-                              null != selectedConition &&
-                              !widget.filter.matchGroups[widget.index]
-                                  .conditionIds!
-                                  .contains(selectedConition!.id))
-                            IconButton(
-                                onPressed: () {
-                                  _addCondition();
+                      Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            divider(),
+                            if (_conditions.isNotEmpty)
+                              DropdownMenu<twinned.Condition>(
+                                initialSelection: selectedConition,
+                                dropdownMenuEntries: _conditions,
+                                enableSearch: true,
+                                onSelected: (condition) {
+                                  setState(() {
+                                    selectedConition = condition;
+                                  });
                                 },
-                                icon: const Icon(Icons.add_box)),
-                        ],
+                              ),
+                            if (_conditions.isEmpty)
+                              Text('No condition found', style: theme.getStyle()),
+                            divider(horizontal: true),
+                            if (_conditions.isNotEmpty &&
+                                null != selectedConition &&
+                                !widget.filter.matchGroups[widget.index]
+                                    .conditionIds!
+                                    .contains(selectedConition!.id))
+                              IconButton(
+                                  onPressed: () {
+                                    _addCondition();
+                                  },
+                                  icon: const Icon(Icons.add_box)),
+                          ],
+                        ),
                       ),
                       divider(),
                       Wrap(
