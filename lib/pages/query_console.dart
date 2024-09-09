@@ -21,7 +21,7 @@ class QueryConsole extends StatefulWidget {
 
 class _QueryConsoleState extends BaseState<QueryConsole> {
   bool isMsgSelected = false;
-  String protocolType = 'POST';
+  GenericQueryReqProtocol protocolType = GenericQueryReqProtocol.post;
   String extraPathType = '/_search';
   Object queryObject = {};
   String jsonStringData = '{}';
@@ -29,6 +29,7 @@ class _QueryConsoleState extends BaseState<QueryConsole> {
   TextEditingController _searchController =
       TextEditingController(text: '/_search');
   bool apiLoadingStatus = false;
+  bool validQuery = false;
   @override
   void initState() {
     super.initState();
@@ -73,18 +74,24 @@ class _QueryConsoleState extends BaseState<QueryConsole> {
                       SizedBox(
                         width: 120,
                         height: 42,
-                        child: DropdownButtonFormField2<String>(
+                        child:
+                            DropdownButtonFormField2<GenericQueryReqProtocol>(
                           value: protocolType,
                           isExpanded: true,
                           onChanged: (newValue) {
                             setState(() {
-                              protocolType = newValue!;
+                              protocolType =
+                                  newValue ?? GenericQueryReqProtocol.post;
                             });
                           },
-                          items: <String>['POST', 'GET', 'DELETE']
-                              .map((String value) {
-                            return DropdownMenuItem<String>(
-                                value: value, child: Text(value));
+                          items: <GenericQueryReqProtocol>[
+                            GenericQueryReqProtocol.post,
+                            GenericQueryReqProtocol.$get,
+                            GenericQueryReqProtocol.put
+                          ].map((GenericQueryReqProtocol value) {
+                            return DropdownMenuItem<GenericQueryReqProtocol>(
+                                value: value,
+                                child: Text(value.value ?? value.name));
                           }).toList(),
                           decoration: const InputDecoration(
                               contentPadding:
@@ -101,9 +108,8 @@ class _QueryConsoleState extends BaseState<QueryConsole> {
                               radius: const Radius.circular(40),
                             ),
                           ),
-                          validator: (value) => value == null || value.isEmpty
-                              ? 'Please select a type'
-                              : null,
+                          validator: (value) =>
+                              value == null ? 'Please select a type' : null,
                         ),
                       ),
                       hdivider,
@@ -132,7 +138,7 @@ class _QueryConsoleState extends BaseState<QueryConsole> {
                   hdivider,
                   PrimaryButton(
                     labelKey: apiLoadingStatus ? "Executing..." : "Execute",
-                    onPressed: apiLoadingStatus
+                    onPressed: (apiLoadingStatus || !validQuery)
                         ? null
                         : () {
                             if (queryObject is! Map<String, dynamic> ||
@@ -155,6 +161,12 @@ class _QueryConsoleState extends BaseState<QueryConsole> {
               onQueryChanged: (String value) {
                 setState(() {
                   queryObject = jsonDecode(value) as Map<String, dynamic>;
+                  validQuery = true;
+                });
+              },
+              isValidQuery: (bool valid) {
+                setState(() {
+                  validQuery = valid;
                 });
               },
               jsonStringData: jsonStringData,
@@ -176,10 +188,13 @@ class _QueryConsoleState extends BaseState<QueryConsole> {
           eql: GenericQueryReq(
               eql: queryObject,
               isMessage: isMsgSelected,
+              protocol: protocolType,
               extraPath: extraPathType));
-      if (validateResponse(cRes)) {
+      if (validateResponse(cRes, shouldAlert: false)) {
         var result = cRes.body!.result;
         jsonStringData = jsonEncode(result);
+      } else {
+        jsonStringData = cRes.bodyString;
       }
     });
 
@@ -193,7 +208,7 @@ class _QueryConsoleState extends BaseState<QueryConsole> {
       _queryController.text = '';
       jsonStringData = '{}';
       isMsgSelected = false;
-      protocolType = 'POST';
+      protocolType = GenericQueryReqProtocol.post;
       _searchController.text = '/_search';
       queryObject = '';
     });
@@ -212,19 +227,19 @@ class _QueryConsoleState extends BaseState<QueryConsole> {
 
 class QueryContentSection extends StatefulWidget {
   final ValueChanged<String> onQueryChanged;
+  final ValueChanged<bool> isValidQuery;
   final String jsonStringData;
   final TextEditingController queryController;
 
   QueryContentSection({
     required this.onQueryChanged,
+    required this.isValidQuery,
     required this.jsonStringData,
     required this.queryController,
   });
   @override
   QueryContentSectionState createState() => QueryContentSectionState();
 }
-
-
 
 class QueryContentSectionState extends BaseState<QueryContentSection> {
   late TextEditingController _controller;
@@ -239,111 +254,118 @@ class QueryContentSectionState extends BaseState<QueryContentSection> {
     );
   }
 
-
   void _copyPrettyJsonToClipboard() {
-  try {
-    var jsonObject = jsonDecode(widget.jsonStringData);
-    var prettyJson = JsonEncoder.withIndent('  ').convert(jsonObject);
-    Clipboard.setData(ClipboardData(text: prettyJson));
-  
-    setState(() {
-      _showCopiedText = true;
-    });
+    try {
+      var jsonObject = jsonDecode(widget.jsonStringData);
+      var prettyJson = JsonEncoder.withIndent('  ').convert(jsonObject);
+      Clipboard.setData(ClipboardData(text: prettyJson));
 
-    Future.delayed(Duration(seconds: 2), () {
       setState(() {
-        _showCopiedText = false;
+        _showCopiedText = true;
       });
-    });
-  } catch (e) {
-    // ScaffoldMessenger.of(context).showSnackBar(
-    //   SnackBar(content: Text('Failed to copy: Invalid JSON format')),
-    // );
+
+      Future.delayed(Duration(seconds: 2), () {
+        setState(() {
+          _showCopiedText = false;
+        });
+      });
+    } catch (e) {
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(content: Text('Failed to copy: Invalid JSON format')),
+      // );
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(10),
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: 5),
-            TextField(
-              controller: widget.queryController,
-              maxLines: null,
-              minLines: 4,
-              keyboardType: TextInputType.multiline,
-              decoration: InputDecoration(
-                labelText: 'Query',
-                border: OutlineInputBorder(),
-              ),
-              onChanged: (String value) {
-                widget.onQueryChanged(value);
-              },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(height: 5),
+          TextField(
+            controller: widget.queryController,
+            maxLines: null,
+            minLines: 8,
+            keyboardType: TextInputType.multiline,
+            decoration: InputDecoration(
+              labelText: 'Query',
+              border: OutlineInputBorder(),
             ),
-            divider(),
-            Stack(
+            onChanged: (value) {
+              try {
+                jsonDecode(value);
+                widget.onQueryChanged(value);
+              } catch (e, s) {
+                widget.isValidQuery(false);
+              }
+            },
+          ),
+          divider(),
+          Flexible(
+            child: Stack(
               children: [
                 Padding(
                   padding: const EdgeInsets.only(top: 10),
                   child: Container(
                     constraints: BoxConstraints(
-                      minHeight: MediaQuery.of(context).size.height*0.6,
+                      minHeight: MediaQuery.of(context).size.height * 0.6,
                     ),
-                    child: JsonView.string(
-                      widget.jsonStringData,
-                      theme: JsonViewTheme(
-                        keyStyle: TextStyle(
-                            color: Colors.white, fontSize: jsonTextFontSize),
-                        doubleStyle: TextStyle(
-                            color: Colors.red, fontSize: jsonTextFontSize),
-                        intStyle: TextStyle(
-                            color: Colors.red, fontSize: jsonTextFontSize),
-                        boolStyle: TextStyle(
-                            color: Colors.orange, fontSize: jsonTextFontSize),
-                        stringStyle: TextStyle(
-                            color: Colors.green, fontSize: jsonTextFontSize),
-                        viewType: JsonViewType.collapsible,
+                    child: SingleChildScrollView(
+                      child: JsonView.string(
+                        widget.jsonStringData,
+                        theme: JsonViewTheme(
+                          keyStyle: TextStyle(
+                              color: Colors.white, fontSize: jsonTextFontSize),
+                          doubleStyle: TextStyle(
+                              color: Colors.red, fontSize: jsonTextFontSize),
+                          intStyle: TextStyle(
+                              color: Colors.red, fontSize: jsonTextFontSize),
+                          boolStyle: TextStyle(
+                              color: Colors.orange, fontSize: jsonTextFontSize),
+                          stringStyle: TextStyle(
+                              color: Colors.green, fontSize: jsonTextFontSize),
+                          viewType: JsonViewType.base,
+                        ),
                       ),
                     ),
                   ),
                 ),
-                if(widget.jsonStringData!=""&&widget.jsonStringData!='{}'&& widget.jsonStringData.isNotEmpty)
-                
-                Positioned(
-                  top: 10,
-                  right: 5,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Tooltip(
-                        message: 'Copy Result',
-                        child: IconButton(
-                          icon: Icon(Icons.copy, color: Colors.white),
-                          onPressed: _copyPrettyJsonToClipboard,
-                        ),
-                      ),
-                      if (_showCopiedText)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 5),
-                          child: Text(
-                            'Copied',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 13,
-                            ),
+                if (widget.jsonStringData != "" &&
+                    widget.jsonStringData != '{}' &&
+                    widget.jsonStringData.isNotEmpty)
+                  Positioned(
+                    top: 10,
+                    right: 5,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Tooltip(
+                          message: 'Copy Result',
+                          child: IconButton(
+                            icon: Icon(Icons.copy, color: Colors.white),
+                            onPressed: _copyPrettyJsonToClipboard,
                           ),
                         ),
-                    ],
+                        if (_showCopiedText)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 5),
+                            child: Text(
+                              'Copied',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
-                ),
               ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
