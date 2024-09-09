@@ -255,6 +255,8 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
 
   Future _delete() async {
     await confirm(
+        titleStyle: theme.getStyle().copyWith(color: Colors.red, fontSize: 20),
+        messageStyle: theme.getStyle(),
         title: 'Are you sure?',
         message: 'you want to delete this image?',
         onPressed: () async {
@@ -286,6 +288,37 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
           });
         });
   }
+
+  String _getSearchHint(InfraType type) {
+    switch (type) {
+      case InfraType.premise:
+        return 'Search Facilities';
+      case InfraType.facility:
+        return 'Search Floors';
+      case InfraType.floor:
+        return 'Search Assets';
+      case InfraType.asset:
+        return 'Search Devices';
+      default:
+        return 'Search';
+    }
+  }
+
+  String _getLabelName(InfraType type) {
+  switch (type) {
+    case InfraType.premise:
+      return 'Premise Name';
+    case InfraType.facility:
+      return 'Facility Name';
+    case InfraType.floor:
+      return 'Floor Name';
+    case InfraType.asset:
+      return 'Asset Name';
+    default:
+      return 'Name';
+  }
+}
+
 
   // Future<void> _pickLocation() async {
   //   return showDialog(
@@ -358,13 +391,13 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
                         children: [
                           Text(
                             'Latitude: ${pickedLatitude.toStringAsFixed(4)}',
-                            style: const TextStyle(
+                            style: theme.getStyle().copyWith(
                                 fontSize: 16, fontWeight: FontWeight.w600),
                           ),
                           const SizedBox(width: 5),
                           Text(
                             'Longitude: ${pickedLongitude.toStringAsFixed(4)}',
-                            style: const TextStyle(
+                            style: theme.getStyle().copyWith(
                                 fontSize: 16, fontWeight: FontWeight.w600),
                           ),
                           const Spacer(),
@@ -673,6 +706,8 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
 
       if (validateResponse(res)) {
         _close();
+        alert(
+            'Success', 'Premise ${res.body!.entity!.name} saved successfully!');
       }
     });
   }
@@ -695,6 +730,8 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
 
       if (validateResponse(res)) {
         _close();
+        alert('Success',
+            'Facility ${res.body!.entity!.name} saved successfully!');
       }
     });
   }
@@ -781,7 +818,7 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
                 child: LabelTextField(
                   style: theme.getStyle(),
                   labelTextStyle: theme.getStyle(),
-                  label: 'Premise Name',
+                  label: _getLabelName(widget.type),
                   controller: _name,
                 ),
               ),
@@ -973,6 +1010,14 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
                                                   .size
                                                   .width,
                                               child: SearchBar(
+                                                  hintText: _getSearchHint(
+                                                      widget.type),
+                                                  hintStyle:
+                                                      WidgetStatePropertyAll(
+                                                          theme.getStyle()),
+                                                  textStyle:
+                                                      WidgetStatePropertyAll(
+                                                          theme.getStyle()),
                                                   leading:
                                                       const Icon(Icons.search),
                                                   onChanged: (value) async {

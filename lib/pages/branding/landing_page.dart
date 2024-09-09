@@ -95,10 +95,8 @@ class _LandingContentPageState extends BaseState<LandingContentPage> {
                         onPressed: () {
                           confirmDeletion(context, landingPage);
                         },
-                        icon: const Icon(
-                          Icons.delete,
-                          color: Colors.black,
-                        ),
+                        icon:
+                            Icon(Icons.delete, color: theme.getPrimaryColor()),
                       ),
                     ),
                   ],

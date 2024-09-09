@@ -149,7 +149,6 @@ class _DisplayContentStatePageState extends BaseState<DisplayContentStatePage> {
           color: Colors.transparent,
           elevation: 5,
           child: Container(
-            //justtt_dumb_
             height: 250,
             width: MediaQuery.of(context).size.width,
             margin: const EdgeInsets.all(5),
@@ -162,22 +161,6 @@ class _DisplayContentStatePageState extends BaseState<DisplayContentStatePage> {
                 borderRadius: const BorderRadius.all(Radius.circular(20))),
             child: Stack(
               children: [
-                // Positioned(
-                //   top: 40,
-                //   left: 30,
-                //   bottom: 30,
-                //   right: 30,
-                //   child: Container(
-                //       height: 64,
-                //       width: 64,
-                //       decoration: BoxDecoration(
-                //         borderRadius: BorderRadius.circular(10),
-                //         image: DecorationImage(
-                //           image: image,
-                //           fit: BoxFit.cover,
-                //         ),
-                //       )),
-                // ),
                 Row(
                   children: [
                     Expanded(
@@ -190,15 +173,18 @@ class _DisplayContentStatePageState extends BaseState<DisplayContentStatePage> {
                     ),
                     Expanded(
                       flex: 1,
-                      child: IconButton(
-                        alignment: Alignment.centerRight,
-                        padding: EdgeInsets.zero,
-                        onPressed: () {
-                          confirmDeletion(context, stateIndex);
-                        },
-                        icon: Icon(
-                          Icons.delete,
-                          color: theme.getPrimaryColor(),
+                      child: Tooltip(
+                        message: 'Delete State ${stateIndex + 1}',
+                        child: IconButton(
+                          alignment: Alignment.centerRight,
+                          padding: EdgeInsets.zero,
+                          onPressed: () {
+                            confirmDeletion(context, stateIndex);
+                          },
+                          icon: Icon(
+                            Icons.delete,
+                            color: theme.getPrimaryColor(),
+                          ),
                         ),
                       ),
                     ),
@@ -245,7 +231,7 @@ class _DisplayContentStatePageState extends BaseState<DisplayContentStatePage> {
       ),
       content: Text(
         "Deleting a display state can not be undone.\nYou will loose all of the display state data, history, etc.\n\nAre you sure you want to delete?",
-        style: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
+        style: theme.getStyle(),
         maxLines: 10,
       ),
       actions: [

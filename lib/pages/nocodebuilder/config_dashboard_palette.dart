@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:twin_app/pages/nocodebuilder/foldable_card.dart';
+
 import 'package:twinned_api/twinned_api.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:twin_commons/core/base_state.dart';
@@ -48,8 +49,10 @@ class _ConfigDashboardPaletteState extends BaseState<ConfigDashboardPalette> {
   Widget build(BuildContext context) {
     return FoldableCard(
       title: 'Dashboard Properties',
-      headerStyle: theme.getStyle().copyWith(fontSize: 18, fontWeight: FontWeight.bold),
-      labelStyle: theme.getStyle().copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+      headerStyle:
+          theme.getStyle().copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+      labelStyle:
+          theme.getStyle().copyWith(fontSize: 18, fontWeight: FontWeight.bold),
       collapsed: collapsed,
       children: [
         Row(
@@ -67,6 +70,7 @@ class _ConfigDashboardPaletteState extends BaseState<ConfigDashboardPalette> {
               height: 35,
               child: IntrinsicWidth(
                 child: SpinBox(
+                  textStyle: theme.getStyle(),
                   min: 0.0,
                   max: 500,
                   value: _screen.spacing ?? 10,
@@ -119,6 +123,7 @@ class _ConfigDashboardPaletteState extends BaseState<ConfigDashboardPalette> {
                   fontWeight: FontWeight.bold),
             ),
             DropdownMenu<MainAxisAlignment>(
+                textStyle: theme.getStyle(),
                 initialSelection: MainAxisAlignment.values.byName(
                     _screen.mainAxisAlignment ?? MainAxisAlignment.start.name),
                 inputDecorationTheme: dropdownDecoration,
@@ -130,20 +135,35 @@ class _ConfigDashboardPaletteState extends BaseState<ConfigDashboardPalette> {
                   });
                   widget.onDashboardScreenSaved(_screen);
                 },
-                dropdownMenuEntries: const [
+                dropdownMenuEntries: [
                   DropdownMenuEntry<MainAxisAlignment>(
-                      value: MainAxisAlignment.start, label: 'Start'),
+                      style: ButtonStyle(
+                          textStyle: WidgetStatePropertyAll(theme.getStyle())),
+                      value: MainAxisAlignment.start,
+                      label: 'Start'),
                   DropdownMenuEntry<MainAxisAlignment>(
-                      value: MainAxisAlignment.center, label: 'Center'),
+                      style: ButtonStyle(
+                          textStyle: WidgetStatePropertyAll(theme.getStyle())),
+                      value: MainAxisAlignment.center,
+                      label: 'Center'),
                   DropdownMenuEntry<MainAxisAlignment>(
-                      value: MainAxisAlignment.end, label: 'End'),
+                      style: ButtonStyle(
+                          textStyle: WidgetStatePropertyAll(theme.getStyle())),
+                      value: MainAxisAlignment.end,
+                      label: 'End'),
                   DropdownMenuEntry<MainAxisAlignment>(
+                      style: ButtonStyle(
+                          textStyle: WidgetStatePropertyAll(theme.getStyle())),
                       value: MainAxisAlignment.spaceEvenly,
                       label: 'Space Evenly'),
                   DropdownMenuEntry<MainAxisAlignment>(
+                      style: ButtonStyle(
+                          textStyle: WidgetStatePropertyAll(theme.getStyle())),
                       value: MainAxisAlignment.spaceBetween,
                       label: 'Space Between'),
                   DropdownMenuEntry<MainAxisAlignment>(
+                      style: ButtonStyle(
+                          textStyle: WidgetStatePropertyAll(theme.getStyle())),
                       value: MainAxisAlignment.spaceAround,
                       label: 'Space Around'),
                 ]),
@@ -162,6 +182,7 @@ class _ConfigDashboardPaletteState extends BaseState<ConfigDashboardPalette> {
                   fontWeight: FontWeight.bold),
             ),
             DropdownMenu<CrossAxisAlignment>(
+                textStyle: theme.getStyle(),
                 initialSelection: CrossAxisAlignment.values.byName(
                     _screen.crossAxisAlignment ??
                         CrossAxisAlignment.start.name),
@@ -174,15 +195,27 @@ class _ConfigDashboardPaletteState extends BaseState<ConfigDashboardPalette> {
                   });
                   widget.onDashboardScreenSaved(_screen);
                 },
-                dropdownMenuEntries: const [
+                dropdownMenuEntries: [
                   DropdownMenuEntry<CrossAxisAlignment>(
-                      value: CrossAxisAlignment.start, label: 'Start'),
+                      style: ButtonStyle(
+                          textStyle: WidgetStatePropertyAll(theme.getStyle())),
+                      value: CrossAxisAlignment.start,
+                      label: 'Start'),
                   DropdownMenuEntry<CrossAxisAlignment>(
-                      value: CrossAxisAlignment.center, label: 'Center'),
+                      style: ButtonStyle(
+                          textStyle: WidgetStatePropertyAll(theme.getStyle())),
+                      value: CrossAxisAlignment.center,
+                      label: 'Center'),
                   DropdownMenuEntry<CrossAxisAlignment>(
-                      value: CrossAxisAlignment.end, label: 'End'),
+                      style: ButtonStyle(
+                          textStyle: WidgetStatePropertyAll(theme.getStyle())),
+                      value: CrossAxisAlignment.end,
+                      label: 'End'),
                   DropdownMenuEntry<CrossAxisAlignment>(
-                      value: CrossAxisAlignment.stretch, label: 'Stretch'),
+                      style: ButtonStyle(
+                          textStyle: WidgetStatePropertyAll(theme.getStyle())),
+                      value: CrossAxisAlignment.stretch,
+                      label: 'Stretch'),
                   // DropdownMenuEntry<CrossAxisAlignment>(
                   //     value: CrossAxisAlignment.baseline, label: 'Baseline'),
                 ]),
@@ -201,6 +234,7 @@ class _ConfigDashboardPaletteState extends BaseState<ConfigDashboardPalette> {
                   fontWeight: FontWeight.bold),
             ),
             DropdownMenu<MainAxisSize>(
+                textStyle: theme.getStyle(),
                 initialSelection: MainAxisSize.values
                     .byName(_screen.mainAxisSize ?? MainAxisSize.max.name),
                 inputDecorationTheme: dropdownDecoration,
@@ -211,11 +245,17 @@ class _ConfigDashboardPaletteState extends BaseState<ConfigDashboardPalette> {
                   });
                   widget.onDashboardScreenSaved(_screen);
                 },
-                dropdownMenuEntries: const [
+                dropdownMenuEntries: [
                   DropdownMenuEntry<MainAxisSize>(
-                      value: MainAxisSize.min, label: 'Min'),
+                      style: ButtonStyle(
+                          textStyle: WidgetStatePropertyAll(theme.getStyle())),
+                      value: MainAxisSize.min,
+                      label: 'Min'),
                   DropdownMenuEntry<MainAxisSize>(
-                      value: MainAxisSize.max, label: 'Max'),
+                      style: ButtonStyle(
+                          textStyle: WidgetStatePropertyAll(theme.getStyle())),
+                      value: MainAxisSize.max,
+                      label: 'Max'),
                 ]),
           ],
         ),
@@ -232,6 +272,7 @@ class _ConfigDashboardPaletteState extends BaseState<ConfigDashboardPalette> {
                   fontWeight: FontWeight.bold),
             ),
             DropdownMenu<Axis>(
+                textStyle: theme.getStyle(),
                 initialSelection: Axis.values
                     .byName(_screen.scrollDirection ?? Axis.vertical.name),
                 inputDecorationTheme: dropdownDecoration,
@@ -242,11 +283,17 @@ class _ConfigDashboardPaletteState extends BaseState<ConfigDashboardPalette> {
                   });
                   widget.onDashboardScreenSaved(_screen);
                 },
-                dropdownMenuEntries: const [
+                dropdownMenuEntries: [
                   DropdownMenuEntry<Axis>(
-                      value: Axis.vertical, label: 'Vertical'),
+                      style: ButtonStyle(
+                          textStyle: WidgetStatePropertyAll(theme.getStyle())),
+                      value: Axis.vertical,
+                      label: 'Vertical'),
                   DropdownMenuEntry<Axis>(
-                      value: Axis.horizontal, label: 'Horizontal'),
+                      style: ButtonStyle(
+                          textStyle: WidgetStatePropertyAll(theme.getStyle())),
+                      value: Axis.horizontal,
+                      label: 'Horizontal'),
                 ]),
           ],
         ),
@@ -302,6 +349,7 @@ class _ConfigDashboardPaletteState extends BaseState<ConfigDashboardPalette> {
                 height: 35,
                 child: IntrinsicWidth(
                   child: SpinBox(
+                    textStyle: theme.getStyle(),
                     min: 1,
                     max: 2048,
                     value: _screen.bannerHeight ?? 100,
@@ -331,6 +379,7 @@ class _ConfigDashboardPaletteState extends BaseState<ConfigDashboardPalette> {
                     fontWeight: FontWeight.bold),
               ),
               DropdownMenu<BoxFit>(
+                  textStyle: theme.getStyle(),
                   initialSelection: BoxFit.values.byName(
                       _screen.bannerImageFit?.fit.name ?? BoxFit.contain.name),
                   inputDecorationTheme: dropdownDecoration,
@@ -344,26 +393,55 @@ class _ConfigDashboardPaletteState extends BaseState<ConfigDashboardPalette> {
                     debugPrint('FIT: ${_screen.bannerImageFit}');
                     widget.onDashboardScreenSaved(_screen);
                   },
-                  dropdownMenuEntries: const [
+                  dropdownMenuEntries: [
                     DropdownMenuEntry<BoxFit>(
-                        value: BoxFit.scaleDown, label: 'Scale Down'),
+                        style: ButtonStyle(
+                            textStyle:
+                                WidgetStatePropertyAll(theme.getStyle())),
+                        value: BoxFit.scaleDown,
+                        label: 'Scale Down'),
                     DropdownMenuEntry<BoxFit>(
-                        value: BoxFit.fitWidth, label: 'Fit Width'),
+                        style: ButtonStyle(
+                            textStyle:
+                                WidgetStatePropertyAll(theme.getStyle())),
+                        value: BoxFit.fitWidth,
+                        label: 'Fit Width'),
                     DropdownMenuEntry<BoxFit>(
-                        value: BoxFit.fitHeight, label: 'Fit Height'),
+                        style: ButtonStyle(
+                            textStyle:
+                                WidgetStatePropertyAll(theme.getStyle())),
+                        value: BoxFit.fitHeight,
+                        label: 'Fit Height'),
                     DropdownMenuEntry<BoxFit>(
-                        value: BoxFit.contain, label: 'Contain'),
+                        style: ButtonStyle(
+                            textStyle:
+                                WidgetStatePropertyAll(theme.getStyle())),
+                        value: BoxFit.contain,
+                        label: 'Contain'),
                     DropdownMenuEntry<BoxFit>(
-                        value: BoxFit.none, label: 'None'),
+                        style: ButtonStyle(
+                            textStyle:
+                                WidgetStatePropertyAll(theme.getStyle())),
+                        value: BoxFit.none,
+                        label: 'None'),
                     DropdownMenuEntry<BoxFit>(
-                        value: BoxFit.fill, label: 'Fill'),
+                        style: ButtonStyle(
+                            textStyle:
+                                WidgetStatePropertyAll(theme.getStyle())),
+                        value: BoxFit.fill,
+                        label: 'Fill'),
                     DropdownMenuEntry<BoxFit>(
-                        value: BoxFit.cover, label: 'Cover'),
+                        style: ButtonStyle(
+                            textStyle:
+                                WidgetStatePropertyAll(theme.getStyle())),
+                        value: BoxFit.cover,
+                        label: 'Cover'),
                   ]),
             ],
           ),
         divider(),
         BorderConfigWidget(
+            style: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
             borderConfig: _screen.screenBorderConfig,
             onBorderConfigured: (border) {
               _onBorderConfigured(border);
@@ -371,6 +449,7 @@ class _ConfigDashboardPaletteState extends BaseState<ConfigDashboardPalette> {
         divider(),
         PaddingConfigWidget(
             title: 'Padding',
+            style: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
             paddingConfig: _screen.paddingConfig,
             onPaddingConfigSaved: (paddingConfig) {
               _onPaddingConfigSaved(paddingConfig);
@@ -378,6 +457,7 @@ class _ConfigDashboardPaletteState extends BaseState<ConfigDashboardPalette> {
         divider(),
         PaddingConfigWidget(
             title: 'Margin',
+            style: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
             paddingConfig: _screen.marginConfig,
             onPaddingConfigSaved: (paddingConfig) {
               _onMarginConfigSaved(paddingConfig);
@@ -573,6 +653,10 @@ class _ConfigDashboardPaletteState extends BaseState<ConfigDashboardPalette> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          contentTextStyle: theme.getStyle().copyWith(color: Colors.black),
+          titleTextStyle: theme
+              .getStyle()
+              .copyWith(fontWeight: FontWeight.bold, fontSize: 18),
           title: const Text('Pick a color'),
           content: SingleChildScrollView(
             child: ColorPicker(
@@ -591,7 +675,10 @@ class _ConfigDashboardPaletteState extends BaseState<ConfigDashboardPalette> {
           ),
           actions: <Widget>[
             TextButton(
-              child: const Text('Done'),
+              child: Text(
+                'Done',
+                style: theme.getStyle().copyWith(fontSize: 16),
+              ),
               onPressed: () {
                 widget.onDashboardScreenSaved(_screen);
                 Navigator.of(context).pop();

@@ -338,7 +338,7 @@ class DataGridHistorySnippetState extends BaseState<DataGridHistorySnippet> {
                             trailing: [const BusyIndicator()],
                             onChanged: (val) {
                               if (loading) {
-                                _controller.text = _searchQuery;
+                              //   _controller.text = _searchQuery;
                                 return;
                               }
                               setState(() {
@@ -752,8 +752,8 @@ class DataGridHistorySnippetState extends BaseState<DataGridHistorySnippet> {
                                                   ],
                                                   onChanged: (val) {
                                                     if (loading) {
-                                                      _controller.text =
-                                                          _searchQuery;
+                                                      // _controller.text =
+                                                      //     _searchQuery;
                                                       return;
                                                     }
                                                     setState(() {
@@ -1044,7 +1044,7 @@ class DataGridHistorySnippetState extends BaseState<DataGridHistorySnippet> {
               null != _assetGroup && _assetGroup!.assetIds.isNotEmpty)
             {
               "terms": {
-                widget.oldVersion ? 'assetId' : 'assetId.keyword':
+                !widget.oldVersion ? 'assetId' : 'assetId.keyword':
                     null != _assetGroup
                         ? _assetGroup!.assetIds
                         : widget.assetIds

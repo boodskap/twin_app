@@ -35,12 +35,14 @@ class _EmailTemplateSnippetState extends BaseState<EmailTemplateSnippet> {
     }
      final RegExp regExp = RegExp(r'{{');
       final Match? match = regExp.firstMatch(_contentController.text);
+       if(match!=null){
       Future.delayed(Duration(seconds: 1), () {
         FocusScope.of(context).requestFocus(_focusNode);
         _contentController.selection = TextSelection.fromPosition(
-          TextPosition(offset: (match!.start + 2)),
+          TextPosition(offset: (match.start + 2)),
         );
       });
+       }
   }
 
   void _validateAndFire() {
