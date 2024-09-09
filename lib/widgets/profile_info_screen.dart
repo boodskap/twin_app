@@ -452,10 +452,9 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
         ),
       );
 
-      if (res.body!.ok) {
-        alert('', 'Profile saved successfully!');
-      } else {
-        alert("Profile not Updated", res.body!.msg!);
+      if (validateResponse(res)) {
+        alert(res.body!.entity!.name, 'Profile saved successfully!');
+        TwinnedSession.instance.setUser(res.body!.entity!);
       }
     });
 
