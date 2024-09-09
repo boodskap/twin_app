@@ -292,17 +292,33 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
   String _getSearchHint(InfraType type) {
     switch (type) {
       case InfraType.premise:
-        return 'Search Premises';
-      case InfraType.facility:
         return 'Search Facilities';
-      case InfraType.floor:
+      case InfraType.facility:
         return 'Search Floors';
-      case InfraType.asset:
+      case InfraType.floor:
         return 'Search Assets';
+      case InfraType.asset:
+        return 'Search Devices';
       default:
         return 'Search';
     }
   }
+
+  String _getLabelName(InfraType type) {
+  switch (type) {
+    case InfraType.premise:
+      return 'Premise Name';
+    case InfraType.facility:
+      return 'Facility Name';
+    case InfraType.floor:
+      return 'Floor Name';
+    case InfraType.asset:
+      return 'Asset Name';
+    default:
+      return 'Name';
+  }
+}
+
 
   // Future<void> _pickLocation() async {
   //   return showDialog(
@@ -690,6 +706,8 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
 
       if (validateResponse(res)) {
         _close();
+        alert(
+            'Success', 'Premise ${res.body!.entity!.name} saved successfully!');
       }
     });
   }
@@ -712,6 +730,8 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
 
       if (validateResponse(res)) {
         _close();
+        alert('Success',
+            'Facility ${res.body!.entity!.name} saved successfully!');
       }
     });
   }
@@ -798,7 +818,7 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
                 child: LabelTextField(
                   style: theme.getStyle(),
                   labelTextStyle: theme.getStyle(),
-                  label: 'Premise Name',
+                  label: _getLabelName(widget.type),
                   controller: _name,
                 ),
               ),
