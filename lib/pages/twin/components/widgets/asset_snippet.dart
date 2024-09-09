@@ -35,7 +35,7 @@ class _AssetSnippetState extends BaseState<AssetSnippet> {
     images: [],
     description: '',
     assetModelId: '',
-     premiseId: '',
+    premiseId: '',
     facilityId: '',
     floorId: '',
     devices: [],
@@ -47,22 +47,21 @@ class _AssetSnippetState extends BaseState<AssetSnippet> {
     if (null != widget.asset) {
       tapi.Asset a = widget.asset!;
       _asset = _asset.copyWith(
-          clientIds: a.clientIds,
-          description: a.description,
-          images: a.images,
-          location: a.location,
-          name: a.name,
-          reportedStamp: a.reportedStamp,
-          roles: a.roles,
-          selectedImage: a.selectedImage,
-          tags: a.tags,
-          assetModelId: a.assetModelId,
-           premiseId: a.premiseId,
+        clientIds: a.clientIds,
+        description: a.description,
+        images: a.images,
+        location: a.location,
+        name: a.name,
+        reportedStamp: a.reportedStamp,
+        roles: a.roles,
+        selectedImage: a.selectedImage,
+        tags: a.tags,
+        assetModelId: a.assetModelId,
+        premiseId: a.premiseId,
         devices: a.devices,
         facilityId: a.facilityId,
         floorId: a.floorId,
-      
-          );
+      );
     }
     nameController.text = _asset.name;
     descController.text = _asset.description ?? '';
@@ -95,6 +94,7 @@ class _AssetSnippetState extends BaseState<AssetSnippet> {
                         child: LabelTextField(
                           label: 'Name',
                           style: theme.getStyle(),
+                          labelTextStyle: theme.getStyle(),
                           controller: nameController,
                           focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
@@ -103,14 +103,13 @@ class _AssetSnippetState extends BaseState<AssetSnippet> {
                           ),
                         ),
                       ),
-                      const SizedBox(
-                        height: 15,
-                      ),
+                      divider(height: 15),
                       SizedBox(
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: LabelTextField(
                           label: 'Description',
                           style: theme.getStyle(),
+                          labelTextStyle: theme.getStyle(),
                           controller: descController,
                           focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
@@ -119,14 +118,13 @@ class _AssetSnippetState extends BaseState<AssetSnippet> {
                           ),
                         ),
                       ),
-                      const SizedBox(
-                        height: 15,
-                      ),
+                      divider(height: 15),
                       SizedBox(
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: LabelTextField(
                           label: 'Tags (space separated)',
                           style: theme.getStyle(),
+                          labelTextStyle: theme.getStyle(),
                           controller: tagController,
                           focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
@@ -135,9 +133,7 @@ class _AssetSnippetState extends BaseState<AssetSnippet> {
                           ),
                         ),
                       ),
-                      const SizedBox(
-                        height: 15,
-                      ),
+                      divider(height: 15),
                       // AssetTypeDropdown(
                       //   key: Key(const Uuid().v4()),
                       //   assetModelId: _selectedAssetModel?.id,
@@ -149,7 +145,7 @@ class _AssetSnippetState extends BaseState<AssetSnippet> {
                       //     }
                       //   },
                       // ),
-                       AssetTypeDropdown(
+                      AssetTypeDropdown(
                         key: Key(const Uuid().v4()),
                         assetModelId: _asset.assetModelId,
                         onTankTypeSelected: (tankType) {
@@ -158,19 +154,14 @@ class _AssetSnippetState extends BaseState<AssetSnippet> {
                               _asset = _asset.copyWith(
                                   assetModelId: tankType?.id ?? '');
                             });
-                          }
-                          else{
+                          } else {
                             setState(() {
-                              _asset = _asset.copyWith(
-                                  assetModelId: '');
+                              _asset = _asset.copyWith(assetModelId: '');
                             });
                           }
-
                         },
                       ),
-                      const SizedBox(
-                        height: 15,
-                      ),
+                     divider(height: 15),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
@@ -311,7 +302,9 @@ class _AssetSnippetState extends BaseState<AssetSnippet> {
   bool _canCreateOrUpdate() {
     final text = nameController.text.trim();
 
-    return text.isNotEmpty && text.length >= 3 && _asset.assetModelId.isNotEmpty;
+    return text.isNotEmpty &&
+        text.length >= 3 &&
+        _asset.assetModelId.isNotEmpty;
   }
 
   void _close() {
@@ -338,7 +331,7 @@ class _AssetSnippetState extends BaseState<AssetSnippet> {
             apikey: TwinnedSession.instance.authToken, body: _asset);
         if (validateResponse(cRes)) {
           _close();
-          alert('Success', 'Asset ${_asset.name} created');
+          alert('Success', 'Asset ${_asset.name} created!');
         }
       } else {
         var uRes = await TwinnedSession.instance.twin.updateAsset(
@@ -348,7 +341,7 @@ class _AssetSnippetState extends BaseState<AssetSnippet> {
         if (validateResponse(uRes)) {
           if (!silent) {
             _close();
-            alert('Success', 'Asset ${_asset.name} updated successfully');
+            alert('Success', 'Asset ${_asset.name} updated successfully!');
           }
         }
       }

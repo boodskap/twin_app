@@ -304,20 +304,20 @@ class _FacilityContentPageState extends BaseState<FacilityContentPage> {
     }
   }
 
-    String _getLabelName(InfraType type) {
-  switch (type) {
-    case InfraType.premise:
-      return 'Premise Name';
-    case InfraType.facility:
-      return 'Faciliy Name';
-    case InfraType.floor:
-      return 'Floor Name';
-    case InfraType.asset:
-      return 'Asset Name';
-    default:
-      return 'Name';
+  String _getLabelName(InfraType type) {
+    switch (type) {
+      case InfraType.premise:
+        return 'Premise Name';
+      case InfraType.facility:
+        return 'Faciliy Name';
+      case InfraType.floor:
+        return 'Floor Name';
+      case InfraType.asset:
+        return 'Asset Name';
+      default:
+        return 'Name';
+    }
   }
-}
 
   // Future<void> _pickLocation() async {
   //   return showDialog(
@@ -390,13 +390,13 @@ class _FacilityContentPageState extends BaseState<FacilityContentPage> {
                         children: [
                           Text(
                             'Latitude: ${pickedLatitude.toStringAsFixed(4)}',
-                            style: const TextStyle(
+                            style: theme.getStyle().copyWith(
                                 fontSize: 16, fontWeight: FontWeight.w600),
                           ),
                           const SizedBox(width: 5),
                           Text(
                             'Longitude: ${pickedLongitude.toStringAsFixed(4)}',
-                            style: const TextStyle(
+                            style: theme.getStyle().copyWith(
                                 fontSize: 16, fontWeight: FontWeight.w600),
                           ),
                           const Spacer(),
@@ -488,16 +488,13 @@ class _FacilityContentPageState extends BaseState<FacilityContentPage> {
                         Text(
                           e.name,
                           style: theme.getStyle().copyWith(
-                                fontSize: 20,
+                                fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
                         ),
                         Text(
                           e.description ?? "",
-                          style: theme.getStyle().copyWith(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
+                          style: theme.getStyle().copyWith(fontSize: 16),
                         ),
                       ],
                     ),
@@ -558,16 +555,13 @@ class _FacilityContentPageState extends BaseState<FacilityContentPage> {
                         Text(
                           e.name,
                           style: theme.getStyle().copyWith(
-                                fontSize: 20,
+                                fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
                         ),
                         Text(
                           e.description ?? "",
-                          style: theme.getStyle().copyWith(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
+                          style: theme.getStyle().copyWith(fontSize: 16),
                         ),
                       ],
                     ),
@@ -629,16 +623,13 @@ class _FacilityContentPageState extends BaseState<FacilityContentPage> {
                         Text(
                           e.name,
                           style: theme.getStyle().copyWith(
-                                fontSize: 20,
+                                fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),
                         ),
                         Text(
                           e.description ?? "",
-                          style: theme.getStyle().copyWith(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
+                          style: theme.getStyle().copyWith(fontSize: 16),
                         ),
                       ],
                     ),

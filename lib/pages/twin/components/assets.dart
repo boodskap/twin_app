@@ -236,7 +236,7 @@ class _AssetsState extends BaseState<Assets> {
                           onTap: _canEdit
                               ? () {
                                   // _edit(e);
-                                   _addEditAssetDialog(asset: e);
+                                  _addEditAssetDialog(asset: e);
                                 }
                               : null,
                           child: Tooltip(
@@ -286,149 +286,149 @@ class _AssetsState extends BaseState<Assets> {
     );
   }
 
-  Future _create() async {
-    if (loading) return;
-    loading = true;
-    List<String>? clientIds = super.isClientAdmin()
-        ? await TwinnedSession.instance.getClientIds()
-        : null;
-    await _getBasicInfo(
-      context,
-      'New Asset',
-      onPressed: (name, desc, t) async {
-        List<String> tags = [];
-        if (t != null) {
-          tags = t.trim().split(' ');
-        }
+  // Future _create() async {
+  //   if (loading) return;
+  //   loading = true;
+  //   List<String>? clientIds = super.isClientAdmin()
+  //       ? await TwinnedSession.instance.getClientIds()
+  //       : null;
+  //   await _getBasicInfo(
+  //     context,
+  //     'New Asset',
+  //     onPressed: (name, desc, t) async {
+  //       List<String> tags = [];
+  //       if (t != null) {
+  //         tags = t.trim().split(' ');
+  //       }
 
-        tapi.AssetInfo assetInfo = tapi.AssetInfo(
-          assetModelId: _selectedAssetModel!.id,
-          name: name,
-          description: desc,
-          tags: tags,
-          clientIds: clientIds,
-        );
+  //       tapi.AssetInfo assetInfo = tapi.AssetInfo(
+  //         assetModelId: _selectedAssetModel!.id,
+  //         name: name,
+  //         description: desc,
+  //         tags: tags,
+  //         clientIds: clientIds,
+  //       );
 
-        if (_selectedPremise != null) {
-          assetInfo = assetInfo.copyWith(premiseId: _selectedPremise!.id);
-        }
-        if (_selectedFacility != null) {
-          assetInfo = assetInfo.copyWith(
-            facilityId: _selectedFacility!.id,
-          );
-        }
-        if (_selectedFloor != null) {
-          assetInfo = assetInfo.copyWith(
-            floorId: _selectedFloor!.id,
-          );
-        }
-      
-        var mRes = await TwinnedSession.instance.twin.createAsset(
-          apikey: TwinnedSession.instance.authToken,
-          body: assetInfo,
-        );
-        if (validateResponse(mRes)) {
-          await _edit(mRes.body!.entity!);
-          alert("Asset ${mRes.body!.entity!.name}", "Saved Successfully!");
-        }
-      },
-    );
-    loading = false;
-    // refresh();
-  }
+  //       if (_selectedPremise != null) {
+  //         assetInfo = assetInfo.copyWith(premiseId: _selectedPremise!.id);
+  //       }
+  //       if (_selectedFacility != null) {
+  //         assetInfo = assetInfo.copyWith(
+  //           facilityId: _selectedFacility!.id,
+  //         );
+  //       }
+  //       if (_selectedFloor != null) {
+  //         assetInfo = assetInfo.copyWith(
+  //           floorId: _selectedFloor!.id,
+  //         );
+  //       }
 
-  Future<void> _getBasicInfo(
-    BuildContext context,
-    String title, {
-    required Function(String, String, String?) onPressed,
-  }) async {
-    String? nameText = '';
-    String? descText = '';
-    String? tagsText = '';
-    return showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return AlertDialog(
-          title: Text(title),
-          content: SizedBox(
-            width: 500,
-            height: 250,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                AssetTypeDropdown(
-                  key: Key(const Uuid().v4()),
-                  assetModelId: _selectedAssetModel?.id,
-                  onTankTypeSelected: (tankType) {
-                    if (tankType != null) {
-                      setState(() {
-                        _selectedAssetModel = tankType;
-                      });
-                    }
-                  },
-                ),
-                TextField(
-                  onChanged: (value) {
-                    nameText = value;
-                  },
-                  style: theme.getStyle(),
-                  decoration: InputDecoration(
-                    hintText: 'Name',
-                    hintStyle: theme.getStyle(),
-                  ),
-                ),
-                TextField(
-                  onChanged: (value) {
-                    descText = value;
-                  },
-                  style: theme.getStyle(),
-                  decoration: InputDecoration(
-                    hintText: 'Description',
-                    hintStyle: theme.getStyle(),
-                  ),
-                ),
-                TextField(
-                  onChanged: (value) {
-                    tagsText = value;
-                  },
-                  style: theme.getStyle(),
-                  decoration: InputDecoration(
-                    hintText: 'Tags (space separated)',
-                    hintStyle: theme.getStyle(),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          actions: <Widget>[
-            SecondaryButton(
-              labelKey: "Cancel",
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-            divider(horizontal: true),
-            PrimaryButton(
-              labelKey: "OK",
-              onPressed: () {
-                if (nameText!.length < 3) {
-                  alert(
-                    'Invalid',
-                    'Name is required and should be minimum 3 characters',
-                  );
-                  return;
-                }
-                onPressed(nameText!, descText!, tagsText);
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
+  //       var mRes = await TwinnedSession.instance.twin.createAsset(
+  //         apikey: TwinnedSession.instance.authToken,
+  //         body: assetInfo,
+  //       );
+  //       if (validateResponse(mRes)) {
+  //         await _edit(mRes.body!.entity!);
+  //         alert("Asset ${mRes.body!.entity!.name}", "Saved Successfully!");
+  //       }
+  //     },
+  //   );
+  //   loading = false;
+  //   // refresh();
+  // }
+
+  // Future<void> _getBasicInfo(
+  //   BuildContext context,
+  //   String title, {
+  //   required Function(String, String, String?) onPressed,
+  // }) async {
+  //   String? nameText = '';
+  //   String? descText = '';
+  //   String? tagsText = '';
+  //   return showDialog(
+  //     context: context,
+  //     barrierDismissible: false,
+  //     builder: (context) {
+  //       return AlertDialog(
+  //         title: Text(title),
+  //         content: SizedBox(
+  //           width: 500,
+  //           height: 250,
+  //           child: Column(
+  //             mainAxisAlignment: MainAxisAlignment.start,
+  //             crossAxisAlignment: CrossAxisAlignment.start,
+  //             children: [
+  //               AssetTypeDropdown(
+  //                 key: Key(const Uuid().v4()),
+  //                 assetModelId: _selectedAssetModel?.id,
+  //                 onTankTypeSelected: (tankType) {
+  //                   if (tankType != null) {
+  //                     setState(() {
+  //                       _selectedAssetModel = tankType;
+  //                     });
+  //                   }
+  //                 },
+  //               ),
+  //               TextField(
+  //                 onChanged: (value) {
+  //                   nameText = value;
+  //                 },
+  //                 style: theme.getStyle(),
+  //                 decoration: InputDecoration(
+  //                   hintText: 'Name',
+  //                   hintStyle: theme.getStyle(),
+  //                 ),
+  //               ),
+  //               TextField(
+  //                 onChanged: (value) {
+  //                   descText = value;
+  //                 },
+  //                 style: theme.getStyle(),
+  //                 decoration: InputDecoration(
+  //                   hintText: 'Description',
+  //                   hintStyle: theme.getStyle(),
+  //                 ),
+  //               ),
+  //               TextField(
+  //                 onChanged: (value) {
+  //                   tagsText = value;
+  //                 },
+  //                 style: theme.getStyle(),
+  //                 decoration: InputDecoration(
+  //                   hintText: 'Tags (space separated)',
+  //                   hintStyle: theme.getStyle(),
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //         actions: <Widget>[
+  //           SecondaryButton(
+  //             labelKey: "Cancel",
+  //             onPressed: () {
+  //               Navigator.pop(context);
+  //             },
+  //           ),
+  //           divider(horizontal: true),
+  //           PrimaryButton(
+  //             labelKey: "OK",
+  //             onPressed: () {
+  //               if (nameText!.length < 3) {
+  //                 alert(
+  //                   'Invalid',
+  //                   'Name is required and should be minimum 3 characters',
+  //                 );
+  //                 return;
+  //               }
+  //               onPressed(nameText!, descText!, tagsText);
+  //               Navigator.pop(context);
+  //             },
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
 
   Future _edit(tapi.Asset e) async {
     var res = await TwinnedSession.instance.twin
@@ -456,7 +456,7 @@ class _AssetsState extends BaseState<Assets> {
         message:
             'Deleting is unrecoverable\nIt may also delete all the related models and components\n\nDo you want to proceed?',
         titleStyle: theme.getStyle().copyWith(color: Colors.red),
-        messageStyle: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
+        messageStyle: theme.getStyle(),
         onPressed: () async {
           await execute(() async {
             int index = _entities.indexWhere((element) => element.id == e.id);
@@ -530,8 +530,10 @@ class _AssetsState extends BaseState<Assets> {
     refresh();
   }
 
- void _addEditAssetDialog({tapi.Asset? asset}) async {
+  void _addEditAssetDialog({tapi.Asset? asset}) async {
     await super.alertDialog(
+      titleStyle:
+          theme.getStyle().copyWith(fontSize: 20, fontWeight: FontWeight.bold),
       title: null == asset ? 'Add New Asset' : 'Update Asset',
       body: AssetSnippet(
         asset: asset,
