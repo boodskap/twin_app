@@ -45,6 +45,9 @@ class _DashboardState extends BaseState<Dashboard> {
     if (asPopup) {
       alertDialog(
           title: '',
+          titleStyle: theme
+              .getStyle()
+              .copyWith(fontWeight: FontWeight.bold, fontSize: 18),
           width: MediaQuery.of(context).size.width - 100,
           body: FieldAnalyticsPage(
             fields: fields,
@@ -122,6 +125,9 @@ class _DashboardState extends BaseState<Dashboard> {
     if (asPopup) {
       alertDialog(
           title: '',
+          titleStyle: theme
+              .getStyle()
+              .copyWith(fontWeight: FontWeight.bold, fontSize: 18),
           width: MediaQuery.of(context).size.width - 100,
           body: FieldAnalyticsPage(
             fields: fields,
