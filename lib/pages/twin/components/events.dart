@@ -10,6 +10,7 @@ import 'package:twin_commons/core/twinned_session.dart';
 import 'package:twinned_api/twinned_api.dart' as tapi;
 import 'package:twinned_widgets/core/device_model_dropdown.dart';
 import 'package:uuid/uuid.dart';
+import 'package:twin_commons/core/twin_image_helper.dart';
 
 class Events extends StatefulWidget {
   const Events({super.key});
@@ -26,6 +27,7 @@ class _EventsState extends BaseState<Events> {
 
   bool _canEdit = false;
   Map<String, bool> _editable = Map<String, bool>();
+  tapi.EventInfo? body;
 
   @override
   void initState() {
@@ -131,6 +133,22 @@ class _EventsState extends BaseState<Events> {
       editable = _editable[e.id] ?? false;
     }
     double width = MediaQuery.of(context).size.width / 8;
+    Widget imageWidget;
+    if (e.icon != null && e.icon!.isNotEmpty) {
+      imageWidget = TwinImageHelper.getCachedImage(
+        e.domainKey,
+        e.icon!,
+        width: width / 2,
+        height: width / 2,
+      );
+    } else {
+      imageWidget = Icon(
+        Icons.image,
+        size: width / 2,
+        color: Colors.grey,
+      );
+    }
+
     return SizedBox(
       width: width,
       height: width,
@@ -140,68 +158,89 @@ class _EventsState extends BaseState<Events> {
             _edit(e);
           }
         },
-        child: Card(
-          elevation: 8,
-          color: Colors.white,
-          child: Stack(
-            children: [
-              Align(
-                alignment: Alignment.topLeft,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    e.name,
-                    style:
-                        theme.getStyle().copyWith(fontWeight: FontWeight.bold),
+        child: SizedBox(
+          width: width,
+          height: width,
+          child: Card(
+            elevation: 8,
+            color: Colors.white,
+            child: Stack(
+              children: [
+                Align(
+                  alignment: Alignment.topLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      e.name,
+                      style: theme
+                          .getStyle()
+                          .copyWith(fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ),
-              ),
-              Align(
-                alignment: Alignment.topRight,
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 8.0, top: 8.0),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      InkWell(
-                        onTap: _canEdit
-                            ? () {
-                                _edit(e);
-                              }
-                            : null,
-                        child: Tooltip(
-                          message:
-                              _canEdit ? "Update" : "No Permission to Edit",
-                          child: Icon(
-                            Icons.edit,
-                            color: _canEdit
-                                ? theme.getPrimaryColor()
-                                : Colors.grey,
+                Align(
+                  alignment: Alignment.topRight,
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 8.0, top: 8.0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Tooltip(
+                          message: "Upload Image",
+                          child: IconButton(
+                            icon: Icon(
+                              Icons.upload,
+                              color: theme.getPrimaryColor(),
+                            ),
+                            onPressed: () {
+                              _uploadImage(e);
+                            },
                           ),
                         ),
-                      ),
-                      InkWell(
-                        onTap: _canEdit
-                            ? () {
-                                _delete(e);
-                              }
-                            : null,
-                        child: Tooltip(
-                          message:
-                              _canEdit ? "Delete" : "No Permission to Delete",
-                          child: Icon(
-                            Icons.delete,
-                            color: _canEdit
-                                ? theme.getPrimaryColor()
-                                : Colors.grey,
+                        InkWell(
+                          onTap: _canEdit
+                              ? () {
+                                  _edit(e);
+                                }
+                              : null,
+                          child: Tooltip(
+                            message:
+                                _canEdit ? "Update" : "No Permission to Edit",
+                            child: Icon(
+                              Icons.edit,
+                              color: _canEdit
+                                  ? theme.getPrimaryColor()
+                                  : Colors.grey,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                        InkWell(
+                          onTap: _canEdit
+                              ? () {
+                                  _delete(e);
+                                }
+                              : null,
+                          child: Tooltip(
+                            message:
+                                _canEdit ? "Delete" : "No Permission to Delete",
+                            child: Icon(
+                              Icons.delete,
+                              color: _canEdit
+                                  ? theme.getPrimaryColor()
+                                  : Colors.grey,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ],
+                Align(
+                  alignment: Alignment.center,
+                  child: imageWidget,
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -309,6 +348,62 @@ class _EventsState extends BaseState<Events> {
         });
   }
 
+  Future<void> _uploadImage(tapi.Event event) async {
+    if (loading) return;
+    loading = true;
+
+    String? tempImageId;
+
+    await execute(() async {
+      var uRes = await TwinImageHelper.uploadDomainImage();
+      if (null != uRes && null != uRes.entity) {
+        tempImageId = uRes.entity!.id;
+      }
+    });
+
+    if (tempImageId != null) {
+      refresh(
+        sync: () {
+          body = tapi.EventInfo(
+            name: event.name,
+            conditions: event.conditions,
+            assetId: event.assetId,
+            clientIds: event.clientIds,
+            description: event.description,
+            deviceId: event.deviceId,
+            emailTemplate: event.emailTemplate,
+            facilityId: event.facilityId,
+            fcmTemplate: event.fcmTemplate,
+            floorId: event.floorId,
+            icon: tempImageId != null ? tempImageId : event.icon,
+            modelId: event.modelId,
+            notificationTemplate: event.notificationTemplate,
+            premiseId: event.premiseId,
+            roles: event.roles,
+            smsTemplate: event.smsTemplate,
+            tags: event.tags,
+            voiceTemplate: event.voiceTemplate,
+          );
+          event = event.copyWith(icon: tempImageId);
+        },
+      );
+      await execute(() async {
+        var res = await TwinnedSession.instance.twin.updateEvent(
+          apikey: TwinnedSession.instance.authToken,
+          eventId: event.id,
+          body: body,
+        );
+
+        if (validateResponse(res)) {
+          await alert('', 'Event ${event.name} Image Uploaded Successfully');
+        }
+      });
+    }
+
+    loading = false;
+    refresh();
+  }
+
   Future _create() async {
     if (loading) return;
     loading = true;
@@ -323,12 +418,14 @@ class _EventsState extends BaseState<Events> {
       var mRes = await TwinnedSession.instance.twin.createEvent(
           apikey: TwinnedSession.instance.authToken,
           body: tapi.EventInfo(
-              modelId: _selectedDeviceModel!.id,
-              name: name,
-              description: desc,
-              tags: tags,
-              conditions: [],
-              clientIds: clientIds));
+            modelId: _selectedDeviceModel!.id,
+            name: name,
+            description: desc,
+            tags: tags,
+            conditions: [],
+            clientIds: clientIds,
+            icon: '',
+          ));
       if (validateResponse(mRes)) {
         await _edit(mRes.body!.entity!);
         alert("Event ${mRes.body!.entity!.name}", "created successfully!");

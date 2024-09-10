@@ -293,6 +293,9 @@ class _AssetReportListState extends BaseState<AssetReportList> {
         barrierDismissible: false,
         builder: (context) {
           return AlertDialog(
+            titleTextStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 20, fontWeight: FontWeight.bold),
             title: Text(title),
             content: SizedBox(
               width: 500,
@@ -311,6 +314,7 @@ class _AssetReportListState extends BaseState<AssetReportList> {
                     decoration: InputDecoration(
                       hintText: 'Name',
                       hintStyle: theme.getStyle(),
+                      labelStyle: theme.getStyle(),
                     ),
                   ),
                   TextField(
@@ -323,6 +327,7 @@ class _AssetReportListState extends BaseState<AssetReportList> {
                     decoration: InputDecoration(
                       hintText: 'Description',
                       hintStyle: theme.getStyle(),
+                      labelStyle: theme.getStyle(),
                     ),
                   ),
                   TextField(
@@ -335,6 +340,7 @@ class _AssetReportListState extends BaseState<AssetReportList> {
                     decoration: InputDecoration(
                       hintText: 'Tags (space separated)',
                       hintStyle: theme.getStyle(),
+                      labelStyle: theme.getStyle(),
                     ),
                   ),
                 ],
@@ -378,7 +384,7 @@ class _AssetReportListState extends BaseState<AssetReportList> {
         message:
             'Deleting is unrecoverable\nIt may also delete all the related models and components\n\nDo you want to proceed?',
         titleStyle: theme.getStyle().copyWith(color: Colors.red),
-        messageStyle: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
+        messageStyle: theme.getStyle(),
         onPressed: () async {
           await execute(() async {
             int index = _reports.indexWhere((element) => element.id == e.id);
@@ -442,7 +448,7 @@ class _AssetReportListState extends BaseState<AssetReportList> {
 
         if (validateResponse(rRes)) {
           await _load();
-          alert('Filter ${rRes.body!.entity!.name} ', 'updated successfully');
+          alert('Filter ${rRes.body!.entity!.name} ', 'updated successfully!');
         }
       }
     });
@@ -517,7 +523,7 @@ class _ReportContentWidgetState extends BaseState<ReportContentWidget> {
               humanDateFormat: false,
               fields: widget.report.fields));
       if (validateResponse(res)) {
-        await alert('Report - ${_name.text}', 'Saved successfully');
+        await alert('Report - ${_name.text}', 'Saved successfully!');
         _close();
       }
     });

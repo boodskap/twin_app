@@ -137,7 +137,7 @@ class _GroupAssetsState extends BaseState<GroupAssets> {
               target: AssetGroupInfoTarget.app,
               assetIds: widget.group.assetIds));
       if (validateResponse(res)) {
-        await alert(widget.group.name, 'Saved successfully');
+        await alert(widget.group.name, 'Saved successfully!');
         _close();
       }
     });
@@ -148,6 +148,8 @@ class _GroupAssetsState extends BaseState<GroupAssets> {
       title: 'Are you sure?',
       message:
           'You want to disassociate ${_selected[idx].name} with ${widget.group.name}?',
+      titleStyle: theme.getStyle().copyWith(color: Colors.red),
+      messageStyle: theme.getStyle(),
       onPressed: () {
         setState(() {
           _assets.add(_selected.removeAt(idx));
@@ -176,10 +178,11 @@ class _GroupAssetsState extends BaseState<GroupAssets> {
               )),
           divider(),
           SizedBox(
-            height: 30,
+            height: 40,
             child: Align(
               alignment: Alignment.topRight,
               child: SearchBar(
+                hintText: 'Search Assets Groups',
                 hintStyle: WidgetStatePropertyAll(theme.getStyle()),
                 textStyle: WidgetStatePropertyAll(theme.getStyle()),
                 leading: const Icon(Icons.search),
