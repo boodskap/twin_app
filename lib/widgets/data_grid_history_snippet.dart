@@ -154,6 +154,7 @@ class DataGridHistorySnippetState extends BaseState<DataGridHistorySnippet> {
     double dialogWidth = (MediaQuery.of(context).size.width / 2) + 100;
     double dialogHeight = (MediaQuery.of(context).size.height / 2) + 100;
     final ButtonStyle customButtonStyle = ElevatedButton.styleFrom(
+      textStyle: theme.getStyle(),
       backgroundColor: Colors.white, // Background color
       foregroundColor: Colors.black, // Text color
       side: BorderSide(color: Colors.black, width: 1), // Border color and width
@@ -162,6 +163,7 @@ class DataGridHistorySnippetState extends BaseState<DataGridHistorySnippet> {
       ),
     );
     final ButtonStyle customEnabledButtonStyle = ElevatedButton.styleFrom(
+      textStyle: theme.getStyle(),
       backgroundColor: Colors.blue, // Background color
       foregroundColor: Colors.white, // Text color
       side: BorderSide(color: Colors.blue, width: 1), // Border color and width
@@ -338,7 +340,7 @@ class DataGridHistorySnippetState extends BaseState<DataGridHistorySnippet> {
                             trailing: [const BusyIndicator()],
                             onChanged: (val) {
                               if (loading) {
-                              //   _controller.text = _searchQuery;
+                                //   _controller.text = _searchQuery;
                                 return;
                               }
                               setState(() {
@@ -404,10 +406,10 @@ class DataGridHistorySnippetState extends BaseState<DataGridHistorySnippet> {
                         Expanded(
                           child: Text(
                             'Filters',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
+                            style: theme.getStyle().copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
                           ),
                         ),
                         IconButton(
@@ -468,6 +470,12 @@ class DataGridHistorySnippetState extends BaseState<DataGridHistorySnippet> {
                                           onPressed: () async {
                                             await super.alertDialog(
                                               title: 'Filter by Data',
+                                              titleStyle: theme
+                                                  .getStyle()
+                                                  .copyWith(
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 20),
                                               width: dialogWidth,
                                               height: dialogHeight,
                                               body: DataSearch(
@@ -535,6 +543,12 @@ class DataGridHistorySnippetState extends BaseState<DataGridHistorySnippet> {
                                           onPressed: () async {
                                             await super.alertDialog(
                                                 title: 'Filter by Event',
+                                                titleStyle: theme
+                                                    .getStyle()
+                                                    .copyWith(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 20),
                                                 width: dialogWidth,
                                                 height: dialogHeight,
                                                 body: EventSearch(
@@ -580,6 +594,12 @@ class DataGridHistorySnippetState extends BaseState<DataGridHistorySnippet> {
                                           onPressed: () async {
                                             await super.alertDialog(
                                                 title: 'Filter by Alarm',
+                                                titleStyle: theme
+                                                    .getStyle()
+                                                    .copyWith(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 20),
                                                 width: dialogWidth,
                                                 height: dialogHeight,
                                                 body: AlarmSearch(
@@ -619,8 +639,9 @@ class DataGridHistorySnippetState extends BaseState<DataGridHistorySnippet> {
                                               children: [
                                                 Text(
                                                   filterLabel,
-                                                  style: const TextStyle(
-                                                      fontSize: 16),
+                                                  style: theme
+                                                      .getStyle()
+                                                      .copyWith(fontSize: 16),
                                                 ),
                                                 divider(horizontal: true),
                                                 const Icon(
@@ -633,93 +654,126 @@ class DataGridHistorySnippetState extends BaseState<DataGridHistorySnippet> {
                                               return <PopupMenuEntry<
                                                   tapi
                                                   .DeviceDataSeriesDeviceIdFieldPageSizeGetFilter>>[
-                                                const PopupMenuItem<
+                                                PopupMenuItem<
                                                     tapi
                                                     .DeviceDataSeriesDeviceIdFieldPageSizeGetFilter>(
                                                   value: tapi
                                                       .DeviceDataSeriesDeviceIdFieldPageSizeGetFilter
                                                       .recent,
-                                                  child: Text('Recent'),
+                                                  child: Text(
+                                                    'Recent',
+                                                    style: theme.getStyle(),
+                                                  ),
                                                 ),
-                                                const PopupMenuItem<
+                                                PopupMenuItem<
                                                     tapi
                                                     .DeviceDataSeriesDeviceIdFieldPageSizeGetFilter>(
                                                   value: tapi
                                                       .DeviceDataSeriesDeviceIdFieldPageSizeGetFilter
                                                       .today,
-                                                  child: Text('Today'),
+                                                  child: Text(
+                                                    'Today',
+                                                    style: theme.getStyle(),
+                                                  ),
                                                 ),
-                                                const PopupMenuItem<
+                                                PopupMenuItem<
                                                     tapi
                                                     .DeviceDataSeriesDeviceIdFieldPageSizeGetFilter>(
                                                   value: tapi
                                                       .DeviceDataSeriesDeviceIdFieldPageSizeGetFilter
                                                       .yesterday,
-                                                  child: Text('Yesterday'),
+                                                  child: Text(
+                                                    'Yesterday',
+                                                    style: theme.getStyle(),
+                                                  ),
                                                 ),
-                                                const PopupMenuItem<
+                                                PopupMenuItem<
                                                     tapi
                                                     .DeviceDataSeriesDeviceIdFieldPageSizeGetFilter>(
                                                   value: tapi
                                                       .DeviceDataSeriesDeviceIdFieldPageSizeGetFilter
                                                       .thisweek,
-                                                  child: Text('This Week'),
+                                                  child: Text(
+                                                    'This Week',
+                                                    style: theme.getStyle(),
+                                                  ),
                                                 ),
-                                                const PopupMenuItem<
+                                                PopupMenuItem<
                                                     tapi
                                                     .DeviceDataSeriesDeviceIdFieldPageSizeGetFilter>(
                                                   value: tapi
                                                       .DeviceDataSeriesDeviceIdFieldPageSizeGetFilter
                                                       .lastweek,
-                                                  child: Text('Last Week'),
+                                                  child: Text(
+                                                    'Last Week',
+                                                    style: theme.getStyle(),
+                                                  ),
                                                 ),
-                                                const PopupMenuItem<
+                                                PopupMenuItem<
                                                     tapi
                                                     .DeviceDataSeriesDeviceIdFieldPageSizeGetFilter>(
                                                   value: tapi
                                                       .DeviceDataSeriesDeviceIdFieldPageSizeGetFilter
                                                       .thismonth,
-                                                  child: Text('This Month'),
+                                                  child: Text(
+                                                    'This Month',
+                                                    style: theme.getStyle(),
+                                                  ),
                                                 ),
-                                                const PopupMenuItem<
+                                                PopupMenuItem<
                                                     tapi
                                                     .DeviceDataSeriesDeviceIdFieldPageSizeGetFilter>(
                                                   value: tapi
                                                       .DeviceDataSeriesDeviceIdFieldPageSizeGetFilter
                                                       .lastmonth,
-                                                  child: Text('Last Month'),
+                                                  child: Text(
+                                                    'Last Month',
+                                                    style: theme.getStyle(),
+                                                  ),
                                                 ),
-                                                const PopupMenuItem<
+                                                PopupMenuItem<
                                                     tapi
                                                     .DeviceDataSeriesDeviceIdFieldPageSizeGetFilter>(
                                                   value: tapi
                                                       .DeviceDataSeriesDeviceIdFieldPageSizeGetFilter
                                                       .thisquarter,
-                                                  child: Text('This Quarter'),
+                                                  child: Text(
+                                                    'This Quarter',
+                                                    style: theme.getStyle(),
+                                                  ),
                                                 ),
-                                                const PopupMenuItem<
+                                                PopupMenuItem<
                                                     tapi
                                                     .DeviceDataSeriesDeviceIdFieldPageSizeGetFilter>(
                                                   value: tapi
                                                       .DeviceDataSeriesDeviceIdFieldPageSizeGetFilter
                                                       .thisyear,
-                                                  child: Text('This Year'),
+                                                  child: Text(
+                                                    'This Year',
+                                                    style: theme.getStyle(),
+                                                  ),
                                                 ),
-                                                const PopupMenuItem<
+                                                PopupMenuItem<
                                                     tapi
                                                     .DeviceDataSeriesDeviceIdFieldPageSizeGetFilter>(
                                                   value: tapi
                                                       .DeviceDataSeriesDeviceIdFieldPageSizeGetFilter
                                                       .lastyear,
-                                                  child: Text('Last Year'),
+                                                  child: Text(
+                                                    'Last Year',
+                                                    style: theme.getStyle(),
+                                                  ),
                                                 ),
-                                                const PopupMenuItem<
+                                                PopupMenuItem<
                                                     tapi
                                                     .DeviceDataSeriesDeviceIdFieldPageSizeGetFilter>(
                                                   value: tapi
                                                       .DeviceDataSeriesDeviceIdFieldPageSizeGetFilter
                                                       .range,
-                                                  child: Text('Date Range'),
+                                                  child: Text(
+                                                    'Date Range',
+                                                    style: theme.getStyle(),
+                                                  ),
                                                 ),
                                               ];
                                             },
@@ -802,11 +856,13 @@ class DataGridHistorySnippetState extends BaseState<DataGridHistorySnippet> {
           ),
           builder: (context, child) {
             return Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ConstrainedBox(
                   constraints: const BoxConstraints(
                     maxWidth: 400.0,
-                    maxHeight: 800.0,
+                    maxHeight: 600.0,
                   ),
                   child: child,
                 )
