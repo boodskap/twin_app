@@ -5,7 +5,9 @@ import 'package:nocode_api/api/nocode.swagger.dart' as nocode;
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/pages/twin/components/widgets/showoverlay_widget.dart';
 import 'package:twin_app/pages/twin/components/widgets/single_value_input.dart';
+import 'package:twin_app/widgets/buy_button.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
+import 'package:twin_app/widgets/purchase_change_addon_widget.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:twin_commons/core/twin_image_helper.dart';
@@ -27,7 +29,7 @@ class OrganizationPage extends StatefulWidget {
 class _OrganizationPageState extends BaseState<OrganizationPage> {
   nocode.Organization? _organization;
   tapi.TwinSysInfo? _twinSysInfo;
-
+  bool _exhausted = true;
   @override
   Widget build(BuildContext context) {
     if (null == _organization || null == _twinSysInfo) {
@@ -182,6 +184,16 @@ class _OrganizationPageState extends BaseState<OrganizationPage> {
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
+            if (_exhausted)
+              BuyButton(
+                  label: 'Buy More License',
+                  tooltip:
+                      'Utilized ${orgPlan?.totalDevicesCount ?? '-'} licenses',
+                  style: theme.getStyle().copyWith(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: Colors.blue),
+                  onPressed: _buyAddon),
             const BusyIndicator(),
             divider(horizontal: true),
             PrimaryButton(
@@ -522,6 +534,27 @@ class _OrganizationPageState extends BaseState<OrganizationPage> {
                 }
               });
             }));
+  }
+
+  Future _buyAddon() async {
+    await showDialog(
+        context: context,
+        builder: (ctx) {
+          return AlertDialog(
+            content: PurchaseChangeAddonWidget(
+              orgId: orgs[selectedOrg].id,
+              purchase: true,
+              users: 1,
+            ),
+          );
+        });
+    await _checkExhausted();
+    await _load();
+  }
+
+  Future _checkExhausted() async {
+    _exhausted = await hasUsersExhausted();
+    refresh();
   }
 
   Future _load() async {
