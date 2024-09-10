@@ -172,12 +172,20 @@ class _DeviceContentPageState extends BaseState<DeviceContentPage> {
 
     execute(() async {
       if (_nameController.text.isEmpty) {
-        alert('Missing', 'Name is required');
+        alert('Missing', 'Name is required',
+            contentStyle: theme.getStyle(),
+            titleStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
         return;
       }
 
       if (_idController.text.isEmpty) {
-        alert('Missing', 'Hardware device id is required');
+        alert('Missing', 'Hardware device id is required',
+            contentStyle: theme.getStyle(),
+            titleStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
         return;
       }
 
@@ -223,7 +231,11 @@ class _DeviceContentPageState extends BaseState<DeviceContentPage> {
 
       if (validateResponse(res)) {
         widget.device = res.body!.entity;
-        alert(widget.device!.name, 'Saved successfully');
+        alert(widget.device!.name, 'Saved successfully!',
+            contentStyle: theme.getStyle(),
+            titleStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
         _cancel();
 
         setup();
@@ -252,7 +264,11 @@ class _DeviceContentPageState extends BaseState<DeviceContentPage> {
       );
       if (validateResponse(res)) {
         Navigator.pop(context);
-        alert(widget.device!.name, "All data wiped out successfully!");
+        alert(widget.device!.name, "All data wiped out successfully!",
+            contentStyle: theme.getStyle(),
+            titleStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
       }
     } catch (e, s) {
       debugPrint('$e\n$s');
@@ -278,15 +294,11 @@ class _DeviceContentPageState extends BaseState<DeviceContentPage> {
     AlertDialog alert = AlertDialog(
       title: Text(
         "WARNING",
-        style: theme.getStyle().copyWith(
-              color: Colors.red,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
+        style: theme.getStyle().copyWith(color: Colors.red, fontSize: 18),
       ),
       content: Text(
         "Cleaning this Device will clean this device's data,\n This deletion can't be undone. Do you want to delete it ",
-        style: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
+        style: theme.getStyle(),
         maxLines: 10,
       ),
       actions: [
@@ -321,15 +333,11 @@ class _DeviceContentPageState extends BaseState<DeviceContentPage> {
     AlertDialog alert = AlertDialog(
       title: Text(
         "WARNING",
-        style: theme.getStyle().copyWith(
-              color: Colors.red,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
+        style: theme.getStyle().copyWith(color: Colors.red, fontSize: 20),
       ),
       content: Text(
         "This action will clear all device history and reprocess from the received raw data, do you wish to proceed?",
-        style: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
+        style: theme.getStyle(),
         maxLines: 10,
       ),
       actions: [
@@ -360,7 +368,11 @@ class _DeviceContentPageState extends BaseState<DeviceContentPage> {
       );
       if (validateResponse(res)) {
         Navigator.pop(context);
-        alert(widget.device!.name, "Reprocessing started");
+        alert(widget.device!.name, "Reprocessing started",
+            contentStyle: theme.getStyle(),
+            titleStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
       }
     } catch (e, s) {
       debugPrint('$e\n$s');
@@ -424,7 +436,11 @@ class _DeviceContentPageState extends BaseState<DeviceContentPage> {
             if (validateResponse(res)) {
               widget.device!.images!.remove(image);
               setup();
-              alert('Image', 'Device model image deleted');
+              alert('Image', 'Device model image deleted',
+                  contentStyle: theme.getStyle(),
+                  titleStyle: theme
+                      .getStyle()
+                      .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
             }
           } catch (e, x) {
             debugPrint('$e\n$x');
