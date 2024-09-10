@@ -170,6 +170,38 @@ class _AddEditGatewayState extends BaseState<AddEditGateway> {
           ],
         );
         break;
+      case pulse.GatewayParamType.email:
+      // TODO: Handle this case.
+      case pulse.GatewayParamType.phoneNumber:
+      // TODO: Handle this case.
+      case pulse.GatewayParamType.timezone:
+      // TODO: Handle this case.
+      case pulse.GatewayParamType.twinDomainKey:
+      // TODO: Handle this case.
+      case pulse.GatewayParamType.twinApiKey:
+      // TODO: Handle this case.
+      case pulse.GatewayParamType.clientId:
+      // TODO: Handle this case.
+      case pulse.GatewayParamType.pulseEmailKey:
+      // TODO: Handle this case.
+      case pulse.GatewayParamType.pulseSmsKey:
+      // TODO: Handle this case.
+      case pulse.GatewayParamType.pulseVoiceKey:
+      // TODO: Handle this case.
+      case pulse.GatewayParamType.pulseEmailGroupId:
+      // TODO: Handle this case.
+      case pulse.GatewayParamType.pulseSmsGroupId:
+      // TODO: Handle this case.
+      case pulse.GatewayParamType.pulseVoiceGroupId:
+        // TODO: Handle this case.
+        return LabelTextField(
+          label: (param.description?.isNotEmpty ?? false)
+              ? param.description!
+              : param.name,
+          controller: c,
+          readOnlyVal: !param.editable,
+        );
+        break;
     }
   }
 
