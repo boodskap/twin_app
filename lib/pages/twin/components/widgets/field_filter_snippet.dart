@@ -215,7 +215,7 @@ class _FieldFilterSnippetState extends BaseState<FieldFilterSnippet> {
 
       if (validateResponse(eRes)) {
         _close();
-        alert('Filter ${eRes.body!.entity!.name} ', 'Saved successfully');
+        alert('Filter ${eRes.body!.entity!.name} ', 'Saved successfully!');
       }
     });
 
@@ -295,7 +295,7 @@ class _FieldFilterSnippetState extends BaseState<FieldFilterSnippet> {
                           decoration: BoxDecoration(
                               border: Border.all(color: Colors.blueGrey),
                               borderRadius: BorderRadius.circular(5)),
-                          child: DropdownButton<twinned.Parameter>(
+                          child: DropdownButton<twinned.Parameter>(style: theme.getStyle(),
                             padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
                             dropdownColor: Colors.white,
                             isDense: true,
@@ -442,7 +442,7 @@ class _FieldFilterSnippetState extends BaseState<FieldFilterSnippet> {
                       labelTextStyle: theme.getStyle(),
                       style: theme.getStyle(),
                       controller: _values,
-                      maxLines: 5,
+                      maxLines: 4,
                     ),
                   ),
               ],
