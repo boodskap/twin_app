@@ -300,7 +300,7 @@ class _InstallationDatabaseState extends BaseState<InstallationDatabase> {
       message:
           'Deleting is unrecoverable\nIt may also delete all the related models and components\n\nDo you want to proceed?',
       titleStyle: theme.getStyle().copyWith(color: Colors.red),
-      messageStyle: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
+      messageStyle: theme.getStyle(),
       onPressed: () async {
         await execute(() async {
           int index = _entities.indexWhere((element) => element.id == e.id);
@@ -310,7 +310,11 @@ class _InstallationDatabaseState extends BaseState<InstallationDatabase> {
             await _load();
             _entities.removeAt(index);
             _cards.removeAt(index);
-            alert("Success", "Installation Databse ${e.name} deleted!");
+            alert("Success", "Installation Databse ${e.name} deleted!",
+                contentStyle: theme.getStyle(),
+                titleStyle: theme
+                    .getStyle()
+                    .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
           }
         });
       },

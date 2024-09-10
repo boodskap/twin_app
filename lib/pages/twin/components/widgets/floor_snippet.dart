@@ -422,7 +422,11 @@ class _FloorSnippetState extends BaseState<FloorSnippet> {
             apikey: TwinnedSession.instance.authToken, body: _floor);
         if (validateResponse(cRes)) {
           _close();
-          alert('Success', 'Floor ${_floor.name} created');
+          alert('Success', 'Floor ${_floor.name} created successfully!',
+              contentStyle: theme.getStyle(),
+              titleStyle: theme
+                  .getStyle()
+                  .copyWith(fontSize: 20, fontWeight: FontWeight.bold));
         }
       } else {
         var uRes = await TwinnedSession.instance.twin.updateFloor(
@@ -432,7 +436,11 @@ class _FloorSnippetState extends BaseState<FloorSnippet> {
         if (validateResponse(uRes)) {
           if (!silent) {
             _close();
-            alert('Success', 'Floor ${_floor.name} updated successfully');
+            alert('Success', 'Floor ${_floor.name} updated successfully',
+                contentStyle: theme.getStyle(),
+                titleStyle: theme
+                    .getStyle()
+                    .copyWith(fontSize: 20, fontWeight: FontWeight.bold));
           }
         }
       }

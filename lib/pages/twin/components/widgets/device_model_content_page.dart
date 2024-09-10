@@ -265,7 +265,12 @@ class _DeviceModelContentPageState extends BaseState<DeviceModelContentPage> {
             if (e.images!.length > 1) {
               _deleteImage(image);
             } else {
-              alert('Delete Prohibited', 'You need to have at least one image');
+              alert('Delete Prohibited', 'You need to have at least one image',
+                  contentStyle: theme.getStyle(),
+                  titleStyle: theme.getStyle().copyWith(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.red));
             }
           },
           child: TwinImageHelper.getCachedImage(e.domainKey, image),
@@ -316,7 +321,11 @@ class _DeviceModelContentPageState extends BaseState<DeviceModelContentPage> {
             widget.model = res.body!.entity;
           });
           await alert(
-              'Device Model ${_nameController.text} saved successfully', '');
+              'Device Model', ' ${_nameController.text} saved successfully!',
+              contentStyle: theme.getStyle(),
+              titleStyle: theme
+                  .getStyle()
+                  .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
           if (shouldPop) {
             _cancel();
           }
@@ -344,7 +353,11 @@ class _DeviceModelContentPageState extends BaseState<DeviceModelContentPage> {
             widget.model = res.body?.entity;
           });
           await alert(
-              'Device Model ${_nameController.text} saved successfully', '');
+              'Device Model ', '${_nameController.text} saved successfully!',
+              contentStyle: theme.getStyle(),
+              titleStyle: theme
+                  .getStyle()
+                  .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
           if (shouldPop) {
             _cancel();
           }
@@ -394,9 +407,7 @@ class _DeviceModelContentPageState extends BaseState<DeviceModelContentPage> {
   void _deleteImage(String image) async {
     confirm(
         title: 'Warning',
-        titleStyle: theme.getStyle().copyWith(
-              color: Colors.red,
-            ),
+        titleStyle: theme.getStyle().copyWith(color: Colors.red),
         messageStyle: theme.getStyle(),
         message: 'Are you sure you want to delete this image?',
         onPressed: () async {
@@ -408,7 +419,11 @@ class _DeviceModelContentPageState extends BaseState<DeviceModelContentPage> {
             if (validateResponse(res)) {
               widget.model!.images!.remove(image);
               setup();
-              alert('Image', 'Device model image deleted');
+              alert('Image', 'Device model image deleted',
+                  contentStyle: theme.getStyle(),
+                  titleStyle: theme
+                      .getStyle()
+                      .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
             }
           } catch (e, x) {
             debugPrint('$e\n$x');
@@ -681,12 +696,22 @@ class _DeviceModelContentPageState extends BaseState<DeviceModelContentPage> {
   @override
   Widget build(BuildContext context) {
     List<DropdownMenuItem<int>> imageItems = [
-       DropdownMenuItem<int>(value: -1, child: Text('Selected Image',style: theme.getStyle(),))
+      DropdownMenuItem<int>(
+          value: -1,
+          child: Text(
+            'Selected Image',
+            style: theme.getStyle(),
+          ))
     ];
 
     for (int i = 0; i < _imageIds.length; i++) {
-      imageItems.add(
-          DropdownMenuItem<int>(value: i, child: Center(child: Text('$i',style: theme.getStyle(),))));
+      imageItems.add(DropdownMenuItem<int>(
+          value: i,
+          child: Center(
+              child: Text(
+            '$i',
+            style: theme.getStyle(),
+          ))));
     }
 
     if (_selectedImage == -1 && _imageIds.isNotEmpty) {
