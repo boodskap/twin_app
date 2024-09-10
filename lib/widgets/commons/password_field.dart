@@ -42,8 +42,10 @@ class _PasswordFieldState extends State<PasswordField> {
         onChanged: widget.onChanged,
         obscureText: _isObscure,
         autofillHints: [AutofillHints.password],
+        style: theme.getStyle(),
         decoration: InputDecoration(
           hintText: widget.hintKey.tr(),
+          errorStyle: theme.getStyle(),
           hintStyle:
               theme.getStyle().copyWith(color: theme.getIntermediateColor()),
           border: InputBorder.none,

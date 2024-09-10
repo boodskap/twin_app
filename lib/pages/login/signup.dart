@@ -89,6 +89,10 @@ class _SignUpMobilePageState extends BaseState<_SignUpMobilePage> {
               title: Text('OTP Sent'),
               content: Text(
                   'A 6 digit OTP has been sent to your email.\nPlease check it.'),
+              titleTextStyle: theme
+                  .getStyle()
+                  .copyWith(fontWeight: FontWeight.bold, fontSize: 20),
+              contentTextStyle: theme.getStyle(),
               actions: <Widget>[
                 PrimaryButton(
                     minimumSize: Size(20, 20),
@@ -142,6 +146,10 @@ class _SignUpMobilePageState extends BaseState<_SignUpMobilePage> {
               title: Text('OTP Sent'),
               content: Text(
                   'A 6 digit OTP has been sent to your email.\nPlease check it.'),
+              titleTextStyle: theme
+                  .getStyle()
+                  .copyWith(fontWeight: FontWeight.bold, fontSize: 20),
+              contentTextStyle: theme.getStyle(),
               actions: <Widget>[
                 PrimaryButton(
                     minimumSize: Size(20, 20),
@@ -267,6 +275,7 @@ class _SignUpMobilePageState extends BaseState<_SignUpMobilePage> {
                                                   0;
                                         });
                                       },
+                                      style: theme.getStyle(),
                                       decoration: InputDecoration(
                                         hintText: "firstName".tr(),
                                         hintStyle: theme
@@ -313,6 +322,7 @@ class _SignUpMobilePageState extends BaseState<_SignUpMobilePage> {
                                                 _doNoCodeSignup();
                                               }
                                             },
+                                      style: theme.getStyle(),
                                       decoration: InputDecoration(
                                         hintText: "lastName".tr(),
                                         hintStyle: theme
