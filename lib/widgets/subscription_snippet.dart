@@ -127,7 +127,7 @@ class _SubscriptionsPageState extends BaseState<SubscriptionsPage> {
         phoneNumber: user?.phone,
         countryCode: countryCodeMap[user?.countryCode ?? 'US'] ?? '+1',
       );
-
+     print(info);
       if (_eventRegistrations.containsKey(event.id)) {
         var res = await TwinnedSession.instance.twin.updateEventRegistration(
           eventRegistrationId: _eventRegistrations[event.id]!.id,

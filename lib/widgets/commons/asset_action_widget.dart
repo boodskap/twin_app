@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/widgets/commons/secondary_button.dart';
 import 'package:twin_commons/widgets/default_deviceview.dart';
@@ -119,7 +120,8 @@ class _AssetActionWidgetState extends State<AssetActionWidget> {
           titleTextStyle: theme
               .getStyle()
               .copyWith(fontWeight: FontWeight.bold, fontSize: 20),
-          title: const Text('Device Data'),
+          // title: const Text('Device Data'),
+          title:ModelHeaderSection(copyText: prettyJson, title: 'Device Data'),
           content: SingleChildScrollView(
             child: Text(
               prettyJson,
@@ -137,5 +139,66 @@ class _AssetActionWidgetState extends State<AssetActionWidget> {
         );
       },
     );
+  }
+}
+
+
+class ModelHeaderSection extends StatefulWidget {
+  final String copyText;
+  final String title;
+  const ModelHeaderSection({super.key, required this.copyText, required this.title});
+
+  @override
+  State<ModelHeaderSection> createState() => _ModelHeaderSectionState();
+}
+
+class _ModelHeaderSectionState extends State<ModelHeaderSection> {
+  bool _showCopiedText = false;
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+         Text(widget.title),
+        Column(
+          children: [
+            Tooltip(
+              message: 'Copy',
+              child: IconButton(
+                icon: Icon(Icons.copy, color: Colors.black),
+                onPressed: () {
+                  copyToClipboard(widget.copyText);
+                },
+              ),
+            ),
+             if (_showCopiedText)
+          Padding(
+            padding: const EdgeInsets.only(top: 3),
+            child: Text(
+              'Copied',
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 13,
+              ),
+            ),
+          ),
+          ],
+        ),
+       
+      ],
+    );
+  }
+
+  copyToClipboard(jsonData) {
+    Clipboard.setData(ClipboardData(text: jsonData));
+    setState(() {
+      _showCopiedText = true;
+    });
+
+    Future.delayed(Duration(seconds: 2), () {
+      setState(() {
+        _showCopiedText = false;
+      });
+    });
   }
 }
