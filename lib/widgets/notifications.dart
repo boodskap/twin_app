@@ -1,6 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:twin_app/core/session_variables.dart';
+import 'package:twin_app/widgets/commons/secondary_button.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:twin_commons/core/twinned_session.dart';
@@ -31,6 +35,7 @@ class _AlarmsNotificationsGridState extends BaseState<AlarmsNotificationsGrid> {
   String _searchQuery = '*';
   bool isShowAll = true;
   TwinUser? user;
+
   @override
   void initState() {
     super.initState();
@@ -363,6 +368,10 @@ class _AlarmsNotificationsGridState extends BaseState<AlarmsNotificationsGrid> {
         TableRow(
           decoration: BoxDecoration(color: Colors.blue[200]),
           children: [
+            // if ((TwinnedSession.instance.isClientAdmin() ||
+            //         TwinnedSession.instance.isAdmin()) &&
+            //     isShowAll)
+            //   _buildTableCell('To', true, false, ""),
             _buildTableCell(
                 _isEmailView
                     ? 'Email Subject'
@@ -414,6 +423,11 @@ class _AlarmsNotificationsGridState extends BaseState<AlarmsNotificationsGrid> {
                         ),
                       ),
                       children: [
+                        // if ((TwinnedSession.instance.isClientAdmin() ||
+                        //         TwinnedSession.instance.isAdmin()) &&
+                        //     isShowAll)
+                        //   _buildTableCell(
+                        //       event.userId!, false, true, event.userId!),
                         Wrap(children: [
                           if (event.icon != null && event.icon != "")
                             SizedBox(
@@ -425,14 +439,11 @@ class _AlarmsNotificationsGridState extends BaseState<AlarmsNotificationsGrid> {
                               ),
                             ),
                           if (_isEmailView)
-                            _buildTableCell(
-                                event.emailSubject!, false, false, ""),
+                            _buildDataTableCell(event.emailSubject!, event),
                           if (_isSMSView)
-                            _buildTableCell(
-                                event.smsMessage!, false, false, ""),
+                            _buildDataTableCell(event.smsMessage!, event),
                           if (_isVoiceView)
-                            _buildTableCell(
-                                event.voiceMessage!, false, false, ""),
+                            _buildDataTableCell(event.voiceMessage!, event),
                         ]),
                         getSourceType(event.sourceType!, event),
                         _buildTableCell(
@@ -504,6 +515,42 @@ class _AlarmsNotificationsGridState extends BaseState<AlarmsNotificationsGrid> {
               ),
             ),
     );
+  }
+
+  Widget _buildDataTableCell(String text, TriggeredEvent eventData) {
+    return Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            InkWell(
+              onTap: () {
+                showEventLogs(context, eventData);
+              },
+              child: const Tooltip(
+                  message: 'View Email Logs Data',
+                  child: Icon(
+                    Icons.remove_red_eye,
+                    size: 20,
+                  )),
+            ),
+            SizedBox(width: 3),
+            Flexible(
+              child: Tooltip(
+                message: text,
+                child: Text(
+                  overflow: TextOverflow.ellipsis,
+                  text,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.normal,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ));
   }
 
   Widget _buildPaginationControls() {
@@ -578,7 +625,8 @@ class _AlarmsNotificationsGridState extends BaseState<AlarmsNotificationsGrid> {
                   "assetName",
                   "premiseName",
                   "facilityName",
-                  "floorName"
+                  "floorName",
+                  "userId"
                 ]
               }
             },
@@ -686,5 +734,105 @@ class _AlarmsNotificationsGridState extends BaseState<AlarmsNotificationsGrid> {
   @override
   void setup() {
     _load();
+  }
+
+  void showEventLogs(BuildContext context, TriggeredEvent emailData) {
+    Map<String, dynamic> emailDataMap;
+
+    if (emailData is Map<String, dynamic>) {
+      emailDataMap = emailData as Map<String, dynamic>;
+    } else
+      emailDataMap = emailData.toJson();
+
+    emailDataMap.remove('emailContent');
+
+    String prettyJson =
+        const JsonEncoder.withIndent('  ').convert(emailDataMap);
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          titleTextStyle: theme
+              .getStyle()
+              .copyWith(fontWeight: FontWeight.bold, fontSize: 20),
+          title: ModelHeaderSection(copyText: prettyJson, title: 'Event Logs Data'),
+          content: SingleChildScrollView(
+            child: Text(
+              prettyJson,
+              style: theme.getStyle(),
+            ),
+          ),
+          actions: [
+            SecondaryButton(
+              labelKey: 'Close',
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class ModelHeaderSection extends StatefulWidget {
+  final String copyText;
+  final String title;
+  const ModelHeaderSection({super.key, required this.copyText, required this.title});
+
+  @override
+  State<ModelHeaderSection> createState() => _ModelHeaderSectionState();
+}
+
+class _ModelHeaderSectionState extends State<ModelHeaderSection> {
+  bool _showCopiedText = false;
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+         Text(widget.title),
+        Column(
+          children: [
+            Tooltip(
+              message: 'Copy',
+              child: IconButton(
+                icon: Icon(Icons.copy, color: Colors.black),
+                onPressed: () {
+                  copyToClipboard(widget.copyText);
+                },
+              ),
+            ),
+             if (_showCopiedText)
+          Padding(
+            padding: const EdgeInsets.only(top: 3),
+            child: Text(
+              'Copied',
+              style: TextStyle(
+                color: Colors.black,
+                fontSize: 13,
+              ),
+            ),
+          ),
+          ],
+        ),
+       
+      ],
+    );
+  }
+
+  copyToClipboard(jsonData) {
+    Clipboard.setData(ClipboardData(text: jsonData));
+    setState(() {
+      _showCopiedText = true;
+    });
+
+    Future.delayed(Duration(seconds: 2), () {
+      setState(() {
+        _showCopiedText = false;
+      });
+    });
   }
 }

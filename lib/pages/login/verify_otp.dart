@@ -212,6 +212,21 @@ class _VerifyOtpMobilePageState extends BaseState<_VerifyOtpMobilePage> {
                                       onChanged: (value) {
                                         setState(() {});
                                       },
+                                      defaultPinTheme: PinTheme(
+                                        constraints: BoxConstraints(
+                                            maxWidth: 50,
+                                            minWidth: 50,
+                                            maxHeight: 50,
+                                            minHeight: 50),
+                                        textStyle: theme.getStyle(),
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          border: Border.all(
+                                              color:
+                                                  theme.getIntermediateColor()),
+                                        ),
+                                      ),
                                     ),
                                   ),
                                   SizedBox(
