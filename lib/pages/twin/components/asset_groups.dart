@@ -267,7 +267,7 @@ class _AssetGroupListState extends BaseState<AssetGroupList> {
       title: 'Warning',
       message: 'Deleting is unrecoverable\n\nDo you want to proceed?',
       titleStyle: theme.getStyle().copyWith(color: Colors.red),
-      messageStyle: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
+      messageStyle: theme.getStyle(),
       onPressed: () async {
         await execute(() async {
           int index = _groups.indexWhere((element) => element.id == e.id);
@@ -321,6 +321,9 @@ class _AssetGroupListState extends BaseState<AssetGroupList> {
       barrierDismissible: false,
       builder: (context) {
         return AlertDialog(
+          titleTextStyle: theme
+              .getStyle()
+              .copyWith(fontSize: 20, fontWeight: FontWeight.bold),
           title: Text(title),
           content: SizedBox(
             width: 500,
@@ -335,18 +338,18 @@ class _AssetGroupListState extends BaseState<AssetGroupList> {
                     },
                     style: theme.getStyle(),
                     decoration: InputDecoration(
-                      hintText: 'Name',
-                      hintStyle: theme.getStyle(),
-                    )),
+                        hintText: 'Name',
+                        labelStyle: theme.getStyle(),
+                        hintStyle: theme.getStyle())),
                 TextField(
                   onChanged: (value) {
                     descText = value;
                   },
                   style: theme.getStyle(),
                   decoration: InputDecoration(
-                    hintText: 'Description',
-                    hintStyle: theme.getStyle(),
-                  ),
+                      hintText: 'Description',
+                      hintStyle: theme.getStyle(),
+                      labelStyle: theme.getStyle()),
                 ),
                 TextField(
                   style: theme.getStyle(),
@@ -355,7 +358,8 @@ class _AssetGroupListState extends BaseState<AssetGroupList> {
                   },
                   decoration: InputDecoration(
                       hintText: 'Tags (space separated)',
-                      hintStyle: theme.getStyle()),
+                      hintStyle: theme.getStyle(),
+                      labelStyle: theme.getStyle()),
                 ),
               ],
             ),
@@ -367,9 +371,7 @@ class _AssetGroupListState extends BaseState<AssetGroupList> {
                 Navigator.pop(context);
               },
             ),
-            divider(
-              horizontal: true,
-            ),
+            divider(horizontal: true),
             PrimaryButton(
               labelKey: "OK",
               onPressed: () {
