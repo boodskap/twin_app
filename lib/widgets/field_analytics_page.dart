@@ -1,12 +1,10 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_commons/analytics/field_analytics.dart';
 import 'package:twin_commons/core/base_state.dart';
-import 'package:twin_commons/util/nocode_utils.dart';
-import 'package:twin_commons/widgets/layout.dart';
-import 'package:twinned_api/api/twinned.swagger.dart' as tapi;
 import 'package:twin_commons/core/twinned_session.dart';
+import 'package:twin_commons/util/nocode_utils.dart';
+import 'package:twinned_api/api/twinned.swagger.dart' as tapi;
 
 class FieldAnalyticsPage extends StatefulWidget {
   final List<String> fields;
@@ -39,6 +37,9 @@ class _FieldAnalyticsPageState extends BaseState<FieldAnalyticsPage> {
     }
     return Scaffold(
       appBar: AppBar(
+        titleTextStyle: theme
+            .getStyle()
+            .copyWith(fontWeight: FontWeight.bold, fontSize: 18),
         backgroundColor: theme.getPrimaryColor(),
         centerTitle: true,
         leading: const BackButton(
@@ -46,9 +47,9 @@ class _FieldAnalyticsPageState extends BaseState<FieldAnalyticsPage> {
         ),
         title: Text(
           title,
-          style: const TextStyle(
-            color: Color(0XFFFFFFFF),
-          ),
+          style: theme.getStyle().copyWith(
+                color: Color(0XFFFFFFFF),
+              ),
         ),
         actions: [
           IconButton(
