@@ -98,6 +98,10 @@ class _ForgotPasswordMobilePageState
               content: Text(
                 'Reset Password OTP has been sent to your email.\nPlease check it.',
               ),
+              titleTextStyle: theme
+                  .getStyle()
+                  .copyWith(fontWeight: FontWeight.bold, fontSize: 20),
+              contentTextStyle: theme.getStyle(),
               actions: <Widget>[
                 PrimaryButton(
                     minimumSize: Size(20, 20),
@@ -119,6 +123,10 @@ class _ForgotPasswordMobilePageState
             title: Text('Error'),
             content: Text(
                 'An error occurred while processing your request. Please try again.'),
+            titleTextStyle: theme
+                .getStyle()
+                .copyWith(fontWeight: FontWeight.bold, fontSize: 20),
+            contentTextStyle: theme.getStyle(),
             actions: <Widget>[
               TextButton(
                 onPressed: () {
