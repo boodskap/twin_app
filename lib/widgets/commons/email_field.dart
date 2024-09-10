@@ -35,6 +35,7 @@ class _EmailFieldState extends State<EmailField> {
             widget.onChanged!(value);
           }
         },
+        style: theme.getStyle(),
         autofillHints: [AutofillHints.username],
         decoration: InputDecoration(
           hintText: "email".tr(),
