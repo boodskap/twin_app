@@ -157,6 +157,7 @@ class _SubscriptionsPageState extends BaseState<SubscriptionsPage> {
           tags: eventRegistration.tags,
           clientIds: eventRegistration.clientIds,
           roles: eventRegistration.roles,
+          countryCode: eventRegistration.countryCode
         );
 
         res = await TwinnedSession.instance.twin.updateEventRegistration(
@@ -173,14 +174,15 @@ class _SubscriptionsPageState extends BaseState<SubscriptionsPage> {
           notification: false,
           fcm: false,
           emailId: user?.email,
-          phoneNumber: '${user?.countryCode ?? ''}${user?.phone ?? ''}',
+          phoneNumber: user?.phone,
           name: 'name',
           targetDeviceIds: [],
           tags: [],
           roles: [],
           clientIds: [],
+          countryCode: user?.countryCode
         );
-
+      
         if (isClient()) {
           evInfo = evInfo.copyWith(clientIds: await getClientIds());
         }
