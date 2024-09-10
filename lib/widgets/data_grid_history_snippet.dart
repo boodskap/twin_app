@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:chopper/chopper.dart' as chopper;
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/widgets/commons/alarm_search.dart';
 import 'package:twin_app/widgets/commons/asset_action_widget.dart';
@@ -15,7 +16,6 @@ import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:twin_commons/core/twinned_session.dart';
 import 'package:twin_commons/widgets/default_deviceview.dart';
 import 'package:twinned_api/api/twinned.swagger.dart' as tapi;
-import 'package:intl/intl.dart';
 
 class DataGridHistorySnippet extends StatefulWidget {
   final bool autoRefresh;
@@ -1091,19 +1091,15 @@ class DataGridHistorySnippetState extends BaseState<DataGridHistorySnippet> {
             },
           if (widget.deviceIds.isNotEmpty)
             {
-              "terms": {
-                widget.oldVersion ? 'deviceId' : 'deviceId.keyword':
-                    widget.deviceIds
-              }
+              "terms": {'deviceId': widget.deviceIds}
             },
           if (widget.assetIds.isNotEmpty ||
               null != _assetGroup && _assetGroup!.assetIds.isNotEmpty)
             {
               "terms": {
-                !widget.oldVersion ? 'assetId' : 'assetId.keyword':
-                    null != _assetGroup
-                        ? _assetGroup!.assetIds
-                        : widget.assetIds
+                'assetId': null != _assetGroup
+                    ? _assetGroup!.assetIds
+                    : widget.assetIds
               }
             },
           if (null != _alarm)

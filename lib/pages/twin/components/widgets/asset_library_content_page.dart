@@ -234,7 +234,7 @@ class _AssetLibraryContentPageState extends BaseState<AssetLibraryContentPage> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
-                                   Text(
+                                  Text(
                                     'Device Models',
                                     style: theme.getStyle().copyWith(
                                         fontWeight: FontWeight.bold,
@@ -267,7 +267,7 @@ class _AssetLibraryContentPageState extends BaseState<AssetLibraryContentPage> {
                                 ],
                               ),
                               divider(),
-                               Text(
+                              Text(
                                 'Allowed Device Models',
                                 style: theme.getStyle().copyWith(
                                     fontWeight: FontWeight.bold, fontSize: 16),
@@ -300,8 +300,6 @@ class _AssetLibraryContentPageState extends BaseState<AssetLibraryContentPage> {
                                         headerBackgroundColor: closeColor,
                                         leftIcon: Icon(
                                           Icons.departure_board_rounded,
-                                          // color: UserSession.getIconColor(),
-                                          // size: UserSession.getIconSize(),
                                         ),
                                         header: Row(
                                           mainAxisAlignment:
@@ -347,7 +345,11 @@ class _AssetLibraryContentPageState extends BaseState<AssetLibraryContentPage> {
       widget.assetModel.allowedDeviceModels!.removeAt(index);
     });
     await alert(
-        'Asset Model - ${widget.assetModel.name}', 'Deleted Successfully');
+        'Asset Model - ${widget.assetModel.name}', 'Deleted Successfully!',
+        contentStyle: theme.getStyle(),
+        titleStyle: theme
+            .getStyle()
+            .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
 
     refresh();
   }
@@ -374,7 +376,11 @@ class _AssetLibraryContentPageState extends BaseState<AssetLibraryContentPage> {
           ));
       if (validateResponse(res)) {
         await alert(
-            'Asset Model - ${widget.assetModel.name}', 'Saved successfully');
+            'Asset Model - ${widget.assetModel.name}', 'Saved successfully!',
+            contentStyle: theme.getStyle(),
+            titleStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
         if (close) {
           _close();
         }
