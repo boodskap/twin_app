@@ -358,7 +358,14 @@ class _UserAddUpdateSnippetState extends BaseState<UserAddUpdateSnippet> {
             apikey: TwinnedSession.instance.authToken, body: _twinUserInfo);
         if (validateResponse(cRes)) {
           _close();
-          alert('Success', 'User ${_twinUserInfo.name} created');
+          alert(
+            'Success',
+            'User ${_twinUserInfo.name} created',
+            titleStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+            contentStyle: theme.getStyle(),
+          );
         }
       } else {
         var uRes = await TwinnedSession.instance.twin.updateTwinUser(
@@ -369,7 +376,14 @@ class _UserAddUpdateSnippetState extends BaseState<UserAddUpdateSnippet> {
         if (validateResponse(uRes)) {
           if (!silent) {
             _close();
-            alert('Success', 'User ${_twinUserInfo.name} updated successfully');
+            alert(
+              'Success',
+              'User ${_twinUserInfo.name} updated successfully',
+              titleStyle: theme
+                  .getStyle()
+                  .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+              contentStyle: theme.getStyle(),
+            );
           }
         }
       }

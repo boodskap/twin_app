@@ -101,7 +101,7 @@ class _OrganizationPageState extends BaseState<OrganizationPage> {
                         OverlayWidget.showOverlay(
                             context: context,
                             topPosition: 170,
-                            rightPosition: 300,
+                            leftPosition: 270,
                             message: " Organization ID Copied!");
                       },
                       child: const Tooltip(
@@ -124,7 +124,7 @@ class _OrganizationPageState extends BaseState<OrganizationPage> {
                         OverlayWidget.showOverlay(
                             context: context,
                             topPosition: 170,
-                            rightPosition: 300,
+                            leftPosition: 300,
                             message: " Domain Key Copied!");
                       },
                       child: const Tooltip(
@@ -147,7 +147,7 @@ class _OrganizationPageState extends BaseState<OrganizationPage> {
                         OverlayWidget.showOverlay(
                             context: context,
                             topPosition: 170,
-                            rightPosition: 300,
+                            leftPosition: 320,
                             message: " API Key Copied!");
                       },
                       child: const Tooltip(
@@ -434,7 +434,14 @@ class _OrganizationPageState extends BaseState<OrganizationPage> {
                   body: getInfo().copyWith(name: value),
                 );
                 if (validateResponse(res)) {
-                  alert('Organization', 'Updated successfully');
+                  alert(
+                    'Organization',
+                    'Updated successfully',
+                    titleStyle: theme
+                        .getStyle()
+                        .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+                    contentStyle: theme.getStyle(),
+                  );
                   _load();
                 }
               });
@@ -460,7 +467,14 @@ class _OrganizationPageState extends BaseState<OrganizationPage> {
                   body: getInfo().copyWith(description: value),
                 );
                 if (validateResponse(res)) {
-                  alert('Organization', 'Updated successfully');
+                  alert(
+                    'Organization',
+                    'Updated successfully',
+                    titleStyle: theme
+                        .getStyle()
+                        .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+                    contentStyle: theme.getStyle(),
+                  );
                   _load();
                 }
               });
@@ -483,7 +497,14 @@ class _OrganizationPageState extends BaseState<OrganizationPage> {
                     apikey: widget.orgInfo.twinAuthToken,
                     body: _twinSysInfo!.copyWith(pulseEmailKey: value));
                 if (validateResponse(res)) {
-                  alert('Email Api', 'Updated successfully');
+                  alert(
+                    'Email Api',
+                    'Updated successfully',
+                    titleStyle: theme
+                        .getStyle()
+                        .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+                    contentStyle: theme.getStyle(),
+                  );
                   _load();
                 }
               });
@@ -506,7 +527,14 @@ class _OrganizationPageState extends BaseState<OrganizationPage> {
                     apikey: widget.orgInfo.twinAuthToken,
                     body: _twinSysInfo!.copyWith(pulseSmsKey: value));
                 if (validateResponse(res)) {
-                  alert('SMS Api', 'Updated successfully');
+                  alert(
+                    'SMS Api',
+                    'Updated successfully',
+                    titleStyle: theme
+                        .getStyle()
+                        .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+                    contentStyle: theme.getStyle(),
+                  );
                   _load();
                 }
               });
@@ -529,7 +557,14 @@ class _OrganizationPageState extends BaseState<OrganizationPage> {
                     apikey: widget.orgInfo.twinAuthToken,
                     body: _twinSysInfo!.copyWith(pulseVoiceKey: value));
                 if (validateResponse(res)) {
-                  alert('Voicemail Api', 'Updated successfully');
+                  alert(
+                    'Voicemail Api',
+                    'Updated successfully',
+                    titleStyle: theme
+                        .getStyle()
+                        .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+                    contentStyle: theme.getStyle(),
+                  );
                   _load();
                 }
               });
@@ -541,6 +576,11 @@ class _OrganizationPageState extends BaseState<OrganizationPage> {
         context: context,
         builder: (ctx) {
           return AlertDialog(
+            titleTextStyle: theme.getStyle().copyWith(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+            contentTextStyle: theme.getStyle(),
             content: PurchaseChangeAddonWidget(
               orgId: orgs[selectedOrg].id,
               purchase: true,

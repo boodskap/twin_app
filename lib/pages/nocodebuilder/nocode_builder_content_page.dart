@@ -1,21 +1,19 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
+import 'package:toggle_switch/toggle_switch.dart';
+import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/pages/nocodebuilder/config_child_palatte.dart';
 import 'package:twin_app/pages/nocodebuilder/config_dashboard_palette.dart';
 import 'package:twin_app/pages/nocodebuilder/config_row_palatte.dart';
 import 'package:twin_app/pages/nocodebuilder/widget_palatte.dart';
+import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:twin_commons/core/base_state.dart';
-import 'package:twinned_widgets/core/top_bar.dart';
-import 'package:toggle_switch/toggle_switch.dart';
+import 'package:twin_commons/core/busy_indicator.dart';
+import 'package:twin_commons/core/twinned_session.dart';
 import 'package:twinned_api/api/twinned.swagger.dart' as twinned;
+import 'package:twinned_widgets/core/top_bar.dart';
 import 'package:twinned_widgets/twinned_dashboard_widget.dart';
 import 'package:twinned_widgets/twinned_widgets.dart';
-import 'package:twin_commons/core/busy_indicator.dart';
-import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:uuid/uuid.dart';
-import 'package:twin_commons/core/twinned_session.dart';
-import 'package:twin_app/core/session_variables.dart';
 
 class NocodeBuilderContentPage extends StatefulWidget {
   twinned.DashboardScreen entity;
@@ -63,7 +61,7 @@ class _NocodeBuilderContentPageState
         children: [
           TopBar(
             title: 'Digital Twin - Dashboard - ${_entity.name}',
-                style: theme.getStyle().copyWith(
+            style: theme.getStyle().copyWith(
                 color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
           ),
           divider(),
@@ -267,7 +265,9 @@ class _NocodeBuilderContentPageState
     super.confirm(
         title: 'Warning',
         message: 'Are you sure to delete this widget?',
-        titleStyle: theme.getStyle().copyWith(color: Colors.red,fontWeight: FontWeight.bold),
+        titleStyle: theme
+            .getStyle()
+            .copyWith(color: Colors.red, fontWeight: FontWeight.bold),
         messageStyle: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
         onPressed: () {
           setState(() {
@@ -360,9 +360,23 @@ class _NocodeBuilderContentPageState
               bgImageFit: _entity.bgImageFit,
               rows: _entity.rows));
       if (validateResponse(sRes)) {
-        alert('Dashboard - ${_entity.name}', 'saved successfully');
+        alert(
+          'Dashboard - ${_entity.name}',
+          'saved successfully',
+          titleStyle: theme
+              .getStyle()
+              .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+          contentStyle: theme.getStyle(),
+        );
       } else {
-        alert('Error', 'Unable to save, unknown failure');
+        alert(
+          'Error',
+          'Unable to save, unknown failure',
+          titleStyle: theme
+              .getStyle()
+              .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+          contentStyle: theme.getStyle(),
+        );
       }
     });
 

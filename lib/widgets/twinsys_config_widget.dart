@@ -105,7 +105,14 @@ class _TwinSysConfigWidgetState extends BaseState<TwinSysConfigWidget> {
           info = info.copyWith(bannerImage: res.entity!.id);
           banner = TwinImageHelper.getCachedDomainImage(info.bannerImage!);
         });
-        await alert('Banner', 'Updated successfully');
+        await alert(
+          'Banner',
+          'Updated successfully',
+          titleStyle: theme
+              .getStyle()
+              .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+          contentStyle: theme.getStyle(),
+        );
       }
     });
 
@@ -124,7 +131,14 @@ class _TwinSysConfigWidgetState extends BaseState<TwinSysConfigWidget> {
           info = info.copyWith(logoImage: res.entity!.id);
           logo = TwinImageHelper.getCachedDomainImage(info.logoImage!);
         });
-        await alert('Logo', 'Updated successfully');
+        await alert(
+          'Logo',
+          'Updated successfully',
+          titleStyle: theme
+              .getStyle()
+              .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+          contentStyle: theme.getStyle(),
+        );
       }
     });
 
@@ -140,14 +154,22 @@ class _TwinSysConfigWidgetState extends BaseState<TwinSysConfigWidget> {
       var res = await TwinnedSession.instance.twin.upsertTwinConfig(
           apikey: TwinnedSession.instance.authToken, body: info);
       if (validateResponse(res)) {
-        await alert('Twin Settings', 'Updated successfully');
+        await alert(
+          'Twin Settings',
+          'Updated successfully',
+          titleStyle: theme
+              .getStyle()
+              .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+          contentStyle: theme.getStyle(),
+        );
         if (close) {
-          _close();
+          // _close();
         }
       }
     });
 
     loading = false;
+    refresh();
   }
 
   void _close() {
