@@ -230,6 +230,9 @@ class _LandingContentPageState extends BaseState<LandingContentPage> {
 
   confirmDeletion(BuildContext context, twinned.LandingPage landingPage) {
     AlertDialog alert = AlertDialog(
+      titleTextStyle: theme.getStyle().copyWith(
+          color: Colors.red, fontWeight: FontWeight.bold, fontSize: 18),
+      contentTextStyle: theme.getStyle(),
       title: Text(
         "WARNING",
         style: theme.getStyle().copyWith(
