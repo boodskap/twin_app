@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/widgets/buy_button.dart';
+import 'package:twin_app/widgets/client_snippet.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:twin_app/widgets/commons/secondary_button.dart';
 import 'package:twin_app/widgets/purchase_change_addon_widget.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
-import 'package:twin_commons/core/twinned_session.dart';
-import 'package:twin_app/widgets/client_snippet.dart';
-import 'package:twinned_api/twinned_api.dart' as tapi;
-import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_commons/core/twin_image_helper.dart';
+import 'package:twin_commons/core/twinned_session.dart';
+import 'package:twinned_api/twinned_api.dart' as tapi;
 
 class Clients extends StatefulWidget {
   const Clients({super.key});
@@ -248,6 +248,12 @@ class _ClientsState extends BaseState<Clients> {
         });
 
     AlertDialog alert = AlertDialog(
+      titleTextStyle: theme.getStyle().copyWith(
+            color: Colors.red,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+      contentTextStyle: theme.getStyle(),
       title: Text(
         "WARNING",
         style: theme.getStyle().copyWith(
@@ -310,6 +316,10 @@ class _ClientsState extends BaseState<Clients> {
         context: context,
         builder: (ctx) {
           return AlertDialog(
+            titleTextStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+            contentTextStyle: theme.getStyle(),
             content: PurchaseChangeAddonWidget(
               orgId: orgs[selectedOrg].id,
               purchase: true,

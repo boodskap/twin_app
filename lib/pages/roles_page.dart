@@ -258,6 +258,12 @@ class _RolesPageState extends BaseState<RolesPage> {
         });
 
     AlertDialog alert = AlertDialog(
+      titleTextStyle: theme.getStyle().copyWith(
+            color: Colors.red,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+      contentTextStyle: theme.getStyle(),
       title: Text(
         "WARNING",
         style: theme.getStyle().copyWith(
