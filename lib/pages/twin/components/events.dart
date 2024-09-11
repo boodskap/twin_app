@@ -224,7 +224,7 @@ class _EventsState extends BaseState<Events> {
                             message:
                                 _canEdit ? "Delete" : "No Permission to Delete",
                             child: Icon(
-                              Icons.delete,
+                              Icons.delete_forever,
                               color: _canEdit
                                   ? theme.getPrimaryColor()
                                   : Colors.grey,
@@ -333,7 +333,10 @@ class _EventsState extends BaseState<Events> {
                 onPressed: () {
                   if (nameText!.length < 3) {
                     alert('Invalid',
-                        'Name is required and should be minimum 3 characters');
+                        'Name is required and should be minimum 3 characters',
+                        contentStyle: theme.getStyle(),
+                        titleStyle: theme.getStyle().copyWith(
+                            fontSize: 18, fontWeight: FontWeight.bold));
                     return;
                   }
                   setState(() {
@@ -395,7 +398,11 @@ class _EventsState extends BaseState<Events> {
         );
 
         if (validateResponse(res)) {
-          await alert('', 'Event ${event.name} Image Uploaded Successfully');
+          await alert('Event - ${event.name}', ' Image Uploaded Successfully!',
+              contentStyle: theme.getStyle(),
+              titleStyle: theme
+                  .getStyle()
+                  .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
         }
       });
     }
@@ -428,7 +435,6 @@ class _EventsState extends BaseState<Events> {
           ));
       if (validateResponse(mRes)) {
         await _edit(mRes.body!.entity!);
-        alert("Event ${mRes.body!.entity!.name}", "created successfully!");
       }
     });
     loading = false;
@@ -469,7 +475,11 @@ class _EventsState extends BaseState<Events> {
               await _load();
               _entities.removeAt(index);
               _cards.removeAt(index);
-              alert("Success", "Event ${e.name} Deleted Successfully!");
+              alert("Event - ${e.name}", "Deleted Successfully!",
+                  contentStyle: theme.getStyle(),
+                  titleStyle: theme
+                      .getStyle()
+                      .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
             }
           });
         });

@@ -211,7 +211,7 @@ class _FloorsState extends BaseState<Floors> {
                                   }
                                 : null,
                             child: Icon(
-                              Icons.delete,
+                              Icons.delete_forever,
                               color: _canEdit ? theme.getPrimaryColor() : null,
                             ),
                           ),
@@ -315,7 +315,7 @@ class _FloorsState extends BaseState<Floors> {
               await _load();
               _entities.removeAt(index);
               _cards.removeAt(index);
-              alert("Success", "Floor ${e.name} Deleted Successfully!",
+              alert("Floor - ${e.name}", " Deleted Successfully!",
                   contentStyle: theme.getStyle(),
                   titleStyle: theme
                       .getStyle()

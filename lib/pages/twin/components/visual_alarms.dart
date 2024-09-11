@@ -248,8 +248,9 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
         barrierDismissible: false,
         builder: (context) {
           return AlertDialog(
-            titleTextStyle:
-                theme.getStyle().copyWith(fontSize: 20, fontWeight: FontWeight.bold),
+            titleTextStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 20, fontWeight: FontWeight.bold),
             title: Text(title),
             content: SizedBox(
               width: 500,
@@ -314,7 +315,10 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
                 onPressed: () {
                   if (nameText!.length < 3) {
                     alert('Invalid',
-                        'Name is required and should be minimum 3 characters');
+                        'Name is required and should be minimum 3 characters',
+                        contentStyle: theme.getStyle(),
+                        titleStyle: theme.getStyle().copyWith(
+                            fontSize: 18, fontWeight: FontWeight.bold));
                     return;
                   }
                   setState(() {
@@ -353,7 +357,11 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
           ));
       if (validateResponse(mRes)) {
         await _edit(mRes.body!.entity!);
-        alert('Success', 'Alarm ${name} created successfully');
+        alert('Visual Alarm - ${name}', ' Created successfully!',
+            contentStyle: theme.getStyle(),
+            titleStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
       }
     });
     loading = false;
@@ -427,6 +435,11 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
         await _load();
         _entities.removeAt(index);
         _cards.removeAt(index);
+        alert("Visual Alarm - ${e.name}", " Deleted Successfully!",
+            contentStyle: theme.getStyle(),
+            titleStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
       }
     });
     loading = false;

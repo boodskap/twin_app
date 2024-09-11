@@ -321,7 +321,7 @@ class _DeviceModelContentPageState extends BaseState<DeviceModelContentPage> {
             widget.model = res.body!.entity;
           });
           await alert(
-              'Device Model', ' ${_nameController.text} saved successfully!',
+              'Device Model - ${widget.model!.name}', 'Saved successfully!',
               contentStyle: theme.getStyle(),
               titleStyle: theme
                   .getStyle()
@@ -353,7 +353,7 @@ class _DeviceModelContentPageState extends BaseState<DeviceModelContentPage> {
             widget.model = res.body?.entity;
           });
           await alert(
-              'Device Model ', '${_nameController.text} saved successfully!',
+              'Device Model - ${widget.model!.name}', 'Saved successfully!',
               contentStyle: theme.getStyle(),
               titleStyle: theme
                   .getStyle()

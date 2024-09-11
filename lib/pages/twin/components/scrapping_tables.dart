@@ -170,7 +170,7 @@ class _ScrappingTablesState extends BaseState<ScrappingTables> {
                                 }
                               : null,
                           child: Icon(
-                            Icons.delete_forever_rounded,
+                            Icons.delete_forever,
                             color: _canEdit ? Colors.white : Colors.grey,
                           ),
                         ),
@@ -403,7 +403,11 @@ class _ScrappingTablesState extends BaseState<ScrappingTables> {
         await _load();
         _entities.removeAt(index);
         _cards.removeAt(index);
-        alert("Success", "Scrapping Table ${e.name} Deleted Successfully!");
+        alert("Scrapping Table - ${e.name}", "Deleted Successfully!",
+            contentStyle: theme.getStyle(),
+            titleStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
       }
     });
     loading = false;

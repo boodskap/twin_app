@@ -165,7 +165,7 @@ class _DeviceLibraryState extends BaseState<DeviceLibrary> {
                       InkWell(
                         onTap: _canEdit ? () => _delete(e) : null,
                         child: Icon(
-                          Icons.delete,
+                          Icons.delete_forever,
                           color:
                               _canEdit ? theme.getPrimaryColor() : Colors.grey,
                         ),
@@ -260,7 +260,7 @@ class _DeviceLibraryState extends BaseState<DeviceLibrary> {
             await _load();
             _entities.removeAt(index);
             _cards.removeAt(index);
-            alert("Success", "Device Model ${e.name} Deleted Successfully!",
+            alert("Device Model - ${e.name}", " Deleted Successfully!",
                 contentStyle: theme.getStyle(),
                 titleStyle: theme
                     .getStyle()

@@ -306,33 +306,6 @@ class _AssetContentPageState extends BaseState<AssetContentPage> {
         });
   }
 
-  // Future<void> _pickLocation() async {
-  //   return showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         content: SizedBox(
-  //           width: 1000,
-  //           child: OSMLocationPicker(
-  //             longitude: _pickedLocation?.coordinates[0],
-  //             latitude: _pickedLocation?.coordinates[1],
-  //             onPicked: (pickedData) {
-  //               setState(() {
-  //                 _pickedLocation = GeoLocation(
-  //                     type: 'point',
-  //                     coordinates: [pickedData.longitude, pickedData.latitude]);
-  //                 _location.text =
-  //                     '${_pickedLocation!.coordinates[0]}, ${_pickedLocation!.coordinates[1]}';
-  //               });
-  //               Navigator.of(context).pop();
-  //             },
-  //           ),
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
-
   // using google map
   Future<void> _pickLocation(BuildContext context) async {
     double pickedLatitude =
@@ -344,6 +317,11 @@ class _AssetContentPageState extends BaseState<AssetContentPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          titleTextStyle: theme.getStyle().copyWith(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
+          contentTextStyle: theme.getStyle(),
           backgroundColor: Colors.white,
           content: SingleChildScrollView(
             child: ConstrainedBox(
@@ -684,6 +662,11 @@ class _AssetContentPageState extends BaseState<AssetContentPage> {
 
       if (validateResponse(res)) {
         _close();
+        alert('Asset - ${res.body!.entity!.name}', 'Saved successfully!',
+            titleStyle: theme
+                .getStyle()
+                .copyWith(fontWeight: FontWeight.bold, fontSize: 18),
+            contentStyle: theme.getStyle());
       }
     });
   }
@@ -706,6 +689,11 @@ class _AssetContentPageState extends BaseState<AssetContentPage> {
 
       if (validateResponse(res)) {
         _close();
+        alert('Facility - ${res.body!.entity!.name}', 'Saved successfully!',
+            titleStyle: theme
+                .getStyle()
+                .copyWith(fontWeight: FontWeight.bold, fontSize: 18),
+            contentStyle: theme.getStyle());
       }
     });
   }
@@ -728,6 +716,11 @@ class _AssetContentPageState extends BaseState<AssetContentPage> {
 
       if (validateResponse(res)) {
         _close();
+        alert('Floor - ${res.body!.entity!.name}', 'Saved successfully!',
+            titleStyle: theme
+                .getStyle()
+                .copyWith(fontWeight: FontWeight.bold, fontSize: 18),
+            contentStyle: theme.getStyle());
       }
     });
   }
@@ -753,6 +746,11 @@ class _AssetContentPageState extends BaseState<AssetContentPage> {
           body: body);
       if (validateResponse(res)) {
         _close();
+        alert('Asset - ${res.body!.entity!.name}', 'Saved successfully!',
+            titleStyle: theme
+                .getStyle()
+                .copyWith(fontWeight: FontWeight.bold, fontSize: 18),
+            contentStyle: theme.getStyle());
       }
     });
   }
@@ -763,6 +761,11 @@ class _AssetContentPageState extends BaseState<AssetContentPage> {
         barrierDismissible: false,
         builder: (context) {
           return AlertDialog(
+            titleTextStyle: theme.getStyle().copyWith(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+            contentTextStyle: theme.getStyle(),
             scrollable: true,
             content: SizedBox(
               width: MediaQuery.of(context).size.width / 2,

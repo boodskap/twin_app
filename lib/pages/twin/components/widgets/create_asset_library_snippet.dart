@@ -235,7 +235,8 @@ class _CreateEditAssetLibraryState extends BaseState<CreateEditAssetLibrary>
           body: _assetModelInfo);
       if (validateResponse(uRes)) {
         _close();
-        alert('Tank Type', '${_assetModelInfo.name} updated successfully!',
+        alert(
+            'Asset Library - ${_assetModelInfo.name}', ' Updated successfully!',
             contentStyle: theme.getStyle(),
             titleStyle: theme
                 .getStyle()
@@ -254,7 +255,8 @@ class _CreateEditAssetLibraryState extends BaseState<CreateEditAssetLibrary>
           apikey: TwinnedSession.instance.authToken, body: _assetModelInfo);
       if (validateResponse(uRes)) {
         _close();
-        alert('Tank Type', '${_assetModelInfo.name} created successfully!',
+        alert(
+            'Asset Library - ${_assetModelInfo.name}', ' Created successfully!',
             contentStyle: theme.getStyle(),
             titleStyle: theme
                 .getStyle()

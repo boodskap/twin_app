@@ -319,33 +319,6 @@ class _FacilityContentPageState extends BaseState<FacilityContentPage> {
     }
   }
 
-  // Future<void> _pickLocation() async {
-  //   return showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         content: SizedBox(
-  //           width: 1000,
-  //           child: OSMLocationPicker(
-  //             longitude: _pickedLocation?.coordinates[0],
-  //             latitude: _pickedLocation?.coordinates[1],
-  //             onPicked: (pickedData) {
-  //               setState(() {
-  //                 _pickedLocation = GeoLocation(
-  //                     type: 'point',
-  //                     coordinates: [pickedData.longitude, pickedData.latitude]);
-  //                 _location.text =
-  //                     '${_pickedLocation!.coordinates[0]}, ${_pickedLocation!.coordinates[1]}';
-  //               });
-  //               Navigator.of(context).pop();
-  //             },
-  //           ),
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
-
   Future<void> _pickLocation(BuildContext context) async {
     double pickedLatitude =
         _pickedLocation != null ? _pickedLocation!.coordinates[1] : 39.6128;
@@ -718,8 +691,11 @@ class _FacilityContentPageState extends BaseState<FacilityContentPage> {
 
       if (validateResponse(res)) {
         _close();
-        alert('Success',
-            'Facility ${res.body!.entity!.name} saved successfully!');
+        alert('Facility - ${res.body!.entity!.name}', ' Saved successfully!',
+            contentStyle: theme.getStyle(),
+            titleStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
       }
     });
   }
@@ -742,6 +718,11 @@ class _FacilityContentPageState extends BaseState<FacilityContentPage> {
 
       if (validateResponse(res)) {
         _close();
+        alert('Floor - ${res.body!.entity!.name}', ' Saved successfully!',
+            contentStyle: theme.getStyle(),
+            titleStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
       }
     });
   }
@@ -764,6 +745,11 @@ class _FacilityContentPageState extends BaseState<FacilityContentPage> {
 
       if (validateResponse(res)) {
         _close();
+        alert('Asset - ${res.body!.entity!.name}', ' Saved successfully!',
+            contentStyle: theme.getStyle(),
+            titleStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
       }
     });
   }
