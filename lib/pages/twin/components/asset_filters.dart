@@ -415,8 +415,8 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
         if (validateResponse(res)) {
           await _load();
           alert(
-            'DataFilter ${res.body!.entity!.name} ',
-            'created successfully!',
+            'DataFilter - ${res.body!.entity!.name} ',
+            'Created successfully!',
             titleStyle: theme
                 .getStyle()
                 .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
@@ -459,8 +459,8 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
               _dataFilters.removeAt(index);
 
               alert(
-                "Success",
-                "DataFilter ${e.name} Deleted Successfully!",
+                "DataFilter - ${e.name}",
+                "Deleted successfully!",
                 titleStyle: theme
                     .getStyle()
                     .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
@@ -494,8 +494,8 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
               _fieldFilters.removeAt(index);
 
               alert(
-                "Success",
-                "Field Filter ${e.name} Deleted Successfully!",
+                "Field Filter - ${e.name}",
+                "Deleted successfully!",
                 titleStyle: theme
                     .getStyle()
                     .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
@@ -638,8 +638,8 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
         if (validateResponse(rRes)) {
           await _loadDataFilters();
           alert(
-            'Filter ${rRes.body!.entity!.name} ',
-            'updated successfully!',
+            'Filter - ${rRes.body!.entity!.name} ',
+            'Updated successfully!',
             titleStyle: theme
                 .getStyle()
                 .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
@@ -680,7 +680,7 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
         if (validateResponse(rRes)) {
           await _loadFieldFilters();
           alert(
-            'Filter ${rRes.body!.entity!.name} ',
+            'Filter - ${rRes.body!.entity!.name} ',
             'Updated successfully!',
             titleStyle: theme
                 .getStyle()

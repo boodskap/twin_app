@@ -303,8 +303,12 @@ class _ScrappingTablesContentPageState
         setState(() {
           widget.model = res.body!.entity;
         });
-        await alert('Success ',
-            'Scrapping Table ${_nameController.text} saved successfully');
+        await alert(
+            'Scrapping Table - ${_nameController.text}', 'Saved successfully!',
+            contentStyle: theme.getStyle(),
+            titleStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
         Navigator.pop(context);
       }
     } catch (e, s) {

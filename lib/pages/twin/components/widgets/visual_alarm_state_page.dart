@@ -109,7 +109,11 @@ class _VisualAlarmStatePageState extends BaseState<VisualAlarmStatePage> {
             deviceId: widget.alarm.deviceId,
           ));
       if (validateResponse(res)) {
-        await alert(widget.alarm.name, 'Saved successfully');
+        await alert('Alarm - ${widget.alarm.name}', 'Saved successfully!',
+            contentStyle: theme.getStyle(),
+            titleStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
         _close();
       }
     } catch (e, s) {
@@ -390,7 +394,7 @@ class _AlarmMatchTypeDropDownState extends State<AlarmMatchTypeDropDown> {
   @override
   Widget build(BuildContext context) {
     return DropdownButton<tapi.AlarmMatchGroupMatchType>(
-      style: theme.getStyle(),
+        style: theme.getStyle(),
         value: widget.selected,
         items: _items,
         onChanged: (value) {

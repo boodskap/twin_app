@@ -133,7 +133,7 @@ class _AssetDeviceState extends BaseState<AssetDevice> {
             assetId: widget.asset.id,
             body: Utils.assetInfo(widget.asset));
         if (validateResponse(res)) {
-          await alert(widget.asset.name, 'Saved successfully.');
+          await alert("Asset - ${widget.asset.name}", 'Saved successfully!');
           _close();
         }
       }

@@ -281,7 +281,7 @@ class _AssetLibraryState extends BaseState<AssetLibrary> {
       await _load();
       _entities.removeAt(index);
       _cards.removeAt(index);
-      alert("Success", "Asset Library ${e.name} Deleted Successfully!",
+      alert("Asset Library - ${e.name}", " Deleted Successfully!",
           contentStyle: theme.getStyle(),
           titleStyle: theme
               .getStyle()
