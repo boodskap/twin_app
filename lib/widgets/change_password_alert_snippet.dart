@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
-import 'package:twin_app/widgets/commons/secondary_button.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/twinned_session.dart';
 import 'package:twinned_api/twinned_api.dart';
-import 'package:twin_app/core/session_variables.dart';
 
 class ChangePasswordSnippet extends StatefulWidget {
   const ChangePasswordSnippet({super.key});
@@ -57,16 +56,39 @@ class _ChangePasswordSnippetState extends BaseState<ChangePasswordSnippet> {
             );
             if (validateResponse(res)) {
               if (rememberMe) {}
-              await alert('Success', 'Password Changed Successfully');
+              await alert(
+                'Success',
+                'Password Changed Successfully',
+                titleStyle: theme
+                    .getStyle()
+                    .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+                contentStyle: theme.getStyle(),
+              );
             }
           } else {
-            alert('Warning', 'Changing Password Mismatched');
+            alert(
+              'Warning',
+              'Changing Password Mismatched',
+              titleStyle: theme
+                  .getStyle()
+                  .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+              contentStyle: theme.getStyle(),
+            );
           }
         } else {
-          alert('Warning', 'Wrong Old Password');
+          alert(
+            'Warning',
+            'Wrong Old Password',
+            titleStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+            contentStyle: theme.getStyle(),
+          );
         }
       }
-    } catch (e) {}
+    } catch (e) {
+      
+    }
   }
 
   @override
@@ -121,6 +143,9 @@ class _ChangePasswordSnippetState extends BaseState<ChangePasswordSnippet> {
                         style: theme.getStyle(),
                         controller: oldPasswordController,
                         decoration: InputDecoration(
+                          hintStyle: theme.getStyle(),
+                          errorStyle: theme.getStyle(),
+                          labelStyle: theme.getStyle(),
                           suffixIcon: IconButton(
                             onPressed: () {
                               setState(() {
@@ -158,6 +183,9 @@ class _ChangePasswordSnippetState extends BaseState<ChangePasswordSnippet> {
                         style: theme.getStyle(),
                         controller: newPasswordController,
                         decoration: InputDecoration(
+                          hintStyle: theme.getStyle(),
+                          errorStyle: theme.getStyle(),
+                          labelStyle: theme.getStyle(),
                           suffixIcon: IconButton(
                             onPressed: () {
                               setState(() {
@@ -198,6 +226,9 @@ class _ChangePasswordSnippetState extends BaseState<ChangePasswordSnippet> {
                         style: theme.getStyle(),
                         controller: confirmPasswordController,
                         decoration: InputDecoration(
+                          hintStyle: theme.getStyle(),
+                          errorStyle: theme.getStyle(),
+                          labelStyle: theme.getStyle(),
                           suffixIcon: IconButton(
                             onPressed: () {
                               setState(() {

@@ -194,7 +194,7 @@ class _FacilitiesState extends BaseState<Facilities> {
                                   }
                                 : null,
                             child: Icon(
-                              Icons.delete,
+                              Icons.delete_forever,
                               color: _canEdit ? theme.getPrimaryColor() : null,
                             ),
                           ),
@@ -290,7 +290,11 @@ class _FacilitiesState extends BaseState<Facilities> {
               await _load();
               _entities.removeAt(index);
               _cards.removeAt(index);
-              alert('Success', 'Facility ${e.name} deleted!');
+              alert('Facility - ${e.name}', ' Deleted successfully!',
+                  contentStyle: theme.getStyle(),
+                  titleStyle: theme
+                      .getStyle()
+                      .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
             }
           });
         });

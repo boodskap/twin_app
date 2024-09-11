@@ -318,7 +318,11 @@ class _InstallationDatabaseSnippetState
             apikey: TwinnedSession.instance.authToken, body: _device);
         if (validateResponse(cRes)) {
           _close();
-          alert('Success', 'Device ${_device.name} created');
+          alert('Device - ${_device.name}', ' Created successfully!',
+              contentStyle: theme.getStyle(),
+              titleStyle: theme
+                  .getStyle()
+                  .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
         }
       } else {
         var uRes = await TwinnedSession.instance.twin.updateDevice(
@@ -328,7 +332,11 @@ class _InstallationDatabaseSnippetState
         if (validateResponse(uRes)) {
           if (!silent) {
             _close();
-            alert('Success', 'Device ${_device.name} updated successfully');
+            alert('Device - ${_device.name}', ' Updated successfully!',
+                contentStyle: theme.getStyle(),
+                titleStyle: theme
+                    .getStyle()
+                    .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
           }
         }
       }

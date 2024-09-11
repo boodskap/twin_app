@@ -318,32 +318,6 @@ class _FloorContentPageState extends BaseState<FloorContentPage> {
         return 'Name';
     }
   }
-  // Future<void> _pickLocation() async {
-  //   return showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         content: SizedBox(
-  //           width: 1000,
-  //           child: OSMLocationPicker(
-  //             longitude: _pickedLocation?.coordinates[0],
-  //             latitude: _pickedLocation?.coordinates[1],
-  //             onPicked: (pickedData) {
-  //               setState(() {
-  //                 _pickedLocation = GeoLocation(
-  //                     type: 'point',
-  //                     coordinates: [pickedData.longitude, pickedData.latitude]);
-  //                 _location.text =
-  //                     '${_pickedLocation!.coordinates[0]}, ${_pickedLocation!.coordinates[1]}';
-  //               });
-  //               Navigator.of(context).pop();
-  //             },
-  //           ),
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
 
   Future<void> _pickLocation(BuildContext context) async {
     double pickedLatitude =
@@ -738,6 +712,11 @@ class _FloorContentPageState extends BaseState<FloorContentPage> {
 
       if (validateResponse(res)) {
         _close();
+        alert('Floor - ${_name.text}', ' Saved successfully!',
+            contentStyle: theme.getStyle(),
+            titleStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 20, fontWeight: FontWeight.bold));
       }
     });
   }

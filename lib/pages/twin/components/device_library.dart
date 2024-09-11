@@ -73,7 +73,7 @@ class _DeviceLibraryState extends BaseState<DeviceLibrary> {
                 width: 250,
                 child: SearchBar(
                   leading: Icon(Icons.search),
-                  hintText: 'Search device library',
+                  hintText: 'Search Device Library',
                   textStyle: WidgetStatePropertyAll(theme.getStyle()),
                   hintStyle: WidgetStatePropertyAll(theme.getStyle()),
                   onChanged: (val) {
@@ -165,7 +165,7 @@ class _DeviceLibraryState extends BaseState<DeviceLibrary> {
                       InkWell(
                         onTap: _canEdit ? () => _delete(e) : null,
                         child: Icon(
-                          Icons.delete,
+                          Icons.delete_forever,
                           color:
                               _canEdit ? theme.getPrimaryColor() : Colors.grey,
                         ),
@@ -250,7 +250,7 @@ class _DeviceLibraryState extends BaseState<DeviceLibrary> {
         message:
             'Deleting is unrecoverable\nIt may also delete all the related models and components\n\nDo you want to proceed?',
         titleStyle: theme.getStyle().copyWith(color: Colors.red),
-        messageStyle: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
+        messageStyle: theme.getStyle(),
         onPressed: () async {
           await execute(() async {
             int index = _entities.indexWhere((element) => element.id == e.id);
@@ -260,7 +260,11 @@ class _DeviceLibraryState extends BaseState<DeviceLibrary> {
             await _load();
             _entities.removeAt(index);
             _cards.removeAt(index);
-            alert("Success", "DeviceModel ${e.name} Deleted Successfully!");
+            alert("Device Model - ${e.name}", " Deleted Successfully!",
+                contentStyle: theme.getStyle(),
+                titleStyle: theme
+                    .getStyle()
+                    .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
           });
         });
     await _load();

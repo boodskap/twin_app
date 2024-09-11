@@ -3,6 +3,7 @@ import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/widgets/buy_button.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:twin_app/widgets/commons/secondary_button.dart';
+import 'package:twin_app/widgets/country_codes.dart';
 import 'package:twin_app/widgets/purchase_change_addon_widget.dart';
 import 'package:twin_app/widgets/user_add_update_snippet.dart';
 import 'package:twin_commons/core/base_state.dart';
@@ -10,7 +11,6 @@ import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:twin_commons/core/twin_image_helper.dart';
 import 'package:twin_commons/core/twinned_session.dart';
 import 'package:twinned_api/twinned_api.dart' as tapi;
-import 'package:twin_app/widgets/country_codes.dart';
 
 var userdefaultImage = Center(
   child: Image.asset(
@@ -511,7 +511,8 @@ class _UsersState extends BaseState<Users> {
 
   void _addUpdateUserDialog({tapi.TwinUser? twinUser}) async {
     await super.alertDialog(
-      titleStyle: theme.getStyle().copyWith(fontWeight: FontWeight.bold,fontSize: 20),
+      titleStyle:
+          theme.getStyle().copyWith(fontWeight: FontWeight.bold, fontSize: 18),
       title: null == twinUser ? 'Add New User' : 'Update User',
       body: UserAddUpdateSnippet(
         twinUser: twinUser,
@@ -539,6 +540,12 @@ class _UsersState extends BaseState<Users> {
       },
     );
     AlertDialog alert = AlertDialog(
+      titleTextStyle: theme.getStyle().copyWith(
+            color: Colors.red,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+      contentTextStyle: theme.getStyle(),
       title: Text(
         "WARNING",
         style: theme.getStyle().copyWith(
@@ -602,6 +609,11 @@ class _UsersState extends BaseState<Users> {
         context: context,
         builder: (ctx) {
           return AlertDialog(
+            titleTextStyle: theme.getStyle().copyWith(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+            contentTextStyle: theme.getStyle(),
             content: PurchaseChangeAddonWidget(
               orgId: orgs[selectedOrg].id,
               purchase: true,
@@ -679,7 +691,10 @@ class TableHeader extends StatelessWidget {
       child: Center(
         child: Text(
           title,
-          style: theme.getStyle().copyWith(fontWeight: FontWeight.bold,fontSize: 16),
+          style: theme.getStyle().copyWith(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
         ),
       ),
     );

@@ -377,6 +377,10 @@ class _CurrentPlanState extends BaseState<CurrentPlan> {
         context: context,
         builder: (ctx) {
           return AlertDialog(
+            contentTextStyle: theme.getStyle(),
+            titleTextStyle: theme
+                .getStyle()
+                .copyWith(fontWeight: FontWeight.bold, fontSize: 18),
             content: PurchaseChangeAddonWidget(
                 orgId: orgs[selectedOrg].id,
                 purchase: true,

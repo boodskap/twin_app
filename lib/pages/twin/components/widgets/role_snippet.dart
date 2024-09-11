@@ -175,7 +175,14 @@ class _RolesSnippetState extends BaseState<RolesSnippet> {
             .createRole(apikey: TwinnedSession.instance.authToken, body: _role);
         if (validateResponse(cRes)) {
           _close();
-          alert('Success', 'Role ${_role.name} created');
+          alert(
+            'Success',
+            'Role ${_role.name} created',
+            titleStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+            contentStyle: theme.getStyle(),
+          );
         }
       } else {
         var uRes = await TwinnedSession.instance.twin.updateRole(
@@ -185,7 +192,14 @@ class _RolesSnippetState extends BaseState<RolesSnippet> {
         if (validateResponse(uRes)) {
           if (!silent) {
             _close();
-            alert('Success', 'Role ${_role.name} updated successfully');
+            alert(
+              'Success',
+              'Role ${_role.name} updated successfully',
+              titleStyle: theme
+                  .getStyle()
+                  .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+              contentStyle: theme.getStyle(),
+            );
           }
           if (null != widget.changeNotifier) {
             widget.changeNotifier!.value = uRes.body!.entity!;

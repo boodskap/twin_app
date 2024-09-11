@@ -137,7 +137,14 @@ class _GroupAssetsState extends BaseState<GroupAssets> {
               target: AssetGroupInfoTarget.app,
               assetIds: widget.group.assetIds));
       if (validateResponse(res)) {
-        await alert(widget.group.name, 'Saved successfully!');
+        await alert(
+          "Asset Group - ${widget.group.name}",
+          'Saved successfully!',
+          titleStyle: theme
+              .getStyle()
+              .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+          contentStyle: theme.getStyle(),
+        );
         _close();
       }
     });

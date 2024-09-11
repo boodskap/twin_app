@@ -173,8 +173,9 @@ class _FloorsState extends BaseState<Floors> {
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
                       e.name,
-                      style:
-                          theme.getStyle().copyWith(fontWeight: FontWeight.bold),
+                      style: theme
+                          .getStyle()
+                          .copyWith(fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
@@ -186,7 +187,8 @@ class _FloorsState extends BaseState<Floors> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Tooltip(
-                          message: _canEdit ? "Update" : "No Permission to Edit",
+                          message:
+                              _canEdit ? "Update" : "No Permission to Edit",
                           child: InkWell(
                             onTap: _canEdit
                                 ? () {
@@ -209,7 +211,7 @@ class _FloorsState extends BaseState<Floors> {
                                   }
                                 : null,
                             child: Icon(
-                              Icons.delete,
+                              Icons.delete_forever,
                               color: _canEdit ? theme.getPrimaryColor() : null,
                             ),
                           ),
@@ -313,7 +315,11 @@ class _FloorsState extends BaseState<Floors> {
               await _load();
               _entities.removeAt(index);
               _cards.removeAt(index);
-              alert("Success", "Floor ${e.name} Deleted Successfully!");
+              alert("Floor - ${e.name}", " Deleted Successfully!",
+                  contentStyle: theme.getStyle(),
+                  titleStyle: theme
+                      .getStyle()
+                      .copyWith(fontSize: 20, fontWeight: FontWeight.bold));
             }
           });
         });

@@ -460,9 +460,9 @@ class _PurchaseChangeAddonWidgetState
                     onPressed: () {
                       Navigator.pop(context);
                     },
-                    child: const Text(
+                    child: Text(
                       'CANCEL',
-                      style: TextStyle(fontSize: 16),
+                      style: theme.getStyle().copyWith(fontSize: 16),
                     )),
                 divider(horizontal: true),
                 if (null != _plan)
