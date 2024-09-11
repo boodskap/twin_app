@@ -1009,7 +1009,8 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
                                         ],
                                       ),
                                       divider(),
-                                      if (canCreate())
+                                      if (canCreate() &&
+                                          widget.type == InfraType.premise)
                                         Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.end,
