@@ -3,13 +3,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/pages/pulse/widgets/gateway_dropdown.dart';
-import 'package:twin_app/pages/twin/components/widgets/create_asset_library_snippet.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/twinned_session.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:twin_commons/widgets/common/label_text_field.dart';
 import 'package:pulse_admin_api/pulse_admin_api.dart' as pulse;
+import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:timezone_dropdown/timezone_dropdown.dart';
 
 class AddEditGateway extends StatefulWidget {
   final pulse.GatewayConfig? config;
@@ -23,7 +24,11 @@ class _AddEditGatewayState extends BaseState<AddEditGateway> {
   static final TextInputFormatter digitsOnly =
       FilteringTextInputFormatter.allow(RegExp(r'[0-9]'));
   static final TextInputFormatter decimalOnly =
-      DecimalTextInputFormatter(decimalRange: 2);
+      FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}$'));
+
+  static final TextInputFormatter emailOnly = FilteringTextInputFormatter.allow(
+    RegExp(r'[a-zA-Z0-9@._]'),
+  );
 
   late pulse.GatewayConfigInfo _config;
   pulse.Gateway? _gateway;
@@ -31,6 +36,8 @@ class _AddEditGatewayState extends BaseState<AddEditGateway> {
   final List<TextEditingController> _controllers = [];
   final Map<String, pulse.GatewayParam> _params =
       <String, pulse.GatewayParam>{};
+
+  String countryCode = 'US';
 
   @override
   void initState() {
@@ -103,6 +110,17 @@ class _AddEditGatewayState extends BaseState<AddEditGateway> {
 
   Widget _buildParameter(pulse.GatewayParam param) {
     TextEditingController c = TextEditingController();
+    if (isClient()) {
+      getClientIds().then((clientIds) {
+        if (clientIds.isNotEmpty) {
+          c.text = clientIds.first;
+
+          setState(() {});
+        }
+      });
+    } else {
+      c.text = '';
+    }
 
     _controllers.add(c);
 
@@ -171,17 +189,93 @@ class _AddEditGatewayState extends BaseState<AddEditGateway> {
         );
         break;
       case pulse.GatewayParamType.email:
-      // TODO: Handle this case.
+        return LabelTextField(
+          label: (param.description?.isNotEmpty ?? false)
+              ? param.description!
+              : param.name,
+          controller: c,
+          readOnlyVal: !param.editable,
+          inputFormatters: [emailOnly],
+          keyboardType: TextInputType.emailAddress,
+        );
       case pulse.GatewayParamType.phoneNumber:
-      // TODO: Handle this case.
+        return SizedBox(
+          width: MediaQuery.of(context).size.width / 2.5,
+          child: IntlPhoneField(
+            controller: c,
+            keyboardType: TextInputType.phone,
+            initialCountryCode: countryCode,
+            inputFormatters: [
+              FilteringTextInputFormatter.digitsOnly,
+            ],
+            decoration: InputDecoration(
+              labelText: 'Phone Number',
+              counterText: "",
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(4.0),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(4.0),
+                borderSide: BorderSide(
+                  color: theme.getPrimaryColor(),
+                ),
+              ),
+            ),
+            validator: (phone) {
+              if (phone == null || phone.number.isEmpty) {
+                return 'Enter a valid phone number';
+              }
+              return null;
+            },
+            onChanged: (phone) {
+              setState(() {
+                countryCode = phone.countryISOCode;
+              });
+            },
+            onCountryChanged: (country) {
+              setState(() {
+                countryCode = country.code;
+              });
+            },
+          ),
+        );
       case pulse.GatewayParamType.timezone:
-      // TODO: Handle this case.
+        return TimezoneDropdown(
+          hintText: 'Select Time Zone',
+          onTimezoneSelected: (selectedTimezone) {
+            setState(() {});
+          },
+        );
       case pulse.GatewayParamType.twinDomainKey:
-      // TODO: Handle this case.
+        return LabelTextField(
+          label: (param.description?.isNotEmpty ?? false)
+              ? param.description!
+              : param.name,
+          controller: c..text = orgs[selectedOrg].twinDomainKey,
+          readOnlyVal: true,
+        );
       case pulse.GatewayParamType.twinApiKey:
-      // TODO: Handle this case.
+        return LabelTextField(
+          label: (param.description?.isNotEmpty ?? false)
+              ? param.description!
+              : param.name,
+          controller: c..text = orgs[selectedOrg].twinAuthToken,
+          readOnlyVal: true,
+        );
       case pulse.GatewayParamType.clientId:
-      // TODO: Handle this case.
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: LabelTextField(
+            style: theme.getStyle(),
+            labelTextStyle: theme.getStyle(),
+            label: 'Value',
+            controller: c,
+            readOnlyVal: !isClient(),
+            onChanged: (value) {
+              setState(() {});
+            },
+          ),
+        );
       case pulse.GatewayParamType.pulseEmailKey:
       // TODO: Handle this case.
       case pulse.GatewayParamType.pulseSmsKey:
@@ -203,6 +297,14 @@ class _AddEditGatewayState extends BaseState<AddEditGateway> {
         );
         break;
     }
+  }
+
+  String? getDomainKeyForSelectedOrg() {
+    return orgs[selectedOrg].twinDomainKey;
+  }
+
+  String? getApiKeyForSelectedOrg() {
+    return orgs[selectedOrg].twinAuthToken;
   }
 
   bool _canSave() {
@@ -281,7 +383,7 @@ class _AddEditGatewayState extends BaseState<AddEditGateway> {
     loading = true;
 
     await execute(() async {
-      if (null == _gateway && (_config?.gatewayId.isNotEmpty ?? false)) {
+      if (null == _gateway && (_config.gatewayId.isNotEmpty ?? false)) {
         var res = await TwinnedSession.instance.pulseAdmin.getGateway(
             apikey: TwinnedSession.instance.authToken,
             gatewayId: _config!.gatewayId);
