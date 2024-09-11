@@ -103,7 +103,7 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
                               }
                             : null,
                         icon: Icon(
-                          Icons.delete,
+                          Icons.delete_forever,
                           color:
                               _canEdit ? theme.getPrimaryColor() : Colors.grey,
                         ),
@@ -118,6 +118,9 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
                         onPressed: _canEdit
                             ? () async {
                                 await alertDialog(
+                                  titleStyle: theme.getStyle().copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18),
                                   title: 'Generic Filter - ${group.name}',
                                   body: FieldFilterSnippet(
                                     fieldFilter: group,
@@ -219,7 +222,7 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
                               }
                             : null,
                         icon: Icon(
-                          Icons.delete,
+                          Icons.delete_forever,
                           color:
                               _canEdit ? theme.getPrimaryColor() : Colors.grey,
                         ),
@@ -412,7 +415,13 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
         if (validateResponse(res)) {
           await _load();
           alert(
-              'DataFilter ${res.body!.entity!.name} ', 'created successfully!');
+            'DataFilter ${res.body!.entity!.name} ',
+            'created successfully!',
+            titleStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+            contentStyle: theme.getStyle(),
+          );
         }
       });
     });
@@ -449,7 +458,14 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
               await _load();
               _dataFilters.removeAt(index);
 
-              alert("Success", "DataFilter ${e.name} Deleted Successfully!");
+              alert(
+                "Success",
+                "DataFilter ${e.name} Deleted Successfully!",
+                titleStyle: theme
+                    .getStyle()
+                    .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+                contentStyle: theme.getStyle(),
+              );
             }
           });
         });
@@ -477,7 +493,14 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
               await _load();
               _fieldFilters.removeAt(index);
 
-              alert("Success", "Field Filter ${e.name} Deleted Successfully!");
+              alert(
+                "Success",
+                "Field Filter ${e.name} Deleted Successfully!",
+                titleStyle: theme
+                    .getStyle()
+                    .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+                contentStyle: theme.getStyle(),
+              );
             }
           });
         });
@@ -508,9 +531,10 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
         barrierDismissible: false,
         builder: (context) {
           return AlertDialog(
+            contentTextStyle: theme.getStyle(),
             titleTextStyle: theme
                 .getStyle()
-                .copyWith(fontSize: 20, fontWeight: FontWeight.bold),
+                .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
             title: Text(title),
             content: SizedBox(
               width: 500,
@@ -571,8 +595,14 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
                 labelKey: "OK",
                 onPressed: () {
                   if (nameText!.length < 3) {
-                    alert('Invalid',
-                        'Name is required and should be minimum 3 characters');
+                    alert(
+                      'Invalid',
+                      'Name is required and should be minimum 3 characters',
+                      titleStyle: theme
+                          .getStyle()
+                          .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+                      contentStyle: theme.getStyle(),
+                    );
                     return;
                   }
                   setState(() {
@@ -607,7 +637,14 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
 
         if (validateResponse(rRes)) {
           await _loadDataFilters();
-          alert('Filter ${rRes.body!.entity!.name} ', 'updated successfully!');
+          alert(
+            'Filter ${rRes.body!.entity!.name} ',
+            'updated successfully!',
+            titleStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+            contentStyle: theme.getStyle(),
+          );
         }
       }
     });
@@ -642,7 +679,14 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
 
         if (validateResponse(rRes)) {
           await _loadFieldFilters();
-          alert('Filter ${rRes.body!.entity!.name} ', 'Updated successfully!');
+          alert(
+            'Filter ${rRes.body!.entity!.name} ',
+            'Updated successfully!',
+            titleStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+            contentStyle: theme.getStyle(),
+          );
         }
       }
     });
@@ -686,13 +730,26 @@ class _AssetFilterContentState extends BaseState<AssetFilterContent> {
 
   bool _validate() {
     if (widget.filter.matchGroups.isEmpty) {
-      alert('Invalid', 'You should have at least one filter group');
+      alert(
+        'Invalid',
+        'You should have at least one filter group',
+        titleStyle: theme
+            .getStyle()
+            .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+        contentStyle: theme.getStyle(),
+      );
       return false;
     }
     for (int i = 0; i < widget.filter.matchGroups.length; i++) {
       if (widget.filter.matchGroups[i].conditionIds?.isEmpty ?? true) {
-        alert('Invalid',
-            'You should have at least condition in filter group ${i + 1}');
+        alert(
+          'Invalid',
+          'You should have at least condition in filter group ${i + 1}',
+          titleStyle: theme
+              .getStyle()
+              .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+          contentStyle: theme.getStyle(),
+        );
         return false;
       }
     }
@@ -718,7 +775,13 @@ class _AssetFilterContentState extends BaseState<AssetFilterContent> {
           ));
       if (validateResponse(res)) {
         await alert(
-            'Data Filter - ${widget.filter.name}', 'Saved successfully!');
+          'Data Filter - ${widget.filter.name}',
+          'Saved successfully!',
+          titleStyle: theme
+              .getStyle()
+              .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+          contentStyle: theme.getStyle(),
+        );
         _close();
       }
     });
@@ -940,7 +1003,8 @@ class _MatchGroupFilterWidgetState extends BaseState<_MatchGroupFilterWidget> {
                                 },
                               ),
                             if (_conditions.isEmpty)
-                              Text('No condition found', style: theme.getStyle()),
+                              Text('No condition found',
+                                  style: theme.getStyle()),
                             divider(horizontal: true),
                             if (_conditions.isNotEmpty &&
                                 null != selectedConition &&
