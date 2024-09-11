@@ -138,7 +138,7 @@ class _GroupAssetsState extends BaseState<GroupAssets> {
               assetIds: widget.group.assetIds));
       if (validateResponse(res)) {
         await alert(
-          widget.group.name,
+          "Asset Group - ${widget.group.name}",
           'Saved successfully!',
           titleStyle: theme
               .getStyle()

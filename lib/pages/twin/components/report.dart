@@ -402,8 +402,8 @@ class _AssetReportListState extends BaseState<AssetReportList> {
               _reports.removeAt(index);
               _cards.removeAt(index);
               alert(
-                "Success",
-                "Report ${e.name} Deleted Successfully!",
+                "Report- ${e.name}",
+                "Deleted successfully!",
                 titleStyle: theme
                     .getStyle()
                     .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
@@ -467,8 +467,8 @@ class _AssetReportListState extends BaseState<AssetReportList> {
         if (validateResponse(rRes)) {
           await _load();
           alert(
-            'Filter ${rRes.body!.entity!.name} ',
-            'updated successfully!',
+            'Filter - ${rRes.body!.entity!.name} ',
+            'Updated successfully!',
             titleStyle: theme
                 .getStyle()
                 .copyWith(fontSize: 18, fontWeight: FontWeight.bold),

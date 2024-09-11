@@ -288,8 +288,8 @@ class _AssetGroupListState extends BaseState<AssetGroupList> {
 
             _groups.removeAt(index);
             alert(
-              "Success",
-              "Asset Group ${e.name} Deleted Successfully!",
+              "Asset Group - ${e.name}",
+              "Deleted successfully!",
               titleStyle: theme
                   .getStyle()
                   .copyWith(fontSize: 18, fontWeight: FontWeight.bold),

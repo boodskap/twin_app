@@ -161,7 +161,7 @@ class _AssetSnippetState extends BaseState<AssetSnippet> {
                           }
                         },
                       ),
-                     divider(height: 15),
+                      divider(height: 15),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
@@ -331,7 +331,15 @@ class _AssetSnippetState extends BaseState<AssetSnippet> {
             apikey: TwinnedSession.instance.authToken, body: _asset);
         if (validateResponse(cRes)) {
           _close();
-          alert('Success', 'Asset ${_asset.name} created!');
+          alert(
+            'Asset - ${_asset.name}',
+            'Created successfully!',
+            titleStyle: theme.getStyle().copyWith(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+            contentStyle: theme.getStyle(),
+          );
         }
       } else {
         var uRes = await TwinnedSession.instance.twin.updateAsset(
@@ -341,7 +349,15 @@ class _AssetSnippetState extends BaseState<AssetSnippet> {
         if (validateResponse(uRes)) {
           if (!silent) {
             _close();
-            alert('Success', 'Asset ${_asset.name} updated successfully!');
+            alert(
+              'Asset - ${_asset.name}',
+              'Updated successfully!',
+              titleStyle: theme.getStyle().copyWith(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+              contentStyle: theme.getStyle(),
+            );
           }
         }
       }
@@ -386,6 +402,11 @@ class _AssetSnippetState extends BaseState<AssetSnippet> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
+          titleTextStyle: theme.getStyle().copyWith(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
+          contentTextStyle: theme.getStyle(),
           backgroundColor: Colors.white,
           content: SingleChildScrollView(
             child: ConstrainedBox(

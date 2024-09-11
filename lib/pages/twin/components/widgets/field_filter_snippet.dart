@@ -230,7 +230,7 @@ class _FieldFilterSnippetState extends BaseState<FieldFilterSnippet> {
       if (validateResponse(eRes)) {
         _close();
         alert(
-          'Filter ${eRes.body!.entity!.name} ',
+          'Filter - ${eRes.body!.entity!.name} ',
           'Saved successfully!',
           titleStyle: theme
               .getStyle()
