@@ -5,7 +5,7 @@ import 'package:twin_commons/twin_commons.dart';
 import 'package:twin_commons/core/twinned_session.dart';
 import 'package:pulse_admin_api/pulse_admin_api.dart' as pulse;
 
-typedef OnGatewaySelected = void Function(pulse.Gateway? gateway);
+typedef OnGatewaySelected = void Function(pulse.GatewayConfig? gateway);
 
 class PulseGatewayDropdown extends StatefulWidget {
   final String? selectedItem;
@@ -43,11 +43,11 @@ class PulseGatewayDropdown extends StatefulWidget {
 }
 
 class _PulseGatewayDropdownState extends BaseState<PulseGatewayDropdown> {
-  pulse.Gateway? _selectedItem;
+  pulse.GatewayConfig? _selectedItem;
 
   @override
   Widget build(BuildContext context) {
-    return SearchChoices<pulse.Gateway>.single(
+    return SearchChoices<pulse.GatewayConfig>.single(
       value: _selectedItem,
       hint: 'Select Gateway',
       searchHint: 'Search Gateways',
@@ -62,7 +62,7 @@ class _PulseGatewayDropdownState extends BaseState<PulseGatewayDropdown> {
       dialogBox: true,
       dropDownDialogPadding: const EdgeInsets.fromLTRB(250, 50, 250, 50),
       selectedValueWidgetFn: (value) {
-        pulse.Gateway entity = value;
+        pulse.GatewayConfig entity = value;
         return Row(
           children: [
             Text(
@@ -81,14 +81,14 @@ class _PulseGatewayDropdownState extends BaseState<PulseGatewayDropdown> {
     );
   }
 
-  Future<Tuple2<List<DropdownMenuItem<pulse.Gateway>>, int>> _search(
+  Future<Tuple2<List<DropdownMenuItem<pulse.GatewayConfig>>, int>> _search(
       {String search = "*", int? page = 0}) async {
     if (loading) return Tuple2([], 0);
     loading = true;
-    List<DropdownMenuItem<pulse.Gateway>> items = [];
+    List<DropdownMenuItem<pulse.GatewayConfig>> items = [];
     int total = 0;
     try {
-      var pRes = await TwinnedSession.instance.pulseAdmin.queryGateway(
+      var pRes = await TwinnedSession.instance.pulseAdmin.queryConfig(
           apikey: TwinnedSession.instance.authToken,
           body: pulse.EqlSearch(source: [], sort: {
             "namek": "asc"
@@ -140,7 +140,7 @@ class _PulseGatewayDropdownState extends BaseState<PulseGatewayDropdown> {
           if (entity.id == widget.selectedItem) {
             _selectedItem = entity;
           }
-          items.add(DropdownMenuItem<pulse.Gateway>(
+          items.add(DropdownMenuItem<pulse.GatewayConfig>(
               value: entity,
               child: Row(
                 children: [
@@ -168,9 +168,9 @@ class _PulseGatewayDropdownState extends BaseState<PulseGatewayDropdown> {
       return;
     }
     try {
-      var eRes = await TwinnedSession.instance.pulseAdmin.getGateway(
+      var eRes = await TwinnedSession.instance.pulseAdmin.getConfigById(
         apikey: TwinnedSession.instance.authToken,
-        gatewayId: widget.selectedItem,
+        configId: widget.selectedItem,
       );
       if (eRes != null && eRes.body != null) {
         setState(() {
