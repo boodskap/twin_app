@@ -49,11 +49,15 @@ class _NocodeBuilderPageState extends BaseState<NocodeBuilderPage> {
         barrierDismissible: false,
         builder: (context) {
           return AlertDialog(
+            contentTextStyle: theme.getStyle(),
+            titleTextStyle: theme
+                .getStyle()
+                .copyWith(fontWeight: FontWeight.bold, fontSize: 18),
             title: Text(
               title,
               style: theme
                   .getStyle()
-                  .copyWith(fontWeight: FontWeight.bold, fontSize: 20),
+                  .copyWith(fontWeight: FontWeight.bold, fontSize: 18),
             ),
             content: SizedBox(
               width: 500,
@@ -71,6 +75,7 @@ class _NocodeBuilderPageState extends BaseState<NocodeBuilderPage> {
                     },
                     decoration: InputDecoration(
                       hintText: 'Name',
+                      errorStyle: theme.getStyle(),
                       hintStyle: theme.getStyle(),
                       labelStyle: theme.getStyle(),
                     ),
@@ -84,6 +89,7 @@ class _NocodeBuilderPageState extends BaseState<NocodeBuilderPage> {
                     },
                     decoration: InputDecoration(
                       hintText: 'Title',
+                      errorStyle: theme.getStyle(),
                       hintStyle: theme.getStyle(),
                       labelStyle: theme.getStyle(),
                     ),
@@ -97,6 +103,7 @@ class _NocodeBuilderPageState extends BaseState<NocodeBuilderPage> {
                     },
                     decoration: InputDecoration(
                       hintText: 'Description',
+                      errorStyle: theme.getStyle(),
                       hintStyle: theme.getStyle(),
                       labelStyle: theme.getStyle(),
                     ),
@@ -110,6 +117,7 @@ class _NocodeBuilderPageState extends BaseState<NocodeBuilderPage> {
                     },
                     decoration: InputDecoration(
                       hintText: 'Tags (space separated)',
+                      errorStyle: theme.getStyle(),
                       hintStyle: theme.getStyle(),
                       labelStyle: theme.getStyle(),
                     ),
@@ -130,13 +138,25 @@ class _NocodeBuilderPageState extends BaseState<NocodeBuilderPage> {
                 labelKey: "OK",
                 onPressed: () {
                   if (nameText.length < 3) {
-                    alert('Invalid',
-                        'Name is required and should be minimum 3 characters');
+                    alert(
+                      'Invalid',
+                      'Name is required and should be minimum 3 characters',
+                      titleStyle: theme
+                          .getStyle()
+                          .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+                      contentStyle: theme.getStyle(),
+                    );
                     return;
                   }
                   if (titleText.length < 3) {
-                    alert('Invalid',
-                        'Title is required and should be minimum 3 characters');
+                    alert(
+                      'Invalid',
+                      'Title is required and should be minimum 3 characters',
+                      titleStyle: theme
+                          .getStyle()
+                          .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+                      contentStyle: theme.getStyle(),
+                    );
                     return;
                   }
                   setState(() {
@@ -193,6 +213,10 @@ class _NocodeBuilderPageState extends BaseState<NocodeBuilderPage> {
         context: context,
         builder: (ctx) {
           return AlertDialog(
+            contentTextStyle: theme.getStyle(),
+            titleTextStyle: theme
+                .getStyle()
+                .copyWith(fontWeight: FontWeight.bold, fontSize: 18),
             content: PurchaseChangeAddonWidget(
               orgId: orgs[selectedOrg].id,
               purchase: true,
@@ -335,6 +359,12 @@ class _NocodeBuilderPageState extends BaseState<NocodeBuilderPage> {
     );
 
     AlertDialog alert = AlertDialog(
+      contentTextStyle: theme.getStyle(),
+      titleTextStyle: theme.getStyle().copyWith(
+            color: Colors.red,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
       title: Text(
         "WARNING",
         style: theme.getStyle().copyWith(
@@ -380,7 +410,14 @@ class _NocodeBuilderPageState extends BaseState<NocodeBuilderPage> {
           await _load();
           _entities.removeAt(index);
           _cards.removeAt(index);
-          alert('Success', 'Dashboard ${e.name} deleted!');
+          alert(
+            'Success',
+            'Dashboard ${e.name} deleted!',
+            titleStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+            contentStyle: theme.getStyle(),
+          );
         }
       },
     );

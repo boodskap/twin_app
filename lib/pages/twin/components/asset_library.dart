@@ -270,12 +270,25 @@ class _AssetLibraryState extends BaseState<AssetLibrary> {
   }
 
   Future _delete(tapi.AssetModel e) async {
+    if (loading) return;
+    loading = true;
+
     await execute(() async {
+      int index = _entities.indexWhere((element) => element.id == e.id);
       var res = await TwinnedSession.instance.twin.deleteAssetModel(
           apikey: TwinnedSession.instance.authToken, assetModelId: e.id);
       validateResponse(res);
       await _load();
+      _entities.removeAt(index);
+      _cards.removeAt(index);
+      alert("Success", "Asset Library ${e.name} Deleted Successfully!",
+          contentStyle: theme.getStyle(),
+          titleStyle: theme
+              .getStyle()
+              .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
     });
+    loading = false;
+    refresh();
   }
 
   Future _load() async {

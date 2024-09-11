@@ -101,7 +101,7 @@ class _AssetGroupListState extends BaseState<AssetGroupList> {
                             }
                           : null,
                       icon: Icon(
-                        Icons.delete,
+                        Icons.delete_forever,
                         color: _canEdit ? theme.getPrimaryColor() : Colors.grey,
                       ),
                     ),
@@ -249,8 +249,14 @@ class _AssetGroupListState extends BaseState<AssetGroupList> {
 
           if (validateResponse(res)) {
             await _load();
-            await alert('Assert Group - ${res.body!.entity!.name}',
-                'Created successfully');
+            await alert(
+              'Assert Group - ${res.body!.entity!.name}',
+              'Created successfully',
+              titleStyle: theme
+                  .getStyle()
+                  .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+              contentStyle: theme.getStyle(),
+            );
           }
         },
       );
@@ -281,7 +287,14 @@ class _AssetGroupListState extends BaseState<AssetGroupList> {
             await _load();
 
             _groups.removeAt(index);
-            alert("Success", "Asset Group ${e.name} Deleted Successfully!");
+            alert(
+              "Success",
+              "Asset Group ${e.name} Deleted Successfully!",
+              titleStyle: theme
+                  .getStyle()
+                  .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+              contentStyle: theme.getStyle(),
+            );
           }
           ;
         });
@@ -297,11 +310,16 @@ class _AssetGroupListState extends BaseState<AssetGroupList> {
       barrierDismissible: false,
       builder: (context) {
         return AlertDialog(
+          titleTextStyle: theme.getStyle().copyWith(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
+          contentTextStyle: theme.getStyle(),
           scrollable: true,
           content: SizedBox(
             width: MediaQuery.of(context).size.width / 2,
             height: 650,
-            child: GroupAssets(group: group),
+            child: SingleChildScrollView(child: GroupAssets(group: group)),
           ),
         );
       },
@@ -324,6 +342,7 @@ class _AssetGroupListState extends BaseState<AssetGroupList> {
           titleTextStyle: theme
               .getStyle()
               .copyWith(fontSize: 20, fontWeight: FontWeight.bold),
+          contentTextStyle: theme.getStyle(),
           title: Text(title),
           content: SizedBox(
             width: 500,
@@ -376,8 +395,14 @@ class _AssetGroupListState extends BaseState<AssetGroupList> {
               labelKey: "OK",
               onPressed: () {
                 if (nameText!.length < 3) {
-                  alert('Invalid',
-                      'Name is required and should be minimum 3 characters');
+                  alert(
+                    'Invalid',
+                    'Name is required and should be minimum 3 characters',
+                    titleStyle: theme
+                        .getStyle()
+                        .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+                    contentStyle: theme.getStyle(),
+                  );
                   return;
                 }
                 onPressed(nameText!, descText, tagsText);
@@ -412,7 +437,13 @@ class _AssetGroupListState extends BaseState<AssetGroupList> {
         if (validateResponse(rRes)) {
           await _load();
           await alert(
-              'Asset Group - ${rRes.body!.entity!.name}', 'Saved successfully');
+            'Asset Group - ${rRes.body!.entity!.name}',
+            'Saved successfully',
+            titleStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+            contentStyle: theme.getStyle(),
+          );
         }
       }
     });
