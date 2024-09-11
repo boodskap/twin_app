@@ -37,9 +37,10 @@ import 'package:twin_app/widgets/profile_info_screen.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/twin_image_helper.dart';
 import 'package:twin_commons/core/twinned_session.dart';
-import 'package:twinned_api/twinned_api.dart' as tapi;
 import 'package:twinned_widgets/twinned_dashboard_widget.dart';
 import 'package:uuid/uuid.dart';
+import 'package:twin_commons/core/storage.dart';
+import 'package:twinned_api/twinned_api.dart' as tapi;
 
 const List<Locale> locales = [Locale("en", "US"), Locale("ta", "IN")];
 
@@ -206,7 +207,6 @@ class HomeScreenState extends BaseState<HomeScreen> {
   final List<tapi.Client> _clients = [];
   final Map<dynamic, ExpansionTileController> _expControllers =
       Map<dynamic, ExpansionTileController>();
-  final Map<dynamic, bool> _expanded = Map<dynamic, bool>();
   Widget? body;
   tapi.TwinUser? user;
   int _selectedClient = -1;
@@ -611,18 +611,19 @@ class HomeScreenState extends BaseState<HomeScreen> {
 
   Future _switchOrg(tapi.OrgInfo o) async {
     await execute(() async {
-      session.selectedOrg = session.orgs.indexOf(o!);
+      session.selectedOrg = session.orgs.indexOf(o);
+      Storage.putString('preferred.orgId', o.id);
       TwinnedSession ts = TwinnedSession.instance;
       TwinnedSession.instance.init(
         debug: ts.debug,
         host: ts.host,
         authToken: o.twinAuthToken,
         domainKey: o.twinDomainKey,
-        orgId: o!.id,
+        orgId: o.id,
         noCodeAuthToken: ts.noCodeAuthToken,
       );
 
-      var oRes = await TwinnedSession.instance.nocode.getOrgPlan(orgId: o!.id);
+      var oRes = await TwinnedSession.instance.nocode.getOrgPlan(orgId: o.id);
       if (validateResponse(oRes)) {
         session.orgPlan = oRes.body?.entity;
       }
@@ -659,8 +660,8 @@ class HomeScreenState extends BaseState<HomeScreen> {
     } else {
       debugPrint('*** MENU: $id not found ***');
     }
-
     setState(() {});
+    BaseState.emitPageEvent(PageEvent.eventRebuild);
   }
 
   List<session.TwinMenuItem> get _menuItems {
@@ -846,12 +847,11 @@ class HomeScreenState extends BaseState<HomeScreen> {
           bottomMenus: _twinBottomMenus(),
           isMenuVisible: () {
             return session.isAdmin() &&
-                TwinnedSession.instance.noCodeAuthToken != null &&
                 TwinnedSession.instance.noCodeAuthToken.isNotEmpty;
           },
           onMenuSelected: (BuildContext context) async {
             return OrganizationPage(
-              orgInfo: session.orgs[session.selectedOrg]!,
+              orgInfo: session.orgs[session.selectedOrg],
             );
           },
         ),
@@ -898,7 +898,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
             return const RolesPage();
           },
         ),
-          if (!session.isClient())
+      if (!session.isClient())
         session.TwinMenuItem(
           id: TwinAppMenu.adminQueryconsole,
           text: 'Query Console',
@@ -908,7 +908,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
             return session.isAdmin();
           },
           onMenuSelected: (BuildContext context) async {
-            return  QueryConsole();
+            return QueryConsole();
           },
         ),
     ];
@@ -1027,7 +1027,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
           icon: Icon(Icons.key, size: 30),
           label: 'Roles',
         ),
-         if (session.isAdmin())
+      if (session.isAdmin())
         const BottomMenuItem(
           id: TwinAppMenu.adminQueryconsole,
           icon: Icon(Icons.wysiwyg, size: 30),
