@@ -162,7 +162,7 @@ class _AssetReportListState extends BaseState<AssetReportList> {
                             }
                           : null,
                       icon: Icon(
-                        Icons.delete,
+                        Icons.delete_forever,
                         color: _canEdit ? theme.getPrimaryColor() : Colors.grey,
                       ),
                     ),
@@ -293,9 +293,10 @@ class _AssetReportListState extends BaseState<AssetReportList> {
         barrierDismissible: false,
         builder: (context) {
           return AlertDialog(
+            contentTextStyle: theme.getStyle(),
             titleTextStyle: theme
                 .getStyle()
-                .copyWith(fontSize: 20, fontWeight: FontWeight.bold),
+                .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
             title: Text(title),
             content: SizedBox(
               width: 500,
@@ -360,8 +361,14 @@ class _AssetReportListState extends BaseState<AssetReportList> {
                 labelKey: "OK",
                 onPressed: () {
                   if (nameText!.length < 3) {
-                    alert('Invalid',
-                        'Name is required and should be minimum 3 characters');
+                    alert(
+                      'Invalid',
+                      'Name is required and should be minimum 3 characters',
+                      titleStyle: theme
+                          .getStyle()
+                          .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+                      contentStyle: theme.getStyle(),
+                    );
                     return;
                   }
                   setState(() {
@@ -394,7 +401,14 @@ class _AssetReportListState extends BaseState<AssetReportList> {
               await _load();
               _reports.removeAt(index);
               _cards.removeAt(index);
-              alert("Success", "Report ${e.name} Deleted Successfully!");
+              alert(
+                "Report- ${e.name}",
+                "Deleted successfully!",
+                titleStyle: theme
+                    .getStyle()
+                    .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+                contentStyle: theme.getStyle(),
+              );
             }
           });
         });
@@ -413,6 +427,10 @@ class _AssetReportListState extends BaseState<AssetReportList> {
         builder: (context) {
           return Center(
             child: AlertDialog(
+              contentTextStyle: theme.getStyle(),
+              titleTextStyle: theme
+                  .getStyle()
+                  .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
               content: ReportContentWidget(
                 report: report,
                 deviceModel: res.body!.entity!,
@@ -448,7 +466,14 @@ class _AssetReportListState extends BaseState<AssetReportList> {
 
         if (validateResponse(rRes)) {
           await _load();
-          alert('Filter ${rRes.body!.entity!.name} ', 'updated successfully!');
+          alert(
+            'Filter - ${rRes.body!.entity!.name} ',
+            'Updated successfully!',
+            titleStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+            contentStyle: theme.getStyle(),
+          );
         }
       }
     });
@@ -523,7 +548,14 @@ class _ReportContentWidgetState extends BaseState<ReportContentWidget> {
               humanDateFormat: false,
               fields: widget.report.fields));
       if (validateResponse(res)) {
-        await alert('Report - ${_name.text}', 'Saved successfully!');
+        await alert(
+          'Report - ${_name.text}',
+          'Saved successfully!',
+          titleStyle: theme
+              .getStyle()
+              .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+          contentStyle: theme.getStyle(),
+        );
         _close();
       }
     });
@@ -644,6 +676,10 @@ class _ReportContentWidgetState extends BaseState<ReportContentWidget> {
             label: 'Report Name',
             controller: _name,
             labelTextStyle: theme.getStyle(),
+            decoration: InputDecoration(
+              hintStyle: theme.getStyle(),
+              errorStyle: theme.getStyle(),
+            ),
             style: theme.getStyle(),
           ),
           divider(),

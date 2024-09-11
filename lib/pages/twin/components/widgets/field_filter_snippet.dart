@@ -162,12 +162,26 @@ class _FieldFilterSnippetState extends BaseState<FieldFilterSnippet> {
     String name = _name.text.trim();
 
     if (name.isEmpty) {
-      alert('Missing Name', 'Please enter a name');
+      alert(
+        'Missing Name',
+        'Please enter a name',
+        titleStyle: theme
+            .getStyle()
+            .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+        contentStyle: theme.getStyle(),
+      );
       return;
     }
 
     if (null == selectedField) {
-      alert('Missing Field', 'Please select a field');
+      alert(
+        'Missing Field',
+        'Please select a field',
+        titleStyle: theme
+            .getStyle()
+            .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+        contentStyle: theme.getStyle(),
+      );
       return;
     }
 
@@ -215,7 +229,14 @@ class _FieldFilterSnippetState extends BaseState<FieldFilterSnippet> {
 
       if (validateResponse(eRes)) {
         _close();
-        alert('Filter ${eRes.body!.entity!.name} ', 'Saved successfully!');
+        alert(
+          'Filter - ${eRes.body!.entity!.name} ',
+          'Saved successfully!',
+          titleStyle: theme
+              .getStyle()
+              .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+          contentStyle: theme.getStyle(),
+        );
       }
     });
 
@@ -295,7 +316,8 @@ class _FieldFilterSnippetState extends BaseState<FieldFilterSnippet> {
                           decoration: BoxDecoration(
                               border: Border.all(color: Colors.blueGrey),
                               borderRadius: BorderRadius.circular(5)),
-                          child: DropdownButton<twinned.Parameter>(style: theme.getStyle(),
+                          child: DropdownButton<twinned.Parameter>(
+                            style: theme.getStyle(),
                             padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
                             dropdownColor: Colors.white,
                             isDense: true,

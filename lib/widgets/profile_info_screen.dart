@@ -453,7 +453,14 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
       );
 
       if (validateResponse(res)) {
-        alert(res.body!.entity!.name, 'Profile saved successfully!');
+        alert(
+          res.body!.entity!.name,
+          'Profile saved successfully!',
+          titleStyle: theme
+              .getStyle()
+              .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+          contentStyle: theme.getStyle(),
+        );
         TwinnedSession.instance.setUser(res.body!.entity!);
       }
     });
@@ -485,6 +492,10 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
+          titleTextStyle: theme
+              .getStyle()
+              .copyWith(fontWeight: FontWeight.bold, fontSize: 18),
+          contentTextStyle: theme.getStyle(),
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
