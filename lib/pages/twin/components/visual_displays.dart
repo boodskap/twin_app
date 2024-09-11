@@ -195,7 +195,7 @@ class _VisualDisplaysState extends BaseState<VisualDisplays> {
                             message:
                                 _canEdit ? "Delete" : "No Permission to Delete",
                             child: Icon(
-                              Icons.delete,
+                              Icons.delete_forever,
                               color: _canEdit
                                   ? theme.getPrimaryColor()
                                   : Colors.grey,
@@ -266,7 +266,9 @@ class _VisualDisplaysState extends BaseState<VisualDisplays> {
         barrierDismissible: false,
         builder: (context) {
           return AlertDialog(
-            titleTextStyle: theme.getStyle().copyWith(fontSize: 20,fontWeight: FontWeight.bold),
+            titleTextStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 20, fontWeight: FontWeight.bold),
             title: Text(title),
             content: SizedBox(
               width: 500,
@@ -330,7 +332,10 @@ class _VisualDisplaysState extends BaseState<VisualDisplays> {
                 onPressed: () {
                   if (nameText!.length < 3) {
                     alert('Invalid',
-                        'Name is required and should be minimum 3 characters');
+                        'Name is required and should be minimum 3 characters',
+                        contentStyle: theme.getStyle(),
+                        titleStyle: theme.getStyle().copyWith(
+                            fontSize: 18, fontWeight: FontWeight.bold));
                     return;
                   }
                   setState(() {
@@ -383,7 +388,11 @@ class _VisualDisplaysState extends BaseState<VisualDisplays> {
               await _load();
               _entities.removeAt(index);
               _cards.removeAt(index);
-              alert('Success', 'Display ${e.name} deleted!');
+              alert('Display - ${e.name}', ' Deleted successfully!',
+                  contentStyle: theme.getStyle(),
+                  titleStyle: theme
+                      .getStyle()
+                      .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
             }
           });
         });

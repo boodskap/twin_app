@@ -215,7 +215,11 @@ class _DisplayStateSectionState extends BaseState<DisplayStateSection> {
     loading = true;
 
     if (selectedConditionValue.isEmpty) {
-      alert('Error', 'Display should have at least one condition');
+      alert('Error', 'Display should have at least one condition',
+          contentStyle: theme.getStyle(),
+          titleStyle: theme
+              .getStyle()
+              .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
       return;
     }
     List<String> selectedConditions = [];

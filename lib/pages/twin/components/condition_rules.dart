@@ -554,6 +554,11 @@ class _ConditionRulesState extends BaseState<ConditionRules> {
       if (validateResponse(res)) {
         _entities.removeAt(index);
         _cards.removeAt(index);
+        alert("Conditions Rules - ${e.name}", "Deleted Successfully!",
+                contentStyle: theme.getStyle(),
+                titleStyle: theme
+                    .getStyle()
+                    .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
       }
     });
     loading = false;

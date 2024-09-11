@@ -131,8 +131,9 @@ class _PremisesState extends BaseState<Premises> {
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
                       e.name,
-                      style:
-                          theme.getStyle().copyWith(fontWeight: FontWeight.bold),
+                      style: theme
+                          .getStyle()
+                          .copyWith(fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
@@ -144,7 +145,8 @@ class _PremisesState extends BaseState<Premises> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Tooltip(
-                          message: _canEdit ? "Update" : "No Permission to Edit",
+                          message:
+                              _canEdit ? "Update" : "No Permission to Edit",
                           child: InkWell(
                             onTap: _canEdit
                                 ? () {
@@ -271,7 +273,11 @@ class _PremisesState extends BaseState<Premises> {
       if (validateResponse(res)) {
         _entities.removeAt(index);
         _cards.removeAt(index);
-        alert('Success', 'Premise ${e.name} deleted!');
+        alert('Premise - ${e.name}', ' Deleted successfully!',
+            contentStyle: theme.getStyle(),
+            titleStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
       }
     });
     loading = false;

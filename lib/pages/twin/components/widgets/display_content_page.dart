@@ -89,19 +89,31 @@ class _DisplayContentStatePageState extends BaseState<DisplayContentStatePage> {
     busy();
     try {
       if (isBlank(_nameController.text)) {
-        alert('Missing', 'Name is required');
+        alert('Missing', 'Name is required',
+            contentStyle: theme.getStyle(),
+            titleStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
         return;
       }
 
       if (widget.display.conditions.isEmpty) {
-        alert('Error', 'At least one display state group is required');
+        alert('Error', 'At least one display state group is required',
+            contentStyle: theme.getStyle(),
+            titleStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
         return;
       }
 
       for (int i = 0; i < widget.display.conditions.length; i++) {
         if (widget.display.conditions[i].conditions.isEmpty) {
           alert('Error',
-              'Display state group $i should have at least one condition');
+              'Display state group $i should have at least one condition',
+              contentStyle: theme.getStyle(),
+              titleStyle: theme
+                  .getStyle()
+                  .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
           return;
         }
       }
@@ -123,7 +135,11 @@ class _DisplayContentStatePageState extends BaseState<DisplayContentStatePage> {
           body: body);
 
       if (validateResponse(res)) {
-        alert('Display ${_nameController.text}', 'saved successfully');
+        alert('Display - ${_nameController.text}', 'Saved successfully!',
+            contentStyle: theme.getStyle(),
+            titleStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
       }
       // setup();
     } catch (e, s) {
@@ -134,7 +150,6 @@ class _DisplayContentStatePageState extends BaseState<DisplayContentStatePage> {
   }
 
   void _buildCard(conditions, stateIndex) {
-    // ImageProvider? image = const AssetImage('images/new-display.png');
     Widget newCard = Tooltip(
       message: 'State ${stateIndex + 1}',
       child: InkWell(
@@ -182,7 +197,7 @@ class _DisplayContentStatePageState extends BaseState<DisplayContentStatePage> {
                             confirmDeletion(context, stateIndex);
                           },
                           icon: Icon(
-                            Icons.delete,
+                            Icons.delete_forever,
                             color: theme.getPrimaryColor(),
                           ),
                         ),

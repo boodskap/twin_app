@@ -177,7 +177,7 @@ class _PreprocessorsState extends BaseState<Preprocessors> {
                             message:
                                 _canEdit ? "Delete" : "No Permission to Delete",
                             child: Icon(
-                              Icons.delete,
+                              Icons.delete_forever,
                               color: _canEdit
                                   ? theme.getPrimaryColor()
                                   : Colors.grey,
@@ -220,7 +220,6 @@ class _PreprocessorsState extends BaseState<Preprocessors> {
           ));
       if (validateResponse(mRes)) {
         await _edit(mRes.body!.entity!);
-        // alert('Success', 'Preprocessor ${name} created successfully!');
       }
     });
 
@@ -316,12 +315,18 @@ class _PreprocessorsState extends BaseState<Preprocessors> {
                 onPressed: () {
                   if (nameText!.length < 3) {
                     alert('Invalid',
-                        'Name is required and should be minimum 3 characters');
+                        'Name is required and should be minimum 3 characters',
+                        contentStyle: theme.getStyle(),
+                        titleStyle: theme.getStyle().copyWith(
+                            fontSize: 18, fontWeight: FontWeight.bold));
                     return;
                   }
                   if (classText!.length < 3) {
                     alert('Invalid',
-                        'Class name is required and should be minimum 3 characters');
+                        'Class name is required and should be minimum 3 characters',
+                        contentStyle: theme.getStyle(),
+                        titleStyle: theme.getStyle().copyWith(
+                            fontSize: 18, fontWeight: FontWeight.bold));
                     return;
                   }
                   setState(() {
@@ -354,7 +359,11 @@ class _PreprocessorsState extends BaseState<Preprocessors> {
             await _load();
             _entities.removeAt(index);
             _cards.removeAt(index);
-            alert('Success', 'Preprocessor ${e.name} deleted!');
+            alert('Preprocessor - ${e.name}', 'Deleted successfully!',
+                contentStyle: theme.getStyle(),
+                titleStyle: theme
+                    .getStyle()
+                    .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
           }
         });
       },
