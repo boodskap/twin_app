@@ -48,6 +48,7 @@ dependencies:
   input_quantity: ^2.4.0
   google_maps_flutter: ^2.9.0
   flutter_json_view: ^1.1.5
+  timezone_dropdown: ^1.0.4
 
 dev_dependencies:
   flutter_test:
