@@ -738,6 +738,11 @@ class _FloorContentPageState extends BaseState<FloorContentPage> {
 
       if (validateResponse(res)) {
         _close();
+        alert('Success', 'Floor ${_name.text} updated successfully!',
+                contentStyle: theme.getStyle(),
+                titleStyle: theme
+                    .getStyle()
+                    .copyWith(fontSize: 20, fontWeight: FontWeight.bold));
       }
     });
   }

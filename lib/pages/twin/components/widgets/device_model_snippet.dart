@@ -364,7 +364,11 @@ class _DeviceModelSnippetState extends BaseState<DeviceModelSnippet> {
           if (!silent) {
             _close();
             alert('Success',
-                'Device Model ${_deviceModelInfo.name} updated successfully');
+                'Device Model ${_deviceModelInfo.name} updated successfully',
+                contentStyle: theme.getStyle(),
+                titleStyle: theme
+                    .getStyle()
+                    .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
           }
         }
       }
