@@ -10,6 +10,7 @@ import 'package:twin_commons/core/twin_image_helper.dart';
 import 'package:twin_commons/core/twinned_session.dart';
 import 'package:twin_commons/widgets/common/label_text_field.dart';
 import 'package:twinned_api/twinned_api.dart' as tapi;
+import 'package:twinned_widgets/core/premise_dropdown.dart';
 
 class FacilitySnippet extends StatefulWidget {
   final tapi.Facility? facility;
@@ -98,6 +99,21 @@ class _FacilitySnippetState extends BaseState<FacilitySnippet> {
                   padding: const EdgeInsets.all(10.0),
                   child: Column(
                     children: [
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width / 2.5,
+                        child: PremiseDropdown(
+                          style: theme.getStyle(),
+                          selectedItem: _facility.premiseId,
+                          onPremiseSelected: (tapi.Premise? selectedPremise) {
+                            setState(() {
+                              if (selectedPremise != null) {
+                                _facility = _facility.copyWith(
+                                    premiseId: selectedPremise.id);
+                              }
+                            });
+                          },
+                        ),
+                      ),
                       SizedBox(
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: LabelTextField(
