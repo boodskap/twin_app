@@ -77,7 +77,11 @@ class _DigitalTwinEventContentPageState
     String tags = _tagsController.text.trim();
 
     if (widget.entity.conditions[0].conditions.isEmpty) {
-      alert('Missing', 'At least one condition is required');
+      alert('Missing', 'At least one condition is required',
+          contentStyle: theme.getStyle(),
+          titleStyle: theme
+              .getStyle()
+              .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
       return;
     }
 
@@ -87,7 +91,11 @@ class _DigitalTwinEventContentPageState
         null == _voiceTemplate &&
         null == _fcmTemplate) {
       alert('Missing',
-          'One of Email, Notification, SMS, Voice or FCM template is required');
+          'One of Email, Notification, SMS, Voice or FCM template is required',
+          contentStyle: theme.getStyle(),
+          titleStyle: theme
+              .getStyle()
+              .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
       return;
     }
 
@@ -120,7 +128,11 @@ class _DigitalTwinEventContentPageState
       );
 
       if (validateResponse(res)) {
-        await alert('', 'Event ${_nameController.text} saved successfully');
+        await alert('Event - ${_nameController.text}', ' Saved successfully!',
+            contentStyle: theme.getStyle(),
+            titleStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
         if (shouldPop) {
           _cancel();
         }

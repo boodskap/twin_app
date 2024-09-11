@@ -151,7 +151,10 @@ class _VisualAlarmsContentPageState extends BaseState<VisualAlarmsContentPage> {
                       onPressed: () {
                         _delete(group.alarmState);
                       },
-                      icon: const Icon(Icons.delete_forever))),
+                      icon: Icon(
+                        Icons.delete_forever,
+                        color: theme.getPrimaryColor(),
+                      ))),
               Center(child: SizedBox(width: 65, height: 65, child: icon)),
             ],
           ),

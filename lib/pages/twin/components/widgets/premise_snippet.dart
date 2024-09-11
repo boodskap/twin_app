@@ -401,7 +401,11 @@ class _PremiseSnippetState extends BaseState<PremiseSnippet> {
             apikey: TwinnedSession.instance.authToken, body: _premise);
         if (validateResponse(cRes)) {
           _close();
-          alert('Success', 'Premise ${_premise.name} created');
+          alert('Premise - ${_premise.name} ', 'Created successfully!',
+              contentStyle: theme.getStyle(),
+              titleStyle: theme
+                  .getStyle()
+                  .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
         }
       } else {
         var uRes = await TwinnedSession.instance.twin.updatePremise(
@@ -411,7 +415,11 @@ class _PremiseSnippetState extends BaseState<PremiseSnippet> {
         if (validateResponse(uRes)) {
           if (!silent) {
             _close();
-            alert('Success', 'Premise ${_premise.name} updated successfully');
+            alert('Premise - ${_premise.name}', ' Updated successfully!',
+                contentStyle: theme.getStyle(),
+                titleStyle: theme
+                    .getStyle()
+                    .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
           }
         }
       }

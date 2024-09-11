@@ -294,26 +294,42 @@ class _CreateEditConditionSnippetState
 
   bool _validateParameter(String data, String field) {
     if (isBlank(data)) {
-      alert('Invalid Value', "$field can't be empty");
+      alert('Invalid Value', "$field can't be empty",
+          contentStyle: theme.getStyle(),
+          titleStyle: theme
+              .getStyle()
+              .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
       return false;
     }
 
     switch (_selectedParameter!.parameterType) {
       case tapi.ParameterParameterType.yesno:
         if (!isBoolean(data)) {
-          alert('Invalid Value', '$field ($data) should be true or false');
+          alert('Invalid Value', '$field ($data) should be true or false',
+              contentStyle: theme.getStyle(),
+              titleStyle: theme
+                  .getStyle()
+                  .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
           return false;
         }
         break;
       case tapi.ParameterParameterType.numeric:
         if (int.tryParse(data) == null) {
-          alert('Invalid Value', '$field ($data) should be a valid number');
+          alert('Invalid Value', '$field ($data) should be a valid number',
+              contentStyle: theme.getStyle(),
+              titleStyle: theme
+                  .getStyle()
+                  .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
           return false;
         }
         break;
       case tapi.ParameterParameterType.floating:
         if (double.tryParse(data) == null) {
-          alert('Invalid Value', '$field ($data) should be a valid decimal');
+          alert('Invalid Value', '$field ($data) should be a valid decimal',
+              contentStyle: theme.getStyle(),
+              titleStyle: theme
+                  .getStyle()
+                  .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
           return false;
         }
         break;
@@ -331,7 +347,11 @@ class _CreateEditConditionSnippetState
     loading = true;
     await execute(() async {
       if (isBlank(_nameController.text)) {
-        alert('Missing Value', "Name can't be empty");
+        alert('Missing Value', "Name can't be empty",
+            contentStyle: theme.getStyle(),
+            titleStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
         return;
       }
 
@@ -346,7 +366,11 @@ class _CreateEditConditionSnippetState
         case tapi.ConditionCondition.contains:
         case tapi.ConditionCondition.ncontains:
           if (isBlank(_valuesController.text)) {
-            alert('Invalid Value', "Values can't be empty");
+            alert('Invalid Value', "Values can't be empty",
+                contentStyle: theme.getStyle(),
+                titleStyle: theme
+                    .getStyle()
+                    .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
             return;
           }
           var values = _valuesController.text.split('\n');
@@ -424,7 +448,12 @@ class _CreateEditConditionSnippetState
         setState(() {
           widget.condition = res.body!.entity;
         });
-        await alert('', 'Condition ${_nameController.text} saved successfully');
+        await alert('Conditions Rules - ${widget.condition!.name}',
+            'Saved successfully!',
+            contentStyle: theme.getStyle(),
+            titleStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
         if (shouldPop) {
           _cancel();
         }
@@ -582,6 +611,10 @@ class _CreateEditConditionSnippetState
               child: Center(
                 child: DropdownButton<tapi.ConditionCondition>(
                   style: theme.getStyle(),
+                  hint: Text(
+                    'Select Condition',
+                    style: theme.getStyle().copyWith(color: Colors.black),
+                  ),
                   iconSize: 0.0,
                   isDense: false,
                   isExpanded: true,
