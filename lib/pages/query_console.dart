@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:string_validator/string_validator.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:twin_commons/core/base_state.dart';
@@ -28,6 +29,8 @@ class _QueryConsoleState extends BaseState<QueryConsole> {
   TextEditingController _queryController = TextEditingController(text: '');
   TextEditingController _searchController =
       TextEditingController(text: '/_search');
+  TextEditingController _specController = TextEditingController(text: '0');
+  int spec = 0;
   bool apiLoadingStatus = false;
   bool validQuery = false;
   @override
@@ -69,6 +72,32 @@ class _QueryConsoleState extends BaseState<QueryConsole> {
                       Padding(
                         padding: const EdgeInsets.only(top: 1, right: 2),
                         child: Text("Message"),
+                      ),
+                      hdivider,
+                      SizedBox(
+                        width: 75,
+                        height: 42,
+                        child: TextField(
+                          controller: _specController,
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly
+                          ],
+                          decoration: InputDecoration(
+                            labelText: '',
+                            border: OutlineInputBorder(),
+                          ),
+                          onChanged: (value) {
+                            setState(() {
+                              if (value.trim() == "") {
+                                _specController.text = '0';
+                                spec = 0;
+                              } else {
+                                spec = int.parse(value);
+                              }
+                            });
+                          },
+                        ),
                       ),
                       hdivider,
                       SizedBox(
@@ -186,10 +215,12 @@ class _QueryConsoleState extends BaseState<QueryConsole> {
       var cRes = await TwinnedSession.instance.twin.queryGeneric(
           apikey: TwinnedSession.instance.authToken,
           eql: GenericQueryReq(
-              eql: queryObject,
-              isMessage: isMsgSelected,
-              protocol: protocolType,
-              extraPath: extraPathType));
+            eql: queryObject,
+            isMessage: isMsgSelected,
+            specId: spec,
+            protocol: protocolType,
+            extraPath: extraPathType,
+          ));
       if (validateResponse(cRes, shouldAlert: false)) {
         var result = cRes.body!.result;
         jsonStringData = jsonEncode(result);

@@ -10,6 +10,7 @@ import 'package:twin_commons/core/twin_image_helper.dart';
 import 'package:twin_commons/core/twinned_session.dart';
 import 'package:twin_commons/widgets/common/label_text_field.dart';
 import 'package:twinned_api/twinned_api.dart' as tapi;
+import 'package:twinned_widgets/core/premise_dropdown.dart';
 
 class FacilitySnippet extends StatefulWidget {
   final tapi.Facility? facility;
@@ -98,6 +99,21 @@ class _FacilitySnippetState extends BaseState<FacilitySnippet> {
                   padding: const EdgeInsets.all(10.0),
                   child: Column(
                     children: [
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width / 2.5,
+                        child: PremiseDropdown(
+                          style: theme.getStyle(),
+                          selectedItem: _facility.premiseId,
+                          onPremiseSelected: (tapi.Premise? selectedPremise) {
+                            setState(() {
+                              if (selectedPremise != null) {
+                                _facility = _facility.copyWith(
+                                    premiseId: selectedPremise.id);
+                              }
+                            });
+                          },
+                        ),
+                      ),
                       SizedBox(
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: LabelTextField(
@@ -418,7 +434,11 @@ class _FacilitySnippetState extends BaseState<FacilitySnippet> {
             apikey: TwinnedSession.instance.authToken, body: _facility);
         if (validateResponse(cRes)) {
           _close();
-          alert('Success', 'Facility ${_facility.name} created!');
+          alert('Facility - ${_facility.name}', ' Created successfully!',
+              contentStyle: theme.getStyle(),
+              titleStyle: theme
+                  .getStyle()
+                  .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
         }
       } else {
         var uRes = await TwinnedSession.instance.twin.updateFacility(
@@ -428,8 +448,11 @@ class _FacilitySnippetState extends BaseState<FacilitySnippet> {
         if (validateResponse(uRes)) {
           if (!silent) {
             _close();
-            alert(
-                'Success', 'Facility ${_facility.name} updated successfully!');
+            alert('Facility - ${_facility.name}', ' Updated successfully!',
+                contentStyle: theme.getStyle(),
+                titleStyle: theme
+                    .getStyle()
+                    .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
           }
         }
       }
@@ -463,33 +486,6 @@ class _FacilitySnippetState extends BaseState<FacilitySnippet> {
     loading = false;
     refresh();
   }
-
-  // Future<void> _showLocationDialog(BuildContext context) async {
-  //   return showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         content: SizedBox(
-  //           width: 1000,
-  //           child: OSMLocationPicker(
-  //             longitude: _facility.location?.coordinates[0],
-  //             latitude: _facility.location?.coordinates[1],
-  //             onPicked: (pickedData) {
-  //               Navigator.of(context).pop();
-  //               setState(() {
-  //                 _facility = _facility.copyWith(
-  //                     location: tapi.GeoLocation(coordinates: [
-  //                   pickedData.longitude,
-  //                   pickedData.latitude
-  //                 ]));
-  //               });
-  //             },
-  //           ),
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
 
   /// using google map
   Future<void> _showLocationDialog(BuildContext context) async {

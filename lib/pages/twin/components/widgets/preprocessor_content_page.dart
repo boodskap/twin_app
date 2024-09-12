@@ -98,9 +98,17 @@ class _PreprocessorContentPageState extends BaseState<PreprocessorContentPage> {
 
       if (validateResponse(res)) {
         await alert(
-            '', 'Preprocessor ${_nameController.text} saved successfully!');
+            'Preprocessor - ${_nameController.text}', ' Saved successfully!',
+            contentStyle: theme.getStyle(),
+            titleStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
       } else {
-        await alert('', res.body!.msg!);
+        await alert('', res.body!.msg!,
+            contentStyle: theme.getStyle(),
+            titleStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
       }
       if (shouldPop) {
         _cancel();

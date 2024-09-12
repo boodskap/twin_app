@@ -4,6 +4,7 @@ import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/pages/twin/components/widgets/asset_device.dart';
 import 'package:twin_app/pages/twin/components/widgets/client_infratsructure_widget.dart';
 import 'package:twin_app/pages/twin/components/widgets/device_info_snippet.dart';
+import 'package:twin_app/pages/twin/components/widgets/facility_snippet.dart';
 import 'package:twin_app/pages/twin/components/widgets/roles_infrastructure_widget.dart';
 import 'package:twin_app/pages/twin/components/widgets/utils.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
@@ -318,33 +319,6 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
         return 'Name';
     }
   }
-
-  // Future<void> _pickLocation() async {
-  //   return showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         content: SizedBox(
-  //           width: 1000,
-  //           child: OSMLocationPicker(
-  //             longitude: _pickedLocation?.coordinates[0],
-  //             latitude: _pickedLocation?.coordinates[1],
-  //             onPicked: (pickedData) {
-  //               setState(() {
-  //                 _pickedLocation = GeoLocation(
-  //                     type: 'point',
-  //                     coordinates: [pickedData.longitude, pickedData.latitude]);
-  //                 _location.text =
-  //                     '${_pickedLocation!.coordinates[0]}, ${_pickedLocation!.coordinates[1]}';
-  //               });
-  //               Navigator.of(context).pop();
-  //             },
-  //           ),
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
 
   Future<void> _pickLocation(BuildContext context) async {
     double pickedLatitude =
@@ -696,8 +670,11 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
 
       if (validateResponse(res)) {
         _close();
-        alert(
-            'Success', 'Premise ${res.body!.entity!.name} saved successfully!');
+        alert('Premise - ${res.body!.entity!.name}', ' Saved successfully!',
+            contentStyle: theme.getStyle(),
+            titleStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
       }
     });
   }
@@ -720,8 +697,11 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
 
       if (validateResponse(res)) {
         _close();
-        alert('Success',
-            'Facility ${res.body!.entity!.name} saved successfully!');
+        alert('Facility - ${res.body!.entity!.name}', ' Saved successfully!',
+            contentStyle: theme.getStyle(),
+            titleStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
       }
     });
   }
@@ -744,6 +724,11 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
 
       if (validateResponse(res)) {
         _close();
+        alert('Floor - ${res.body!.entity!.name}', ' Saved successfully!',
+            contentStyle: theme.getStyle(),
+            titleStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
       }
     });
   }
@@ -766,6 +751,11 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
 
       if (validateResponse(res)) {
         _close();
+        alert('Asset - ${res.body!.entity!.name}', ' Saved successfully!',
+            contentStyle: theme.getStyle(),
+            titleStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
       }
     });
   }
@@ -1019,6 +1009,27 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
                                         ],
                                       ),
                                       divider(),
+                                      if (canCreate() &&
+                                          widget.type == InfraType.premise)
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
+                                          children: [
+                                            PrimaryButton(
+                                              labelKey: 'New Facility',
+                                              leading: Icon(
+                                                Icons.add,
+                                                color: Colors.white,
+                                              ),
+                                              onPressed: (canCreate())
+                                                  ? () {
+                                                      _addEditFacilityDialog();
+                                                    }
+                                                  : null,
+                                            ),
+                                          ],
+                                        ),
+                                      divider(),
                                       if (widget.type == InfraType.premise)
                                         ..._facilities
                                             .map((e) => _buildFacility(e)),
@@ -1046,6 +1057,8 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
+              BusyIndicator(),
+              divider(horizontal: true),
               SecondaryButton(
                 labelKey: "Close",
                 onPressed: () {
@@ -1070,5 +1083,32 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
         ],
       ),
     );
+  }
+
+  void _addEditFacilityDialog({Facility? facility}) async {
+    var res;
+    Premise? selectedPremise;
+
+    if (facility != null && widget.premise != null) {
+      res = await TwinnedSession.instance.twin.getPremise(
+        premiseId: facility.premiseId,
+        apikey: TwinnedSession.instance.authToken,
+      );
+      selectedPremise = res.body?.entity;
+    }
+
+    await super.alertDialog(
+      titleStyle:
+          theme.getStyle().copyWith(fontSize: 20, fontWeight: FontWeight.bold),
+      title: facility == null ? 'Add New Facility' : 'Update Facility',
+      body: FacilitySnippet(
+        selectedPremise: selectedPremise ?? widget.premise,
+        facility: facility,
+      ),
+      width: 750,
+      height: MediaQuery.of(context).size.height - 150,
+    );
+
+    _load();
   }
 }

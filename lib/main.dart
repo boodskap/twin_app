@@ -30,7 +30,7 @@ void main() async {
 
 void start({
   bool disableTwinApp = false,
-  String flavour = "prod",
+  String flavour = "dev",
   required String appTitle,
   required dynamic homeMenu,
   required String homeMenuTitle,
