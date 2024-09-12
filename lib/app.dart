@@ -22,6 +22,7 @@ import 'package:twin_app/pages/branding/fonts_colors.dart';
 import 'package:twin_app/pages/branding/landing_page.dart';
 import 'package:twin_app/pages/dashboard.dart';
 import 'package:twin_app/pages/nocode_builder.dart';
+import 'package:twin_app/pages/pulse/template.dart';
 import 'package:twin_app/pages/query_console.dart';
 import 'package:twin_app/pages/pulse/admin/manage_gateways.dart';
 import 'package:twin_app/pages/pulse/email.dart';
@@ -69,6 +70,7 @@ enum TwinAppMenu {
   pulseSms,
   pulseVoice,
   pulseGateway,
+  pulseTemplate
   ;
 }
 
@@ -994,6 +996,18 @@ class HomeScreenState extends BaseState<HomeScreen> {
         },
       ),
       session.TwinMenuItem(
+        id: TwinAppMenu.pulseTemplate,
+        text: 'Template',
+        icon: Icons.event_note,
+        bottomMenus: _pulseBottomMenus(),
+        isMenuVisible: () {
+          return session.isAdmin();
+        },
+        onMenuSelected: (BuildContext context) async {
+          return const TemplatePage();
+        },
+      ),
+      session.TwinMenuItem(
         id: TwinAppMenu.pulseGateway,
         text: 'Gateways',
         icon: Icons.settings,
@@ -1105,6 +1119,11 @@ class HomeScreenState extends BaseState<HomeScreen> {
         id: TwinAppMenu.pulseVoice,
         icon: Icon(Icons.voicemail, size: 30),
         label: 'Voice',
+      ),
+       const BottomMenuItem(
+        id: TwinAppMenu.pulseTemplate,
+        icon: Icon(Icons.event_note, size: 30),
+        label: 'Template',
       ),
       const BottomMenuItem(
         id: TwinAppMenu.pulseGateway,
