@@ -30,8 +30,8 @@ class _PulseSmsGroupDropdownState extends BaseState<PulseSmsGroupDropdown> {
   Widget build(BuildContext context) {
     return SearchChoices<pulse.SmsGroup>.single(
       value: _selectedItem,
-      hint: 'Select Email Group',
-      searchHint: 'Search Email Groups',
+      hint: 'Select Sms Group',
+      searchHint: 'Search Sms Groups',
       isExpanded: true,
       futureSearchFn: (String? keyword, String? orderBy, bool? orderAsc,
           List<Tuple2<String, String>>? filters, int? pageNb) async {
