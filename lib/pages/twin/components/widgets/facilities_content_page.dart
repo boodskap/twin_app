@@ -4,6 +4,7 @@ import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/pages/twin/components/widgets/asset_device.dart';
 import 'package:twin_app/pages/twin/components/widgets/client_infratsructure_widget.dart';
 import 'package:twin_app/pages/twin/components/widgets/device_info_snippet.dart';
+import 'package:twin_app/pages/twin/components/widgets/floor_snippet.dart';
 import 'package:twin_app/pages/twin/components/widgets/roles_infrastructure_widget.dart';
 import 'package:twin_app/pages/twin/components/widgets/utils.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
@@ -134,18 +135,6 @@ class _FacilityContentPageState extends BaseState<FacilityContentPage> {
     }
 
     super.initState();
-  }
-
-  @override
-  void setup() async {
-    if (imageIds.length > selectedImage) {
-      setState(() {
-        imageId = imageIds[selectedImage];
-        infraImage = TwinImageHelper.getCachedImage(domainKey, imageId,
-            fit: BoxFit.fill);
-      });
-    }
-    await _load();
   }
 
   Future _load() async {
@@ -1003,6 +992,20 @@ class _FacilityContentPageState extends BaseState<FacilityContentPage> {
                                         ],
                                       ),
                                       divider(),
+                                      Align(
+                                        alignment: Alignment.topRight,
+                                        child: PrimaryButton(
+                                          labelKey: 'Create Floor',
+                                          leading: Icon(
+                                            Icons.add,
+                                            color: Colors.white,
+                                          ),
+                                          onPressed: (canCreate())
+                                              ? _addEditFloorDialog
+                                              : null,
+                                        ),
+                                      ),
+                                      divider(),
                                       if (widget.type == InfraType.premise)
                                         ..._facilities
                                             .map((e) => _buildFacility(e)),
@@ -1054,5 +1057,53 @@ class _FacilityContentPageState extends BaseState<FacilityContentPage> {
         ],
       ),
     );
+  }
+
+  void _addEditFloorDialog({Floor? floor}) async {
+    Premise? selectedPremise;
+    Facility? selectedFacility;
+
+    if (floor != null && (widget.premise != null && widget.facility != null)) {
+      var pRes = await TwinnedSession.instance.twin.getPremise(
+        premiseId: floor.premiseId,
+        apikey: TwinnedSession.instance.authToken,
+      );
+      selectedPremise = pRes.body?.entity;
+
+      var fRes = await TwinnedSession.instance.twin.getFacility(
+        facilityId: floor.facilityId,
+        apikey: TwinnedSession.instance.authToken,
+      );
+      selectedFacility = fRes.body?.entity;
+    }
+
+    await super.alertDialog(
+      title: floor == null ? 'Add New Floor' : 'Update Floor',
+      titleStyle:
+          theme.getStyle().copyWith(fontSize: 20, fontWeight: FontWeight.bold),
+      body: FloorSnippet(
+        selectedFacilityId: widget.facility!.id,
+        selectedPremiseId: widget.facility!.premiseId,
+        selectedPremise: selectedPremise,
+        selectedFacility: selectedFacility ?? widget.facility,
+        floor: floor,
+      ),
+      width: 750,
+      height: MediaQuery.of(context).size.height - 150,
+    );
+
+    _load();
+  }
+
+  @override
+  void setup() async {
+    if (imageIds.length > selectedImage) {
+      setState(() {
+        imageId = imageIds[selectedImage];
+        infraImage = TwinImageHelper.getCachedImage(domainKey, imageId,
+            fit: BoxFit.fill);
+      });
+    }
+    await _load();
   }
 }

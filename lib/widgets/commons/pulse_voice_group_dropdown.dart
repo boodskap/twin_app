@@ -31,8 +31,8 @@ class _PulseVoiceGroupDropdownState extends BaseState<PulseVoiceGroupDropdown> {
   Widget build(BuildContext context) {
     return SearchChoices<pulse.VoiceGroup>.single(
       value: _selectedItem,
-      hint: 'Select Email Group',
-      searchHint: 'Search Email Groups',
+      hint: 'Select Voice Group',
+      searchHint: 'Search Voice Groups',
       isExpanded: true,
       futureSearchFn: (String? keyword, String? orderBy, bool? orderAsc,
           List<Tuple2<String, String>>? filters, int? pageNb) async {

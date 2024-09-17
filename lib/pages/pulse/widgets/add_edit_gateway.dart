@@ -3,6 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/pages/pulse/widgets/gateway_dropdown.dart';
+import 'package:twin_app/widgets/commons/pulse_email_group_dropdown.dart';
+import 'package:twin_app/widgets/commons/pulse_gateway_dropdown.dart';
+import 'package:twin_app/widgets/commons/pulse_sms_group_dropdown.dart';
+import 'package:twin_app/widgets/commons/pulse_voice_group_dropdown.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/twinned_session.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
@@ -170,7 +174,8 @@ class _AddEditGatewayState extends BaseState<AddEditGateway> {
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
             Checkbox(
-                value: bool.parse(param.$value),
+                value: param.$value.toLowerCase() == 'true',
+                // value: bool.parse(param.$value),
                 onChanged: (v) {
                   if (!param.editable) return;
                   setState(() {
@@ -187,7 +192,6 @@ class _AddEditGatewayState extends BaseState<AddEditGateway> {
             ),
           ],
         );
-        break;
       case pulse.GatewayParamType.email:
         return LabelTextField(
           label: (param.description?.isNotEmpty ?? false)
@@ -277,34 +281,78 @@ class _AddEditGatewayState extends BaseState<AddEditGateway> {
           ),
         );
       case pulse.GatewayParamType.pulseEmailKey:
-      // TODO: Handle this case.
-      case pulse.GatewayParamType.pulseSmsKey:
-      // TODO: Handle this case.
-      case pulse.GatewayParamType.pulseVoiceKey:
-      // TODO: Handle this case.
-      case pulse.GatewayParamType.pulseEmailGroupId:
-      // TODO: Handle this case.
-      case pulse.GatewayParamType.pulseSmsGroupId:
-      // TODO: Handle this case.
-      case pulse.GatewayParamType.pulseVoiceGroupId:
-        // TODO: Handle this case.
-        return LabelTextField(
-          label: (param.description?.isNotEmpty ?? false)
-              ? param.description!
-              : param.name,
-          controller: c,
-          readOnlyVal: !param.editable,
+        return PulseGatewayDropdown(
+          onGatewaySelected: (pulse.GatewayConfig? gateway) {
+            if (gateway != null) {
+              setState(() {
+                _params[param.name] = param.copyWith($value: gateway.id);
+              });
+            }
+          },
+          selectedItem: _params[param.name]?.$value,
+          style: theme.getStyle(),
         );
-        break;
+      case pulse.GatewayParamType.pulseSmsKey:
+        return PulseGatewayDropdown(
+          onGatewaySelected: (pulse.GatewayConfig? gateway) {
+            if (gateway != null) {
+              setState(() {
+                _params[param.name] = param.copyWith($value: gateway.id);
+              });
+            }
+          },
+          selectedItem: _params[param.name]?.$value,
+          style: theme.getStyle(),
+        );
+      case pulse.GatewayParamType.pulseVoiceKey:
+        return PulseGatewayDropdown(
+          onGatewaySelected: (pulse.GatewayConfig? gateway) {
+            if (gateway != null) {
+              setState(() {
+                _params[param.name] = param.copyWith($value: gateway.id);
+              });
+            }
+          },
+          selectedItem: _params[param.name]?.$value,
+          style: theme.getStyle(),
+        );
+      case pulse.GatewayParamType.pulseEmailGroupId:
+        return PulseEmailGroupDropdown(
+          onEmailGroupSelected: (pulse.EmailGroup? group) {
+            if (group != null) {
+              setState(() {
+                _params[param.name] = param.copyWith($value: group.id);
+              });
+            }
+          },
+          selectedItem: _params[param.name]?.$value,
+          style: theme.getStyle(),
+        );
+      case pulse.GatewayParamType.pulseSmsGroupId:
+        return PulseSmsGroupDropdown(
+          onSmsGroupSelected: (pulse.SmsGroup? group) {
+            if (group != null) {
+              setState(() {
+                _params[param.name] = param.copyWith($value: group.id);
+              });
+            }
+          },
+          selectedItem: _params[param.name]?.$value,
+          style: theme.getStyle(),
+        );
+      case pulse.GatewayParamType.pulseVoiceGroupId:
+        return PulseVoiceGroupDropdown(
+          onVoiceGroupSelected: (pulse.VoiceGroup? group) {
+            if (group != null) {
+              setState(() {
+                _params[param.name] = param.copyWith($value: group.id);
+              });
+            }
+          },
+          selectedItem: _params[param.name]?.$value,
+          style: theme.getStyle(),
+        );
     }
-  }
-
-  String? getDomainKeyForSelectedOrg() {
-    return orgs[selectedOrg].twinDomainKey;
-  }
-
-  String? getApiKeyForSelectedOrg() {
-    return orgs[selectedOrg].twinAuthToken;
   }
 
   bool _canSave() {
