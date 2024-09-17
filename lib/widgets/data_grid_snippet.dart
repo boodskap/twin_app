@@ -1395,7 +1395,7 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
     _models.clear();
     _modelIds.clear();
 
-    setState(() {
+    refresh(sync: () {
       _buildChildren();
     });
 
@@ -1531,7 +1531,9 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
 
     loading = false;
 
-    _buildChildren();
+    if (mounted) {
+      _buildChildren();
+    }
 
     refresh();
   }
@@ -1548,7 +1550,10 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-               Text('Preview Location',style: theme.getStyle(),),
+              Text(
+                'Preview Location',
+                style: theme.getStyle(),
+              ),
               IconButton(
                 icon: Icon(Icons.close),
                 onPressed: () {

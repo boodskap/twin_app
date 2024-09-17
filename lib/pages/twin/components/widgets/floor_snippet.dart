@@ -1,15 +1,17 @@
 import 'package:flutter/Material.dart';
 import 'package:flutter/services.dart';
 import 'package:twin_app/core/session_variables.dart';
+import 'package:twin_app/widgets/commons/email_field.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:twin_app/widgets/commons/secondary_button.dart';
 import 'package:twin_app/widgets/google_map.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/widgets/common/label_text_field.dart';
-import 'package:twin_commons/util/osm_location_picker.dart';
 import 'package:twinned_api/twinned_api.dart' as tapi;
 import 'package:twin_commons/core/twin_image_helper.dart';
 import 'package:twin_commons/core/twinned_session.dart';
+import 'package:twinned_widgets/core/facility_dropdown.dart';
+import 'package:twinned_widgets/core/premise_dropdown.dart';
 import 'package:uuid/uuid.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 
@@ -17,11 +19,15 @@ class FloorSnippet extends StatefulWidget {
   final tapi.Floor? floor;
   final tapi.Premise? selectedPremise;
   final tapi.Facility? selectedFacility;
-  const FloorSnippet({
+  String? selectedPremiseId;
+  String? selectedFacilityId;
+  FloorSnippet({
     super.key,
     this.floor,
     this.selectedPremise,
     this.selectedFacility,
+    this.selectedPremiseId,
+    this.selectedFacilityId,
   });
 
   @override
@@ -60,12 +66,14 @@ class _FloorSnippetState extends BaseState<FloorSnippet> {
       _floor = _floor.copyWith(
         premiseId: widget.selectedPremise!.id,
       );
-    }
-    if (widget.selectedFacility != null) {
+    } else {
       _floor = _floor.copyWith(
-        facilityId: widget.selectedFacility!.id,
+        premiseId: widget.selectedPremiseId,
       );
     }
+    _floor = _floor.copyWith(
+      facilityId: widget.selectedFacilityId,
+    );
     if (null != widget.floor) {
       tapi.Floor p = widget.floor!;
       _floor = _floor.copyWith(
@@ -93,9 +101,6 @@ class _FloorSnippetState extends BaseState<FloorSnippet> {
     emailController.text = _floor.email ?? '';
     phoneController.text = _floor.phone ?? '';
     countryCode = _floor.countryCode ?? '';
-    nameController.addListener(_onNameChanged);
-    phoneController.addListener(_onNameChanged);
-    emailController.addListener(_onNameChanged);
   }
 
   @override
@@ -118,6 +123,46 @@ class _FloorSnippetState extends BaseState<FloorSnippet> {
                   padding: const EdgeInsets.all(10.0),
                   child: Column(
                     children: [
+                      PremiseDropdown(
+                        key: Key(const Uuid().v4()),
+                        selectedItem: _floor.premiseId,
+                        onPremiseSelected: (tapi.Premise? selectedPremise) {
+                          setState(() {
+                            if (selectedPremise == null) {
+                              _floor = _floor.copyWith(
+                                premiseId: '',
+                                facilityId: '',
+                              );
+                            } else {
+                              _floor = _floor.copyWith(
+                                premiseId: selectedPremise.id,
+                                facilityId: '',
+                              );
+                            }
+                          });
+                        },
+                      ),
+                      FacilityDropdown(
+                        key: Key(const Uuid().v4()),
+                        style: theme.getStyle(),
+                        selectedItem: _floor.facilityId,
+                        selectedPremise: _floor.premiseId,
+                        onFacilitySelected: (tapi.Facility? selectedFacility) {
+                          setState(() {
+                            if (selectedFacility != null) {
+                              _floor = _floor.copyWith(
+                                facilityId: selectedFacility.id,
+                              );
+                            } else {
+                              _floor = _floor.copyWith(
+                                // premiseId: '',
+                                facilityId: '',
+                              );
+                            }
+                          });
+                        },
+                      ),
+                      divider(),
                       SizedBox(
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: LabelTextField(
@@ -352,11 +397,14 @@ class _FloorSnippetState extends BaseState<FloorSnippet> {
                   divider(horizontal: true),
                   PrimaryButton(
                     labelKey: (null == widget.floor) ? 'Create' : 'Update',
-                    onPressed: !_canCreateOrUpdate()
-                        ? null
-                        : () {
-                            _save();
-                          },
+                    onPressed: () {
+                      if (_canCreateOrUpdate()) {
+                        _save();
+                      } else {
+                        alert('Error',
+                            'Please check the Name, Email, PhoneNumber!');
+                      }
+                    },
                   ),
                 ],
               ),
@@ -369,19 +417,7 @@ class _FloorSnippetState extends BaseState<FloorSnippet> {
 
   @override
   void dispose() {
-    nameController.removeListener(_onNameChanged);
-    phoneController.removeListener(_onNameChanged);
-    emailController.removeListener(_onNameChanged);
-    nameController.dispose();
-    descController.dispose();
-    addressController.dispose();
-    phoneController.dispose();
-    emailController.dispose();
     super.dispose();
-  }
-
-  void _onNameChanged() {
-    setState(() {});
   }
 
   bool _canCreateOrUpdate() {
@@ -572,7 +608,5 @@ class _FloorSnippetState extends BaseState<FloorSnippet> {
   }
 
   @override
-  void setup() {
-    // TODO: implement setup
-  }
+  void setup() {}
 }
