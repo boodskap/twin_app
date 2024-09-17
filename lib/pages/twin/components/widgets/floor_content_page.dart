@@ -992,18 +992,25 @@ class _FloorContentPageState extends BaseState<FloorContentPage> {
                                           ),
                                         ],
                                       ),
+                                      divider(),
                                       if (canCreate())
-                                        PrimaryButton(
-                                          labelKey: 'Create Asset',
-                                          leading: Icon(
-                                            Icons.add,
-                                            color: Colors.white,
-                                          ),
-                                          onPressed: (canCreate())
-                                              ? () {
-                                                  _addEditAssetDialog();
-                                                }
-                                              : null,
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
+                                          children: [
+                                            PrimaryButton(
+                                              labelKey: 'Create Asset',
+                                              leading: Icon(
+                                                Icons.add,
+                                                color: Colors.white,
+                                              ),
+                                              onPressed: (canCreate())
+                                                  ? () {
+                                                      _addEditAssetDialog();
+                                                    }
+                                                  : null,
+                                            ),
+                                          ],
                                         ),
                                       divider(),
                                       if (widget.type == InfraType.premise)
