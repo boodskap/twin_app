@@ -1,20 +1,36 @@
 import 'package:flutter/Material.dart';
-import 'package:flutter/services.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/pages/twin/components/widgets/asset_type_dropdown.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:twin_app/widgets/commons/secondary_button.dart';
 import 'package:twin_app/widgets/google_map.dart';
 import 'package:twin_commons/core/base_state.dart';
-import 'package:twin_commons/widgets/common/label_text_field.dart';
-import 'package:twinned_api/twinned_api.dart' as tapi;
 import 'package:twin_commons/core/twin_image_helper.dart';
 import 'package:twin_commons/core/twinned_session.dart';
+import 'package:twin_commons/widgets/common/label_text_field.dart';
+import 'package:twinned_api/twinned_api.dart' as tapi;
+import 'package:twinned_widgets/core/facility_dropdown.dart';
+import 'package:twinned_widgets/core/floor_dropdown.dart';
+import 'package:twinned_widgets/core/premise_dropdown.dart';
 import 'package:uuid/uuid.dart';
 
 class AssetSnippet extends StatefulWidget {
   final tapi.Asset? asset;
-  const AssetSnippet({super.key, this.asset});
+  final tapi.Premise? selectedPremise;
+  final tapi.Facility? selectedFacility;
+  final tapi.Floor? selectedFloor;
+  String? selectedPremiseId;
+  String? selectedFacilityId;
+  String? selectedFloorId;
+  AssetSnippet(
+      {super.key,
+      this.asset,
+      this.selectedPremise,
+      this.selectedFacility,
+      this.selectedFloor,
+      this.selectedPremiseId,
+      this.selectedFacilityId,
+      this.selectedFloorId});
 
   @override
   State<AssetSnippet> createState() => _AssetSnippetState();
@@ -24,9 +40,9 @@ class _AssetSnippetState extends BaseState<AssetSnippet> {
   TextEditingController nameController = TextEditingController();
   TextEditingController descController = TextEditingController();
   TextEditingController tagController = TextEditingController();
+
   Future<List<String>>? clientIds =
       isClientAdmin() ? TwinnedSession.instance.getClientIds() : null;
-  tapi.AssetModel? _selectedAssetModel;
   tapi.AssetInfo _asset = const tapi.AssetInfo(
     name: '',
     clientIds: [],
@@ -44,6 +60,24 @@ class _AssetSnippetState extends BaseState<AssetSnippet> {
   @override
   void initState() {
     super.initState();
+
+    _asset = _asset.copyWith(
+      premiseId: widget.selectedPremise != null
+          ? (widget.selectedPremise?.id ?? widget.asset?.premiseId ?? '')
+          : (widget.selectedPremiseId ?? ''),
+    );
+
+    _asset = _asset.copyWith(
+      facilityId: widget.selectedFacility != null
+          ? (widget.selectedFacility?.id ?? widget.asset?.facilityId ?? '')
+          : (widget.selectedFacilityId ?? ''),
+    );
+
+    _asset = _asset.copyWith(
+      floorId: widget.selectedFloor != null
+          ? (widget.selectedFloor?.id ?? '')
+          : (widget.selectedFloorId ?? ''),
+    );
     if (null != widget.asset) {
       tapi.Asset a = widget.asset!;
       _asset = _asset.copyWith(
@@ -66,7 +100,7 @@ class _AssetSnippetState extends BaseState<AssetSnippet> {
     nameController.text = _asset.name;
     descController.text = _asset.description ?? '';
     tagController.text = (_asset.tags ?? []).join(' ');
-    nameController.addListener(_onNameChanged);
+    // nameController.addListener(_onNameChanged);
   }
 
   @override
@@ -89,6 +123,66 @@ class _AssetSnippetState extends BaseState<AssetSnippet> {
                   padding: const EdgeInsets.all(10.0),
                   child: Column(
                     children: [
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width / 2.5,
+                        child: PremiseDropdown(
+                          key: Key(const Uuid().v4()),
+                          selectedItem: _asset.premiseId,
+                          onPremiseSelected: (tapi.Premise? selectedPremise) {
+                            setState(() {
+                              if (selectedPremise == null) {
+                                _asset = _asset.copyWith(
+                                  premiseId: '',
+                                  facilityId: '',
+                                  floorId: '',
+                                );
+                              } else {
+                                _asset = _asset.copyWith(
+                                  premiseId: selectedPremise.id,
+                                  facilityId: '',
+                                  floorId: '',
+                                );
+                              }
+                            });
+                          },
+                        ),
+                      ),
+                      FacilityDropdown(
+                          key: Key(const Uuid().v4()),
+                          selectedItem: _asset.facilityId,
+                          selectedPremise: _asset.premiseId,
+                          onFacilitySelected:
+                              (tapi.Facility? selectedFacility) {
+                            setState(() {
+                              if (selectedFacility == null) {
+                                _asset = _asset.copyWith(
+                                  facilityId: '',
+                                  floorId: '',
+                                );
+                              } else {
+                                _asset = _asset.copyWith(
+                                  facilityId: selectedFacility.id,
+                                  floorId: '',
+                                );
+                              }
+                            });
+                          }),
+                      FloorDropdown(
+                          key: Key(const Uuid().v4()),
+                          selectedItem: _asset.floorId,
+                          selectedPremise: _asset.premiseId,
+                          selectedFacility: _asset.facilityId,
+                          onFloorSelected: (tapi.Floor? selectedFloor) {
+                            setState(() {
+                              if (selectedFloor != null) {
+                                _asset = _asset.copyWith(
+                                  floorId: selectedFloor.id,
+                                );
+                              } else {
+                                _asset = _asset.copyWith(floorId: '');
+                              }
+                            });
+                          }),
                       SizedBox(
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: LabelTextField(
@@ -134,17 +228,6 @@ class _AssetSnippetState extends BaseState<AssetSnippet> {
                         ),
                       ),
                       divider(height: 15),
-                      // AssetTypeDropdown(
-                      //   key: Key(const Uuid().v4()),
-                      //   assetModelId: _selectedAssetModel?.id,
-                      //   onTankTypeSelected: (tankType) {
-                      //     if (tankType != null) {
-                      //       setState(() {
-                      //         _selectedAssetModel = tankType;
-                      //       });
-                      //     }
-                      //   },
-                      // ),
                       AssetTypeDropdown(
                         key: Key(const Uuid().v4()),
                         assetModelId: _asset.assetModelId,
@@ -280,11 +363,22 @@ class _AssetSnippetState extends BaseState<AssetSnippet> {
                   divider(horizontal: true),
                   PrimaryButton(
                     labelKey: (null == widget.asset) ? 'Create' : 'Update',
-                    onPressed: !_canCreateOrUpdate()
-                        ? null
-                        : () {
-                            _save();
-                          },
+                    onPressed: () {
+                      if (_canCreateOrUpdate()) {
+                        _save();
+                      } else {
+                        alert("Please check",
+                            "Name and Asset model type can't be empty",
+                            contentStyle: theme.getStyle(),
+                            titleStyle: theme.getStyle().copyWith(
+                                fontSize: 18, fontWeight: FontWeight.bold));
+                      }
+                    },
+                    // onPressed: !_canCreateOrUpdate()
+                    // ? null
+                    // : () {
+                    //     _save();
+                    //   },
                   ),
                 ],
               ),
@@ -499,10 +593,10 @@ class _AssetSnippetState extends BaseState<AssetSnippet> {
 
   @override
   void dispose() {
-    nameController.removeListener(_onNameChanged);
-    nameController.dispose();
-    descController.dispose();
-    tagController.dispose();
+    // nameController.removeListener(_onNameChanged);
+    // nameController.dispose();
+    // descController.dispose();
+    // tagController.dispose();
     super.dispose();
   }
 }
