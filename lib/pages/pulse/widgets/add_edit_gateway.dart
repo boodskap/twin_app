@@ -355,14 +355,6 @@ class _AddEditGatewayState extends BaseState<AddEditGateway> {
     }
   }
 
-  String? getDomainKeyForSelectedOrg() {
-    return orgs[selectedOrg].twinDomainKey;
-  }
-
-  String? getApiKeyForSelectedOrg() {
-    return orgs[selectedOrg].twinAuthToken;
-  }
-
   bool _canSave() {
     for (pulse.GatewayParam p in _params.values) {
       if (p.$value.trim().isEmpty) return false;
