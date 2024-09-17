@@ -124,18 +124,20 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
 
         String orgId = await Storage.getString('preferred.orgId', '');
         late tapi.OrgInfo orgInfo;
+        bool hasStoredOrg = false;
 
         if (orgId.isNotEmpty) {
           for (tapi.OrgInfo oi in session.orgs) {
             if (oi.id == orgId) {
               session.selectedOrg = session.orgs.indexOf(oi);
               orgInfo = oi;
+              hasStoredOrg = true;
               break;
             }
           }
         }
 
-        if (null == orgInfo) {
+        if (!hasStoredOrg) {
           orgInfo = session.orgs.first;
         }
 
