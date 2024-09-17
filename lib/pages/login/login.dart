@@ -123,21 +123,28 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
         }
 
         String orgId = await Storage.getString('preferred.orgId', '');
+        late tapi.OrgInfo orgInfo;
+
         if (orgId.isNotEmpty) {
           for (tapi.OrgInfo oi in session.orgs) {
             if (oi.id == orgId) {
               session.selectedOrg = session.orgs.indexOf(oi);
+              orgInfo = oi;
               break;
             }
           }
         }
 
+        if (null == orgInfo) {
+          orgInfo = session.orgs.first;
+        }
+
         TwinnedSession.instance.init(
           debug: debug,
           host: host,
-          authToken: session.orgs.first.twinAuthToken,
-          domainKey: session.orgs.first.twinDomainKey,
-          orgId: session.orgs.first.id,
+          authToken: orgInfo.twinAuthToken,
+          domainKey: orgInfo.twinDomainKey,
+          orgId: orgInfo.id,
           noCodeAuthToken: lRes.body!.nocodeAuthToken ?? '',
         );
         loggedIn = true;

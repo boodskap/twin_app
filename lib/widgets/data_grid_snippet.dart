@@ -1395,7 +1395,7 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
     _models.clear();
     _modelIds.clear();
 
-    setState(() {
+    refresh(sync: () {
       _buildChildren();
     });
 
