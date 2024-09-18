@@ -46,57 +46,9 @@ class _EmailGroupPageState extends BaseState<EmailGroupPage> {
                   color: Colors.white,
                 ),
                 labelKey: 'Add New',
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        title: Text('Create Email Group'),
-                         scrollable: true,
-                        content: Container(
-                          width: MediaQuery.of(context).size.width * 0.3,
-                          height: MediaQuery.of(context).size.height * 0.6,
-                          child: AddEditEmailGroup(
-                            onNameSaved: (String value) {
-                              setState(() {
-                                name = value;
-                              });
-                            },
-                            onEmailSaved: (List<String> email) {
-                              setState(() {
-                                emailList = email;
-                              });
-                            },
-                          ),
-                        ),
-                        actions: [
-                          
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              SecondaryButton(
-                                labelKey: 'Cancel',
-                                onPressed: () {
-                                  _close();
-                                },
-                              ),
-                              divider(horizontal: true),
-                              PrimaryButton(
-                                labelKey: 'Create',
-                                onPressed: () {
-                                  if (canCreateOrUpdate()) {
-                                    _save(null);
-                                  } else {
-                                    alert('Warning', 'Enter mandatory field');
-                                  }
-                                },
-                              ),
-                            ],
-                          ),
-                        ],
-                      );
-                    },
-                  );
+                onPressed: () async {
+                  _reset();
+                  await _showEmailGroupDialog('Create', null);
                 },
               ),
               divider(horizontal: true),
@@ -134,8 +86,12 @@ class _EmailGroupPageState extends BaseState<EmailGroupPage> {
     );
   }
 
-  bool canCreateOrUpdate() {
-    return name.isNotEmpty && emailList.isNotEmpty;
+  bool canCreateOrUpdate(pulse.EmailGroup? entity) {
+    if (entity != null) {
+      return entity.name.isNotEmpty && entity.list.isNotEmpty;
+    } else {
+      return name.isNotEmpty && emailList.isNotEmpty;
+    }
   }
 
   Widget _buildChild(pulse.EmailGroup entity) {
@@ -152,57 +108,10 @@ class _EmailGroupPageState extends BaseState<EmailGroupPage> {
                 Tooltip(
                     message: 'Edit ${entity.name}',
                     child: IconButton(
-                        onPressed: () {
-                           showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        title: Text('Edit Email Group'),
-                        content: Container(
-                          width: MediaQuery.of(context).size.width * 0.3,
-                          height: MediaQuery.of(context).size.height * 0.6,
-                          child: AddEditEmailGroup(
-                            emailGroup:entity,
-                            onNameSaved: (String value) {
-                              setState(() {
-                                name = value;
-                              });
-                            },
-                            onEmailSaved: (List<String> email) {
-                              setState(() {
-                                emailList = email;
-                              });
-                            },
-                          ),
-                        ),
-                        actions: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              SecondaryButton(
-                                labelKey: 'Cancel',
-                                onPressed: () {
-                                  _close();
-                                },
-                              ),
-                              divider(horizontal: true),
-                              PrimaryButton(
-                                labelKey: 'Update',
-                                onPressed: () {
-                                  // if (canCreateOrUpdate()) {
-                                    _save(entity);
-                                  // } else {
-                                  //   alert('Warning', 'Enter mandatory field');
-                                  // }
-                                },
-                              ),
-                            ],
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                        }, icon: const Icon(Icons.edit))),
+                        onPressed: () async {
+                          await _showEmailGroupDialog('Update', entity);
+                        },
+                        icon: const Icon(Icons.edit))),
                 Tooltip(
                     message: 'Delete ${entity.name}',
                     child: IconButton(
@@ -233,14 +142,14 @@ class _EmailGroupPageState extends BaseState<EmailGroupPage> {
   Future _delete(pulse.EmailGroup group) async {
     await confirm(
       title: 'Delete ${group.name}',
-      message: 'Are you sure you want to delete this group?',
+      message: 'Are you sure you want to delete this email group?',
       onPressed: () async {
         await execute(() async {
           var res = await TwinnedSession.instance.pulseAdmin.deleteEmailGroup(
               apikey: TwinnedSession.instance.authToken, groupId: group.id);
 
           if (validateResponse(res)) {
-            alert('Group ${group.name}', 'Deleted successfully');
+            alert('Email Group ${group.name}', 'Deleted Successfully');
           }
         });
       },
@@ -248,6 +157,80 @@ class _EmailGroupPageState extends BaseState<EmailGroupPage> {
     Future.delayed(Duration(seconds: 1), () {
       _load();
     });
+  }
+
+  Future<void> _showEmailGroupDialog(
+      String type, pulse.EmailGroup? entity) async {
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(
+            '$type Email Group',
+            style: theme.getStyle().copyWith(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+          ),
+          scrollable: true,
+          content: Container(
+            width: MediaQuery.of(context).size.width * 0.3,
+            height: MediaQuery.of(context).size.height * 0.6,
+            child: AddEditEmailGroup(
+              emailGroup: entity,
+              onNameSaved: (String value) {
+                setState(() {
+                  if (entity == null) {
+                    name = value.trim();
+                  } else {
+                    entity = entity!.copyWith(name: value.trim());
+                  }
+                });
+              },
+              onEmailSaved: (List<String> email) {
+                setState(() {
+                  if (entity == null) {
+                    emailList = email;
+                  } else {
+                    entity = entity!.copyWith(list: email);
+                  }
+                  emailList = email;
+                });
+              },
+            ),
+          ),
+          actions: [
+             Divider(
+              color: theme.getPrimaryColor(),
+              thickness: 1.0,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                SecondaryButton(
+                  labelKey: 'Cancel',
+                  onPressed: () {
+                    _close();
+                  },
+                ),
+                divider(horizontal: true),
+                PrimaryButton(
+                  labelKey: type,
+                  onPressed: () async {
+                    if (canCreateOrUpdate(entity)) {
+                      await _save(entity); 
+                    } else {
+                      alert('Warning', 'Please fill in all fields.');
+                    }
+                  },
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
+    _load();
   }
 
   Future _load() async {
@@ -278,18 +261,45 @@ class _EmailGroupPageState extends BaseState<EmailGroupPage> {
   Future _save(pulse.EmailGroup? groupEmail) async {
     if (loading) return;
     loading = true;
+  late pulse.EmailGroupInfo _config;
+   
+     if (null == groupEmail) {
+      _config =  pulse.EmailGroupInfo(
+        name: name,
+        list: emailList,
+      );
+    } else {
+      _config = pulse.EmailGroupInfo(
+        name: groupEmail.name,
+        list:groupEmail.list
+      );
+    }
     await execute(() async {
       var uRes = await TwinnedSession.instance.pulseAdmin.upsertEmailGroup(
           apikey: TwinnedSession.instance.authToken,
-           // ignore: unnecessary_null_comparison
-           groupId: groupEmail!.id != null ? groupEmail.id : null,
-          body: pulse.EmailGroupInfo(name: name, list: emailList));
+          groupId: groupEmail != null ? groupEmail.id : null,
+          body: _config);
       if (validateResponse(uRes)) {
-        // if (!silent) {
-          _close();
-
-          alert('Success', 'Group ${name} created successfully!');
-        // }
+        _close();
+        if (groupEmail == null) {
+          alert(
+            'Success',
+            'Email Group ${_config.name} Created Successfully!',
+            titleStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+            contentStyle: theme.getStyle(),
+          );
+        } else {
+          alert(
+            'Success',
+            'Email Group ${_config.name} Updated Successfully!',
+            titleStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+            contentStyle: theme.getStyle(),
+          );
+        }
       }
     });
 
@@ -299,5 +309,12 @@ class _EmailGroupPageState extends BaseState<EmailGroupPage> {
 
   void _close() {
     Navigator.of(context).pop();
+  }
+
+   void _reset() {
+   setState(() {
+     name = "";
+     emailList = [];
+   });
   }
 }

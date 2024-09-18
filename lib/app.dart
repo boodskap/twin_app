@@ -961,7 +961,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
     return [
       session.TwinMenuItem(
         id: TwinAppMenu.pulseEmail,
-        text: 'Email Logs',
+        text: 'Email',
         icon: Icons.email,
         bottomMenus: _pulseBottomMenus(),
         isMenuVisible: () {
