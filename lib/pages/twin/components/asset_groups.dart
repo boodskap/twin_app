@@ -244,6 +244,7 @@ class _AssetGroupListState extends BaseState<AssetGroupList> {
               icon: '',
               target: twinned.AssetGroupInfoTarget.app,
               assetIds: [],
+              clientIds: await getClientIds(),
             ),
           );
 
@@ -431,6 +432,7 @@ class _AssetGroupListState extends BaseState<AssetGroupList> {
             icon: res!.entity!.id,
             target: twinned.AssetGroupInfoTarget.app,
             assetIds: group.assetIds,
+            clientIds: await getClientIds(),
           ),
         );
 

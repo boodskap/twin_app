@@ -131,7 +131,10 @@ class _AssetDeviceState extends BaseState<AssetDevice> {
         var res = await TwinnedSession.instance.twin.updateAsset(
             apikey: TwinnedSession.instance.authToken,
             assetId: widget.asset.id,
-            body: Utils.assetInfo(widget.asset));
+            body: Utils.assetInfo(
+              widget.asset,
+              clientIds: await getClientIds(),
+            ));
         if (validateResponse(res)) {
           await alert("Asset - ${widget.asset.name}", 'Saved successfully!');
           _close();

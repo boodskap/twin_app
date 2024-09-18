@@ -127,15 +127,23 @@ class _GroupAssetsState extends BaseState<GroupAssets> {
       for (var asset in _selected) {
         widget.group.assetIds.add(asset.id);
       }
+      List<String> clientIds = [];
+
+      if (isClient()) {
+        clientIds = await getClientIds();
+      }
+
       var res = await TwinnedSession.instance.twin.updateAssetGroup(
           apikey: TwinnedSession.instance.authToken,
           assetGroupId: widget.group.id,
           body: AssetGroupInfo(
-              name: widget.group.name,
-              description: widget.group.description,
-              tags: widget.group.tags,
-              target: AssetGroupInfoTarget.app,
-              assetIds: widget.group.assetIds));
+            name: widget.group.name,
+            description: widget.group.description,
+            tags: widget.group.tags,
+            target: AssetGroupInfoTarget.app,
+            assetIds: widget.group.assetIds,
+            clientIds: clientIds,
+          ));
       if (validateResponse(res)) {
         await alert(
           "Asset Group - ${widget.group.name}",

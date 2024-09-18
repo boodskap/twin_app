@@ -71,8 +71,7 @@ enum TwinAppMenu {
   pulseSms,
   pulseVoice,
   pulseGateway,
-  pulseTemplate
-  ;
+  pulseTemplate;
 }
 
 class CustomMenu {
@@ -469,7 +468,9 @@ class HomeScreenState extends BaseState<HomeScreen> {
             onPressed: () {
               setState(() {
                 //TODO
-                body = ProfileInfoScreen();
+                body = ProfileInfoScreen(
+                  auth: auth,
+                );
               });
             },
           ),
@@ -715,6 +716,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
           return ProfileInfoScreen(
             key: Key(Uuid().v4()),
             selectedTab: 2,
+            auth: auth,
           );
         },
       ),
@@ -729,6 +731,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
           return ProfileInfoScreen(
             key: Key(Uuid().v4()),
             selectedTab: 0,
+            auth: auth,
           );
         },
       ),
@@ -997,7 +1000,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
       ),
       session.TwinMenuItem(
         id: TwinAppMenu.pulseTemplate,
-        text: 'Template',
+        text: 'Templates',
         icon: Icons.event_note,
         bottomMenus: _pulseBottomMenus(),
         isMenuVisible: () {
@@ -1120,7 +1123,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
         icon: Icon(Icons.voicemail, size: 30),
         label: 'Voice',
       ),
-       const BottomMenuItem(
+      const BottomMenuItem(
         id: TwinAppMenu.pulseTemplate,
         icon: Icon(Icons.event_note, size: 30),
         label: 'Template',

@@ -414,9 +414,6 @@ class _EventsState extends BaseState<Events> {
   Future _create() async {
     if (loading) return;
     loading = true;
-    List<String>? clientIds = super.isClientAdmin()
-        ? await TwinnedSession.instance.getClientIds()
-        : null;
     await _getBasicInfo(context, 'New Event', onPressed: (name, desc, t) async {
       List<String> tags = [];
       if (null != t) {
@@ -430,7 +427,7 @@ class _EventsState extends BaseState<Events> {
             description: desc,
             tags: tags,
             conditions: [],
-            clientIds: clientIds,
+            clientIds: await getClientIds(),
             icon: '',
           ));
       if (validateResponse(mRes)) {

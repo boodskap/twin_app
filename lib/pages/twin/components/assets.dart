@@ -392,11 +392,39 @@ class _AssetsState extends BaseState<Assets> {
   }
 
   void _addEditAssetDialog({tapi.Asset? asset}) async {
+    tapi.Premise? selectedPremise;
+    tapi.Facility? selectedFacility;
+    tapi.Floor? selectedFloor;
+    if (asset != null &&
+        (_selectedPremise != null &&
+            _selectedFacility != null &&
+            _selectedFloor != null)) {
+      var pRes = await TwinnedSession.instance.twin.getPremise(
+        premiseId: asset.premiseId,
+        apikey: TwinnedSession.instance.authToken,
+      );
+      selectedPremise = pRes.body?.entity;
+
+      var fRes = await TwinnedSession.instance.twin.getFacility(
+        facilityId: asset.facilityId,
+        apikey: TwinnedSession.instance.authToken,
+      );
+      selectedFacility = fRes.body?.entity;
+      var floorRes = await TwinnedSession.instance.twin.getFloor(
+        floorId: asset.floorId,
+        apikey: TwinnedSession.instance.authToken,
+      );
+      selectedFloor = floorRes.body?.entity;
+    }
+
     await super.alertDialog(
       titleStyle:
           theme.getStyle().copyWith(fontSize: 18, fontWeight: FontWeight.bold),
       title: null == asset ? 'Add New Asset' : 'Update Asset',
       body: AssetSnippet(
+        selectedPremise: selectedPremise ?? _selectedPremise,
+        selectedFacility: selectedFacility ?? _selectedFacility,
+        selectedFloor: selectedFloor ?? _selectedFloor,
         asset: asset,
       ),
       width: 750,

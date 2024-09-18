@@ -253,9 +253,6 @@ class _AssetReportListState extends BaseState<AssetReportList> {
   Future _addNew() async {
     if (loading) return;
     loading = true;
-    List<String>? clientIds = super.isClientAdmin()
-        ? await TwinnedSession.instance.getClientIds()
-        : null;
     await execute(() async {
       await _getBasicInfo(context, 'New Report',
           onPressed: (String name, String? description, String? tags) async {
@@ -272,7 +269,7 @@ class _AssetReportListState extends BaseState<AssetReportList> {
               includeDevice: false,
               includeAsset: true,
               fields: [],
-              clientIds: clientIds,
+              clientIds: await getClientIds(),
             ));
         if (validateResponse(res)) {
           await _load();
@@ -533,20 +530,22 @@ class _ReportContentWidgetState extends BaseState<ReportContentWidget> {
           apikey: TwinnedSession.instance.authToken,
           reportId: widget.report.id,
           body: twinned.ReportInfo(
-              modelId: widget.report.modelId,
-              name: _name.text,
-              description: _desc.text,
-              tags: _tags.text.split(' '),
-              icon: widget.report.icon,
-              includeAsset: includeAsset,
-              includeDevice: includeDevice,
-              includeFacility: includeFacility,
-              includeFloor: includeFloor,
-              includePremise: includePremise,
-              dateFormat: _dateFormat.text.trim(),
-              tz: DateTime.now().timeZoneName,
-              humanDateFormat: false,
-              fields: widget.report.fields));
+            modelId: widget.report.modelId,
+            name: _name.text,
+            description: _desc.text,
+            tags: _tags.text.split(' '),
+            icon: widget.report.icon,
+            includeAsset: includeAsset,
+            includeDevice: includeDevice,
+            includeFacility: includeFacility,
+            includeFloor: includeFloor,
+            includePremise: includePremise,
+            dateFormat: _dateFormat.text.trim(),
+            tz: DateTime.now().timeZoneName,
+            humanDateFormat: false,
+            fields: widget.report.fields,
+            clientIds: await getClientIds(),
+          ));
       if (validateResponse(res)) {
         await alert(
           'Report - ${_name.text}',

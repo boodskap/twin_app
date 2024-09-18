@@ -333,10 +333,6 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
   }
 
   Future _create() async {
-    List<String>? clientIds = super.isClientAdmin()
-        ? await TwinnedSession.instance.getClientIds()
-        : null;
-
     if (loading) return;
     loading = true;
     await _getBasicInfo(context, 'New Alarm', onPressed: (name, desc, t) async {
@@ -353,7 +349,7 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
             tags: tags,
             state: -1,
             conditions: [],
-            clientIds: clientIds,
+            clientIds: await getClientIds(),
           ));
       if (validateResponse(mRes)) {
         await _edit(mRes.body!.entity!);

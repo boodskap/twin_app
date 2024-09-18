@@ -181,11 +181,13 @@ class _NocodeBuilderPageState extends BaseState<NocodeBuilderPage> {
           var res = await TwinnedSession.instance.twin.createDashboardScreen(
               apikey: TwinnedSession.instance.authToken,
               body: twinned.DashboardScreenInfo(
-                  name: name,
-                  titleConfig: twinned.TitleConfig(title: title),
-                  description: description,
-                  tags: tags.split(' '),
-                  rows: []));
+                name: name,
+                titleConfig: twinned.TitleConfig(title: title),
+                description: description,
+                tags: tags.split(' '),
+                rows: [],
+                clientIds: await getClientIds(),
+              ));
           if (validateResponse(res)) {
             await _edit(res.body!.entity!);
           }

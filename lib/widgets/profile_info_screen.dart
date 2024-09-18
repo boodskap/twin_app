@@ -1,18 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:twin_app/auth.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/widgets/change_password_alert_snippet.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:twin_app/widgets/country_codes.dart';
 import 'package:twin_app/widgets/subscription_snippet.dart';
+import 'package:twin_app/widgets/unregister_snippet.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/twinned_session.dart';
 import 'package:twinned_api/api/twinned.swagger.dart';
 
 class ProfileInfoScreen extends StatefulWidget {
+  final StreamAuth auth;
   final int selectedTab;
-  const ProfileInfoScreen({Key? key, this.selectedTab = 0}) : super(key: key);
+  const ProfileInfoScreen({Key? key, required this.auth, this.selectedTab = 0})
+      : super(key: key);
 
   @override
   State<ProfileInfoScreen> createState() => _ProfileInfoScreenState();
@@ -151,6 +155,11 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
                                           fontWeight: FontWeight.bold)),
                                   Row(
                                     children: [
+                                      PrimaryButton(
+                                        labelKey: 'Delete My Account',
+                                        onPressed: _deleteMyAccount,
+                                      ),
+                                      divider(horizontal: true),
                                       Tooltip(
                                         message: "Edit ",
                                         child: IconButton(
@@ -388,6 +397,14 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
     );
   }
 
+  Future _deleteMyAccount() async {
+    await super.alertDialog(
+      title: 'Delete My Account',
+      body: UnregisterSnippet(auth: widget.auth),
+      height: 200,
+    );
+  }
+
   Future<void> load() async {
     if (loading) return;
     loading = true;
@@ -449,6 +466,7 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
           phone: _phoneController.text,
           description: _descController.text,
           countryCode: countryCode,
+          clientIds: await getClientIds(),
         ),
       );
 
