@@ -468,7 +468,9 @@ class HomeScreenState extends BaseState<HomeScreen> {
             onPressed: () {
               setState(() {
                 //TODO
-                body = ProfileInfoScreen();
+                body = ProfileInfoScreen(
+                  auth: auth,
+                );
               });
             },
           ),
@@ -714,6 +716,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
           return ProfileInfoScreen(
             key: Key(Uuid().v4()),
             selectedTab: 2,
+            auth: auth,
           );
         },
       ),
@@ -728,6 +731,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
           return ProfileInfoScreen(
             key: Key(Uuid().v4()),
             selectedTab: 0,
+            auth: auth,
           );
         },
       ),
