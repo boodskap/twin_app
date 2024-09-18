@@ -314,6 +314,8 @@ class _DeviceModelContentPageState extends BaseState<DeviceModelContentPage> {
               preprocessorId: _preprocessor,
               parameters: paramList,
               scrappingTableConfigs: scrappingTableConfigs,
+              clientIds: [],
+              roles: [],
             ));
 
         if (validateResponse(res)) {
@@ -346,6 +348,7 @@ class _DeviceModelContentPageState extends BaseState<DeviceModelContentPage> {
               preprocessorId: _preprocessor,
               parameters: paramList,
               scrappingTableConfigs: scrappingTableConfigs,
+              clientIds: [],
             ));
 
         if (validateResponse(res)) {

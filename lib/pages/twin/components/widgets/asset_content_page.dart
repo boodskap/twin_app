@@ -735,7 +735,7 @@ class _AssetContentPageState extends BaseState<AssetContentPage> {
         selectedImage: selectedImage,
         location: _pickedLocation,
         roles: rolesSelected,
-        clientIds: selectedClient != null ? [selectedClient!] : null,
+        clientIds: selectedClient != null ? [selectedClient!] : [],
         premiseId: selectedPremise,
         facilityId: selectedFacility,
         floorId: selectedFloor,

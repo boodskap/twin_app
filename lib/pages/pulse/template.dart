@@ -53,7 +53,7 @@ class _TemplatePageState extends BaseState<TemplatePage> {
                   hintText: 'Search Template',
                   onChanged: (val) {
                     _search = val.trim().isEmpty ? '*' : val.trim();
-                      _load();
+                    _load();
                   },
                 )),
           ],
@@ -80,7 +80,7 @@ class _TemplatePageState extends BaseState<TemplatePage> {
       context,
       MaterialPageRoute(
         builder: (context) => TemplateContentPage(
-          title: 'Digital Twin - Template',
+          title: 'Pulse - Template',
           template: entity,
         ),
       ),

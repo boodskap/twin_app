@@ -83,7 +83,11 @@ class _PreprocessorContentPageState extends BaseState<PreprocessorContentPage> {
   }
 
   Future _save({bool shouldPop = false}) async {
-    execute(() async {
+    await execute(() async {
+      List<String> clientIds = [];
+      if (isClient()) {
+        clientIds = await getClientIds();
+      }
       var res = await TwinnedSession.instance.twin.updatePreprocessor(
         apikey: TwinnedSession.instance.authToken,
         preprocessorId: widget.preprocessor!.id,
@@ -93,6 +97,7 @@ class _PreprocessorContentPageState extends BaseState<PreprocessorContentPage> {
           description: _descController.text.trim(),
           tags: _tagsController.text.trim().split(' '),
           code: _controller.text.trim(),
+          clientIds: clientIds,
         ),
       );
 

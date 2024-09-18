@@ -2,6 +2,7 @@ import 'package:flutter/Material.dart';
 import 'package:flutter/material.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/pages/twin/components/widgets/asset_device.dart';
+import 'package:twin_app/pages/twin/components/widgets/asset_snippet.dart';
 import 'package:twin_app/pages/twin/components/widgets/client_infratsructure_widget.dart';
 import 'package:twin_app/pages/twin/components/widgets/device_info_snippet.dart';
 import 'package:twin_app/pages/twin/components/widgets/roles_infrastructure_widget.dart';
@@ -992,6 +993,26 @@ class _FloorContentPageState extends BaseState<FloorContentPage> {
                                         ],
                                       ),
                                       divider(),
+                                      if (canCreate())
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
+                                          children: [
+                                            PrimaryButton(
+                                              labelKey: 'Create Asset',
+                                              leading: Icon(
+                                                Icons.add,
+                                                color: Colors.white,
+                                              ),
+                                              onPressed: (canCreate())
+                                                  ? () {
+                                                      _addEditAssetDialog();
+                                                    }
+                                                  : null,
+                                            ),
+                                          ],
+                                        ),
+                                      divider(),
                                       if (widget.type == InfraType.premise)
                                         ..._facilities
                                             .map((e) => _buildFacility(e)),
@@ -1043,5 +1064,53 @@ class _FloorContentPageState extends BaseState<FloorContentPage> {
         ],
       ),
     );
+  }
+
+  void _addEditAssetDialog({Asset? asset}) async {
+    Premise? selectedPremise;
+    Facility? selectedFacility;
+    Floor? selectedFloor;
+    String? selectedPremiseId;
+    String? selectedFacilityId;
+    String? selectedFloorId;
+    if (asset != null &&
+        (widget.premise != null &&
+            widget.facility != null &&
+            widget.floor != null)) {
+      var pRes = await TwinnedSession.instance.twin.getPremise(
+        premiseId: asset.premiseId,
+        apikey: TwinnedSession.instance.authToken,
+      );
+      selectedPremise = pRes.body?.entity;
+
+      var fRes = await TwinnedSession.instance.twin.getFacility(
+        facilityId: asset.facilityId,
+        apikey: TwinnedSession.instance.authToken,
+      );
+      selectedFacility = fRes.body?.entity;
+      var floorRes = await TwinnedSession.instance.twin.getFloor(
+        floorId: asset.floorId,
+        apikey: TwinnedSession.instance.authToken,
+      );
+      selectedFloor = floorRes.body?.entity;
+    }
+
+    await super.alertDialog(
+      titleStyle:
+          theme.getStyle().copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+      title: null == asset ? 'Add New Asset' : 'Update Asset',
+      body: AssetSnippet(
+        selectedFacilityId: widget.floor!.facilityId,
+        selectedFloorId: widget.floor!.id,
+        selectedPremiseId: widget.floor!.premiseId,
+        selectedPremise: selectedPremise ?? widget.premise,
+        selectedFacility: selectedFacility ?? widget.facility,
+        selectedFloor: selectedFloor ?? widget.floor,
+        asset: asset,
+      ),
+      width: 750,
+      height: MediaQuery.of(context).size.height - 150,
+    );
+    _load();
   }
 }

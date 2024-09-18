@@ -12,8 +12,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:go_router/go_router.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:twin_commons/core/twinned_session.dart';
+import 'package:twin_commons/core/storage.dart';
 import 'package:twinned_api/twinned_api.dart' as tapi;
-import 'package:nocode_api/api/nocode.swagger.dart' as nocode;
 import 'package:twin_app/core/session_variables.dart' as session;
 
 import '../../core/session_variables.dart';
@@ -122,12 +122,31 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
           session.orgs.addAll(lRes.body!.orgs ?? []);
         }
 
+        String orgId = await Storage.getString('preferred.orgId', '');
+        late tapi.OrgInfo orgInfo;
+        bool hasStoredOrg = false;
+
+        if (orgId.isNotEmpty) {
+          for (tapi.OrgInfo oi in session.orgs) {
+            if (oi.id == orgId) {
+              session.selectedOrg = session.orgs.indexOf(oi);
+              orgInfo = oi;
+              hasStoredOrg = true;
+              break;
+            }
+          }
+        }
+
+        if (!hasStoredOrg) {
+          orgInfo = session.orgs.first;
+        }
+
         TwinnedSession.instance.init(
           debug: debug,
           host: host,
-          authToken: session.orgs.first.twinAuthToken,
-          domainKey: session.orgs.first.twinDomainKey,
-          orgId: session.orgs.first.id,
+          authToken: orgInfo.twinAuthToken,
+          domainKey: orgInfo.twinDomainKey,
+          orgId: orgInfo.id,
           noCodeAuthToken: lRes.body!.nocodeAuthToken ?? '',
         );
         loggedIn = true;

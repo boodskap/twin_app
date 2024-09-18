@@ -340,9 +340,6 @@ class _CreateEditConditionSnippetState
   }
 
   Future _save({bool shouldPop = false}) async {
-    List<String>? clientIds = super.isClientAdmin()
-        ? await TwinnedSession.instance.getClientIds()
-        : null;
     if (loading) return;
     loading = true;
     await execute(() async {
@@ -422,7 +419,7 @@ class _CreateEditConditionSnippetState
               leftValue: lValue,
               rightValue: rValue,
               values: values,
-              clientIds: clientIds,
+              clientIds: await getClientIds(),
             ));
       } else {
         res = await TwinnedSession.instance.twin.updateCondition(
@@ -441,7 +438,7 @@ class _CreateEditConditionSnippetState
               rightValue: rValue,
               values: values,
               icon: widget.condition!.icon,
-              clientIds: clientIds,
+              clientIds: await getClientIds(),
             ));
       }
       if (validateResponse(res)) {

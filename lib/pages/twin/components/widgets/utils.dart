@@ -112,20 +112,21 @@ class Utils {
     );
   }
 
-  static tapi.AssetInfo assetInfo(tapi.Asset e,
-      {String? name,
-      String? description,
-      List<String>? tags,
-      List<String>? roles,
-      List<String>? clientIds,
-      List<String>? images,
-      List<String>? devices,
-      tapi.GeoLocation? location,
-      int? selectedImage,
-      String? premiseId,
-      String? facilityId,
-      String? floorId,
-      }) {
+  static tapi.AssetInfo assetInfo(
+    tapi.Asset e, {
+    String? name,
+    String? description,
+    List<String>? tags,
+    List<String>? roles,
+    required List<String> clientIds,
+    List<String>? images,
+    List<String>? devices,
+    tapi.GeoLocation? location,
+    int? selectedImage,
+    String? premiseId,
+    String? facilityId,
+    String? floorId,
+  }) {
     return tapi.AssetInfo(
       name: name ?? e.name,
       assetModelId: e.assetModelId,

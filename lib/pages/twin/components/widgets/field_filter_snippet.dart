@@ -200,6 +200,12 @@ class _FieldFilterSnippetState extends BaseState<FieldFilterSnippet> {
       value = '$selectedValue ?? false';
     }
 
+    List<String> clientIds = [];
+
+    if (isClient()) {
+      clientIds = await getClientIds();
+    }
+
     twinned.FieldFilterInfo body = twinned.FieldFilterInfo(
       name: name,
       description: _desc.text.trim(),
@@ -212,6 +218,7 @@ class _FieldFilterSnippetState extends BaseState<FieldFilterSnippet> {
       leftValue: _leftValue.text.trim(),
       rightValue: _rightValue.text.trim(),
       values: _values.text.trim().split(','),
+      clientIds: clientIds,
     );
 
     await execute(() async {
