@@ -522,6 +522,12 @@ class _ConfigDashboardPaletteState extends BaseState<ConfigDashboardPalette> {
         bannerImage: _screen.bannerImage,
         screenBorderConfig: _screen.screenBorderConfig,
         rows: _screen.rows,
+        clientIds: _screen.clientIds,
+        priority: _screen.priority,
+        bannerImageFit: _screen.bannerImageFit,
+        bannerHeight: _screen.bannerHeight,
+        roles: _screen.roles,
+        paddingConfig: _screen.paddingConfig,
       );
     } else {
       thisScreen = _screen.copyWith(paddingConfig: paddingConfig);
@@ -562,6 +568,12 @@ class _ConfigDashboardPaletteState extends BaseState<ConfigDashboardPalette> {
         bannerImage: _screen.bannerImage,
         screenBorderConfig: _screen.screenBorderConfig,
         rows: _screen.rows,
+        clientIds: _screen.clientIds,
+        roles: _screen.roles,
+        bannerHeight: _screen.bannerHeight,
+        bannerImageFit: _screen.bannerImageFit,
+        priority: _screen.priority,
+        marginConfig: _screen.marginConfig,
       );
     } else {
       thisScreen = _screen.copyWith(marginConfig: marginConfig);
@@ -602,6 +614,12 @@ class _ConfigDashboardPaletteState extends BaseState<ConfigDashboardPalette> {
         description: _screen.description,
         bannerImage: _screen.bannerImage,
         rows: _screen.rows,
+        clientIds: _screen.clientIds,
+        roles: _screen.roles,
+        bannerHeight: _screen.bannerHeight,
+        bannerImageFit: _screen.bannerImageFit,
+        priority: _screen.priority,
+        screenBorderConfig: _screen.screenBorderConfig,
       );
     } else {
       thisScreen = _screen.copyWith(screenBorderConfig: borderConfig);

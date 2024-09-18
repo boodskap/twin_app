@@ -449,6 +449,7 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
           phone: _phoneController.text,
           description: _descController.text,
           countryCode: countryCode,
+          clientIds: await getClientIds(),
         ),
       );
 
