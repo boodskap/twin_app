@@ -7,6 +7,7 @@ import 'package:twin_app/pages/twin/components/widgets/showoverlay_widget.dart';
 import 'package:twin_app/pages/twin/components/widgets/single_value_input.dart';
 import 'package:twin_app/widgets/buy_button.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
+import 'package:twin_app/widgets/commons/secondary_button.dart';
 import 'package:twin_app/widgets/purchase_change_addon_widget.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
@@ -214,6 +215,62 @@ class _OrganizationPageState extends BaseState<OrganizationPage> {
               onPressed: _editVoiceApi,
             ),
             divider(horizontal: true),
+            ElevatedButton(
+              onPressed: confirmWipeAllData,
+              child: Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: 5,
+                children: [
+                  Icon(
+                    Icons.auto_delete_rounded,
+                    color: Colors.white,
+                  ),
+                  Text(
+                    'Wipe All Data',
+                    style: theme.getStyle().copyWith(
+                          color: Colors.white,
+                          fontSize: 18,
+                        ),
+                  ),
+                ],
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                minimumSize: Size(150, 50),
+              ),
+            ),
+            divider(horizontal: true),
+            ElevatedButton(
+              onPressed: confirmWipeAndReindexData,
+              child: Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: 5,
+                children: [
+                  Icon(
+                    Icons.delete_forever,
+                    color: Colors.white,
+                  ),
+                  Text(
+                    'Wipe & Re Index',
+                    style: theme.getStyle().copyWith(
+                          color: Colors.white,
+                          fontSize: 18,
+                        ),
+                  ),
+                ],
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                minimumSize: Size(150, 50),
+              ),
+            ),
+            divider(horizontal: true),
           ],
         ),
         divider(height: 50),
@@ -412,6 +469,123 @@ class _OrganizationPageState extends BaseState<OrganizationPage> {
       portraitBanner: o.portraitBanner,
       settings: o.settings,
       website: o.website,
+    );
+  }
+
+  void wipeAllData() async {
+    if (loading) return;
+    loading = true;
+    await execute(() async {
+      dynamic res = await TwinnedSession.instance.twin.cleanupModels(
+        apikey: TwinnedSession.instance.authToken,
+      );
+      if (validateResponse(res)) {
+        Navigator.pop(context);
+        alert(_organization!.name, "All data wiped out successfully!",
+            contentStyle: theme.getStyle(),
+            titleStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
+      }
+    });
+    loading = false;
+    refresh();
+  }
+
+  void confirmWipeAllData() {
+    Widget cancelButton = SecondaryButton(
+      labelKey: "Cancel",
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
+    Widget continueButton = PrimaryButton(
+      labelKey: "Delete",
+      onPressed: () {
+        wipeAllData();
+      },
+    );
+
+    AlertDialog alert = AlertDialog(
+      title: Text(
+        "WARNING",
+        style: theme.getStyle().copyWith(color: Colors.red, fontSize: 18),
+      ),
+      content: Text(
+        "Cleaning this Organization will clean this Organization's data,\n This deletion can't be undone. Do you want to delete it ",
+        style: theme.getStyle(),
+        maxLines: 10,
+      ),
+      actions: [
+        cancelButton,
+        continueButton,
+      ],
+    );
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
+  void wipeAndReindexData() async {
+    if (loading) return;
+    loading = true;
+    await execute(() async {
+      dynamic res = await TwinnedSession.instance.twin.cleanup(
+        apikey: TwinnedSession.instance.authToken,
+        dropIndexes: true,
+      );
+      if (validateResponse(res)) {
+        Navigator.pop(context);
+        alert(_organization!.name, "All data wiped out successfully!",
+            contentStyle: theme.getStyle(),
+            titleStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
+      }
+    });
+    loading = false;
+    refresh();
+  }
+
+  void confirmWipeAndReindexData() {
+    Widget cancelButton = SecondaryButton(
+      labelKey: "Cancel",
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
+    Widget continueButton = PrimaryButton(
+      labelKey: "Delete",
+      onPressed: () {
+        wipeAndReindexData();
+      },
+    );
+
+    AlertDialog alert = AlertDialog(
+      title: Text(
+        "WARNING",
+        style: theme.getStyle().copyWith(color: Colors.red, fontSize: 18),
+      ),
+      content: Text(
+        "Cleaning this Organization will clean this Organization's data,\n This deletion can't be undone. Do you want to delete it ",
+        style: theme.getStyle(),
+        maxLines: 10,
+      ),
+      actions: [
+        cancelButton,
+        continueButton,
+      ],
+    );
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
     );
   }
 
