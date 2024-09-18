@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:twin_app/core/session_variables.dart';
-import 'package:twin_app/pages/pulse/widgets/template_content.dart';
+import 'package:twin_app/pages/pulse/template_content.dart';
+import 'package:twin_app/pages/pulse/widgets/custom_badge.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
@@ -123,12 +124,12 @@ class _TemplatePageState extends BaseState<TemplatePage> {
             ),
             divider(),
             if (entity.contentType == pulse.ContentTemplateContentType.html)
-              TemplateBadge(
+              CustomBadge(
                   text: 'HTML',
                   hintText: 'H',
                   badgeColor: theme.getPrimaryColor()),
             if (entity.contentType == pulse.ContentTemplateContentType.plain)
-              TemplateBadge(
+              CustomBadge(
                   text: 'PLAIN', hintText: 'P', badgeColor: Colors.black)
           ],
         ),
@@ -195,44 +196,4 @@ class _TemplatePageState extends BaseState<TemplatePage> {
   }
 }
 
-class TemplateBadge extends StatelessWidget {
-  final String hintText;
-  final String text;
-  final Color badgeColor;
-  const TemplateBadge(
-      {super.key,
-      required this.hintText,
-      required this.text,
-      required this.badgeColor});
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20.0),
-        border: Border.all(color: badgeColor),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          CircleAvatar(
-            backgroundColor: badgeColor,
-            radius: 10.0,
-            child: Text(
-              hintText,
-              style: TextStyle(color: Colors.white, fontSize: 12.0),
-            ),
-          ),
-          SizedBox(width: 8.0),
-          Text(
-            text,
-            style: TextStyle(color: badgeColor),
-          ),
-          SizedBox(width: 8.0),
-        ],
-      ),
-    );
-  }
-}
