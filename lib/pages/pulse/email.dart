@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/pages/wrapper_page.dart';

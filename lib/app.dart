@@ -21,6 +21,7 @@ import 'package:twin_app/pages/branding/fonts_colors.dart';
 import 'package:twin_app/pages/branding/landing_page.dart';
 import 'package:twin_app/pages/dashboard.dart';
 import 'package:twin_app/pages/nocode_builder.dart';
+import 'package:twin_app/pages/pulse/email_tab.dart';
 import 'package:twin_app/pages/pulse/template.dart';
 import 'package:twin_app/pages/query_console.dart';
 import 'package:twin_app/pages/pulse/admin/manage_gateways.dart';
@@ -953,14 +954,14 @@ class HomeScreenState extends BaseState<HomeScreen> {
     return [
       session.TwinMenuItem(
         id: TwinAppMenu.pulseEmail,
-        text: 'Email Logs',
+        text: 'Email',
         icon: Icons.email,
         bottomMenus: _pulseBottomMenus(),
         isMenuVisible: () {
           return session.isAdmin();
         },
         onMenuSelected: (BuildContext context) async {
-          return const EmailPage();
+          return const EmailTabPage();
         },
       ),
       session.TwinMenuItem(
