@@ -696,6 +696,65 @@ class _DeviceModelContentPageState extends BaseState<DeviceModelContentPage> {
     rows.add(row);
   }
 
+  void wipeAllData() async {
+    if (loading) return;
+    loading = true;
+    await execute(() async {
+      dynamic res = await TwinnedSession.instance.twin.cleanupData(
+        apikey: TwinnedSession.instance.authToken,
+        modelId: widget.model!.id,
+      );
+      if (validateResponse(res)) {
+        Navigator.pop(context);
+        alert(deviceModelName, "All data wiped out successfully!",
+            contentStyle: theme.getStyle(),
+            titleStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
+      }
+    });
+    loading = false;
+    refresh();
+  }
+
+  void confirmWipeAllData() {
+    Widget cancelButton = SecondaryButton(
+      labelKey: "Cancel",
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
+    Widget continueButton = PrimaryButton(
+      labelKey: "Delete",
+      onPressed: () {
+        wipeAllData();
+      },
+    );
+
+    AlertDialog alert = AlertDialog(
+      title: Text(
+        "WARNING",
+        style: theme.getStyle().copyWith(color: Colors.red, fontSize: 18),
+      ),
+      content: Text(
+        "Cleaning this Device Model will clean this Device Model's data,\n This deletion can't be undone. Do you want to delete it ",
+        style: theme.getStyle(),
+        maxLines: 10,
+      ),
+      actions: [
+        cancelButton,
+        continueButton,
+      ],
+    );
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     List<DropdownMenuItem<int>> imageItems = [
@@ -953,40 +1012,78 @@ class _DeviceModelContentPageState extends BaseState<DeviceModelContentPage> {
                                   ),
                                   divider(),
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      if (widget.type == 'Update') ...[
-                                        PrimaryButton(
-                                          labelKey: "Update & Close",
-                                          onPressed: () {
-                                            _save(
-                                                scrappingTableConfigs:
-                                                    scrappingTableConfigs);
-                                          },
+                                      ElevatedButton(
+                                        onPressed: confirmWipeAllData,
+                                        child: Wrap(
+                                          crossAxisAlignment:
+                                              WrapCrossAlignment.center,
+                                          spacing: 5,
+                                          children: [
+                                            Icon(
+                                              Icons.delete_forever,
+                                              color: Colors.white,
+                                            ),
+                                            Text(
+                                              'Wipe All Data',
+                                              style: theme.getStyle().copyWith(
+                                                    color: Colors.white,
+                                                    fontSize: 18,
+                                                  ),
+                                            ),
+                                          ],
                                         ),
-                                        divider(horizontal: true),
-                                      ],
-                                      SecondaryButton(
-                                        labelKey: "Cancel",
-                                        onPressed: () {
-                                          _cancel();
-                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.red,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(5),
+                                          ),
+                                          minimumSize: Size(150, 50),
+                                        ),
                                       ),
-                                      divider(horizontal: true),
-                                      PrimaryButton(
-                                        labelKey: "Next",
-                                        onPressed: () {
-                                          if (_basicFormKey.currentState!
-                                              .validate()) {
-                                            // Save entered values
-                                            enteredName = _nameController.text;
-                                            enteredDescription =
-                                                _descController.text;
-                                            enteredTags = _tagsController.text;
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        children: [
+                                          if (widget.type == 'Update') ...[
+                                            PrimaryButton(
+                                              labelKey: "Update & Close",
+                                              onPressed: () {
+                                                _save(
+                                                    scrappingTableConfigs:
+                                                        scrappingTableConfigs);
+                                              },
+                                            ),
+                                            divider(horizontal: true),
+                                          ],
+                                          SecondaryButton(
+                                            labelKey: "Cancel",
+                                            onPressed: () {
+                                              _cancel();
+                                            },
+                                          ),
+                                          divider(horizontal: true),
+                                          PrimaryButton(
+                                            labelKey: "Next",
+                                            onPressed: () {
+                                              if (_basicFormKey.currentState!
+                                                  .validate()) {
+                                                // Save entered values
+                                                enteredName =
+                                                    _nameController.text;
+                                                enteredDescription =
+                                                    _descController.text;
+                                                enteredTags =
+                                                    _tagsController.text;
 
-                                            _pageController.jumpToPage(1);
-                                          }
-                                        },
+                                                _pageController.jumpToPage(1);
+                                              }
+                                            },
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   ),
