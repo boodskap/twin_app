@@ -10,7 +10,6 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:twin_app/auth.dart';
-import 'package:twin_app/core/session_variables.dart' as session;
 import 'package:twin_app/core/twin_helper.dart';
 import 'package:twin_app/foundation/logger/logger.dart';
 import 'package:twin_app/pages/admin/clients.dart';
@@ -34,6 +33,7 @@ import 'package:twin_app/pages/twin/organization_page.dart';
 import 'package:twin_app/router.dart';
 import 'package:twin_app/widgets/client_snippet.dart';
 import 'package:twin_app/widgets/notifications.dart';
+import 'package:twin_app/widgets/org_change_widget.dart';
 import 'package:twin_app/widgets/profile_info_screen.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/twin_image_helper.dart';
@@ -42,6 +42,7 @@ import 'package:twinned_widgets/twinned_dashboard_widget.dart';
 import 'package:uuid/uuid.dart';
 import 'package:twin_commons/core/storage.dart';
 import 'package:twinned_api/twinned_api.dart' as tapi;
+import 'package:twin_app/core/session_variables.dart' as session;
 
 const List<Locale> locales = [Locale("en", "US"), Locale("ta", "IN")];
 
@@ -435,30 +436,8 @@ class HomeScreenState extends BaseState<HomeScreen> {
         elevation: 5,
         iconTheme: IconThemeData(color: Colors.white),
         actions: [
-          if (session.orgs.length > 1)
-            DropdownMenu<tapi.OrgInfo>(
-              initialSelection: session.orgs[session.selectedOrg],
-              leadingIcon: Icon(
-                Icons.bungalow_sharp,
-                color: Colors.white,
-              ),
-              textStyle: session.theme.getStyle().copyWith(color: Colors.white),
-              dropdownMenuEntries: session.orgs.map((o) {
-                return DropdownMenuEntry(
-                    value: o,
-                    label: o.name,
-                    labelWidget: Text(
-                      o.name,
-                      style: session.theme.getStyle(),
-                    ));
-              }).toList(),
-              onSelected: (o) async {
-                if (null != o) {
-                  await _switchOrg(o);
-                }
-              },
-            ),
-          if (session.orgs.length > 1) const SizedBox(width: 8),
+          if (!session.smallScreen) OrgChangeWidget(onSelected: _switchOrg),
+          if (!session.smallScreen) const SizedBox(width: 8),
           Text(
             toCamelCase(user!.name),
             style: session.theme.getStyle().copyWith(color: Colors.white),
@@ -567,7 +546,17 @@ class HomeScreenState extends BaseState<HomeScreen> {
               flex: 80,
               child: SingleChildScrollView(
                 child: Column(
-                  children: _sideMenus,
+                  children: [
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width,
+                      child: Container(
+                          color: session.theme.getPrimaryColor(),
+                          child: Align(
+                              alignment: Alignment.centerRight,
+                              child: OrgChangeWidget(onSelected: _switchOrg))),
+                    ),
+                    ..._sideMenus,
+                  ],
                 ),
               ),
             ),
