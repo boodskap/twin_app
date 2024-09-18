@@ -411,6 +411,7 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
               description: description,
               tags: (tags ?? '').split(' '),
               matchGroups: [],
+              clientIds: await getClientIds(),
             ));
         if (validateResponse(res)) {
           await _load();
@@ -633,6 +634,7 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
               icon: res.entity!.id,
               tags: filter.tags,
               description: filter.description,
+              clientIds: await getClientIds(),
             ));
 
         if (validateResponse(rRes)) {
@@ -675,6 +677,7 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
               rightValue: filter.rightValue,
               leftValue: filter.leftValue,
               $value: filter.$value,
+              clientIds: await getClientIds(),
             ));
 
         if (validateResponse(rRes)) {
@@ -772,6 +775,7 @@ class _AssetFilterContentState extends BaseState<AssetFilterContent> {
             icon: widget.filter.icon,
             tags: _tags.text.split(' '),
             description: _desc.text,
+            clientIds: await getClientIds(),
           ));
       if (validateResponse(res)) {
         await alert(

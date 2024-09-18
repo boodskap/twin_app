@@ -35,24 +35,25 @@ class _CreateEditAssetLibraryState extends BaseState<CreateEditAssetLibrary>
   void initState() {
     super.initState();
 
-    _assetModelInfo = twin.AssetModelInfo(name: '');
+    _assetModelInfo = twin.AssetModelInfo(name: '', clientIds: []);
 
     if (null != widget.assetModel) {
       twin.AssetModel e = widget.assetModel!;
       _assetModelInfo = _assetModelInfo.copyWith(
-          name: e.name,
-          description: e.description,
-          images: e.images,
-          roles: e.roles,
-          tags: e.tags,
-          clientIds: e.clientIds,
-          selectedImage: e.selectedImage,
-          icon: e.icon,
-          allowedDeviceModels: e.allowedDeviceModels,
-          banners: e.banners,
-          metadata: e.metadata,
-          movable: e.movable,
-          selectedBanner: e.selectedBanner);
+        name: e.name,
+        description: e.description,
+        images: e.images,
+        roles: e.roles,
+        tags: e.tags,
+        clientIds: e.clientIds,
+        selectedImage: e.selectedImage,
+        icon: e.icon,
+        allowedDeviceModels: e.allowedDeviceModels,
+        banners: e.banners,
+        metadata: e.metadata,
+        movable: e.movable,
+        selectedBanner: e.selectedBanner,
+      );
 
       _nameController.text = _assetModelInfo?.name ?? '';
       _descController.text = _assetModelInfo?.description ?? '';

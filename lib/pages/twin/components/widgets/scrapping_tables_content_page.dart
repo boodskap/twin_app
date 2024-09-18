@@ -281,6 +281,7 @@ class _ScrappingTablesContentPageState
       attributes: paramList,
       description: _descController.text,
       tags: _tagsController.text.split(','),
+      clientIds: await getClientIds(),
     );
 
     try {

@@ -217,6 +217,7 @@ class _PreprocessorsState extends BaseState<Preprocessors> {
             description: desc,
             tags: [],
             className: className!,
+            clientIds: await getClientIds(),
           ));
       if (validateResponse(mRes)) {
         await _edit(mRes.body!.entity!);

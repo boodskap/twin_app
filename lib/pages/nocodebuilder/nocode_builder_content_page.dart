@@ -16,7 +16,7 @@ import 'package:twinned_widgets/twinned_widgets.dart';
 import 'package:uuid/uuid.dart';
 
 class NocodeBuilderContentPage extends StatefulWidget {
-  twinned.DashboardScreen entity;
+  final twinned.DashboardScreen entity;
 
   NocodeBuilderContentPage({super.key, required this.entity});
 
@@ -316,7 +316,7 @@ class _NocodeBuilderContentPageState
       insert = true;
     } else {
       insert = false;
-      col = _entity.rows[row!].children.length;
+      col = _entity.rows[row].children.length;
     }
     setState(() {
       twinned.ScreenChild child = twinned.ScreenChild(
@@ -344,21 +344,29 @@ class _NocodeBuilderContentPageState
           apikey: TwinnedSession.instance.authToken,
           screenId: widget.entity.id,
           body: twinned.DashboardScreenInfo(
-              name: _entity.name,
-              titleConfig: _entity.titleConfig,
-              scrollDirection: _entity.scrollDirection,
-              mainAxisAlignment: _entity.mainAxisAlignment,
-              spacing: _entity.spacing,
-              crossAxisAlignment: _entity.crossAxisAlignment,
-              bgColor: _entity.bgColor,
-              mainAxisSize: _entity.mainAxisSize,
-              description: _entity.description,
-              tags: _entity.tags,
-              bannerImage: _entity.bannerImage,
-              bgImage: _entity.bgImage,
-              screenBorderConfig: _entity.screenBorderConfig,
-              bgImageFit: _entity.bgImageFit,
-              rows: _entity.rows));
+            name: _entity.name,
+            titleConfig: _entity.titleConfig,
+            scrollDirection: _entity.scrollDirection,
+            mainAxisAlignment: _entity.mainAxisAlignment,
+            spacing: _entity.spacing,
+            crossAxisAlignment: _entity.crossAxisAlignment,
+            bgColor: _entity.bgColor,
+            mainAxisSize: _entity.mainAxisSize,
+            description: _entity.description,
+            tags: _entity.tags,
+            bannerImage: _entity.bannerImage,
+            bgImage: _entity.bgImage,
+            screenBorderConfig: _entity.screenBorderConfig,
+            bgImageFit: _entity.bgImageFit,
+            rows: _entity.rows,
+            clientIds: _entity.clientIds,
+            marginConfig: _entity.marginConfig,
+            priority: _entity.priority,
+            bannerImageFit: _entity.bannerImageFit,
+            bannerHeight: _entity.bannerHeight,
+            roles: _entity.roles,
+            paddingConfig: _entity.paddingConfig,
+          ));
       if (validateResponse(sRes)) {
         alert(
           'Dashboard - ${_entity.name}',
