@@ -321,7 +321,7 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
                                       ],
                                     ),
                                   ),
-                                  BusyIndicator(),
+                                  //BusyIndicator(),
                                   PrimaryTextButton(
                                     labelKey: 'forgotPassword',
                                     onPressed: () {
@@ -330,10 +330,17 @@ class _LoginMobilePageState extends BaseState<_LoginMobilePage> {
                                   ),
                                 ],
                               ),
-                              SizedBox(height: 30),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const BusyIndicator(),
+                                ],
+                              ),
+                              SizedBox(height: 8),
                               PrimaryButton(
                                 labelKey: 'login',
                                 minimumSize: Size(400, 50),
+                                //trailing: BusyIndicator(),
                                 onPressed: !_canLogin()
                                     ? null
                                     : () {

@@ -512,7 +512,7 @@ class _OrganizationPageState extends BaseState<OrganizationPage> {
         style: theme.getStyle().copyWith(color: Colors.red, fontSize: 18),
       ),
       content: Text(
-        "Cleaning this Organization will clean this Organization's data,\n This deletion can't be undone. Do you want to delete it ",
+        "This action can't be undone.\nAll of the org data like device libraries, assets, premises, etc will be wiped out\nDo you really want to proceed?",
         style: theme.getStyle(),
         maxLines: 10,
       ),
@@ -571,7 +571,7 @@ class _OrganizationPageState extends BaseState<OrganizationPage> {
         style: theme.getStyle().copyWith(color: Colors.red, fontSize: 18),
       ),
       content: Text(
-        "Cleaning this Organization will clean this Organization's data,\n This deletion can't be undone. Do you want to delete it ",
+        "This action can't be undone.\nYour organization will be factory reset!\nDo you really want to proceed?",
         style: theme.getStyle(),
         maxLines: 10,
       ),

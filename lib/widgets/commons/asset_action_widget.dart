@@ -55,16 +55,18 @@ class _AssetActionWidgetState extends State<AssetActionWidget> {
                 message: '${dd.hardwareDeviceId} History Data',
                 child: Icon(Icons.history)),
           ),
-        SizedBox(
-          height: 8,
-        ),
-        InkWell(
-          onTap: () {
-            showDeviceDataJson(context, widget.deviceData);
-          },
-          child: Tooltip(
-              message: 'View Device Data', child: Icon(Icons.remove_red_eye)),
-        ),
+        if (!smallScreen)
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: InkWell(
+              onTap: () {
+                showDeviceDataJson(context, widget.deviceData);
+              },
+              child: Tooltip(
+                  message: 'View Device Data',
+                  child: Icon(Icons.remove_red_eye)),
+            ),
+          ),
         SizedBox(
           height: 8,
         ),
@@ -121,7 +123,7 @@ class _AssetActionWidgetState extends State<AssetActionWidget> {
               .getStyle()
               .copyWith(fontWeight: FontWeight.bold, fontSize: 20),
           // title: const Text('Device Data'),
-          title:ModelHeaderSection(copyText: prettyJson, title: 'Device Data'),
+          title: ModelHeaderSection(copyText: prettyJson, title: 'Device Data'),
           content: SingleChildScrollView(
             child: Text(
               prettyJson,
@@ -142,11 +144,11 @@ class _AssetActionWidgetState extends State<AssetActionWidget> {
   }
 }
 
-
 class ModelHeaderSection extends StatefulWidget {
   final String copyText;
   final String title;
-  const ModelHeaderSection({super.key, required this.copyText, required this.title});
+  const ModelHeaderSection(
+      {super.key, required this.copyText, required this.title});
 
   @override
   State<ModelHeaderSection> createState() => _ModelHeaderSectionState();
@@ -159,7 +161,7 @@ class _ModelHeaderSectionState extends State<ModelHeaderSection> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-         Text(widget.title),
+        Text(widget.title),
         Column(
           children: [
             Tooltip(
@@ -171,20 +173,19 @@ class _ModelHeaderSectionState extends State<ModelHeaderSection> {
                 },
               ),
             ),
-             if (_showCopiedText)
-          Padding(
-            padding: const EdgeInsets.only(top: 3),
-            child: Text(
-              'Copied',
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 13,
+            if (_showCopiedText)
+              Padding(
+                padding: const EdgeInsets.only(top: 3),
+                child: Text(
+                  'Copied',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 13,
+                  ),
+                ),
               ),
-            ),
-          ),
           ],
         ),
-       
       ],
     );
   }

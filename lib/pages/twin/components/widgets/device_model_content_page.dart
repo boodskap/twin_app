@@ -737,7 +737,7 @@ class _DeviceModelContentPageState extends BaseState<DeviceModelContentPage> {
         style: theme.getStyle().copyWith(color: Colors.red, fontSize: 18),
       ),
       content: Text(
-        "Cleaning this Device Model will clean this Device Model's data,\n This deletion can't be undone. Do you want to delete it ",
+        "This action can't be undone!\nThis will wipe out all of your device data of this model *${widget.model?.name ?? '-'}* including the historical data.\nDo you really want to proceed?",
         style: theme.getStyle(),
         maxLines: 10,
       ),

@@ -62,73 +62,77 @@ class _VerifyOtpMobilePageState extends BaseState<_VerifyOtpMobilePage> {
   }
 
   Future<void> _doVerifyNoCodePin() async {
-    String pinToken = localVariables['pinToken'] ?? '';
-    if (pinToken.isEmpty) {
-      alert("", "Pin token is missing");
-      return;
-    }
+    await execute(() async {
+      String pinToken = localVariables['pinToken'] ?? '';
+      if (pinToken.isEmpty) {
+        alert("", "Pin token is missing");
+        return;
+      }
 
-    try {
-      String pin = _pinController.text;
-      chopper.Response res;
+      try {
+        String pin = _pinController.text;
+        chopper.Response res;
 
-      if (widget.signUp ?? false) {
-        var body = tapi.VerificationReq(
-          pin: pin,
-          pinToken: pinToken,
-        );
+        if (widget.signUp ?? false) {
+          var body = tapi.VerificationReq(
+            pin: pin,
+            pinToken: pinToken,
+          );
 
-        res = await config.twinned.verifyRegistrationPin(body: body);
-      } else {
+          res = await config.twinned.verifyRegistrationPin(body: body);
+        } else {
+          var body = vapi.VerificationReq(
+            pin: pin,
+            pinToken: pinToken,
+          );
+
+          res = await config.verification.verifyPin(
+            body: body,
+            dkey: config.isTwinApp()
+                ? config.twinDomainKey
+                : config.noCodeDomainKey,
+          );
+        }
+
+        if (validateResponse(res)) {
+          localVariables['authToken'] = res.body!.authToken;
+          localVariables['pin'] = pin;
+          _doShowResetPassword();
+        }
+      } catch (e) {
+        alert("", "Error: $e");
+      }
+    });
+  }
+
+  Future<void> _doVerifyTwinPin() async {
+    await execute(() async {
+      String pinToken = localVariables['pinToken'] ?? '';
+      if (pinToken.isEmpty) {
+        alert("", "Pin token is missing");
+        return;
+      }
+
+      try {
+        String pin = _pinController.text;
         var body = vapi.VerificationReq(
           pin: pin,
           pinToken: pinToken,
         );
+        chopper.Response res;
 
-        res = await config.verification.verifyPin(
-          body: body,
-          dkey: config.isTwinApp()
-              ? config.twinDomainKey
-              : config.noCodeDomainKey,
-        );
+        res = await config.verification
+            .verifyPin(dkey: config.twinDomainKey, body: body);
+
+        if (validateResponse(res)) {
+          localVariables['authToken'] = res.body!.authToken;
+          localVariables['pin'] = pin;
+          _doShowResetPassword();
+        }
+      } catch (e) {
+        alert("", "Error: $e");
       }
-
-      if (validateResponse(res)) {
-        localVariables['authToken'] = res.body!.authToken;
-        localVariables['pin'] = pin;
-        _doShowResetPassword();
-      }
-    } catch (e) {
-      alert("", "Error: $e");
-    }
-  }
-
-  Future<void> _doVerifyTwinPin() async {
-    String pinToken = localVariables['pinToken'] ?? '';
-    if (pinToken.isEmpty) {
-      alert("", "Pin token is missing");
-      return;
-    }
-
-    try {
-      String pin = _pinController.text;
-      var body = vapi.VerificationReq(
-        pin: pin,
-        pinToken: pinToken,
-      );
-      chopper.Response res;
-
-      res = await config.verification
-          .verifyPin(dkey: config.twinDomainKey, body: body);
-
-      if (validateResponse(res)) {
-        localVariables['authToken'] = res.body!.authToken;
-        localVariables['pin'] = pin;
-        _doShowResetPassword();
-      }
-    } catch (e) {
-      alert("", "Error: $e");
-    }
+    });
   }
 
   @override
@@ -236,7 +240,16 @@ class _VerifyOtpMobilePageState extends BaseState<_VerifyOtpMobilePage> {
                               ),
                             ),
                             SizedBox(
-                              height: 60,
+                              height: 30,
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const BusyIndicator(),
+                              ],
+                            ),
+                            SizedBox(
+                              height: 30,
                             ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -247,7 +260,6 @@ class _VerifyOtpMobilePageState extends BaseState<_VerifyOtpMobilePage> {
                                     context.pop();
                                   },
                                 ),
-                                const BusyIndicator(),
                                 PrimaryButton(
                                   labelKey: 'verify',
                                   minimumSize: Size(200, 50),

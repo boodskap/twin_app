@@ -329,6 +329,15 @@ class HomeScreenState extends BaseState<HomeScreen> {
   void _initMenus() {
     _sideMenus.clear();
     if (null == user) return;
+    if (session.orgs.length > 1)
+      _sideMenus.add(SizedBox(
+        width: MediaQuery.of(context).size.width,
+        child: Container(
+            color: session.theme.getPrimaryColor(),
+            child: Align(
+                alignment: Alignment.centerLeft,
+                child: OrgChangeWidget(onSelected: _switchOrg))),
+      ));
     for (session.TwinMenuItem ci in menuItems) {
       if (ci.subItems.isNotEmpty) {
         var m = _createMenu(ci, 1);
@@ -438,8 +447,10 @@ class HomeScreenState extends BaseState<HomeScreen> {
         elevation: 5,
         iconTheme: IconThemeData(color: Colors.white),
         actions: [
-          if (!session.smallScreen) OrgChangeWidget(onSelected: _switchOrg),
-          if (!session.smallScreen) const SizedBox(width: 8),
+          if (!session.smallScreen && session.orgs.length > 1)
+            OrgChangeWidget(onSelected: _switchOrg),
+          if (!session.smallScreen && session.orgs.length > 1)
+            const SizedBox(width: 8),
           Text(
             toCamelCase(user!.name),
             style: session.theme.getStyle().copyWith(color: Colors.white),
@@ -480,7 +491,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
           //padding: EdgeInsets.zero,
           children: [
             Expanded(
-              flex: 10,
+              flex: 20,
               child: DrawerHeader(
                 margin: const EdgeInsets.only(bottom: 0.0),
                 decoration: BoxDecoration(
@@ -545,20 +556,10 @@ class HomeScreenState extends BaseState<HomeScreen> {
               ),
             ),
             Expanded(
-              flex: 80,
+              flex: 70,
               child: SingleChildScrollView(
                 child: Column(
-                  children: [
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width,
-                      child: Container(
-                          color: session.theme.getPrimaryColor(),
-                          child: Align(
-                              alignment: Alignment.centerRight,
-                              child: OrgChangeWidget(onSelected: _switchOrg))),
-                    ),
-                    ..._sideMenus,
-                  ],
+                  children: _sideMenus,
                 ),
               ),
             ),

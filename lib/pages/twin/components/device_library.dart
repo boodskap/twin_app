@@ -259,7 +259,7 @@ class _DeviceLibraryState extends BaseState<DeviceLibrary> {
         style: theme.getStyle().copyWith(color: Colors.red, fontSize: 18),
       ),
       content: Text(
-        "Cleaning this Device Library will clean this Device Library's data,\n This deletion can't be undone. Do you want to delete it ",
+        "This action can't be undone!\n This will wipe out all of your device data including the historical data.\nDo you really want to proceed?",
         style: theme.getStyle(),
         maxLines: 10,
       ),
