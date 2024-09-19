@@ -1,19 +1,19 @@
 import 'package:flutter/Material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:twin_app/core/session_variables.dart';
-import 'package:twin_app/widgets/commons/email_field.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:twin_app/widgets/commons/secondary_button.dart';
 import 'package:twin_app/widgets/google_map.dart';
 import 'package:twin_commons/core/base_state.dart';
-import 'package:twin_commons/widgets/common/label_text_field.dart';
-import 'package:twinned_api/twinned_api.dart' as tapi;
 import 'package:twin_commons/core/twin_image_helper.dart';
 import 'package:twin_commons/core/twinned_session.dart';
+import 'package:twin_commons/widgets/common/label_text_field.dart';
+import 'package:twinned_api/twinned_api.dart' as tapi;
+import 'package:twinned_widgets/core/client_dropdown.dart';
 import 'package:twinned_widgets/core/facility_dropdown.dart';
 import 'package:twinned_widgets/core/premise_dropdown.dart';
 import 'package:uuid/uuid.dart';
-import 'package:intl_phone_field/intl_phone_field.dart';
 
 class FloorSnippet extends StatefulWidget {
   final tapi.Floor? floor;
@@ -42,8 +42,8 @@ class _FloorSnippetState extends BaseState<FloorSnippet> {
   TextEditingController emailController = TextEditingController();
   bool _isPhoneValid = true;
   String countryCode = 'US';
-  Future<List<String>>? clientIds =
-      isClientAdmin() ? TwinnedSession.instance.getClientIds() : null;
+  // Future<List<String>>? clientIds =
+  //     isClientAdmin() ? TwinnedSession.instance.getClientIds() : null;
   tapi.FloorInfo _floor = const tapi.FloorInfo(
       premiseId: '',
       facilityId: '',
@@ -123,6 +123,21 @@ class _FloorSnippetState extends BaseState<FloorSnippet> {
                   padding: const EdgeInsets.all(10.0),
                   child: Column(
                     children: [
+                      if (!isClientAdmin())
+                        ClientDropdown(
+                          key: Key(const Uuid().v4()),
+                          selectedItem: (null != _floor.clientIds &&
+                                  _floor.clientIds!.isNotEmpty)
+                              ? _floor.clientIds!.first
+                              : null,
+                          onClientSelected: (client) {
+                            setState(() {
+                              _floor = _floor.copyWith(
+                                  clientIds:
+                                      null != client ? [client!.id] : []);
+                            });
+                          },
+                        ),
                       PremiseDropdown(
                         key: Key(const Uuid().v4()),
                         selectedItem: _floor.premiseId,
@@ -437,9 +452,14 @@ class _FloorSnippetState extends BaseState<FloorSnippet> {
   }
 
   Future _save({bool silent = false}) async {
-    List<String>? clientIds = super.isClientAdmin()
-        ? await TwinnedSession.instance.getClientIds()
-        : null;
+    // List<String>? clientIds = super.isClientAdmin()
+    //     ? await TwinnedSession.instance.getClientIds()
+    //     : null;
+    List<String>? clientIds = _floor.clientIds?.isNotEmpty == true
+        ? _floor.clientIds
+        : (super.isClientAdmin()
+            ? await TwinnedSession.instance.getClientIds()
+            : null);
     if (loading) return;
     loading = true;
 
