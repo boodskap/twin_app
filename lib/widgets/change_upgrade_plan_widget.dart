@@ -5,9 +5,9 @@ import 'package:twin_app/widgets/utils.dart';
 import 'package:twin_commons/core/twinned_session.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
-import 'package:nocode_api/api/nocode.swagger.dart' as nocode;
-import 'dart:js' as js;
+import 'package:url_launcher/url_launcher.dart';
 import 'package:twin_app/core/session_variables.dart';
+import 'package:nocode_api/api/nocode.swagger.dart' as nocode;
 
 class ChangeUpgradePlanWidget extends StatefulWidget {
   final nocode.Plan plan;
@@ -31,17 +31,19 @@ class ChangeUpgradePlanWidget extends StatefulWidget {
 class _ChangeUpgradePlanWidgetState extends BaseState<ChangeUpgradePlanWidget> {
   static TextStyle freqencyStyle = theme.getStyle().copyWith(
       color: Colors.black38, fontSize: 14, fontWeight: FontWeight.bold);
-  static TextStyle currencyStyle =  theme.getStyle().copyWith(
+  static TextStyle currencyStyle = theme.getStyle().copyWith(
       color: Colors.black45, fontSize: 14, fontWeight: FontWeight.bold);
-  static  TextStyle planStyle =  theme.getStyle().copyWith(
+  static TextStyle planStyle = theme.getStyle().copyWith(
       color: Colors.black38, fontSize: 14, fontWeight: FontWeight.bold);
-  static  TextStyle buttonStyle =
-      theme.getStyle().copyWith(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold);
-  static  TextStyle headerStyle =  theme.getStyle().copyWith(
+  static TextStyle buttonStyle = theme
+      .getStyle()
+      .copyWith(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold);
+  static TextStyle headerStyle = theme.getStyle().copyWith(
       color: Color(0xFF287FFF), fontSize: 20, fontWeight: FontWeight.bold);
-  static  TextStyle featureStyle =
-       theme.getStyle().copyWith(color: Colors.black, fontSize: 12, fontWeight: FontWeight.bold);
-  static  TextStyle addOnStyle =  theme.getStyle().copyWith(
+  static TextStyle featureStyle = theme
+      .getStyle()
+      .copyWith(color: Colors.black, fontSize: 12, fontWeight: FontWeight.bold);
+  static TextStyle addOnStyle = theme.getStyle().copyWith(
       color: Colors.black45, fontSize: 14, fontWeight: FontWeight.bold);
 
   void _close() {
@@ -117,7 +119,7 @@ class _ChangeUpgradePlanWidgetState extends BaseState<ChangeUpgradePlanWidget> {
       }
 
       if (secretGenerated) {
-        js.context.callMethod('open', [order!.paymentUrl!]);
+        await launchUrl(Uri.parse(order!.paymentUrl!));
       }
     });
 
@@ -163,7 +165,7 @@ class _ChangeUpgradePlanWidgetState extends BaseState<ChangeUpgradePlanWidget> {
                         spacing: 10,
                         crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
-                           Text(
+                          Text(
                             'PRICE',
                             style: headerStyle,
                           ),
@@ -375,11 +377,11 @@ class _ChangeUpgradePlanWidgetState extends BaseState<ChangeUpgradePlanWidget> {
                                   '${currencyToSymbol(widget.plan.currency)}${widget.plan.extraUserFee}',
                                   style: featureStyle,
                                 ),
-                                 Text(
+                                Text(
                                   '/ user',
                                   style: addOnStyle,
                                 ),
-                                 Text(
+                                Text(
                                   '/ month',
                                   style: planStyle,
                                 ),
@@ -399,11 +401,11 @@ class _ChangeUpgradePlanWidgetState extends BaseState<ChangeUpgradePlanWidget> {
                                   '${currencyToSymbol(widget.plan.currency)}${widget.plan.extraDashboardFee}',
                                   style: featureStyle,
                                 ),
-                                 Text(
+                                Text(
                                   '/ 10 dashboards',
                                   style: addOnStyle,
                                 ),
-                                 Text(
+                                Text(
                                   '/ month',
                                   style: planStyle,
                                 ),
@@ -423,11 +425,11 @@ class _ChangeUpgradePlanWidgetState extends BaseState<ChangeUpgradePlanWidget> {
                                   '${currencyToSymbol(widget.plan.currency)}${widget.plan.extraDeviceModelFee}',
                                   style: featureStyle,
                                 ),
-                                 Text(
+                                Text(
                                   '/ 10 device libraries',
                                   style: addOnStyle,
                                 ),
-                                 Text(
+                                Text(
                                   '/ month',
                                   style: planStyle,
                                 ),
@@ -447,11 +449,11 @@ class _ChangeUpgradePlanWidgetState extends BaseState<ChangeUpgradePlanWidget> {
                                   '${currencyToSymbol(widget.plan.currency)}${widget.plan.extraModelParametersFee}',
                                   style: featureStyle,
                                 ),
-                                 Text(
+                                Text(
                                   '/ 10 device parameters',
                                   style: addOnStyle,
                                 ),
-                                 Text(
+                                Text(
                                   '/ month',
                                   style: planStyle,
                                 ),
