@@ -7,6 +7,8 @@ import 'package:twin_commons/widgets/common/label_text_field.dart';
 import 'package:twinned_api/twinned_api.dart' as tapi;
 import 'package:twin_commons/core/twin_image_helper.dart';
 import 'package:twin_commons/core/twinned_session.dart';
+import 'package:twinned_widgets/core/client_dropdown.dart';
+import 'package:uuid/uuid.dart';
 
 class InstallationDatabaseSnippet extends StatefulWidget {
   final tapi.Device? device;
@@ -25,8 +27,8 @@ class _InstallationDatabaseSnippetState
   TextEditingController hardwareIdController = TextEditingController();
   TextEditingController descController = TextEditingController();
   TextEditingController tagController = TextEditingController();
-  Future<List<String>>? clientIds =
-      isClientAdmin() ? TwinnedSession.instance.getClientIds() : null;
+  // Future<List<String>>? clientIds =[]
+  //     isClientAdmin() ? TwinnedSession.instance.getClientIds() : null;
   tapi.DeviceInfo _device = const tapi.DeviceInfo(
     name: '',
     description: '',
@@ -107,6 +109,21 @@ class _InstallationDatabaseSnippetState
                   padding: const EdgeInsets.all(10.0),
                   child: Column(
                     children: [
+                      if (!isClientAdmin())
+                        ClientDropdown(
+                          key: Key(const Uuid().v4()),
+                          selectedItem: (null != _device.clientIds &&
+                                  _device.clientIds!.isNotEmpty)
+                              ? _device.clientIds!.first
+                              : null,
+                          onClientSelected: (client) {
+                            setState(() {
+                              _device = _device.copyWith(
+                                  clientIds:
+                                      null != client ? [client!.id] : []);
+                            });
+                          },
+                        ),
                       SizedBox(
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: LabelTextField(
@@ -284,9 +301,14 @@ class _InstallationDatabaseSnippetState
   }
 
   Future _save({bool silent = false}) async {
-    List<String>? clientIds = super.isClientAdmin()
-        ? await TwinnedSession.instance.getClientIds()
-        : null;
+    // List<String>? clientIds = super.isClientAdmin()
+    //     ? await TwinnedSession.instance.getClientIds()
+    //     : null;
+    List<String>? clientIds = _device.clientIds?.isNotEmpty == true
+        ? _device.clientIds
+        : (super.isClientAdmin()
+            ? await TwinnedSession.instance.getClientIds()
+            : null);
     if (loading) return;
     loading = true;
 

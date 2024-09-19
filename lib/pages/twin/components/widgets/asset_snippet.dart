@@ -12,6 +12,8 @@ import 'package:twinned_api/twinned_api.dart' as tapi;
 import 'package:twinned_widgets/core/facility_dropdown.dart';
 import 'package:twinned_widgets/core/floor_dropdown.dart';
 import 'package:twinned_widgets/core/premise_dropdown.dart';
+import 'package:twinned_widgets/core/client_dropdown.dart';
+
 import 'package:uuid/uuid.dart';
 
 class AssetSnippet extends StatefulWidget {
@@ -41,8 +43,8 @@ class _AssetSnippetState extends BaseState<AssetSnippet> {
   TextEditingController descController = TextEditingController();
   TextEditingController tagController = TextEditingController();
 
-  Future<List<String>>? clientIds =
-      isClientAdmin() ? TwinnedSession.instance.getClientIds() : null;
+  // Future<List<String>>? clientIds =
+  //     isClientAdmin() ? TwinnedSession.instance.getClientIds() : null;
   tapi.AssetInfo _asset = const tapi.AssetInfo(
     name: '',
     clientIds: [],
@@ -123,6 +125,21 @@ class _AssetSnippetState extends BaseState<AssetSnippet> {
                   padding: const EdgeInsets.all(10.0),
                   child: Column(
                     children: [
+                      if (!isClientAdmin())
+                        ClientDropdown(
+                          key: Key(const Uuid().v4()),
+                          selectedItem: (null != _asset.clientIds &&
+                                  _asset.clientIds!.isNotEmpty)
+                              ? _asset.clientIds!.first
+                              : null,
+                          onClientSelected: (client) {
+                            setState(() {
+                              _asset = _asset.copyWith(
+                                  clientIds:
+                                      null != client ? [client!.id] : []);
+                            });
+                          },
+                        ),
                       SizedBox(
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: PremiseDropdown(
@@ -406,9 +423,14 @@ class _AssetSnippetState extends BaseState<AssetSnippet> {
   }
 
   Future _save({bool silent = false}) async {
-    List<String>? clientIds = super.isClientAdmin()
-        ? await TwinnedSession.instance.getClientIds()
-        : null;
+    // List<String>? clientIds = super.isClientAdmin()
+    //     ? await TwinnedSession.instance.getClientIds()
+    //     : null;
+    List<String>? clientIds = _asset.clientIds?.isNotEmpty == true
+        ? _asset.clientIds
+        : (super.isClientAdmin()
+            ? await TwinnedSession.instance.getClientIds()
+            : null);
     if (loading) return;
     loading = true;
 
