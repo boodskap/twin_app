@@ -60,51 +60,53 @@ class _ResetPasswordMobilePageState
   }
 
   Future<void> _doResetPassword() async {
-    if (_formKey.currentState!.validate()) {
-      String newPassword = _newPassController.text.trim();
-      String confirmPassword = _confPassController.text.trim();
+    await execute(() async {
+      if (_formKey.currentState!.validate()) {
+        String confirmPassword = _confPassController.text.trim();
 
-      String userId = localVariables['userId'] ?? '';
-      String pinToken = localVariables['pinToken'] ?? '';
-      String pin = localVariables['pin'] ?? '';
+        String userId = localVariables['userId'] ?? '';
+        String pinToken = localVariables['pinToken'] ?? '';
+        String pin = localVariables['pin'] ?? '';
 
-      if (userId.isEmpty || pinToken.isEmpty || pin.isEmpty) {
-        alert("Failure", "Missing required information for password reset.");
-        return;
-      }
-
-      try {
-        final vapi.ResetPassword body = vapi.ResetPassword(
-          userId: userId,
-          pinToken: pinToken,
-          pin: pin,
-          password: confirmPassword,
-        );
-        var res = await config.verification.resetPassword(
-            body: body,
-            dkey: config.isTwinApp()
-                ? config.twinDomainKey
-                : config.noCodeDomainKey);
-        if (validateResponse(res)) {
-          localVariables.clear();
-          alert("Success", "Password Changed Successfully");
-
-          if (widget.signUp ?? false) {
-            var pRes =
-                await config.nocode.getAppProfile(token: res.body!.authToken);
-            validateResponse(pRes);
-          }
-
-          if ((widget.signUp ?? false) && null != postSignUpHook) {
-            await postSignUpHook!(res.body!);
-          }
-
-          context.push(Routes.login, extra: {'signUp': widget.signUp ?? false});
+        if (userId.isEmpty || pinToken.isEmpty || pin.isEmpty) {
+          alert("Failure", "Missing required information for password reset.");
+          return;
         }
-      } catch (e) {
-        alert("Error", "Error: $e");
+
+        try {
+          final vapi.ResetPassword body = vapi.ResetPassword(
+            userId: userId,
+            pinToken: pinToken,
+            pin: pin,
+            password: confirmPassword,
+          );
+          var res = await config.verification.resetPassword(
+              body: body,
+              dkey: config.isTwinApp()
+                  ? config.twinDomainKey
+                  : config.noCodeDomainKey);
+          if (validateResponse(res)) {
+            localVariables.clear();
+            alert("Success", "Password Changed Successfully");
+
+            if (widget.signUp ?? false) {
+              var pRes =
+                  await config.nocode.getAppProfile(token: res.body!.authToken);
+              validateResponse(pRes);
+            }
+
+            if ((widget.signUp ?? false) && null != postSignUpHook) {
+              await postSignUpHook!(res.body!);
+            }
+
+            context
+                .push(Routes.login, extra: {'signUp': widget.signUp ?? false});
+          }
+        } catch (e) {
+          alert("Error", "Error: $e");
+        }
       }
-    }
+    });
   }
 
   @override
@@ -231,7 +233,6 @@ class _ResetPasswordMobilePageState
                                       context.pop();
                                     },
                                   ),
-                                  const BusyIndicator(),
                                   PrimaryButton(
                                     labelKey: 'continue',
                                     minimumSize: Size(200, 50),
@@ -243,7 +244,14 @@ class _ResetPasswordMobilePageState
                                   ),
                                 ],
                               ),
-                              SizedBox(height: 50),
+                              SizedBox(height: 16),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const BusyIndicator(),
+                                ],
+                              ),
+                              SizedBox(height: 30),
                               Align(
                                 alignment: Alignment.bottomRight,
                                 child: Wrap(

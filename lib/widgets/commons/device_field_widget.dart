@@ -122,10 +122,7 @@ class _DeviceFieldWidgetState extends BaseState<DeviceFieldWidget> {
       }
     }
 
-    return Wrap(
-      //mainAxisSize: MainAxisSize.min,
-      spacing: 5.0,
-      crossAxisAlignment: WrapCrossAlignment.center,
+    return Row(
       children: [
         ...children,
         if (dd.alarms.isNotEmpty ||
