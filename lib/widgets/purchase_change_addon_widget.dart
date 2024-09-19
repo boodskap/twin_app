@@ -2,15 +2,14 @@ import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/widgets/buy_button.dart';
-import 'package:twin_app/widgets/commons/secondary_button.dart';
 import 'package:twin_app/widgets/utils.dart';
 import 'package:twin_commons/core/base_state.dart';
-import 'package:nocode_api/api/nocode.swagger.dart' as nocode;
 import 'package:twin_commons/core/twinned_session.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:chopper/src/response.dart';
-import 'dart:js' as js;
 import 'package:input_quantity/input_quantity.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:nocode_api/api/nocode.swagger.dart' as nocode;
 
 class PurchaseChangeAddonWidget extends StatefulWidget {
   final String orgId;
@@ -538,7 +537,7 @@ class _PurchaseChangeAddonWidgetState
       }
 
       if (secretGenerated) {
-        js.context.callMethod('open', [order!.paymentUrl!]);
+        await launchUrl(Uri.parse(order!.paymentUrl!));
       }
     });
 

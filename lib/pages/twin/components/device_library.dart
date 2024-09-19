@@ -4,6 +4,7 @@ import 'package:twin_app/pages/twin/components/widgets/device_model_content_page
 import 'package:twin_app/pages/twin/components/widgets/device_model_snippet.dart';
 import 'package:twin_app/widgets/buy_button.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
+import 'package:twin_app/widgets/commons/secondary_button.dart';
 import 'package:twin_app/widgets/purchase_change_addon_widget.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
@@ -67,6 +68,34 @@ class _DeviceLibraryState extends BaseState<DeviceLibrary> {
                 ),
                 onPressed: (canCreate()) ? _create : null,
               ),
+            divider(horizontal: true),
+            ElevatedButton(
+              onPressed: confirmWipeAllData,
+              child: Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: 5,
+                children: [
+                  Icon(
+                    Icons.auto_delete_rounded,
+                    color: Colors.white,
+                  ),
+                  Text(
+                    'Wipe All Data',
+                    style: theme.getStyle().copyWith(
+                          color: Colors.white,
+                          fontSize: 18,
+                        ),
+                  ),
+                ],
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                minimumSize: Size(150, 50),
+              ),
+            ),
             divider(horizontal: true),
             SizedBox(
                 height: 40,
@@ -185,6 +214,66 @@ class _DeviceLibraryState extends BaseState<DeviceLibrary> {
           ),
         ),
       ),
+    );
+  }
+
+  void wipeAllData() async {
+    if (loading) return;
+    loading = true;
+    await execute(() async {
+      dynamic res = await TwinnedSession.instance.twin.cleanupData(
+        apikey: TwinnedSession.instance.authToken,
+        modelId: null,
+        deviceId: null,
+      );
+      if (validateResponse(res)) {
+        Navigator.pop(context);
+        alert('', "All data wiped out successfully!",
+            contentStyle: theme.getStyle(),
+            titleStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
+      }
+    });
+    loading = false;
+    refresh();
+  }
+
+  void confirmWipeAllData() {
+    Widget cancelButton = SecondaryButton(
+      labelKey: "Cancel",
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
+    Widget continueButton = PrimaryButton(
+      labelKey: "Delete",
+      onPressed: () {
+        wipeAllData();
+      },
+    );
+
+    AlertDialog alert = AlertDialog(
+      title: Text(
+        "WARNING",
+        style: theme.getStyle().copyWith(color: Colors.red, fontSize: 18),
+      ),
+      content: Text(
+        "This action can't be undone!\n This will wipe out all of your device data including the historical data.\nDo you really want to proceed?",
+        style: theme.getStyle(),
+        maxLines: 10,
+      ),
+      actions: [
+        cancelButton,
+        continueButton,
+      ],
+    );
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
     );
   }
 

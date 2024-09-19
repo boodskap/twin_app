@@ -122,8 +122,10 @@ class _DeviceFieldWidgetState extends BaseState<DeviceFieldWidget> {
       }
     }
 
-    return Row(
-      mainAxisSize: MainAxisSize.min,
+    return Wrap(
+      //mainAxisSize: MainAxisSize.min,
+      spacing: 5.0,
+      crossAxisAlignment: WrapCrossAlignment.center,
       children: [
         ...children,
         if (dd.alarms.isNotEmpty ||
@@ -135,7 +137,6 @@ class _DeviceFieldWidgetState extends BaseState<DeviceFieldWidget> {
               deviceData: dd),
       ],
     );
-    
   }
 
   void _padding(List<Widget> children) {

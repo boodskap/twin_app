@@ -21,6 +21,7 @@ import 'package:twin_app/pages/branding/fonts_colors.dart';
 import 'package:twin_app/pages/branding/landing_page.dart';
 import 'package:twin_app/pages/dashboard.dart';
 import 'package:twin_app/pages/nocode_builder.dart';
+import 'package:twin_app/pages/pulse/email_tab.dart';
 import 'package:twin_app/pages/pulse/template.dart';
 import 'package:twin_app/pages/query_console.dart';
 import 'package:twin_app/pages/pulse/admin/manage_gateways.dart';
@@ -327,6 +328,15 @@ class HomeScreenState extends BaseState<HomeScreen> {
   void _initMenus() {
     _sideMenus.clear();
     if (null == user) return;
+    if (session.orgs.length > 1)
+      _sideMenus.add(SizedBox(
+        width: MediaQuery.of(context).size.width,
+        child: Container(
+            color: session.theme.getPrimaryColor(),
+            child: Align(
+                alignment: Alignment.centerLeft,
+                child: OrgChangeWidget(onSelected: _switchOrg))),
+      ));
     for (session.TwinMenuItem ci in menuItems) {
       if (ci.subItems.isNotEmpty) {
         var m = _createMenu(ci, 1);
@@ -436,8 +446,10 @@ class HomeScreenState extends BaseState<HomeScreen> {
         elevation: 5,
         iconTheme: IconThemeData(color: Colors.white),
         actions: [
-          if (!session.smallScreen) OrgChangeWidget(onSelected: _switchOrg),
-          if (!session.smallScreen) const SizedBox(width: 8),
+          if (!session.smallScreen && session.orgs.length > 1)
+            OrgChangeWidget(onSelected: _switchOrg),
+          if (!session.smallScreen && session.orgs.length > 1)
+            const SizedBox(width: 8),
           Text(
             toCamelCase(user!.name),
             style: session.theme.getStyle().copyWith(color: Colors.white),
@@ -478,7 +490,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
           //padding: EdgeInsets.zero,
           children: [
             Expanded(
-              flex: 10,
+              flex: 20,
               child: DrawerHeader(
                 margin: const EdgeInsets.only(bottom: 0.0),
                 decoration: BoxDecoration(
@@ -543,20 +555,10 @@ class HomeScreenState extends BaseState<HomeScreen> {
               ),
             ),
             Expanded(
-              flex: 80,
+              flex: 70,
               child: SingleChildScrollView(
                 child: Column(
-                  children: [
-                    SizedBox(
-                      width: MediaQuery.of(context).size.width,
-                      child: Container(
-                          color: session.theme.getPrimaryColor(),
-                          child: Align(
-                              alignment: Alignment.centerRight,
-                              child: OrgChangeWidget(onSelected: _switchOrg))),
-                    ),
-                    ..._sideMenus,
-                  ],
+                  children: _sideMenus,
                 ),
               ),
             ),
@@ -953,14 +955,14 @@ class HomeScreenState extends BaseState<HomeScreen> {
     return [
       session.TwinMenuItem(
         id: TwinAppMenu.pulseEmail,
-        text: 'Email Logs',
+        text: 'Email',
         icon: Icons.email,
         bottomMenus: _pulseBottomMenus(),
         isMenuVisible: () {
           return session.isAdmin();
         },
         onMenuSelected: (BuildContext context) async {
-          return const EmailPage();
+          return const EmailTabPage();
         },
       ),
       session.TwinMenuItem(
