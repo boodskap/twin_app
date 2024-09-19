@@ -1238,12 +1238,7 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
               ),
             Flexible(
               child: SingleChildScrollView(
-                child: Wrap(
-                  alignment: WrapAlignment.center,
-                  crossAxisAlignment: _data.length == 0
-                      ? WrapCrossAlignment.center
-                      : WrapCrossAlignment.start,
-                  direction: _isTableView ? Axis.vertical : Axis.horizontal,
+                child: Column(
                   children: _children,
                 ),
               ),
@@ -1270,140 +1265,142 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
         geoLocationList.add(dd.geolocation!);
       }
 
-      refresh(sync: () {
-        if (_isTableView) {
-          var dT = DateTime.fromMillisecondsSinceEpoch(dd.updatedStamp);
-          _children.add(Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (smallScreen && (dd.assetId?.isNotEmpty ?? false))
-                Wrap(
-                  spacing: 5.0,
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        widget.onAssetTapped(dd.assetId!, dd);
-                      },
-                      child: Text(
-                        dd.asset!,
-                        style: theme.getStyle().copyWith(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
-                            color: theme.getPrimaryColor()),
-                      ),
-                    ),
-                    Text(
-                      timeago.format(dT, locale: 'en'),
-                      style: theme
-                          .getStyle()
-                          .copyWith(fontWeight: FontWeight.bold, fontSize: 14),
-                    ),
-                  ],
-                ),
-              if (smallScreen && (dd.assetId?.isEmpty ?? true))
-                Wrap(
-                  spacing: 5.0,
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        widget.onDeviceTapped(dd.deviceId, dd);
-                      },
-                      child: Text(
-                        dd.deviceName!,
-                        style: theme.getStyle().copyWith(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
-                            color: theme.getPrimaryColor()),
-                      ),
-                    ),
-                    Text(
-                      timeago.format(dT, locale: 'en'),
-                      style: theme
-                          .getStyle()
-                          .copyWith(fontWeight: FontWeight.bold, fontSize: 14),
-                    ),
-                  ],
-                ),
-              if (smallScreen) divider(),
-              Row(
-                mainAxisSize: MainAxisSize.max,
+      if (_isTableView) {
+        var dT = DateTime.fromMillisecondsSinceEpoch(dd.updatedStamp);
+        _children.add(Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (smallScreen && (dd.assetId?.isNotEmpty ?? false))
+              Wrap(
+                spacing: 5.0,
+                crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
-                  if (smallScreen)
-                    Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
-                      child: AssetActionWidget(
-                        direction: Axis.vertical,
-                        models: _models,
-                        deviceData: dd,
-                        onDeviceTapped: widget.onDeviceTapped,
-                        onAssetModelTapped: widget.onAssetModelTapped,
-                        onDeviceModelTapped: widget.onDeviceModelTapped,
-                        onTimeSeriesDoubleTapped:
-                            widget.onAnalyticsDoubleTapped,
-                        onTimeSeriesTapped: widget.onAnalyticsTapped,
-                      ),
+                  InkWell(
+                    onTap: () {
+                      widget.onAssetTapped(dd.assetId!, dd);
+                    },
+                    child: Text(
+                      dd.asset!,
+                      style: theme.getStyle().copyWith(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                          color: theme.getPrimaryColor()),
                     ),
-                  if (!smallScreen)
-                    SizedBox(
-                      width: colWidth,
-                      child: AssetInfoWidget(
-                        models: _models,
-                        deviceData: dd,
-                        onDeviceTapped: widget.onDeviceTapped,
-                        onClientTapped: widget.onClientTapped,
-                        onAssetTapped: widget.onAssetTapped,
-                        onFacilityTapped: widget.onFacilityTapped,
-                        onPremiseTapped: widget.onPremiseTapped,
-                        onFloorTapped: widget.onFloorTapped,
-                        onAssetModelTapped: widget.onAssetModelTapped,
-                        onDeviceModelTapped: widget.onDeviceModelTapped,
-                        onTimeSeriesDoubleTapped:
-                            widget.onAnalyticsDoubleTapped,
-                        onTimeSeriesTapped: widget.onAnalyticsTapped,
-                      ),
+                  ),
+                  Text(
+                    timeago.format(dT, locale: 'en'),
+                    style: theme
+                        .getStyle()
+                        .copyWith(fontWeight: FontWeight.bold, fontSize: 14),
+                  ),
+                ],
+              ),
+            if (smallScreen && (dd.assetId?.isEmpty ?? true))
+              Wrap(
+                spacing: 5.0,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  InkWell(
+                    onTap: () {
+                      widget.onDeviceTapped(dd.deviceId, dd);
+                    },
+                    child: Text(
+                      dd.deviceName!,
+                      style: theme.getStyle().copyWith(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                          color: theme.getPrimaryColor()),
                     ),
-                  if (!smallScreen)
-                    Padding(
-                      padding: const EdgeInsets.only(left: 8.0),
-                      child: SizedBox(
-                        width: colWidth,
-                        child: LocationInfoWidget(
+                  ),
+                  Text(
+                    timeago.format(dT, locale: 'en'),
+                    style: theme
+                        .getStyle()
+                        .copyWith(fontWeight: FontWeight.bold, fontSize: 14),
+                  ),
+                ],
+              ),
+            if (smallScreen) divider(),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Container(
+                color: Colors.redAccent,
+                child: Row(
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    if (smallScreen)
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: AssetActionWidget(
+                          direction: Axis.vertical,
+                          models: _models,
                           deviceData: dd,
+                          onDeviceTapped: widget.onDeviceTapped,
+                          onAssetModelTapped: widget.onAssetModelTapped,
+                          onDeviceModelTapped: widget.onDeviceModelTapped,
+                          onTimeSeriesDoubleTapped:
+                              widget.onAnalyticsDoubleTapped,
+                          onTimeSeriesTapped: widget.onAnalyticsTapped,
+                        ),
+                      ),
+                    if (!smallScreen)
+                      SizedBox(
+                        width: colWidth,
+                        child: AssetInfoWidget(
+                          models: _models,
+                          deviceData: dd,
+                          onDeviceTapped: widget.onDeviceTapped,
                           onClientTapped: widget.onClientTapped,
+                          onAssetTapped: widget.onAssetTapped,
                           onFacilityTapped: widget.onFacilityTapped,
                           onPremiseTapped: widget.onPremiseTapped,
                           onFloorTapped: widget.onFloorTapped,
+                          onAssetModelTapped: widget.onAssetModelTapped,
+                          onDeviceModelTapped: widget.onDeviceModelTapped,
+                          onTimeSeriesDoubleTapped:
+                              widget.onAnalyticsDoubleTapped,
+                          onTimeSeriesTapped: widget.onAnalyticsTapped,
                         ),
                       ),
-                    ),
-                  divider(horizontal: true),
-                  SingleChildScrollView(
-                    child: DeviceFieldWidget(
+                    if (!smallScreen)
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8.0),
+                        child: SizedBox(
+                          width: colWidth,
+                          child: LocationInfoWidget(
+                            deviceData: dd,
+                            onClientTapped: widget.onClientTapped,
+                            onFacilityTapped: widget.onFacilityTapped,
+                            onPremiseTapped: widget.onPremiseTapped,
+                            onFloorTapped: widget.onFloorTapped,
+                          ),
+                        ),
+                      ),
+                    divider(horizontal: true),
+                    DeviceFieldWidget(
                       deviceData: dd,
                       models: _models,
                       onDeviceAnalyticsTapped: widget.onDeviceAnalyticsTapped,
                       onDeviceAnalyticsDoubleTapped:
                           widget.onDeviceAnalyticsDoubleTapped,
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ],
-          ));
-
-          _children.add(Padding(
-            padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-            child: Container(
-              width: MediaQuery.of(context).size.width - 10,
-              height: 1,
-              decoration: BoxDecoration(
-                  border: Border.all(color: theme.getPrimaryColor())),
             ),
-          ));
-        }
-      });
+          ],
+        ));
+
+        _children.add(Padding(
+          padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+          child: Container(
+            width: MediaQuery.of(context).size.width - 10,
+            height: 1,
+            decoration: BoxDecoration(
+                border: Border.all(color: theme.getPrimaryColor())),
+          ),
+        ));
+      }
     }
 
     if (_isMapView) {
