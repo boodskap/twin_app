@@ -72,73 +72,44 @@ class _ForgotPasswordMobilePageState
   }
 
   Future<void> _doChangePassword() async {
-    try {
-      var userEmail = _emailController.text.trim();
-      var body = vapi.ForgotPassword(
-        userId: userEmail,
-        subject: config.emailSubject,
-        template: config.resetPswdTemplate,
-      );
-      var res = await config.verification.forgotPassword(
-        body: body,
-        dkey:
-            config.isTwinApp() ? config.twinDomainKey : config.noCodeDomainKey,
-      );
+    await execute(() async {
+      try {
+        var userEmail = _emailController.text.trim();
+        var body = vapi.ForgotPassword(
+          userId: userEmail,
+          subject: config.emailSubject,
+          template: config.resetPswdTemplate,
+        );
+        var res = await config.verification.forgotPassword(
+          body: body,
+          dkey: config.isTwinApp()
+              ? config.twinDomainKey
+              : config.noCodeDomainKey,
+        );
 
-      if (validateResponse(res)) {
-        localVariables['userId'] = userEmail;
-        localVariables['pinToken'] = res.body!.pinToken;
+        if (validateResponse(res)) {
+          localVariables['userId'] = userEmail;
+          localVariables['pinToken'] = res.body!.pinToken;
 
-        showDialog(
-          barrierDismissible: false,
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('OTP Sent'),
-              content: Text(
-                'Reset Password OTP has been sent to your email.\nPlease check it.',
-              ),
-              titleTextStyle: theme
-                  .getStyle()
-                  .copyWith(fontWeight: FontWeight.bold, fontSize: 20),
-              contentTextStyle: theme.getStyle(),
-              actions: <Widget>[
-                PrimaryButton(
-                    minimumSize: Size(20, 20),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      _showForgotOtpPage();
-                    },
-                    labelKey: 'OK'),
-              ],
-            );
-          },
+          await alert(
+            'OTP Sent',
+            'Reset Password OTP has been sent to your email.\nPlease check it.',
+            titleStyle: theme.getStyle().copyWith(
+                fontWeight: FontWeight.bold, fontSize: 20, color: Colors.black),
+            contentStyle: theme.getStyle().copyWith(color: Colors.black),
+          );
+          _showForgotOtpPage();
+        }
+      } catch (e) {
+        await alert(
+          'Error',
+          'An error occurred while processing your request.\nPlease try again.',
+          titleStyle: theme.getStyle().copyWith(
+              fontWeight: FontWeight.bold, fontSize: 20, color: Colors.black),
+          contentStyle: theme.getStyle().copyWith(color: Colors.black),
         );
       }
-    } catch (e) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Error'),
-            content: Text(
-                'An error occurred while processing your request. Please try again.'),
-            titleTextStyle: theme
-                .getStyle()
-                .copyWith(fontWeight: FontWeight.bold, fontSize: 20),
-            contentTextStyle: theme.getStyle(),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
-    }
+    });
   }
 
   @override
@@ -203,7 +174,7 @@ class _ForgotPasswordMobilePageState
                               child: Column(
                                 children: <Widget>[
                                   EmailField(
-                                    onSubmitted: (value) {
+                                    onChanged: (value) {
                                       _doChangePassword();
                                     },
                                     controller: _emailController,
@@ -222,7 +193,6 @@ class _ForgotPasswordMobilePageState
                                     context.pop();
                                   },
                                 ),
-                                const BusyIndicator(),
                                 PrimaryButton(
                                   labelKey: 'generateOtp',
                                   minimumSize: Size(200, 50),
@@ -232,7 +202,14 @@ class _ForgotPasswordMobilePageState
                                 ),
                               ],
                             ),
-                            SizedBox(height: 30),
+                            SizedBox(height: 16),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const BusyIndicator(),
+                              ],
+                            ),
+                            SizedBox(height: 16),
                             if (_canSignUp)
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,

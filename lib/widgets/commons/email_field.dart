@@ -4,10 +4,10 @@ import 'package:twin_app/core/session_variables.dart';
 
 class EmailField extends StatefulWidget {
   final TextEditingController? controller;
-  final ValueChanged<String>? onChanged;
+  final ValueChanged<String> onChanged;
   final ValueChanged<String>? onSubmitted;
   const EmailField(
-      {super.key, this.controller, this.onChanged, this.onSubmitted});
+      {super.key, this.controller, required this.onChanged, this.onSubmitted});
 
   @override
   State<EmailField> createState() => _EmailFieldState();

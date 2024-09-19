@@ -53,7 +53,6 @@ class DataGridSnippet extends StatefulWidget {
   final bool enableGroupFiler;
   final bool enableAlarmFiler;
   final bool enableEventFiler;
-  final bool isTwin;
   final bool oldVersion;
 
   const DataGridSnippet({
@@ -88,7 +87,6 @@ class DataGridSnippet extends StatefulWidget {
     this.enableGroupFiler = true,
     this.enableAlarmFiler = true,
     this.enableEventFiler = true,
-    required this.isTwin,
     this.oldVersion = false,
   });
 
@@ -166,7 +164,7 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
     return Container(
       child: Column(
         children: [
-          if (widget.isTwin || smallScreen)
+          if (smallScreen)
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -596,7 +594,7 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                 ],
               ),
             ),
-          if (!smallScreen && !widget.isTwin)
+          if (!smallScreen)
             Padding(
               padding: const EdgeInsets.only(top: 10),
               child: Container(
@@ -673,13 +671,23 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                                               null != _fieldFilter)
                                           ? customEnabledButtonStyle
                                           : customButtonStyle,
-                                      child: Text(
-                                        'Filter by Data',
-                                        style: theme.getStyle().copyWith(
-                                            color: (null != _dataFilter ||
-                                                    null != _fieldFilter)
-                                                ? Colors.white
-                                                : null),
+                                      child: Wrap(
+                                        spacing: 5,
+                                        children: [
+                                          Icon(Icons.filter_alt_sharp,
+                                              color: (null != _dataFilter ||
+                                                      null != _fieldFilter)
+                                                  ? theme.getPrimaryColor()
+                                                  : null),
+                                          Text(
+                                            'Data',
+                                            style: theme.getStyle().copyWith(
+                                                color: (null != _dataFilter ||
+                                                        null != _fieldFilter)
+                                                    ? Colors.white
+                                                    : null),
+                                          ),
+                                        ],
                                       ),
                                       onPressed: () async {
                                         await super.alertDialog(
@@ -754,11 +762,20 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                                       style: null == _client
                                           ? customButtonStyle
                                           : customEnabledButtonStyle,
-                                      child: Text('Filter by Clients',
-                                          style: theme.getStyle().copyWith(
+                                      child: Wrap(
+                                        spacing: 5,
+                                        children: [
+                                          Icon(Icons.perm_contact_cal_outlined,
                                               color: null == _client
                                                   ? null
-                                                  : Colors.white)),
+                                                  : theme.getPrimaryColor()),
+                                          Text('Clients',
+                                              style: theme.getStyle().copyWith(
+                                                  color: null == _client
+                                                      ? null
+                                                      : Colors.white)),
+                                        ],
+                                      ),
                                       onPressed: () async {
                                         await super.alertDialog(
                                             title: 'Filter by Client',
@@ -807,13 +824,22 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                                       style: null == _premise
                                           ? customButtonStyle
                                           : customEnabledButtonStyle,
-                                      child: Text(
-                                        'Filter by Premises',
-                                        style: theme.getStyle().copyWith(
+                                      child: Wrap(
+                                        spacing: 5,
+                                        children: [
+                                          Icon(Icons.home,
                                               color: null == _premise
                                                   ? null
-                                                  : Colors.white,
-                                            ),
+                                                  : theme.getPrimaryColor()),
+                                          Text(
+                                            'Premises',
+                                            style: theme.getStyle().copyWith(
+                                                  color: null == _premise
+                                                      ? null
+                                                      : Colors.white,
+                                                ),
+                                          ),
+                                        ],
                                       ),
                                       onPressed: () async {
                                         await super.alertDialog(
@@ -862,12 +888,21 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                                       style: null == _facility
                                           ? customButtonStyle
                                           : customEnabledButtonStyle,
-                                      child: Text(
-                                        'Filter by Facility',
-                                        style: theme.getStyle().copyWith(
-                                            color: null == _facility
-                                                ? null
-                                                : Colors.white),
+                                      child: Wrap(
+                                        spacing: 5,
+                                        children: [
+                                          Icon(Icons.business,
+                                              color: null == _facility
+                                                  ? null
+                                                  : theme.getPrimaryColor()),
+                                          Text(
+                                            'Facilities',
+                                            style: theme.getStyle().copyWith(
+                                                color: null == _facility
+                                                    ? null
+                                                    : Colors.white),
+                                          ),
+                                        ],
                                       ),
                                       onPressed: () async {
                                         await super.alertDialog(
@@ -914,12 +949,21 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                                       style: null == _floor
                                           ? customButtonStyle
                                           : customEnabledButtonStyle,
-                                      child: Text(
-                                        'Filter by Floor',
-                                        style: theme.getStyle().copyWith(
-                                            color: null == _floor
-                                                ? null
-                                                : Colors.white),
+                                      child: Wrap(
+                                        spacing: 5,
+                                        children: [
+                                          Icon(Icons.cabin,
+                                              color: null == _floor
+                                                  ? null
+                                                  : theme.getPrimaryColor()),
+                                          Text(
+                                            'Filter by Floor',
+                                            style: theme.getStyle().copyWith(
+                                                color: null == _floor
+                                                    ? null
+                                                    : Colors.white),
+                                          ),
+                                        ],
                                       ),
                                       onPressed: () async {
                                         await super.alertDialog(
@@ -963,12 +1007,21 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                                       style: null == _assetGroup
                                           ? customButtonStyle
                                           : customEnabledButtonStyle,
-                                      child: Text(
-                                        'Filter by Group',
-                                        style: theme.getStyle().copyWith(
-                                            color: null == _assetGroup
-                                                ? null
-                                                : Colors.white),
+                                      child: Wrap(
+                                        spacing: 5,
+                                        children: [
+                                          Icon(Icons.group_add,
+                                              color: null == _assetGroup
+                                                  ? null
+                                                  : theme.getPrimaryColor()),
+                                          Text(
+                                            'Groups',
+                                            style: theme.getStyle().copyWith(
+                                                color: null == _assetGroup
+                                                    ? null
+                                                    : Colors.white),
+                                          ),
+                                        ],
                                       ),
                                       onPressed: () async {
                                         await super.alertDialog(
@@ -1013,12 +1066,21 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                                       style: null == _event
                                           ? customButtonStyle
                                           : customEnabledButtonStyle,
-                                      child: Text(
-                                        'Filter by Event',
-                                        style: theme.getStyle().copyWith(
-                                            color: null == _event
-                                                ? null
-                                                : Colors.white),
+                                      child: Wrap(
+                                        spacing: 5,
+                                        children: [
+                                          Icon(Icons.event_rounded,
+                                              color: null == _event
+                                                  ? null
+                                                  : theme.getPrimaryColor()),
+                                          Text(
+                                            'Events',
+                                            style: theme.getStyle().copyWith(
+                                                color: null == _event
+                                                    ? null
+                                                    : Colors.white),
+                                          ),
+                                        ],
                                       ),
                                       onPressed: () async {
                                         await super.alertDialog(
@@ -1063,12 +1125,21 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                                       style: null == _alarm
                                           ? customButtonStyle
                                           : customEnabledButtonStyle,
-                                      child: Text(
-                                        'Filter by Alarm',
-                                        style: theme.getStyle().copyWith(
-                                            color: null == _alarm
-                                                ? null
-                                                : Colors.white),
+                                      child: Wrap(
+                                        spacing: 5,
+                                        children: [
+                                          Icon(Icons.doorbell_outlined,
+                                              color: null == _alarm
+                                                  ? null
+                                                  : theme.getPrimaryColor()),
+                                          Text(
+                                            'Alarms',
+                                            style: theme.getStyle().copyWith(
+                                                color: null == _alarm
+                                                    ? null
+                                                    : Colors.white),
+                                          ),
+                                        ],
                                       ),
                                       onPressed: () async {
                                         await super.alertDialog(
@@ -1238,12 +1309,7 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
               ),
             Flexible(
               child: SingleChildScrollView(
-                child: Wrap(
-                  alignment: WrapAlignment.center,
-                  crossAxisAlignment: _data.length == 0
-                      ? WrapCrossAlignment.center
-                      : WrapCrossAlignment.start,
-                  direction: _isTableView ? Axis.vertical : Axis.horizontal,
+                child: Column(
                   children: _children,
                 ),
               ),
@@ -1270,10 +1336,11 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
         geoLocationList.add(dd.geolocation!);
       }
 
-      refresh(sync: () {
-        if (_isTableView) {
-          var dT = DateTime.fromMillisecondsSinceEpoch(dd.updatedStamp);
-          _children.add(Column(
+      if (_isTableView) {
+        var dT = DateTime.fromMillisecondsSinceEpoch(dd.updatedStamp);
+        _children.add(SizedBox(
+          width: MediaQuery.of(context).size.width,
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (smallScreen && (dd.assetId?.isNotEmpty ?? false))
@@ -1327,95 +1394,96 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                   ],
                 ),
               if (smallScreen) divider(),
-              Row(
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  if (smallScreen)
-                    Padding(
-                      padding: const EdgeInsets.only(right: 8.0),
-                      child: AssetActionWidget(
-                        direction: Axis.vertical,
-                        models: _models,
-                        deviceData: dd,
-                        onDeviceTapped: widget.onDeviceTapped,
-                        onAssetModelTapped: widget.onAssetModelTapped,
-                        onDeviceModelTapped: widget.onDeviceModelTapped,
-                        onTimeSeriesDoubleTapped:
-                            widget.onAnalyticsDoubleTapped,
-                        onTimeSeriesTapped: widget.onAnalyticsTapped,
-                      ),
-                    ),
-                  if (!smallScreen)
-                    SizedBox(
-                      width: colWidth,
-                      child: AssetInfoWidget(
-                        models: _models,
-                        deviceData: dd,
-                        onDeviceTapped: widget.onDeviceTapped,
-                        onClientTapped: widget.onClientTapped,
-                        onAssetTapped: widget.onAssetTapped,
-                        onFacilityTapped: widget.onFacilityTapped,
-                        onPremiseTapped: widget.onPremiseTapped,
-                        onFloorTapped: widget.onFloorTapped,
-                        onAssetModelTapped: widget.onAssetModelTapped,
-                        onDeviceModelTapped: widget.onDeviceModelTapped,
-                        onTimeSeriesDoubleTapped:
-                            widget.onAnalyticsDoubleTapped,
-                        onTimeSeriesTapped: widget.onAnalyticsTapped,
-                      ),
-                    ),
-                  if (!smallScreen)
-                    Padding(
-                      padding: const EdgeInsets.only(left: 8.0),
-                      child: SizedBox(
-                        width: colWidth,
-                        child: LocationInfoWidget(
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    if (smallScreen)
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: AssetActionWidget(
+                          direction: Axis.vertical,
+                          models: _models,
                           deviceData: dd,
+                          onDeviceTapped: widget.onDeviceTapped,
+                          onAssetModelTapped: widget.onAssetModelTapped,
+                          onDeviceModelTapped: widget.onDeviceModelTapped,
+                          onTimeSeriesDoubleTapped:
+                              widget.onAnalyticsDoubleTapped,
+                          onTimeSeriesTapped: widget.onAnalyticsTapped,
+                        ),
+                      ),
+                    if (!smallScreen)
+                      SizedBox(
+                        width: colWidth,
+                        child: AssetInfoWidget(
+                          models: _models,
+                          deviceData: dd,
+                          onDeviceTapped: widget.onDeviceTapped,
                           onClientTapped: widget.onClientTapped,
+                          onAssetTapped: widget.onAssetTapped,
                           onFacilityTapped: widget.onFacilityTapped,
                           onPremiseTapped: widget.onPremiseTapped,
                           onFloorTapped: widget.onFloorTapped,
+                          onAssetModelTapped: widget.onAssetModelTapped,
+                          onDeviceModelTapped: widget.onDeviceModelTapped,
+                          onTimeSeriesDoubleTapped:
+                              widget.onAnalyticsDoubleTapped,
+                          onTimeSeriesTapped: widget.onAnalyticsTapped,
                         ),
                       ),
-                    ),
-                  divider(horizontal: true),
-                  SingleChildScrollView(
-                    child: DeviceFieldWidget(
+                    if (!smallScreen)
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8.0),
+                        child: SizedBox(
+                          width: colWidth,
+                          child: LocationInfoWidget(
+                            deviceData: dd,
+                            onClientTapped: widget.onClientTapped,
+                            onFacilityTapped: widget.onFacilityTapped,
+                            onPremiseTapped: widget.onPremiseTapped,
+                            onFloorTapped: widget.onFloorTapped,
+                          ),
+                        ),
+                      ),
+                    divider(horizontal: true),
+                    DeviceFieldWidget(
                       deviceData: dd,
                       models: _models,
                       onDeviceAnalyticsTapped: widget.onDeviceAnalyticsTapped,
                       onDeviceAnalyticsDoubleTapped:
                           widget.onDeviceAnalyticsDoubleTapped,
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ],
-          ));
+          ),
+        ));
 
-          _children.add(Padding(
-            padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-            child: Container(
-              width: MediaQuery.of(context).size.width - 10,
-              height: 1,
-              decoration: BoxDecoration(
-                  border: Border.all(color: theme.getPrimaryColor())),
-            ),
-          ));
-        }
-      });
+        _children.add(Padding(
+          padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+          child: Container(
+            width: MediaQuery.of(context).size.width - 10,
+            height: 1,
+            decoration: BoxDecoration(
+                border: Border.all(color: theme.getPrimaryColor())),
+          ),
+        ));
+      }
     }
 
     if (_isMapView) {
       _children.add(geoLocationList.isNotEmpty
           ? SizedBox(
               width: MediaQuery.of(context).size.width,
-              height: widget.isTwin
+              height: smallScreen
                   ? MediaQuery.of(context).size.height
                   : MediaQuery.of(context).size.height / 1.6,
               child: GoogleMapMultiWidget(
                 geoLocationList: geoLocationList,
-                isTwin: widget.isTwin,
+                isTwin: smallScreen,
                 deviceDataList: _data,
                 onAssetTapped: widget.onAssetTapped,
                 onDeviceTapped: widget.onDeviceTapped,
