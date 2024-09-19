@@ -1323,69 +1323,66 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
             if (smallScreen) divider(),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              child: Container(
-                color: Colors.redAccent,
-                child: Row(
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    if (smallScreen)
-                      Padding(
-                        padding: const EdgeInsets.only(right: 8.0),
-                        child: AssetActionWidget(
-                          direction: Axis.vertical,
-                          models: _models,
-                          deviceData: dd,
-                          onDeviceTapped: widget.onDeviceTapped,
-                          onAssetModelTapped: widget.onAssetModelTapped,
-                          onDeviceModelTapped: widget.onDeviceModelTapped,
-                          onTimeSeriesDoubleTapped:
-                              widget.onAnalyticsDoubleTapped,
-                          onTimeSeriesTapped: widget.onAnalyticsTapped,
-                        ),
+              child: Row(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  if (smallScreen)
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: AssetActionWidget(
+                        direction: Axis.vertical,
+                        models: _models,
+                        deviceData: dd,
+                        onDeviceTapped: widget.onDeviceTapped,
+                        onAssetModelTapped: widget.onAssetModelTapped,
+                        onDeviceModelTapped: widget.onDeviceModelTapped,
+                        onTimeSeriesDoubleTapped:
+                            widget.onAnalyticsDoubleTapped,
+                        onTimeSeriesTapped: widget.onAnalyticsTapped,
                       ),
-                    if (!smallScreen)
-                      SizedBox(
+                    ),
+                  if (!smallScreen)
+                    SizedBox(
+                      width: colWidth,
+                      child: AssetInfoWidget(
+                        models: _models,
+                        deviceData: dd,
+                        onDeviceTapped: widget.onDeviceTapped,
+                        onClientTapped: widget.onClientTapped,
+                        onAssetTapped: widget.onAssetTapped,
+                        onFacilityTapped: widget.onFacilityTapped,
+                        onPremiseTapped: widget.onPremiseTapped,
+                        onFloorTapped: widget.onFloorTapped,
+                        onAssetModelTapped: widget.onAssetModelTapped,
+                        onDeviceModelTapped: widget.onDeviceModelTapped,
+                        onTimeSeriesDoubleTapped:
+                            widget.onAnalyticsDoubleTapped,
+                        onTimeSeriesTapped: widget.onAnalyticsTapped,
+                      ),
+                    ),
+                  if (!smallScreen)
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8.0),
+                      child: SizedBox(
                         width: colWidth,
-                        child: AssetInfoWidget(
-                          models: _models,
+                        child: LocationInfoWidget(
                           deviceData: dd,
-                          onDeviceTapped: widget.onDeviceTapped,
                           onClientTapped: widget.onClientTapped,
-                          onAssetTapped: widget.onAssetTapped,
                           onFacilityTapped: widget.onFacilityTapped,
                           onPremiseTapped: widget.onPremiseTapped,
                           onFloorTapped: widget.onFloorTapped,
-                          onAssetModelTapped: widget.onAssetModelTapped,
-                          onDeviceModelTapped: widget.onDeviceModelTapped,
-                          onTimeSeriesDoubleTapped:
-                              widget.onAnalyticsDoubleTapped,
-                          onTimeSeriesTapped: widget.onAnalyticsTapped,
                         ),
                       ),
-                    if (!smallScreen)
-                      Padding(
-                        padding: const EdgeInsets.only(left: 8.0),
-                        child: SizedBox(
-                          width: colWidth,
-                          child: LocationInfoWidget(
-                            deviceData: dd,
-                            onClientTapped: widget.onClientTapped,
-                            onFacilityTapped: widget.onFacilityTapped,
-                            onPremiseTapped: widget.onPremiseTapped,
-                            onFloorTapped: widget.onFloorTapped,
-                          ),
-                        ),
-                      ),
-                    divider(horizontal: true),
-                    DeviceFieldWidget(
-                      deviceData: dd,
-                      models: _models,
-                      onDeviceAnalyticsTapped: widget.onDeviceAnalyticsTapped,
-                      onDeviceAnalyticsDoubleTapped:
-                          widget.onDeviceAnalyticsDoubleTapped,
                     ),
-                  ],
-                ),
+                  divider(horizontal: true),
+                  DeviceFieldWidget(
+                    deviceData: dd,
+                    models: _models,
+                    onDeviceAnalyticsTapped: widget.onDeviceAnalyticsTapped,
+                    onDeviceAnalyticsDoubleTapped:
+                        widget.onDeviceAnalyticsDoubleTapped,
+                  ),
+                ],
               ),
             ),
           ],
