@@ -345,7 +345,6 @@ class _SignUpMobilePageState extends BaseState<_SignUpMobilePage> {
                                     context.pop();
                                   },
                                 ),
-                                BusyIndicator(),
                                 PrimaryButton(
                                   labelKey: 'signUp',
                                   minimumSize: Size(200, 50),
@@ -361,7 +360,14 @@ class _SignUpMobilePageState extends BaseState<_SignUpMobilePage> {
                                 ),
                               ],
                             ),
-                            SizedBox(height: 20),
+                            SizedBox(height: 16),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                BusyIndicator(),
+                              ],
+                            ),
+                            //SizedBox(height: 8),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
