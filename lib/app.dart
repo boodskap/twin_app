@@ -24,6 +24,7 @@ import 'package:twin_app/pages/nocode_builder.dart';
 import 'package:twin_app/pages/pulse/email_tab.dart';
 import 'package:twin_app/pages/pulse/sms_tab.dart';
 import 'package:twin_app/pages/pulse/template.dart';
+import 'package:twin_app/pages/pulse/voice_tab.dart';
 import 'package:twin_app/pages/query_console.dart';
 import 'package:twin_app/pages/pulse/admin/manage_gateways.dart';
 import 'package:twin_app/pages/pulse/email.dart';
@@ -980,14 +981,14 @@ class HomeScreenState extends BaseState<HomeScreen> {
       ),
       session.TwinMenuItem(
         id: TwinAppMenu.pulseVoice,
-        text: 'Voicemail Logs',
+        text: 'Voice',
         icon: Icons.voicemail,
         bottomMenus: _pulseBottomMenus(),
         isMenuVisible: () {
           return session.isAdmin();
         },
         onMenuSelected: (BuildContext context) async {
-          return const VoicePage();
+          return const VoiceTabPage();
         },
       ),
       session.TwinMenuItem(

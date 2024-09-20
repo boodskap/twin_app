@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pulse_admin_api/api/pulse_admin.swagger.dart';
 import 'package:twin_app/core/session_variables.dart';
-import 'package:twin_app/pages/pulse/widgets/add_edit_email_group.dart';
 import 'package:twin_app/pages/pulse/widgets/add_edit_phone_group.dart';
 import 'package:twin_app/pages/pulse/widgets/custom_badge.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
@@ -10,19 +9,19 @@ import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/twinned_session.dart';
 import 'package:pulse_admin_api/pulse_admin_api.dart' as pulse;
 
-class SmsGroupPage extends StatefulWidget {
-  const SmsGroupPage({super.key});
+class VoiceGroupPage extends StatefulWidget {
+  const VoiceGroupPage({super.key});
 
   @override
-  State<SmsGroupPage> createState() => _SmsGroupPageState();
+  State<VoiceGroupPage> createState() => _VoiceGroupPageState();
 }
 
-class _SmsGroupPageState extends BaseState<SmsGroupPage> {
+class _VoiceGroupPageState extends BaseState<VoiceGroupPage> {
   String _search = '*';
-  List<PhoneNumber> SMSList = [];
+  List<PhoneNumber> VoiceList = [];
   String name = "";
-  final TextEditingController _searchTextController = TextEditingController();
   final List<Widget> _children = [];
+   final TextEditingController _searchTextController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,9 +35,8 @@ class _SmsGroupPageState extends BaseState<SmsGroupPage> {
                 message: "Refresh",
                 child: IconButton(
                   onPressed: () async {
-                    _searchTextController.text = "";
                     _search = "*";
-
+                    _searchTextController.text = "";
                     await _load();
                   },
                   icon: const Icon(Icons.refresh),
@@ -53,7 +51,7 @@ class _SmsGroupPageState extends BaseState<SmsGroupPage> {
                 labelKey: 'Add New',
                 onPressed: () async {
                   _reset();
-                  await _showSmsGroupDialog('Create', null);
+                  await _showVoiceGroupDialog('Create', null);
                 },
               ),
               divider(horizontal: true),
@@ -61,11 +59,11 @@ class _SmsGroupPageState extends BaseState<SmsGroupPage> {
                 width: 250,
                 height: 40,
                 child: SearchBar(
-                  controller:_searchTextController,
+                  controller: _searchTextController,
                   leading: const Icon(Icons.search),
                   textStyle: WidgetStatePropertyAll(theme.getStyle()),
                   hintStyle: WidgetStatePropertyAll(theme.getStyle()),
-                  hintText: "Search SMS",
+                  hintText: "Search Voices",
                   onChanged: (value) async {
                     _search = value.trim().isNotEmpty ? value.trim() : '*';
                     await _load();
@@ -92,15 +90,15 @@ class _SmsGroupPageState extends BaseState<SmsGroupPage> {
     );
   }
 
-  bool canCreateOrUpdate(pulse.SmsGroup? entity) {
+  bool canCreateOrUpdate(pulse.VoiceGroup? entity) {
     if (entity != null) {
       return entity.name.isNotEmpty && entity.phoneList.isNotEmpty;
     } else {
-      return name.isNotEmpty && SMSList.isNotEmpty;
+      return name.isNotEmpty && VoiceList.isNotEmpty;
     }
   }
 
-  Widget _buildChild(pulse.SmsGroup entity) {
+  Widget _buildChild(pulse.VoiceGroup entity) {
     return SizedBox(
       width: 300,
       height: 200,
@@ -115,7 +113,7 @@ class _SmsGroupPageState extends BaseState<SmsGroupPage> {
                     message: 'Edit ${entity.name}',
                     child: IconButton(
                         onPressed: () async {
-                          await _showSmsGroupDialog('Update', entity);
+                          await _showVoiceGroupDialog('Update', entity);
                         },
                         icon: const Icon(Icons.edit))),
                 Tooltip(
@@ -145,17 +143,17 @@ class _SmsGroupPageState extends BaseState<SmsGroupPage> {
     );
   }
 
-  Future _delete(pulse.SmsGroup group) async {
+  Future _delete(pulse.VoiceGroup group) async {
     await confirm(
       title: 'Delete ${group.name}',
-      message: 'Are you sure you want to delete this SMS group?',
+      message: 'Are you sure you want to delete this Voice group?',
       onPressed: () async {
         await execute(() async {
-          var res = await TwinnedSession.instance.pulseAdmin.deleteSmsGroup(
+          var res = await TwinnedSession.instance.pulseAdmin.deleteVoiceGroup(
               apikey: TwinnedSession.instance.authToken, groupId: group.id);
 
           if (validateResponse(res)) {
-            alert('SMS Group ${group.name}', 'Deleted Successfully');
+            alert('Voice Group ${group.name}', 'Deleted Successfully');
           }
         });
       },
@@ -165,13 +163,13 @@ class _SmsGroupPageState extends BaseState<SmsGroupPage> {
     });
   }
 
-  Future<void> _showSmsGroupDialog(String type, pulse.SmsGroup? entity) async {
+  Future<void> _showVoiceGroupDialog(String type, pulse.VoiceGroup? entity) async {
     await showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           title: Text(
-            '$type SMS Group',
+            '$type Voice Group',
             style: theme.getStyle().copyWith(
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
@@ -182,7 +180,7 @@ class _SmsGroupPageState extends BaseState<SmsGroupPage> {
             width: MediaQuery.of(context).size.width * 0.3,
             height: MediaQuery.of(context).size.height * 0.6,
             child: AddEditPhoneGroup(
-              SmsGroup: entity,
+              VoiceGroup: entity,
               onNameSaved: (String value) {
                 setState(() {
                   if (entity == null) {
@@ -192,14 +190,14 @@ class _SmsGroupPageState extends BaseState<SmsGroupPage> {
                   }
                 });
               },
-              onPhoneNumberSaved: (List<PhoneNumber> SMS) {
+              onPhoneNumberSaved: (List<PhoneNumber> Voice) {
                 setState(() {
                   if (entity == null) {
-                    SMSList = SMS;
+                    VoiceList = Voice;
                   } else {
-                    entity = entity!.copyWith(phoneList: SMS);
+                    entity = entity!.copyWith(phoneList: Voice);
                   }
-                  SMSList = SMS;
+                  VoiceList = Voice;
                 });
               },
             ),
@@ -244,12 +242,12 @@ class _SmsGroupPageState extends BaseState<SmsGroupPage> {
     _children.clear();
     refresh();
     await execute(() async {
-      var res = await TwinnedSession.instance.pulseAdmin.searchSmsGroup(
+      var res = await TwinnedSession.instance.pulseAdmin.searchVoiceGroup(
           apikey: TwinnedSession.instance.authToken,
           body: pulse.SearchReq(search: _search, page: 0, size: 25));
 
       if (validateResponse(res)) {
-        for (pulse.SmsGroup entity in res.body?.values ?? []) {
+        for (pulse.VoiceGroup entity in res.body?.values ?? []) {
           _children.add(_buildChild(entity));
         }
       }
@@ -263,31 +261,31 @@ class _SmsGroupPageState extends BaseState<SmsGroupPage> {
     _load();
   }
 
-  Future _save(pulse.SmsGroup? groupSMS) async {
+  Future _save(pulse.VoiceGroup? groupVoice) async {
     if (loading) return;
     loading = true;
-    late pulse.SmsGroupInfo _config;
+    late pulse.VoiceGroupInfo _config;
 
-    if (null == groupSMS) {
-      _config = pulse.SmsGroupInfo(
+    if (null == groupVoice) {
+      _config = pulse.VoiceGroupInfo(
         name: name,
-        phoneList: SMSList,
+        phoneList: VoiceList,
       );
     } else {
-      _config = pulse.SmsGroupInfo(
-          name: groupSMS.name, phoneList: groupSMS.phoneList);
+      _config = pulse.VoiceGroupInfo(
+          name: groupVoice.name, phoneList: groupVoice.phoneList);
     }
     await execute(() async {
-      var uRes = await TwinnedSession.instance.pulseAdmin.upsertSmsGroup(
+      var uRes = await TwinnedSession.instance.pulseAdmin.upsertVoiceGroup(
           apikey: TwinnedSession.instance.authToken,
-          groupId: groupSMS != null ? groupSMS.id : null,
+          groupId: groupVoice != null ? groupVoice.id : null,
           body: _config);
       if (validateResponse(uRes)) {
         _close();
-        if (groupSMS == null) {
+        if (groupVoice == null) {
           alert(
             'Success',
-            'SMS Group ${_config.name} Created Successfully!',
+            'Voice Group ${_config.name} Created Successfully!',
             titleStyle: theme
                 .getStyle()
                 .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
@@ -296,7 +294,7 @@ class _SmsGroupPageState extends BaseState<SmsGroupPage> {
         } else {
           alert(
             'Success',
-            'SMS Group ${_config.name} Updated Successfully!',
+            'Voice Group ${_config.name} Updated Successfully!',
             titleStyle: theme
                 .getStyle()
                 .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
@@ -317,7 +315,7 @@ class _SmsGroupPageState extends BaseState<SmsGroupPage> {
   void _reset() {
     setState(() {
       name = "";
-      SMSList = [];
+      VoiceList = [];
     });
   }
 

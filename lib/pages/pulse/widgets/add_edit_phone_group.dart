@@ -10,14 +10,16 @@ import 'package:intl_phone_field/intl_phone_field.dart';
 // ignore: must_be_immutable
 class AddEditPhoneGroup extends StatefulWidget {
   pulse.SmsGroup? SmsGroup;
+  pulse.VoiceGroup? VoiceGroup;
   final ValueChanged<String> onNameSaved;
-  final ValueChanged<List<pulse.PhoneNumber>> onSmsSaved;
+  final ValueChanged<List<pulse.PhoneNumber>> onPhoneNumberSaved;
 
   AddEditPhoneGroup({
     super.key,
     required this.onNameSaved,
-    required this.onSmsSaved,
+    required this.onPhoneNumberSaved,
     this.SmsGroup,
+    this.VoiceGroup,
   });
   @override
   _AddEditPhoneGroupState createState() => _AddEditPhoneGroupState();
@@ -38,6 +40,10 @@ class _AddEditPhoneGroupState extends BaseState<AddEditPhoneGroup> {
       _phoneNumbers = widget.SmsGroup!.phoneList;
       _nameController.text = widget.SmsGroup!.name;
     }
+     if (widget.VoiceGroup != null) {
+      _phoneNumbers = widget.VoiceGroup!.phoneList;
+      _nameController.text = widget.VoiceGroup!.name;
+    }
   }
 
   void _addPhoneNumber() {
@@ -45,8 +51,7 @@ class _AddEditPhoneGroupState extends BaseState<AddEditPhoneGroup> {
         !_phoneNumbers.contains(selectedPhoneNumber)) {
       setState(() {
         _phoneNumbers.add(selectedPhoneNumber!);
-        initialPhoneNumber = '';
-        widget.onSmsSaved(_phoneNumbers);
+        widget.onPhoneNumberSaved(_phoneNumbers);
       });
     } else {
       alert(
@@ -63,7 +68,7 @@ class _AddEditPhoneGroupState extends BaseState<AddEditPhoneGroup> {
   void _editPhoneNumber(int index) {
     String currentPhoneNumber = _phoneNumbers[index].phoneNumber;
     String currentCountryCode = _phoneNumbers[index].countryCode ?? 'US';
-
+print(currentPhoneNumber);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -138,7 +143,7 @@ class _AddEditPhoneGroupState extends BaseState<AddEditPhoneGroup> {
           _phoneNumbers[index] == selectedPhoneNumber) {
         setState(() {
           _phoneNumbers[index] = selectedPhoneNumber!;
-          widget.onSmsSaved(_phoneNumbers);
+          widget.onPhoneNumberSaved(_phoneNumbers);
         });
         Navigator.of(context).pop();
       } else {
@@ -157,7 +162,7 @@ class _AddEditPhoneGroupState extends BaseState<AddEditPhoneGroup> {
   void _removePhoneNumber(int index) {
     setState(() {
       _phoneNumbers.removeAt(index);
-      widget.onSmsSaved(_phoneNumbers);
+      widget.onPhoneNumberSaved(_phoneNumbers);
     });
   }
 

@@ -20,6 +20,7 @@ class _EmailGroupPageState extends BaseState<EmailGroupPage> {
   List<String> emailList = [];
   String name = "";
   final List<Widget> _children = [];
+     final TextEditingController _searchTextController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,6 +34,7 @@ class _EmailGroupPageState extends BaseState<EmailGroupPage> {
                 message: "Refresh",
                 child: IconButton(
                   onPressed: () async {
+                    _searchTextController.text = "";
                     _search = "*";
                     await _load();
                   },
@@ -56,6 +58,7 @@ class _EmailGroupPageState extends BaseState<EmailGroupPage> {
                 width: 250,
                 height: 40,
                 child: SearchBar(
+                  controller: _searchTextController,
                   leading: const Icon(Icons.search),
                   textStyle: WidgetStatePropertyAll(theme.getStyle()),
                   hintStyle: WidgetStatePropertyAll(theme.getStyle()),
@@ -317,4 +320,6 @@ class _EmailGroupPageState extends BaseState<EmailGroupPage> {
      emailList = [];
    });
   }
+
+ 
 }
