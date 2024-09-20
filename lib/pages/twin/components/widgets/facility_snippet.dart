@@ -10,7 +10,9 @@ import 'package:twin_commons/core/twin_image_helper.dart';
 import 'package:twin_commons/core/twinned_session.dart';
 import 'package:twin_commons/widgets/common/label_text_field.dart';
 import 'package:twinned_api/twinned_api.dart' as tapi;
+import 'package:twinned_widgets/core/client_dropdown.dart';
 import 'package:twinned_widgets/core/premise_dropdown.dart';
+import 'package:uuid/uuid.dart';
 
 class FacilitySnippet extends StatefulWidget {
   final tapi.Facility? facility;
@@ -99,6 +101,21 @@ class _FacilitySnippetState extends BaseState<FacilitySnippet> {
                   padding: const EdgeInsets.all(10.0),
                   child: Column(
                     children: [
+                      if (!isClientAdmin())
+                        ClientDropdown(
+                          key: Key(const Uuid().v4()),
+                          selectedItem: (null != _facility.clientIds &&
+                                  _facility.clientIds!.isNotEmpty)
+                              ? _facility.clientIds!.first
+                              : null,
+                          onClientSelected: (client) {
+                            setState(() {
+                              _facility = _facility.copyWith(
+                                  clientIds:
+                                      null != client ? [client!.id] : []);
+                            });
+                          },
+                        ),
                       SizedBox(
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: PremiseDropdown(
@@ -292,21 +309,6 @@ class _FacilitySnippetState extends BaseState<FacilitySnippet> {
                               ),
                               child: Stack(
                                 children: [
-                                  // _facility.location != null
-                                  //     ? OSMLocationPicker(
-                                  //         key: Key(const Uuid().v4()),
-                                  //         viewMode: true,
-                                  //         longitude: _facility
-                                  //             ?.location?.coordinates[0],
-                                  //         latitude: _facility
-                                  //             ?.location?.coordinates[1],
-                                  //         onPicked: (_) {},
-                                  //       )
-                                  //     : Center(
-                                  //         child: Text(
-                                  //         'No location selected',
-                                  //         style: theme.getStyle(),
-                                  //       )),
                                   _facility.location != null
                                       ? GoogleMapWidget(
                                           longitude: _facility
@@ -413,9 +415,14 @@ class _FacilitySnippetState extends BaseState<FacilitySnippet> {
   }
 
   Future _save({bool silent = false}) async {
-    List<String>? clientIds = super.isClientAdmin()
-        ? await TwinnedSession.instance.getClientIds()
-        : null;
+    // List<String>? clientIds = super.isClientAdmin()
+    //     ? await TwinnedSession.instance.getClientIds()
+    //     : null;
+    List<String>? clientIds = _facility.clientIds?.isNotEmpty == true
+        ? _facility.clientIds
+        : (super.isClientAdmin()
+            ? await TwinnedSession.instance.getClientIds()
+            : null);
     if (loading) return;
     loading = true;
 
