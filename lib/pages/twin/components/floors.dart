@@ -289,7 +289,6 @@ class _FloorsState extends BaseState<Floors> {
         builder: (context) => FloorContentPage(
           key: Key(const Uuid().v4()),
           floor: e,
-          type: InfraType.floor,
         ),
       ),
     );

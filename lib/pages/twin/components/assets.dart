@@ -353,17 +353,14 @@ class _AssetsState extends BaseState<Assets> {
   }
 
   Future _edit(tapi.Asset e) async {
-    var res = await TwinnedSession.instance.twin
-        .getAsset(assetId: e.id, apikey: TwinnedSession.instance.authToken);
     await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => AssetContentPage(
-          asset: res.body!.entity!,
+          asset: e,
           key: Key(
             Uuid().v4(),
           ),
-          type: InfraType.asset,
         ),
       ),
     );

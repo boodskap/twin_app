@@ -21,18 +21,13 @@ class AssetSnippet extends StatefulWidget {
   final tapi.Premise? selectedPremise;
   final tapi.Facility? selectedFacility;
   final tapi.Floor? selectedFloor;
-  String? selectedPremiseId;
-  String? selectedFacilityId;
-  String? selectedFloorId;
-  AssetSnippet(
-      {super.key,
-      this.asset,
-      this.selectedPremise,
-      this.selectedFacility,
-      this.selectedFloor,
-      this.selectedPremiseId,
-      this.selectedFacilityId,
-      this.selectedFloorId});
+  AssetSnippet({
+    super.key,
+    this.asset,
+    this.selectedPremise,
+    this.selectedFacility,
+    this.selectedFloor,
+  });
 
   @override
   State<AssetSnippet> createState() => _AssetSnippetState();
@@ -64,22 +59,11 @@ class _AssetSnippetState extends BaseState<AssetSnippet> {
     super.initState();
 
     _asset = _asset.copyWith(
-      premiseId: widget.selectedPremise != null
-          ? (widget.selectedPremise?.id ?? widget.asset?.premiseId ?? '')
-          : (widget.selectedPremiseId ?? ''),
+      premiseId: widget.selectedPremise?.id,
+      facilityId: widget.selectedFacility?.id,
+      floorId: widget.selectedFloor?.id,
     );
 
-    _asset = _asset.copyWith(
-      facilityId: widget.selectedFacility != null
-          ? (widget.selectedFacility?.id ?? widget.asset?.facilityId ?? '')
-          : (widget.selectedFacilityId ?? ''),
-    );
-
-    _asset = _asset.copyWith(
-      floorId: widget.selectedFloor != null
-          ? (widget.selectedFloor?.id ?? '')
-          : (widget.selectedFloorId ?? ''),
-    );
     if (null != widget.asset) {
       tapi.Asset a = widget.asset!;
       _asset = _asset.copyWith(
@@ -99,6 +83,7 @@ class _AssetSnippetState extends BaseState<AssetSnippet> {
         floorId: a.floorId,
       );
     }
+
     nameController.text = _asset.name;
     descController.text = _asset.description ?? '';
     tagController.text = (_asset.tags ?? []).join(' ');
@@ -128,15 +113,13 @@ class _AssetSnippetState extends BaseState<AssetSnippet> {
                       if (!isClientAdmin())
                         ClientDropdown(
                           key: Key(const Uuid().v4()),
-                          selectedItem: (null != _asset.clientIds &&
-                                  _asset.clientIds!.isNotEmpty)
-                              ? _asset.clientIds!.first
+                          selectedItem: (_asset.clientIds.isNotEmpty)
+                              ? _asset.clientIds.first
                               : null,
                           onClientSelected: (client) {
                             setState(() {
                               _asset = _asset.copyWith(
-                                  clientIds:
-                                      null != client ? [client!.id] : []);
+                                  clientIds: null != client ? [client.id] : []);
                             });
                           },
                         ),
@@ -251,8 +234,8 @@ class _AssetSnippetState extends BaseState<AssetSnippet> {
                         onTankTypeSelected: (tankType) {
                           if (tankType != null) {
                             setState(() {
-                              _asset = _asset.copyWith(
-                                  assetModelId: tankType?.id ?? '');
+                              _asset =
+                                  _asset.copyWith(assetModelId: tankType.id);
                             });
                           } else {
                             setState(() {
@@ -406,10 +389,6 @@ class _AssetSnippetState extends BaseState<AssetSnippet> {
     );
   }
 
-  void _onNameChanged() {
-    setState(() {});
-  }
-
   bool _canCreateOrUpdate() {
     final text = nameController.text.trim();
 
@@ -423,22 +402,19 @@ class _AssetSnippetState extends BaseState<AssetSnippet> {
   }
 
   Future _save({bool silent = false}) async {
-    // List<String>? clientIds = super.isClientAdmin()
-    //     ? await TwinnedSession.instance.getClientIds()
-    //     : null;
-    List<String>? clientIds = _asset.clientIds?.isNotEmpty == true
-        ? _asset.clientIds
-        : (super.isClientAdmin()
-            ? await TwinnedSession.instance.getClientIds()
-            : null);
     if (loading) return;
     loading = true;
+
+    List<String>? clientIds = _asset.clientIds;
+    if (isClient()) {
+      clientIds = await getClientIds();
+    }
 
     _asset = _asset.copyWith(
       name: nameController.text.trim(),
       description: descController.text.trim(),
       tags: tagController.text.trim().split(' '),
-      clientIds: clientIds ?? _asset.clientIds,
+      clientIds: clientIds,
     );
 
     await execute(() async {

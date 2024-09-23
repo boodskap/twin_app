@@ -19,33 +19,25 @@ import 'package:twinned_widgets/core/facility_dropdown.dart';
 import 'package:twinned_widgets/core/floor_dropdown.dart';
 import 'package:twinned_widgets/core/premise_dropdown.dart';
 import 'package:twinned_widgets/core/top_bar.dart';
-import 'package:uuid/uuid.dart';
 
 class AssetContentPage extends StatefulWidget {
-  final InfraType type;
   final Premise? premise;
   final Facility? facility;
   final Floor? floor;
-  final Asset? asset;
+  final Asset asset;
 
   const AssetContentPage(
       {super.key,
-      required this.type,
       this.premise,
       this.facility,
       this.floor,
-      this.asset});
+      required this.asset});
 
   @override
   State<AssetContentPage> createState() => _AssetContentPageState();
 }
 
 class _AssetContentPageState extends BaseState<AssetContentPage> {
-  static const Widget _missingImage = Icon(
-    Icons.question_mark,
-    size: 50,
-  );
-
   final TextEditingController _name = TextEditingController();
   final TextEditingController _desc = TextEditingController();
   final TextEditingController _tags = TextEditingController();
@@ -77,80 +69,28 @@ class _AssetContentPageState extends BaseState<AssetContentPage> {
 
   @override
   void initState() {
-    switch (widget.type) {
-      case InfraType.premise:
-        domainKey = widget.premise!.domainKey;
-        heading = 'Premise';
-        name = widget.premise!.name;
-        selectedImage = 0;
-        imageIds = widget.premise!.images ?? [];
-        _name.text = widget.premise!.name;
-        _desc.text = widget.premise!.description ?? '';
-        _tags.text = (widget.premise!.tags ?? []).join(' ');
-        _pickedLocation = widget.premise!.location;
-        rolesSelected = widget.premise!.roles!;
-        selectedClient = widget.premise!.clientIds!.isNotEmpty
-            ? widget.premise!.clientIds!.first
-            : null;
-        break;
-      case InfraType.facility:
-        domainKey = widget.facility!.domainKey;
-        heading = 'Facility';
-        name = widget.facility!.name;
-        selectedImage = 0;
-        imageIds = widget.facility!.images ?? [];
-        _name.text = widget.facility!.name;
-        _desc.text = widget.facility!.description ?? '';
-        _tags.text = (widget.facility!.tags ?? []).join(' ');
-        _pickedLocation = widget.facility!.location;
-        rolesSelected = widget.facility!.roles!;
-        selectedClient = widget.facility!.clientIds!.isNotEmpty
-            ? widget.facility!.clientIds!.first
-            : null;
-        break;
-      case InfraType.floor:
-        domainKey = widget.floor!.domainKey;
-        heading = 'Floor';
-        name = widget.floor!.name;
-        if (null != widget.floor!.floorPlan &&
-            widget.floor!.floorPlan!.isNotEmpty) {
-          imageIds.add(widget.floor!.floorPlan!);
-        }
-        _name.text = widget.floor!.name;
-        _desc.text = widget.floor!.description ?? '';
-        _tags.text = (widget.floor!.tags ?? []).join(' ');
-        _pickedLocation = widget.floor!.location;
-        rolesSelected = widget.floor!.roles!;
-        selectedClient = widget.floor!.clientIds!.isNotEmpty
-            ? widget.floor!.clientIds!.first
-            : null;
-        break;
-      case InfraType.asset:
-        domainKey = widget.asset!.domainKey;
-        heading = 'Asset';
-        name = widget.asset!.name;
-        selectedImage = 0;
-        imageIds = widget.asset!.images ?? [];
-        _name.text = widget.asset!.name;
-        _desc.text = widget.asset!.description ?? '';
-        _tags.text = (widget.asset!.tags ?? []).join(' ');
-        _pickedLocation = widget.asset!.location;
-        rolesSelected = widget.asset!.roles!;
-        selectedClient = widget.asset!.clientIds!.isNotEmpty
-            ? widget.asset!.clientIds!.first
-            : null;
-        selectedPremise = widget.asset!.premiseId;
-        selectedFacility = widget.asset!.facilityId;
-        selectedFloor = widget.asset!.floorId;
-        break;
-    }
+    super.initState();
+
+    domainKey = widget.asset.domainKey;
+    heading = 'Asset';
+    name = widget.asset.name;
+    selectedImage = 0;
+    imageIds = widget.asset.images ?? [];
+    _name.text = widget.asset.name;
+    _desc.text = widget.asset.description ?? '';
+    _tags.text = (widget.asset.tags ?? []).join(' ');
+    _pickedLocation = widget.asset.location;
+    rolesSelected = widget.asset.roles!;
+    selectedClient =
+        widget.asset.clientIds.isNotEmpty ? widget.asset.clientIds.first : null;
+    selectedPremise = widget.asset.premiseId;
+    selectedFacility = widget.asset.facilityId;
+    selectedFloor = widget.asset.floorId;
 
     if (null != _pickedLocation) {
       _location.text =
           '${_pickedLocation!.coordinates[0]}, ${_pickedLocation!.coordinates[1]}';
     }
-
-    super.initState();
   }
 
   @override
@@ -180,43 +120,12 @@ class _AssetContentPageState extends BaseState<AssetContentPage> {
     _devices.clear();
 
     await execute(() async {
-      switch (widget.type) {
-        case InfraType.premise:
-          var res = await TwinnedSession.instance.twin.searchFacilities(
-              apikey: TwinnedSession.instance.authToken,
-              premiseId: widget.premise!.id,
-              body: SearchReq(search: search, page: 0, size: 10000));
-          if (validateResponse(res)) {
-            _facilities.addAll(res.body!.values!);
-          }
-          break;
-        case InfraType.facility:
-          var res = await TwinnedSession.instance.twin.searchFloors(
-              apikey: TwinnedSession.instance.authToken,
-              facilityId: widget.facility!.id,
-              body: SearchReq(search: search, page: 0, size: 10000));
-          if (validateResponse(res)) {
-            _floors.addAll(res.body!.values!);
-          }
-          break;
-        case InfraType.floor:
-          var res = await TwinnedSession.instance.twin.searchAssets(
-              apikey: TwinnedSession.instance.authToken,
-              floorId: widget.floor!.id,
-              body: SearchReq(search: search, page: 0, size: 10000));
-          if (validateResponse(res)) {
-            _assets.addAll(res.body!.values!);
-          }
-          break;
-        case InfraType.asset:
-          var res = await TwinnedSession.instance.twin.searchDevices(
-              apikey: TwinnedSession.instance.authToken,
-              assetId: widget.asset!.id,
-              body: SearchReq(search: search, page: 0, size: 10000));
-          if (validateResponse(res)) {
-            _devices.addAll(res.body!.values!);
-          }
-          break;
+      var res = await TwinnedSession.instance.twin.searchDevices(
+          apikey: TwinnedSession.instance.authToken,
+          assetId: widget.asset.id,
+          body: SearchReq(search: search, page: 0, size: 10000));
+      if (validateResponse(res)) {
+        _devices.addAll(res.body!.values!);
       }
     });
 
@@ -226,44 +135,15 @@ class _AssetContentPageState extends BaseState<AssetContentPage> {
 
   Future _upload() async {
     await execute(() async {
-      ImageFileEntityRes? res;
-
-      switch (widget.type) {
-        case InfraType.premise:
-          res = await TwinImageHelper.uploadPremiseImage(
-              premiseId: widget.premise!.id);
-          if (null != res) {
-            imageId = res.entity!.id;
-            widget.premise!.images!.add(imageId);
-          }
-          break;
-        case InfraType.facility:
-          res = await TwinImageHelper.uploadFacilityImage(
-              facilityId: widget.facility!.id);
-          if (null != res) {
-            imageId = res.entity!.id;
-            widget.facility!.images!.add(imageId);
-          }
-          break;
-        case InfraType.floor:
-          res =
-              await TwinImageHelper.uploadFloorImage(floorId: widget.floor!.id);
-          if (null != res) {
-            imageId = res.entity!.id;
-          }
-          break;
-        case InfraType.asset:
-          res =
-              await TwinImageHelper.uploadAssetImage(assetId: widget.asset!.id);
-          if (null != res) {
-            imageId = res.entity!.id;
-            widget.asset!.images!.add(imageId);
-          }
-          break;
+      ImageFileEntityRes? res =
+          await TwinImageHelper.uploadAssetImage(assetId: widget.asset.id);
+      if (null != res) {
+        imageId = res.entity!.id;
+        widget.asset.images!.add(imageId);
       }
 
       if (imageId.isNotEmpty) {
-        setState(() {
+        refresh(sync: () {
           infraImage = TwinImageHelper.getCachedImage(domainKey, imageId);
         });
       }
@@ -281,20 +161,8 @@ class _AssetContentPageState extends BaseState<AssetContentPage> {
             var res = await TwinnedSession.instance.twin.deleteImage(
                 apikey: TwinnedSession.instance.authToken, id: imageId);
             if (res.body!.ok) {
-              switch (widget.type) {
-                case InfraType.premise:
-                  widget.premise!.images!.remove(imageId);
-                  break;
-                case InfraType.facility:
-                  widget.facility!.images!.remove(imageId);
-                  break;
-                case InfraType.floor:
-                  break;
-                case InfraType.asset:
-                  widget.asset!.images!.remove(imageId);
-                  break;
-              }
-              setState(() {
+              widget.asset.images!.remove(imageId);
+              refresh(sync: () {
                 imageId = '';
                 infraImage = const Icon(
                   Icons.question_mark,
@@ -406,210 +274,6 @@ class _AssetContentPageState extends BaseState<AssetContentPage> {
     }
   }
 
-  Widget _buildFacility(Facility e) {
-    int idx = e.selectedImage ?? 0;
-    if (idx < 0) idx = 0;
-    String imageId = '';
-    if (null != e.images && e.images!.length > idx) {
-      imageId = e.images![idx];
-    }
-    Widget image = imageId.isNotEmpty
-        ? TwinImageHelper.getCachedImage(e.domainKey, imageId)
-        : _missingImage;
-
-    return Card(
-      elevation: 10,
-      child: InkWell(
-        onDoubleTap: () async {
-          await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => AssetContentPage(
-                key: Key(const Uuid().v4()),
-                type: InfraType.facility,
-                facility: e,
-              ),
-            ),
-          );
-          await _load();
-        },
-        child: Container(
-          color: Colors.white,
-          child: Row(
-            children: [
-              SizedBox(
-                  width: 100,
-                  height: 100,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: image,
-                  )),
-              divider(horizontal: true),
-              Center(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Column(
-                      children: [
-                        Text(
-                          e.name,
-                          style: theme.getStyle().copyWith(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                        ),
-                        Text(
-                          e.description ?? "",
-                          style: theme.getStyle().copyWith(fontSize: 16),
-                        ),
-                      ],
-                    ),
-                    SizedBox(width: 10),
-                  ],
-                ),
-              )
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFloor(Floor e) {
-    String imageId = '';
-    if (null != e.floorPlan && e.floorPlan!.isNotEmpty) {
-      imageId = e.floorPlan!;
-    }
-    Widget image = imageId.isNotEmpty
-        ? TwinImageHelper.getCachedImage(e.domainKey, imageId)
-        : _missingImage;
-
-    return Card(
-      elevation: 10,
-      child: InkWell(
-        onDoubleTap: () async {
-          await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => AssetContentPage(
-                key: Key(const Uuid().v4()),
-                type: InfraType.floor,
-                floor: e,
-              ),
-            ),
-          );
-          await _load();
-        },
-        child: Container(
-          color: Colors.white,
-          child: Row(
-            children: [
-              SizedBox(
-                  width: 100,
-                  height: 100,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: image,
-                  )),
-              divider(horizontal: true),
-              Center(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Column(
-                      children: [
-                        Text(
-                          e.name,
-                          style: theme.getStyle().copyWith(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                        ),
-                        Text(
-                          e.description ?? "",
-                          style: theme.getStyle().copyWith(fontSize: 16),
-                        ),
-                      ],
-                    ),
-                    SizedBox(width: 10),
-                  ],
-                ),
-              )
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAsset(Asset e) {
-    int idx = e.selectedImage ?? 0;
-    String imageId = '';
-    if (null != e.images && e.images!.length > idx) {
-      imageId = e.images![idx];
-    }
-    Widget image = imageId.isNotEmpty
-        ? TwinImageHelper.getCachedImage(e.domainKey, imageId)
-        : _missingImage;
-
-    return Card(
-      elevation: 10,
-      child: InkWell(
-        onDoubleTap: () async {
-          await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => AssetContentPage(
-                key: Key(const Uuid().v4()),
-                type: InfraType.asset,
-                asset: e,
-              ),
-            ),
-          );
-          await _load();
-        },
-        child: Container(
-          color: Colors.white,
-          child: Row(
-            children: [
-              SizedBox(
-                  width: 100,
-                  height: 100,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: image,
-                  )),
-              divider(horizontal: true),
-              Center(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Column(
-                      children: [
-                        Text(
-                          e.name,
-                          style: theme.getStyle().copyWith(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                        ),
-                        Text(
-                          e.description ?? "",
-                          style: theme.getStyle().copyWith(fontSize: 16),
-                        ),
-                      ],
-                    ),
-                    SizedBox(width: 10),
-                  ],
-                ),
-              )
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildDevice(Device e) {
     return Card(
       elevation: 10,
@@ -628,107 +292,9 @@ class _AssetContentPageState extends BaseState<AssetContentPage> {
   }
 
   Future _save() async {
-    switch (widget.type) {
-      case InfraType.premise:
-        await _savePremise();
-        break;
-      case InfraType.facility:
-        await _saveFacility();
-        break;
-      case InfraType.floor:
-        await _saveFloor();
-        break;
-      case InfraType.asset:
-        await _saveAsset();
-        break;
-    }
-  }
-
-  Future _savePremise() async {
-    await execute(() async {
-      PremiseInfo body = Utils.premiseInfo(widget.premise!,
-          name: _name.text,
-          description: _desc.text,
-          tags: _tags.text.trim().split(' '),
-          selectedImage: selectedImage,
-          location: _pickedLocation,
-          roles: rolesSelected,
-          clientIds: selectedClient != null ? [selectedClient!] : null);
-
-      var res = await TwinnedSession.instance.twin.updatePremise(
-          apikey: TwinnedSession.instance.authToken,
-          premiseId: widget.premise!.id,
-          body: body);
-
-      if (validateResponse(res)) {
-        _close();
-        alert('Asset - ${res.body!.entity!.name}', 'Saved successfully!',
-            titleStyle: theme
-                .getStyle()
-                .copyWith(fontWeight: FontWeight.bold, fontSize: 18),
-            contentStyle: theme.getStyle());
-      }
-    });
-  }
-
-  Future _saveFacility() async {
-    await execute(() async {
-      FacilityInfo body = Utils.facilityInfo(widget.facility!,
-          name: _name.text,
-          description: _desc.text,
-          tags: _tags.text.trim().split(' '),
-          selectedImage: selectedImage,
-          location: _pickedLocation,
-          roles: rolesSelected,
-          clientIds: selectedClient != null ? [selectedClient!] : null);
-
-      var res = await TwinnedSession.instance.twin.updateFacility(
-          apikey: TwinnedSession.instance.authToken,
-          facilityId: widget.facility!.id,
-          body: body);
-
-      if (validateResponse(res)) {
-        _close();
-        alert('Facility - ${res.body!.entity!.name}', 'Saved successfully!',
-            titleStyle: theme
-                .getStyle()
-                .copyWith(fontWeight: FontWeight.bold, fontSize: 18),
-            contentStyle: theme.getStyle());
-      }
-    });
-  }
-
-  Future _saveFloor() async {
-    await execute(() async {
-      FloorInfo body = Utils.floorInfo(widget.floor!,
-          name: _name.text,
-          description: _desc.text,
-          tags: _tags.text.trim().split(' '),
-          location: _pickedLocation,
-          floorPlan: imageId,
-          roles: rolesSelected,
-          clientIds: selectedClient != null ? [selectedClient!] : null);
-
-      var res = await TwinnedSession.instance.twin.updateFloor(
-          apikey: TwinnedSession.instance.authToken,
-          floorId: widget.floor!.id,
-          body: body);
-
-      if (validateResponse(res)) {
-        _close();
-        alert('Floor - ${res.body!.entity!.name}', 'Saved successfully!',
-            titleStyle: theme
-                .getStyle()
-                .copyWith(fontWeight: FontWeight.bold, fontSize: 18),
-            contentStyle: theme.getStyle());
-      }
-    });
-  }
-
-  Future _saveAsset() async {
     await execute(() async {
       AssetInfo body = Utils.assetInfo(
-        widget.asset!,
+        widget.asset,
         name: _name.text,
         description: _desc.text,
         tags: _tags.text.trim().split(' '),
@@ -742,7 +308,7 @@ class _AssetContentPageState extends BaseState<AssetContentPage> {
       );
       var res = await TwinnedSession.instance.twin.updateAsset(
           apikey: TwinnedSession.instance.authToken,
-          assetId: widget.asset!.id,
+          assetId: widget.asset.id,
           body: body);
       if (validateResponse(res)) {
         _close();
@@ -771,7 +337,7 @@ class _AssetContentPageState extends BaseState<AssetContentPage> {
               width: MediaQuery.of(context).size.width / 2,
               height: 670,
               child: AssetDevice(
-                asset: widget.asset!,
+                asset: widget.asset,
               ),
             ),
           );
@@ -781,7 +347,6 @@ class _AssetContentPageState extends BaseState<AssetContentPage> {
 
   @override
   Widget build(BuildContext context) {
-    double cbxWidth = (MediaQuery.of(context).size.width / 4) - 16;
     return Scaffold(
       body: Column(
         children: [
@@ -902,126 +467,92 @@ class _AssetContentPageState extends BaseState<AssetContentPage> {
                                 child: IntrinsicHeight(
                                   child: Column(
                                     children: <Widget>[
-                                      if (widget.type == InfraType.premise)
-                                        Align(
-                                          alignment: Alignment.topRight,
-                                          child: Text(
-                                            "${widget.premise!.name} - Facilities",
-                                            style: theme
-                                                .getStyle()
-                                                .copyWith(fontSize: 20),
-                                          ),
-                                        ),
-                                      if (widget.type == InfraType.facility)
-                                        Align(
-                                          alignment: Alignment.topRight,
-                                          child: Text(
-                                            "${widget.facility!.name} - Floors",
-                                            style: theme
-                                                .getStyle()
-                                                .copyWith(fontSize: 20),
-                                          ),
-                                        ),
-                                      if (widget.type == InfraType.floor)
-                                        Align(
-                                          alignment: Alignment.topRight,
-                                          child: Text(
-                                            "${widget.floor!.name} - Assets",
-                                            style: theme
-                                                .getStyle()
-                                                .copyWith(fontSize: 20),
-                                          ),
-                                        ),
-                                      if (widget.type == InfraType.asset)
-                                        Align(
-                                          alignment: Alignment.topRight,
-                                          child: Column(
-                                            children: [
-                                              if (!isClientAdmin())
-                                                ClientDropdown(
-                                                    selectedItem:
-                                                        selectedClient,
-                                                    style: theme.getStyle(),
-                                                    onClientSelected: (entity) {
-                                                      setState(() {
-                                                        if (entity == null) {
-                                                          selectedClient = null;
-                                                        } else {
-                                                          selectedClient =
-                                                              entity.id;
-                                                        }
-                                                      });
-                                                    }),
-                                              PremiseDropdown(
-                                                  selectedItem: selectedPremise,
+                                      Align(
+                                        alignment: Alignment.topRight,
+                                        child: Column(
+                                          children: [
+                                            if (!isClientAdmin())
+                                              ClientDropdown(
+                                                  selectedItem: selectedClient,
                                                   style: theme.getStyle(),
-                                                  onPremiseSelected: (entity) {
+                                                  onClientSelected: (entity) {
                                                     setState(() {
                                                       if (entity == null) {
-                                                        selectedPremise = null;
+                                                        selectedClient = null;
                                                       } else {
-                                                        selectedPremise =
-                                                            entity.id;
-                                                        selectedFacility = null;
-                                                      }
-                                                    });
-                                                  }),
-                                              FacilityDropdown(
-                                                  selectedItem:
-                                                      selectedFacility,
-                                                  style: theme.getStyle(),
-                                                  selectedPremise:
-                                                      selectedPremise,
-                                                  onFacilitySelected: (entity) {
-                                                    setState(() {
-                                                      if (entity == null) {
-                                                        selectedFacility = null;
-                                                      } else {
-                                                        selectedFacility =
-                                                            entity.id;
-                                                        selectedFloor = null;
-                                                      }
-                                                    });
-                                                  }),
-                                              FloorDropdown(
-                                                  selectedItem: selectedFloor,
-                                                  selectedPremise:
-                                                      selectedPremise,
-                                                  selectedFacility:
-                                                      selectedFacility,
-                                                  style: theme.getStyle(),
-                                                  onFloorSelected: (entity) {
-                                                    setState(() {
-                                                      if (entity == null) {
-                                                        selectedFloor = null;
-                                                      } else {
-                                                        selectedFloor =
+                                                        selectedClient =
                                                             entity.id;
                                                       }
                                                     });
                                                   }),
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.end,
-                                                children: [
-                                                  Text(
-                                                    "${widget.asset!.name} - Devices",
-                                                    style: theme
-                                                        .getStyle()
-                                                        .copyWith(fontSize: 20),
-                                                  ),
-                                                  divider(horizontal: true),
-                                                  IconButton(
-                                                      onPressed: () async {
-                                                        await _editAsset();
-                                                      },
-                                                      icon: const Icon(
-                                                          Icons.edit)),
-                                                ],
-                                              ),
-                                            ],
-                                          ),
+                                            PremiseDropdown(
+                                                selectedItem: selectedPremise,
+                                                style: theme.getStyle(),
+                                                onPremiseSelected: (entity) {
+                                                  setState(() {
+                                                    if (entity == null) {
+                                                      selectedPremise = null;
+                                                    } else {
+                                                      selectedPremise =
+                                                          entity.id;
+                                                      selectedFacility = null;
+                                                    }
+                                                  });
+                                                }),
+                                            FacilityDropdown(
+                                                selectedItem: selectedFacility,
+                                                style: theme.getStyle(),
+                                                selectedPremise:
+                                                    selectedPremise,
+                                                onFacilitySelected: (entity) {
+                                                  setState(() {
+                                                    if (entity == null) {
+                                                      selectedFacility = null;
+                                                    } else {
+                                                      selectedFacility =
+                                                          entity.id;
+                                                      selectedFloor = null;
+                                                    }
+                                                  });
+                                                }),
+                                            FloorDropdown(
+                                                selectedItem: selectedFloor,
+                                                selectedPremise:
+                                                    selectedPremise,
+                                                selectedFacility:
+                                                    selectedFacility,
+                                                style: theme.getStyle(),
+                                                onFloorSelected: (entity) {
+                                                  setState(() {
+                                                    if (entity == null) {
+                                                      selectedFloor = null;
+                                                    } else {
+                                                      selectedFloor = entity.id;
+                                                    }
+                                                  });
+                                                }),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.end,
+                                              children: [
+                                                Text(
+                                                  "${widget.asset.name} - Devices",
+                                                  style: theme
+                                                      .getStyle()
+                                                      .copyWith(fontSize: 20),
+                                                ),
+                                                divider(horizontal: true),
+                                                IconButton(
+                                                    onPressed: () async {
+                                                      await _editAsset();
+                                                    },
+                                                    icon:
+                                                        const Icon(Icons.edit)),
+                                              ],
+                                            ),
+                                          ],
                                         ),
+                                      ),
                                       Row(
                                         children: [
                                           Tooltip(
@@ -1063,15 +594,7 @@ class _AssetContentPageState extends BaseState<AssetContentPage> {
                                         ],
                                       ),
                                       divider(),
-                                      if (widget.type == InfraType.premise)
-                                        ..._facilities
-                                            .map((e) => _buildFacility(e)),
-                                      if (widget.type == InfraType.facility)
-                                        ..._floors.map((e) => _buildFloor(e)),
-                                      if (widget.type == InfraType.floor)
-                                        ..._assets.map((e) => _buildAsset(e)),
-                                      if (widget.type == InfraType.asset)
-                                        ..._devices.map((e) => _buildDevice(e)),
+                                      ..._devices.map((e) => _buildDevice(e)),
                                     ],
                                   ),
                                 ),
