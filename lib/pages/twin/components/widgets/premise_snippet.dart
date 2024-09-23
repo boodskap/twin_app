@@ -7,10 +7,10 @@ import 'package:twin_app/widgets/commons/secondary_button.dart';
 import 'package:twin_app/widgets/google_map.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/widgets/common/label_text_field.dart';
-// import 'package:twin_commons/util/osm_premise_picker.dart';
 import 'package:twinned_api/twinned_api.dart' as tapi;
 import 'package:twin_commons/core/twin_image_helper.dart';
 import 'package:twin_commons/core/twinned_session.dart';
+import 'package:twinned_widgets/core/client_dropdown.dart';
 import 'package:uuid/uuid.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 
@@ -30,8 +30,8 @@ class _PremiseSnippetState extends BaseState<PremiseSnippet> {
   TextEditingController emailController = TextEditingController();
   bool _isPhoneValid = true;
   String countryCode = 'US';
-  Future<List<String>>? clientIds =
-      isClientAdmin() ? TwinnedSession.instance.getClientIds() : null;
+  // Future<List<String>>? clientIds =
+  //     isClientAdmin() ? TwinnedSession.instance.getClientIds() : null;
   tapi.PremiseInfo _premise = const tapi.PremiseInfo(
       name: '',
       address: '',
@@ -97,6 +97,21 @@ class _PremiseSnippetState extends BaseState<PremiseSnippet> {
                   padding: const EdgeInsets.all(10.0),
                   child: Column(
                     children: [
+                      if (!isClientAdmin())
+                        ClientDropdown(
+                          key: Key(const Uuid().v4()),
+                          selectedItem: (null != _premise.clientIds &&
+                                  _premise.clientIds!.isNotEmpty)
+                              ? _premise.clientIds!.first
+                              : null,
+                          onClientSelected: (client) {
+                            setState(() {
+                              _premise = _premise.copyWith(
+                                  clientIds:
+                                      null != client ? [client!.id] : []);
+                            });
+                          },
+                        ),
                       SizedBox(
                         width: MediaQuery.of(context).size.width / 2.5,
                         child: LabelTextField(
@@ -380,9 +395,14 @@ class _PremiseSnippetState extends BaseState<PremiseSnippet> {
   }
 
   Future _save({bool silent = false}) async {
-    List<String>? clientIds = super.isClientAdmin()
-        ? await TwinnedSession.instance.getClientIds()
-        : null;
+    // List<String>? clientIds = super.isClientAdmin()
+    //     ? await TwinnedSession.instance.getClientIds()
+    //     : null;
+    List<String>? clientIds = _premise.clientIds?.isNotEmpty == true
+        ? _premise.clientIds
+        : (super.isClientAdmin()
+            ? await TwinnedSession.instance.getClientIds()
+            : null);
     if (loading) return;
     loading = true;
 
@@ -453,33 +473,6 @@ class _PremiseSnippetState extends BaseState<PremiseSnippet> {
     loading = false;
     refresh();
   }
-
-  // Future<void> _showLocationDialog(BuildContext context) async {
-  //   return showDialog(
-  //     context: context,
-  //     builder: (BuildContext context) {
-  //       return AlertDialog(
-  //         content: SizedBox(
-  //           width: 1000,
-  //           child: OSMLocationPicker(
-  //             longitude: _premise.location?.coordinates[0],
-  //             latitude: _premise.location?.coordinates[1],
-  //             onPicked: (pickedData) {
-  //               Navigator.of(context).pop();
-  //               setState(() {
-  //                 _premise = _premise.copyWith(
-  //                     location: tapi.GeoLocation(coordinates: [
-  //                   pickedData.longitude,
-  //                   pickedData.latitude
-  //                 ]));
-  //               });
-  //             },
-  //           ),
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
 
   /// using google map
   Future<void> _showLocationDialog(BuildContext context) async {
