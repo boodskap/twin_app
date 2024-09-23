@@ -329,29 +329,29 @@ class _VisualAlarmStatePageState extends BaseState<VisualAlarmStatePage> {
                     ],
                   ),
                 divider(horizontal: true, width: 16),
-                if (widget.group.conditions.isNotEmpty &&
-                    ((widget.model.images?.length ?? 0) > 0))
-                  Text(
-                    'DEVICE',
-                    style: theme
-                        .getStyle()
-                        .copyWith(fontSize: 24, color: Colors.orange),
-                  ),
-                divider(horizontal: true, width: 16),
-                if (widget.group.conditions.isNotEmpty &&
-                    ((widget.model.images?.length ?? 0) > 0))
-                  NumberDropDown(
-                      max: widget.model.images?.length ?? 0,
-                      selected: selectedDeviceImage,
-                      selectionChanged: (index) {
-                        setState(() {
-                          selectedDeviceImage = index;
-                        });
-                      }),
-                divider(horizontal: true, width: 16),
-                if (widget.group.conditions.isNotEmpty &&
-                    ((widget.model.images?.length ?? 0) > 0))
-                  SizedBox(width: 250, height: 250, child: deviceImage),
+                // if (widget.group.conditions.isNotEmpty &&
+                //     ((widget.model.images?.length ?? 0) > 0))
+                //   Text(
+                //     'DEVICE',
+                //     style: theme
+                //         .getStyle()
+                //         .copyWith(fontSize: 24, color: Colors.orange),
+                //   ),
+                // divider(horizontal: true, width: 16),
+                // if (widget.group.conditions.isNotEmpty &&
+                //     ((widget.model.images?.length ?? 0) > 0))
+                //   NumberDropDown(
+                //       max: widget.model.images?.length ?? 0,
+                //       selected: selectedDeviceImage,
+                //       selectionChanged: (index) {
+                //         setState(() {
+                //           selectedDeviceImage = index;
+                //         });
+                //       }),
+                // divider(horizontal: true, width: 16),
+                // if (widget.group.conditions.isNotEmpty &&
+                //     ((widget.model.images?.length ?? 0) > 0))
+                //   SizedBox(width: 250, height: 250, child: deviceImage),
               ],
             ),
           ),
