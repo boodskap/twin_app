@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:twin_app/auth.dart';
 import 'package:twin_app/core/session_variables.dart';
+import 'package:twin_app/core/twin_helper.dart';
+import 'package:twin_app/pages/login/login.dart';
 import 'package:twin_app/widgets/buy_button.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:twin_app/widgets/commons/secondary_button.dart';
@@ -38,10 +41,11 @@ class _UsersState extends BaseState<Users> {
   List<String> rolesSelected = [];
   List<String> clientSelected = [];
   bool _exhausted = true;
+  late StreamAuth auth;
 
   @override
   Widget build(BuildContext context) {
-
+    auth = StreamAuthScope.of(context);
     return Column(
       children: [
         divider(),
@@ -248,19 +252,20 @@ class _UsersState extends BaseState<Users> {
     clientSelected = user.clientIds!;
     setState(() {});
 
-    bool isAdmin = false;
-
+    bool isAdminStatus = false;
     if (user.platformRoles!.contains("domainadmin")) {
-      isAdmin = true;
+      isAdminStatus = true;
     }
-    bool isClientAdmin = false;
+    bool isClientAdminStatus = false;
 
     if (user.platformRoles!.contains("clientadmin")) {
-      isClientAdmin = true;
+      isClientAdminStatus = true;
     }
     String? countryCode = countryCodeMap[user.countryCode];
     String formattedPhone = user.phone != null && user.phone!.isNotEmpty
-        ? (user.countryCode!.isNotEmpty &&  countryCode!.isNotEmpty ? '$countryCode ${user.phone}' : user.phone!)
+        ? (user.countryCode!.isNotEmpty && countryCode!.isNotEmpty
+            ? '$countryCode ${user.phone}'
+            : user.phone!)
         : '';
 
     return TableRow(
@@ -282,59 +287,64 @@ class _UsersState extends BaseState<Users> {
           child: Wrap(
             spacing: 8.0,
             children: [
-              Tooltip(
-                message: isAdmin
-                    ? 'Remove Admin Privilege'
-                    : 'Assign Admin Privilege',
-                child: IconButton(
-                  onPressed: () {
-                    confirm(
-                        title: 'Info',
-                        message: !isAdmin
-                            ? "Are you sure you want to assign this person as administrator?"
-                            : "Are you sure you want to remove administrative privilege from this person?",
-                        titleStyle: theme.getStyle(),
-                        messageStyle: theme
-                            .getStyle()
-                            .copyWith(fontWeight: FontWeight.bold),
-                        // const TextStyle(fontWeight: FontWeight.bold),
-                        onPressed: () async {
-                          await execute(() async {
-                            if (isAdmin) {
-                              var res = await TwinnedSession.instance.twin
-                                  .unsetAdmin(
-                                      apikey: TwinnedSession.instance.authToken,
-                                      twinUserId: user.id);
-                              validateResponse(res);
-                              _load();
-                            } else {
-                              var res = await TwinnedSession.instance.twin
-                                  .setAdmin(
-                                      apikey: TwinnedSession.instance.authToken,
-                                      twinUserId: user.id);
-                              validateResponse(res);
-                              _load();
-                            }
+              if (isAdmin())
+                Tooltip(
+                  message: isAdminStatus
+                      ? 'Remove Admin Privilege'
+                      : 'Assign Admin Privilege',
+                  child: IconButton(
+                    onPressed: () {
+                      confirm(
+                          title: 'Info',
+                          message: !isAdminStatus
+                              ? "Are you sure you want to assign this person as administrator?"
+                              : "Are you sure you want to remove administrative privilege from this person?",
+                          titleStyle: theme.getStyle(),
+                          messageStyle: theme
+                              .getStyle()
+                              .copyWith(fontWeight: FontWeight.bold),
+                          // const TextStyle(fontWeight: FontWeight.bold),
+                          onPressed: () async {
+                            await execute(() async {
+                              if (isAdminStatus) {
+                                var res = await TwinnedSession.instance.twin
+                                    .unsetAdmin(
+                                        apikey:
+                                            TwinnedSession.instance.authToken,
+                                        twinUserId: user.id);
+                                validateResponse(res);
+                                _load();
+                              } else {
+                                var res = await TwinnedSession.instance.twin
+                                    .setAdmin(
+                                        apikey:
+                                            TwinnedSession.instance.authToken,
+                                        twinUserId: user.id);
+                                validateResponse(res);
+                                _load();
+                              }
+                                 TwinHelper.navigateToLogin(auth);
+
+                            });
                           });
-                        });
-                  },
-                  icon: Icon(
-                    Icons.admin_panel_settings,
-                    size: 18,
-                    color: isAdmin ? Colors.black : Colors.grey,
+                    },
+                    icon: Icon(
+                      Icons.admin_panel_settings,
+                      size: 18,
+                      color: isAdminStatus ? Colors.black : Colors.grey,
+                    ),
                   ),
                 ),
-              ),
-              if (!isAdmin)
+              if (!isAdminStatus)
                 Tooltip(
-                  message: isClientAdmin
+                  message: isClientAdminStatus
                       ? 'Remove ClientAdmin Privilege'
                       : 'Assign ClientAdmin Privilege',
                   child: IconButton(
                     onPressed: () {
                       confirm(
                           title: 'Info',
-                          message: !isClientAdmin
+                          message: !isClientAdminStatus
                               ? "Are you sure you want to assign this person as client administrator?"
                               : "Are you sure you want to remove client administrative privilege from this person?",
                           titleStyle: theme.getStyle(),
@@ -343,7 +353,7 @@ class _UsersState extends BaseState<Users> {
                               .copyWith(fontWeight: FontWeight.bold),
                           onPressed: () async {
                             await execute(() async {
-                              if (isClientAdmin) {
+                              if (isClientAdminStatus) {
                                 var res = await TwinnedSession.instance.twin
                                     .unsetClientAdmin(
                                         apikey:
@@ -352,6 +362,7 @@ class _UsersState extends BaseState<Users> {
                                         clientId: user.clientIds!.first);
                                 validateResponse(res);
                                 _load();
+                                 
                               } else {
                                 var res = await TwinnedSession.instance.twin
                                     .setClientAdmin(
@@ -362,13 +373,14 @@ class _UsersState extends BaseState<Users> {
                                 validateResponse(res);
                                 _load();
                               }
+                              TwinHelper.navigateToLogin(auth);
                             });
                           });
                     },
                     icon: Icon(
                       Icons.account_circle,
                       size: 18,
-                      color: isClientAdmin ? Colors.black : Colors.grey,
+                      color: isClientAdminStatus ? Colors.black : Colors.grey,
                     ),
                   ),
                 ),
@@ -398,10 +410,9 @@ class _UsersState extends BaseState<Users> {
   }
 
   Widget _buildCard(tapi.TwinUser entity) {
-    
     String? countryCode = countryCodeMap[entity.countryCode];
-    String formattedPhone = entity.phone != null && entity.phone!.isNotEmpty 
-        ?  (entity.countryCode!.isNotEmpty && countryCode!.isNotEmpty
+    String formattedPhone = entity.phone != null && entity.phone!.isNotEmpty
+        ? (entity.countryCode!.isNotEmpty && countryCode!.isNotEmpty
             ? '$countryCode ${entity.phone}'
             : entity.phone!)
         : '';
@@ -579,6 +590,8 @@ class _UsersState extends BaseState<Users> {
     );
   }
 
+
+
   void _removeEntity(String id) async {
     if (loading) return;
     loading = true;
@@ -668,8 +681,6 @@ class _UsersState extends BaseState<Users> {
         );
       }
     });
-
- 
 
     loading = false;
     refresh();
