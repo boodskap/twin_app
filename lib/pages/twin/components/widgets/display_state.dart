@@ -273,10 +273,10 @@ class _DisplayStateSectionState extends BaseState<DisplayStateSection> {
     _conditionsList.clear();
     conditions.clear();
     // conditions = [];
-    var res = await TwinnedSession.instance.twin.listConditions(
+    var res = await TwinnedSession.instance.twin.searchConditions(
         apikey: TwinnedSession.instance.authToken,
         modelId: dmodelID,
-        body: const twinned.ListReq(page: 0, size: 10000));
+        body: const twinned.SearchReq(search: '*', page: 0, size: 10000));
 
     if (validateResponse(res)) {
       for (twinned.Condition e in res.body!.values!) {

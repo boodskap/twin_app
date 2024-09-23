@@ -79,6 +79,7 @@ class _FloorsState extends BaseState<Floors> {
                 selectedPremise: _selectedPremise?.id,
                 onFacilitySelected: (e) {
                   setState(() {
+                    
                     _selectedFacility = e;
                   });
                   _load();
@@ -248,6 +249,8 @@ class _FloorsState extends BaseState<Floors> {
   }
 
   void _addEditFloorDialog({tapi.Floor? floor}) async {
+
+  
     tapi.Premise? selectedPremise;
     tapi.Facility? selectedFacility;
 
@@ -289,7 +292,6 @@ class _FloorsState extends BaseState<Floors> {
         builder: (context) => FloorContentPage(
           key: Key(const Uuid().v4()),
           floor: e,
-          type: InfraType.floor,
         ),
       ),
     );

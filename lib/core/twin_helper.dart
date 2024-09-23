@@ -10,6 +10,7 @@ import 'package:twinned_api/twinned_api.dart' as tapi;
 import 'package:verification_api/api/verification.swagger.dart' as vapi;
 import 'package:nocode_api/api/nocode.swagger.dart' as ncapi;
 import 'package:chopper/chopper.dart' as chopper;
+import 'package:twin_app/auth.dart';
 
 class TwinHelper {
   static void registerNoCode() {}
@@ -145,6 +146,23 @@ class TwinHelper {
     return entity;
   }
 
+  static Future<List<tapi.DeviceModel>> getDeviceModels(
+      {String search = '*', int page = 0, int size = 10000}) async {
+    List<tapi.DeviceModel> models = [];
+
+    await execute(() async {
+      var res = await config.twinned.searchDeviceModels(
+        apikey: TwinnedSession.instance.authToken,
+        body: tapi.SearchReq(search: search, page: page, size: size),
+      );
+      if (TwinUtils.validateResponse(res)) {
+        models.addAll(res.body?.values ?? []);
+      }
+    });
+
+    return models;
+  }
+
   static Future<tapi.DeviceModel?> getDeviceModel(String id) async {
     tapi.DeviceModel? entity;
 
@@ -187,5 +205,11 @@ class TwinHelper {
     });
 
     return entities;
+  }
+
+  static Future<void> navigateToLogin(StreamAuth auth) async {
+    selectedMenu = homeMenu;
+    selectedMenuTitle = '';
+    await auth.signOut();
   }
 }

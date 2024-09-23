@@ -274,17 +274,20 @@ class _ScrappingTablesContentPageState
   }
 
   void _save() async {
-    busy();
+    await execute(() async {
+      List<String> clientIds = widget.model?.clientIds ?? [];
+      if (isClient()) {
+        clientIds = await getClientIds();
+      }
 
-    tapi.ScrappingTableInfo info = tapi.ScrappingTableInfo(
-      name: _nameController.text,
-      attributes: paramList,
-      description: _descController.text,
-      tags: _tagsController.text.split(','),
-      clientIds: await getClientIds(),
-    );
+      tapi.ScrappingTableInfo info = tapi.ScrappingTableInfo(
+        name: _nameController.text,
+        attributes: paramList,
+        description: _descController.text,
+        tags: _tagsController.text.split(','),
+        clientIds: clientIds,
+      );
 
-    try {
       var res;
 
       if (null == widget.model) {
@@ -312,11 +315,7 @@ class _ScrappingTablesContentPageState
                 .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
         Navigator.pop(context);
       }
-    } catch (e, s) {
-      debugPrint('$e\n$s');
-    }
-
-    busy(busy: false);
+    });
   }
 
   @override
@@ -325,7 +324,7 @@ class _ScrappingTablesContentPageState
       body: Column(
         children: [
           TopBar(
-            title: 'Digital Twin - Setting - ${widget.model?.name}',
+            title: 'Digital Twin - Scrapping Tables - ${widget.model?.name}',
             style: theme.getStyle().copyWith(
                 color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
           ),

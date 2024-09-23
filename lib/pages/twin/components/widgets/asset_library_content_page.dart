@@ -74,7 +74,7 @@ class _AssetLibraryContentPageState extends BaseState<AssetLibraryContentPage> {
       body: Column(
         children: [
           TopBar(
-            title: 'Digital Twin Asset Type  - ${widget.assetModel.name}',
+            title: 'Digital Twin Asset Library  - ${widget.assetModel.name}',
             style: theme.getStyle().copyWith(
                 color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
           ),
@@ -345,7 +345,7 @@ class _AssetLibraryContentPageState extends BaseState<AssetLibraryContentPage> {
       widget.assetModel.allowedDeviceModels!.removeAt(index);
     });
     await alert(
-        'Asset Model - ${widget.assetModel.name}', 'Deleted Successfully!',
+        'Asset Library - ${widget.assetModel.name}', 'Deleted Successfully!',
         contentStyle: theme.getStyle(),
         titleStyle: theme
             .getStyle()
@@ -376,7 +376,7 @@ class _AssetLibraryContentPageState extends BaseState<AssetLibraryContentPage> {
           ));
       if (validateResponse(res)) {
         await alert(
-            'Asset Model - ${widget.assetModel.name}', 'Saved successfully!',
+            'Asset Library - ${widget.assetModel.name}', 'Saved successfully!',
             contentStyle: theme.getStyle(),
             titleStyle: theme
                 .getStyle()

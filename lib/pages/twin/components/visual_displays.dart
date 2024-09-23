@@ -26,14 +26,7 @@ class _VisualDisplaysState extends BaseState<VisualDisplays> {
   final List<Widget> _cards = [];
   String _search = '';
   tapi.DeviceModel? _selectedDeviceModel;
-  bool _canEdit = false;
   Map<String, bool> _editable = Map<String, bool>();
-
-  @override
-  void initState() {
-    super.initState();
-    _checkCanEdit();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -128,10 +121,7 @@ class _VisualDisplaysState extends BaseState<VisualDisplays> {
   }
 
   Widget _buildCard(tapi.Display e) {
-    bool editable = _canEdit;
-    if (!editable) {
-      editable = _editable[e.id] ?? false;
-    }
+    bool editable = _editable[e.id] ?? false;
 
     double width = MediaQuery.of(context).size.width / 8;
     return SizedBox(
@@ -139,7 +129,7 @@ class _VisualDisplaysState extends BaseState<VisualDisplays> {
       height: width,
       child: InkWell(
         onDoubleTap: () {
-          if (_canEdit) {
+          if (editable) {
             _edit(e);
           }
         },
@@ -170,33 +160,33 @@ class _VisualDisplaysState extends BaseState<VisualDisplays> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         InkWell(
-                            onTap: _canEdit
+                            onTap: editable
                                 ? () {
                                     _edit(e);
                                   }
                                 : null,
                             child: Tooltip(
                               message:
-                                  _canEdit ? "Update" : "No Permission to Edit",
+                                  editable ? "Update" : "No Permission to Edit",
                               child: Icon(
                                 Icons.edit,
-                                color: _canEdit
+                                color: editable
                                     ? theme.getPrimaryColor()
                                     : Colors.grey,
                               ),
                             )),
                         InkWell(
-                          onTap: _canEdit
+                          onTap: editable
                               ? () {
                                   _delete(e);
                                 }
                               : null,
                           child: Tooltip(
                             message:
-                                _canEdit ? "Delete" : "No Permission to Delete",
+                                editable ? "Delete" : "No Permission to Delete",
                             child: Icon(
                               Icons.delete_forever,
-                              color: _canEdit
+                              color: editable
                                   ? theme.getPrimaryColor()
                                   : Colors.grey,
                             ),
@@ -220,24 +210,20 @@ class _VisualDisplaysState extends BaseState<VisualDisplays> {
     );
   }
 
-  Future<void> _checkCanEdit() async {
-    List<String> clientIds = await getClientIds();
-    bool canEditResult = await canEdit(clientIds: clientIds);
-
-    setState(() {
-      _canEdit = canEditResult;
-    });
-  }
-
   Future _create() async {
     if (loading) return;
     loading = true;
+    List<String> clientIds = [];
+    if (isClient()) {
+      clientIds = await getClientIds();
+    }
     await _getBasicInfo(context, 'New Display',
         onPressed: (name, desc, t) async {
       List<String> tags = [];
       if (null != t) {
         tags = t.trim().split(' ');
       }
+
       var mRes = await TwinnedSession.instance.twin.createDisplay(
           apikey: TwinnedSession.instance.authToken,
           body: tapi.DisplayInfo(
@@ -246,7 +232,7 @@ class _VisualDisplaysState extends BaseState<VisualDisplays> {
             description: desc,
             tags: tags,
             conditions: [],
-            clientIds: [],
+            clientIds: clientIds,
           ));
       if (validateResponse(mRes)) {
         await _edit(mRes.body!.entity!);

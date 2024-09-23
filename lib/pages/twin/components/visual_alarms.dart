@@ -24,13 +24,11 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
   final List<Widget> _cards = [];
   String _search = '';
   tapi.DeviceModel? _selectedDeviceModel;
-  bool _canEdit = false;
   Map<String, bool> _editable = Map<String, bool>();
 
   @override
   void initState() {
     super.initState();
-    _checkCanEdit();
   }
 
   @override
@@ -67,7 +65,7 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
                 Icons.add,
                 color: Colors.white,
               ),
-              onPressed: (canCreate()) ? _create : null,
+              onPressed: (_canCreate()) ? _create : null,
             ),
             divider(horizontal: true),
             SizedBox(
@@ -123,12 +121,13 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
     );
   }
 
+  bool _canCreate() {
+    return null != _selectedDeviceModel && canCreate();
+  }
+
   Widget _buildCard(tapi.Alarm e) {
     double width = MediaQuery.of(context).size.width / 8;
-    bool editable = _canEdit;
-    if (!editable) {
-      editable = _editable[e.id] ?? false;
-    }
+    bool editable = _editable[e.id] ?? false;
     Widget icon = const Icon(
       Icons.question_mark,
       size: 45,
@@ -146,7 +145,7 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
     }
     return InkWell(
       onDoubleTap: () {
-        if (_canEdit) {
+        if (editable) {
           _edit(e);
         }
       },
@@ -161,7 +160,7 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
               Align(
                 alignment: Alignment.center,
                 child: Padding(
-                  padding: EdgeInsets.all(10),
+                  padding: EdgeInsets.all(35),
                   child: icon,
                 ),
               ),
@@ -186,16 +185,16 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Tooltip(
-                        message: _canEdit ? "Update" : "No Permission to Edit",
+                        message: editable ? "Update" : "No Permission to Edit",
                         child: InkWell(
-                          onTap: _canEdit
+                          onTap: editable
                               ? () {
                                   _edit(e);
                                 }
                               : null,
                           child: Icon(
                             Icons.edit,
-                            color: _canEdit
+                            color: editable
                                 ? theme.getPrimaryColor()
                                 : Colors.grey,
                           ),
@@ -203,16 +202,16 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
                       ),
                       Tooltip(
                         message:
-                            _canEdit ? "Delete" : "No Permission to Delete",
+                            editable ? "Delete" : "No Permission to Delete",
                         child: InkWell(
-                          onTap: _canEdit
+                          onTap: editable
                               ? () {
                                   _confirmDeletionDialog(context, e);
                                 }
                               : null,
                           child: Icon(
                             Icons.delete_forever_rounded,
-                            color: _canEdit
+                            color: editable
                                 ? theme.getPrimaryColor()
                                 : Colors.grey,
                           ),
@@ -227,15 +226,6 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
         ),
       ),
     );
-  }
-
-  Future<void> _checkCanEdit() async {
-    List<String> clientIds = await getClientIds();
-    bool canEditResult = await canEdit(clientIds: clientIds);
-
-    setState(() {
-      _canEdit = canEditResult;
-    });
   }
 
   Future<void> _getBasicInfo(BuildContext context, String title,

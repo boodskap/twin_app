@@ -30,8 +30,6 @@ class _DisplayContentStatePageState extends BaseState<DisplayContentStatePage> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _descController = TextEditingController();
   final TextEditingController _tagsController = TextEditingController();
-  Future<List<String>>? clientIds =
-      isClientAdmin() ? TwinnedSession.instance.getClientIds() : null;
 
   bool _showDisplayStateSection = false;
   bool _displayStateEditMode = false;
@@ -127,6 +125,9 @@ class _DisplayContentStatePageState extends BaseState<DisplayContentStatePage> {
         tags: _tagsController.text.split(' '),
         conditions: widget.display.conditions,
         clientIds: widget.display.clientIds,
+        icon: widget.display.icon,
+        label: widget.display.label,
+        deviceId: widget.display.deviceId,
       );
 
       res = await TwinnedSession.instance.twin.updateDisplay(

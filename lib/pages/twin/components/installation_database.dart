@@ -30,14 +30,12 @@ class _InstallationDatabaseState extends BaseState<InstallationDatabase> {
   final Map<String, tapi.DeviceModel> _models = <String, tapi.DeviceModel>{};
   String _search = '';
   tapi.DeviceModel? _selectedDeviceModel;
-  bool _canEdit = false;
   Map<String, bool> _editable = Map<String, bool>();
   bool _exhausted = true;
 
   @override
   void initState() {
     super.initState();
-    _checkCanEdit();
   }
 
   @override
@@ -51,8 +49,8 @@ class _InstallationDatabaseState extends BaseState<InstallationDatabase> {
             children: [
               BusyIndicator(),
               IconButton(
-                onPressed: () {
-                  _load();
+                onPressed: () async {
+                  await _load();
                 },
                 icon: Icon(Icons.refresh),
               ),
@@ -153,10 +151,10 @@ class _InstallationDatabaseState extends BaseState<InstallationDatabase> {
           : '';
     }
 
-    if (imageId.isEmpty) {
-      imageId = (null != _models[e.modelId])
-          ? (_models[e.modelId]?.images?.first ?? '')
-          : '';
+    if (imageId.isEmpty &&
+        null != _models[e.modelId] &&
+        (_models[e.modelId]?.images?.isNotEmpty ?? false)) {
+      imageId = _models[e.modelId]?.images?.first ?? '';
     }
 
     if (imageId.isEmpty) {
@@ -171,10 +169,7 @@ class _InstallationDatabaseState extends BaseState<InstallationDatabase> {
   }
 
   Future<Widget> _buildCard(tapi.Device e) async {
-    bool editable = _canEdit;
-    if (!editable) {
-      editable = _editable[e.id] ?? false;
-    }
+    bool editable = _editable[e.id] ?? false;
     double width = MediaQuery.of(context).size.width / 8;
 
     String imageId = await getImageId(e);
@@ -184,7 +179,7 @@ class _InstallationDatabaseState extends BaseState<InstallationDatabase> {
       height: width,
       child: InkWell(
         onDoubleTap: () {
-          if (_canEdit) {
+          if (editable) {
             _edit(e);
           }
         },
@@ -201,34 +196,34 @@ class _InstallationDatabaseState extends BaseState<InstallationDatabase> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       InkWell(
-                        onTap: _canEdit
+                        onTap: editable
                             ? () {
                                 _addEditDeviceDialog(device: e);
                               }
                             : null,
                         child: Tooltip(
                           message:
-                              _canEdit ? "Update" : "No Permission to Edit",
+                              editable ? "Update" : "No Permission to Edit",
                           child: Icon(
                             Icons.edit,
-                            color: _canEdit
+                            color: editable
                                 ? theme.getPrimaryColor()
                                 : Colors.grey,
                           ),
                         ),
                       ),
                       InkWell(
-                        onTap: _canEdit
+                        onTap: editable
                             ? () {
                                 _delete(e);
                               }
                             : null,
                         child: Tooltip(
                           message:
-                              _canEdit ? "Delete" : "No Permission to Delete",
+                              editable ? "Delete" : "No Permission to Delete",
                           child: Icon(
                             Icons.delete_forever,
-                            color: _canEdit
+                            color: editable
                                 ? theme.getPrimaryColor()
                                 : Colors.grey,
                           ),
@@ -275,15 +270,6 @@ class _InstallationDatabaseState extends BaseState<InstallationDatabase> {
         ),
       ),
     );
-  }
-
-  Future<void> _checkCanEdit() async {
-    List<String> clientIds = await getClientIds();
-    bool canEditResult = await canEdit(clientIds: clientIds);
-
-    setState(() {
-      _canEdit = canEditResult;
-    });
   }
 
   void _addEditDeviceDialog({
@@ -374,6 +360,7 @@ class _InstallationDatabaseState extends BaseState<InstallationDatabase> {
     if (loading) return;
     loading = true;
 
+    _editable.clear();
     _entities.clear();
     _cards.clear();
 
@@ -404,7 +391,10 @@ class _InstallationDatabaseState extends BaseState<InstallationDatabase> {
       }
 
       for (tapi.Device e in _entities) {
-        _editable[e.id] = await super.canEdit(clientIds: e.clientIds);
+        _editable[e.id] = false;
+        try {
+          _editable[e.id] = await super.canEdit(clientIds: e.clientIds);
+        } catch (e, s) {}
 
         _cards.add(await _buildCard(e));
       }

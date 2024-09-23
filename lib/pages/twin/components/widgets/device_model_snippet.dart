@@ -46,16 +46,29 @@ class _DeviceModelSnippetState extends BaseState<DeviceModelSnippet> {
     if (null != widget.deviceModel) {
       tapi.DeviceModel p = widget.deviceModel!;
       _deviceModelInfo = _deviceModelInfo.copyWith(
-          clientIds: p.clientIds,
-          description: p.description,
-          images: p.images,
-          name: p.name,
-          model: p.model,
-          make: p.make,
-          version: p.version,
-          roles: p.roles,
-          selectedImage: p.selectedImage,
-          tags: p.tags);
+        clientIds: p.clientIds,
+        description: p.description,
+        images: p.images,
+        name: p.name,
+        model: p.model,
+        make: p.make,
+        version: p.version,
+        roles: p.roles,
+        selectedImage: p.selectedImage,
+        tags: p.tags,
+        makePublic: p.makePublic,
+        hasGeoLocation: p.hasGeoLocation,
+        defaultView: p.defaultView,
+        customWidget: p.customWidget,
+        banners: p.banners,
+        metadata: p.metadata,
+        movable: p.movable,
+        selectedBanner: p.selectedBanner,
+        icon: p.icon,
+        parameters: p.parameters,
+        preprocessorId: p.preprocessorId,
+        scrappingTableConfigs: p.scrappingTableConfigs,
+      );
     }
 
     nameController.text = _deviceModelInfo.name;
@@ -318,13 +331,13 @@ class _DeviceModelSnippetState extends BaseState<DeviceModelSnippet> {
   }
 
   Future _save({bool silent = false}) async {
-    List<String>? clientIds = _deviceModelInfo.clientIds?.isNotEmpty == true
-        ? _deviceModelInfo.clientIds
-        : (super.isClientAdmin()
-            ? await TwinnedSession.instance.getClientIds()
-            : null);
     if (loading) return;
     loading = true;
+
+    List<String> clientIds = _deviceModelInfo.clientIds;
+    if (isClient()) {
+      clientIds = await getClientIds();
+    }
 
     _deviceModelInfo = _deviceModelInfo.copyWith(
       name: nameController.text.trim(),
@@ -333,8 +346,9 @@ class _DeviceModelSnippetState extends BaseState<DeviceModelSnippet> {
       make: makeController.text.trim(),
       model: modelController.text.trim(),
       version: versionController.text.trim(),
-      clientIds: clientIds ?? _deviceModelInfo.clientIds,
+      clientIds: clientIds,
     );
+
     await execute(() async {
       if (null == widget.deviceModel) {
         var cRes = await TwinnedSession.instance.twin.createDeviceModel(
@@ -350,7 +364,7 @@ class _DeviceModelSnippetState extends BaseState<DeviceModelSnippet> {
                 key: Key(const Uuid().v4()),
                 type: '',
                 initialPage: 2,
-                model: cRes!.body!.entity,
+                model: cRes!.body!.entity!,
               ),
             ),
           );

@@ -215,7 +215,6 @@ class _PremisesState extends BaseState<Premises> {
           key: Key(
             Uuid().v4(),
           ),
-          type: InfraType.premise,
         ),
       ),
     );

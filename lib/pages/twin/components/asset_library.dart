@@ -25,13 +25,11 @@ class _AssetLibraryState extends BaseState<AssetLibrary> {
   final List<tapi.AssetModel> _entities = [];
   final List<Widget> _cards = [];
   String _search = '';
-  bool _canEdit = false;
   Map<String, bool> _editable = Map<String, bool>();
 
   @override
   void initState() {
     super.initState();
-    _checkCanEdit();
   }
 
   @override
@@ -111,13 +109,10 @@ class _AssetLibraryState extends BaseState<AssetLibrary> {
 
   Widget _buildCard(tapi.AssetModel e) {
     double width = MediaQuery.of(context).size.width / 8;
-    bool editable = _canEdit;
-    if (!editable) {
-      editable = _editable[e.id] ?? false;
-    }
+    bool editable = _editable[e.id] ?? false;
     return InkWell(
       onDoubleTap: () {
-        if (_canEdit) {
+        if (editable) {
           _edit(e);
         }
       },
@@ -149,16 +144,16 @@ class _AssetLibraryState extends BaseState<AssetLibrary> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Tooltip(
-                        message: _canEdit ? "Update" : "No Permission to Edit",
+                        message: editable ? "Update" : "No Permission to Edit",
                         child: InkWell(
-                          onTap: _canEdit
+                          onTap: editable
                               ? () {
                                   _edit(e);
                                 }
                               : null,
                           child: Icon(
                             Icons.edit,
-                            color: _canEdit
+                            color: editable
                                 ? theme.getPrimaryColor()
                                 : Colors.grey,
                           ),
@@ -166,16 +161,16 @@ class _AssetLibraryState extends BaseState<AssetLibrary> {
                       ),
                       Tooltip(
                         message:
-                            _canEdit ? "Delete" : "No Permission to Delete",
+                            editable ? "Delete" : "No Permission to Delete",
                         child: InkWell(
-                          onTap: _canEdit
+                          onTap: editable
                               ? () {
                                   _confirmDeletionDialog(context, e);
                                 }
                               : null,
                           child: Icon(
                             Icons.delete_forever_rounded,
-                            color: _canEdit
+                            color: editable
                                 ? theme.getPrimaryColor()
                                 : Colors.grey,
                           ),
@@ -199,20 +194,11 @@ class _AssetLibraryState extends BaseState<AssetLibrary> {
     );
   }
 
-  Future<void> _checkCanEdit() async {
-    List<String> clientIds = await getClientIds();
-    bool canEditResult = await canEdit(clientIds: clientIds);
-
-    setState(() {
-      _canEdit = canEditResult;
-    });
-  }
-
   Future _create() async {
     await super.alertDialog(
       titleStyle:
           theme.getStyle().copyWith(fontSize: 20, fontWeight: FontWeight.bold),
-      title: 'New Asset Type',
+      title: 'New Asset Library',
       width: MediaQuery.of(context).size.width / 2 + 100,
       height: MediaQuery.of(context).size.height / 2 + 100,
       body: const CreateEditAssetLibrary(),

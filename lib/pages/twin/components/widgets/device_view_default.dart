@@ -313,10 +313,10 @@ class _DeviceViewDefaultState extends BaseState<DeviceViewDefault> {
   }
 
   Future<void> _loadAlarms() async {
-    var res = await TwinnedSession.instance.twin.listAlarms(
+    var res = await TwinnedSession.instance.twin.searchAlarms(
         apikey: TwinnedSession.instance.authToken,
         modelId: widget.deviceModel.id,
-        body: const ListReq(page: 0, size: 10000));
+        body: const SearchReq(search: '*', page: 0, size: 10000));
     if (validateResponse(res)) {
       for (var alarm in res.body!.values!) {
         Map<String, dynamic> params = {};
@@ -374,10 +374,10 @@ class _DeviceViewDefaultState extends BaseState<DeviceViewDefault> {
   }
 
   Future<void> _loadDisplays() async {
-    var res = await TwinnedSession.instance.twin.listDisplays(
+    var res = await TwinnedSession.instance.twin.searchDisplays(
         apikey: TwinnedSession.instance.authToken,
         modelId: widget.deviceModel.id,
-        body: const ListReq(page: 0, size: 10000));
+        body: const SearchReq(search: '*', page: 0, size: 10000));
     if (validateResponse(res)) {
       for (var display in res.body!.values!) {
         EvaluatedDisplay? edisp = _getEvaluatedDisplay(display.id);

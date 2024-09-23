@@ -66,7 +66,7 @@ bool isAdmin() {
 }
 
 bool isClient() {
-  return TwinnedSession.instance.isClient();
+  return TwinnedSession.instance.isClient() || isClientAdmin();
 }
 
 bool isClientAdmin() {
