@@ -26,9 +26,9 @@ class _PreprocessorDropDownState extends BaseState<PreprocessorDropDown> {
 
   Future<void> _load() async {
     execute(() async {
-      var res = await TwinnedSession.instance.twin.listPreprocessors(
+      var res = await TwinnedSession.instance.twin.searchPreprocessors(
         apikey: TwinnedSession.instance.authToken,
-        body: const ListReq(page: 0, size: 10000),
+        body: const SearchReq(search: '*', page: 0, size: 10000),
       );
 
       if (validateResponse(res)) {

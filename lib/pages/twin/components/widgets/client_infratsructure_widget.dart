@@ -51,9 +51,9 @@ class _ClientInfrastructeWidgetState
 
   Future<void> _loadclients() async {
     try {
-      var res = await TwinnedSession.instance.twin.listClients(
+      var res = await TwinnedSession.instance.twin.searchClients(
         apikey: TwinnedSession.instance.authToken,
-        body: const ListReq(page: 0, size: 10000),
+        body: const SearchReq(search: '*', page: 0, size: 10000),
       );
 
       if (validateResponse(res)) {

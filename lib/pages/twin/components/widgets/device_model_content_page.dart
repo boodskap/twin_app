@@ -18,14 +18,14 @@ import 'package:twin_commons/widgets/common/label_text_field.dart';
 enum PickTarget { border, background }
 
 class DeviceModelContentPage extends StatefulWidget {
-  twinned.DeviceModel? model;
+  twinned.DeviceModel model;
   final String type;
   final PageController? pageController;
   int initialPage;
 
   DeviceModelContentPage({
     super.key,
-    this.model,
+    required this.model,
     required this.type,
     this.pageController,
     required this.initialPage,
@@ -291,93 +291,54 @@ class _DeviceModelContentPageState extends BaseState<DeviceModelContentPage> {
     required List<twinned.ScrappingTableConfig> scrappingTableConfigs,
     bool shouldPop = false,
   }) async {
-    busy();
-
-    try {
+    await execute(() async {
+      twinned.DeviceModel dm = widget.model;
       List<twinned.ScrappingTableConfig> swap = [];
       swap.addAll(scrappingTableConfigs);
       this.scrappingTableConfigs.clear();
       this.scrappingTableConfigs.addAll(swap);
 
-      if (null == widget.model) {
-        var res = await TwinnedSession.instance.twin.createDeviceModel(
-            apikey: TwinnedSession.instance.authToken,
-            body: twinned.DeviceModelInfo(
-              name: _nameController.text,
-              description: _descController.text,
-              make: _makeController.text,
-              model: _modelController.text,
-              version: _versionController.text,
-              tags: _tagsController.text.split(','),
-              images: _imageIds,
-              selectedImage: _selectedImage,
-              preprocessorId: _preprocessor,
-              parameters: paramList,
-              scrappingTableConfigs: scrappingTableConfigs,
-              clientIds: [],
-              roles: [],
-            ));
+      var res = await TwinnedSession.instance.twin.updateDeviceModel(
+          apikey: TwinnedSession.instance.authToken,
+          modelId: widget.model!.id,
+          body: twinned.DeviceModelInfo(
+            name: _nameController.text,
+            description: _descController.text,
+            make: _makeController.text,
+            model: _modelController.text,
+            version: _versionController.text,
+            tags: _tagsController.text.split(','),
+            images: _imageIds,
+            selectedImage: _selectedImage,
+            preprocessorId: _preprocessor,
+            parameters: paramList,
+            scrappingTableConfigs: scrappingTableConfigs,
+            clientIds: dm.clientIds,
+            icon: dm.icon,
+            roles: dm.roles,
+            selectedBanner: dm.selectedBanner,
+            movable: dm.movable,
+            metadata: dm.metadata,
+            banners: dm.banners,
+            customWidget: dm.customWidget,
+            defaultView: dm.defaultView,
+            hasGeoLocation: dm.hasGeoLocation,
+            makePublic: dm.makePublic,
+          ));
 
-        if (validateResponse(res)) {
-          setState(() {
-            widget.model = res.body!.entity;
-          });
-          await alert(
-              'Device Model - ${widget.model!.name}', 'Saved successfully!',
-              contentStyle: theme.getStyle(),
-              titleStyle: theme
-                  .getStyle()
-                  .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
-          if (shouldPop) {
-            _cancel();
-          }
+      if (validateResponse(res)) {
+        setState(() {
+          widget.model = res.body!.entity!;
+        });
+        await alert(
+            'Device Model - ${widget.model!.name}', 'Saved successfully!',
+            contentStyle: theme.getStyle(),
+            titleStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
+        if (shouldPop) {
+          _cancel();
         }
-      } else {
-        var res = await TwinnedSession.instance.twin.updateDeviceModel(
-            apikey: TwinnedSession.instance.authToken,
-            modelId: widget.model!.id,
-            body: twinned.DeviceModelInfo(
-              name: _nameController.text,
-              description: _descController.text,
-              make: _makeController.text,
-              model: _modelController.text,
-              version: _versionController.text,
-              tags: _tagsController.text.split(','),
-              images: _imageIds,
-              selectedImage: _selectedImage,
-              preprocessorId: _preprocessor,
-              parameters: paramList,
-              scrappingTableConfigs: scrappingTableConfigs,
-              clientIds: [],
-            ));
-
-        if (validateResponse(res)) {
-          setState(() {
-            widget.model = res.body?.entity;
-          });
-          await alert(
-              'Device Model - ${widget.model!.name}', 'Saved successfully!',
-              contentStyle: theme.getStyle(),
-              titleStyle: theme
-                  .getStyle()
-                  .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
-          if (shouldPop) {
-            _cancel();
-          }
-        }
-      }
-    } catch (e, s) {
-      debugPrint('$e\n$s');
-    }
-
-    busy(busy: false);
-  }
-
-  Future _upload() async {
-    await execute(() async {
-      var res = await TwinImageHelper.uploadDomainImage();
-      if (null != res) {
-        iconParamId = res.entity!.id;
       }
     });
   }

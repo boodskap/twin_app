@@ -79,9 +79,9 @@ class _SubscriptionsPageState extends BaseState<SubscriptionsPage> {
     _rows.clear();
     _events.clear();
 
-    var res = await TwinnedSession.instance.twin.listEvents(
+    var res = await TwinnedSession.instance.twin.searchEvents(
       apikey: TwinnedSession.instance.authToken,
-      body: const ListReq(page: 0, size: 10000),
+      body: const SearchReq(search: '*', page: 0, size: 10000),
     );
 
     if (validateResponse(res)) {

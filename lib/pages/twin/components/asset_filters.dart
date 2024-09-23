@@ -361,10 +361,10 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
 
     _dataFilters.clear();
     await execute(() async {
-      var res = await TwinnedSession.instance.twin.listDataFilters(
+      var res = await TwinnedSession.instance.twin.searchDataFilters(
           apikey: TwinnedSession.instance.authToken,
           modelId: _selectedDeviceModel?.id,
-          body: const twinned.ListReq(page: 0, size: 10000));
+          body: const twinned.SearchReq(search: '*', page: 0, size: 10000));
       if (validateResponse(res)) {
         refresh(sync: () {
           _dataFilters.addAll(res.body!.values!);
@@ -382,9 +382,9 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
 
     _fieldFilters.clear();
     await execute(() async {
-      var res = await TwinnedSession.instance.twin.listFieldFilters(
+      var res = await TwinnedSession.instance.twin.searchFieldFilters(
           apikey: TwinnedSession.instance.authToken,
-          body: const twinned.ListReq(page: 0, size: 10000));
+          body: const twinned.SearchReq(search: '*', page: 0, size: 10000));
       if (validateResponse(res)) {
         refresh(sync: () {
           _fieldFilters.addAll(res.body!.values!);
@@ -1079,10 +1079,10 @@ class _MatchGroupFilterWidgetState extends BaseState<_MatchGroupFilterWidget> {
   @override
   void setup() async {
     await execute(() async {
-      var res = await TwinnedSession.instance.twin.listConditions(
+      var res = await TwinnedSession.instance.twin.searchConditions(
           apikey: TwinnedSession.instance.authToken,
           modelId: widget.filter.modelId,
-          body: const twinned.ListReq(page: 0, size: 10000));
+          body: const twinned.SearchReq(search: '*', page: 0, size: 10000));
       if (validateResponse(res)) {
         List<DropdownMenuEntry<twinned.Condition>> conditions = [];
         for (var condition in res.body!.values!) {

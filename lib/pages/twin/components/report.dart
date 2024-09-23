@@ -230,10 +230,10 @@ class _AssetReportListState extends BaseState<AssetReportList> {
       } else {
         modelId = _selectedDeviceModel!.id;
       }
-      var res = await TwinnedSession.instance.twin.listReports(
+      var res = await TwinnedSession.instance.twin.searchReports(
           apikey: TwinnedSession.instance.authToken,
           modelId: modelId,
-          body: const twinned.ListReq(page: 0, size: 10000));
+          body: const twinned.SearchReq(search: '*', page: 0, size: 10000));
 
       if (validateResponse(res)) {
         _reports.addAll(res.body!.values!);
