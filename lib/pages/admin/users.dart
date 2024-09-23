@@ -41,6 +41,7 @@ class _UsersState extends BaseState<Users> {
 
   @override
   Widget build(BuildContext context) {
+
     return Column(
       children: [
         divider(),
@@ -226,7 +227,6 @@ class _UsersState extends BaseState<Users> {
         ),
       );
     }
-
     return GridView.builder(
       padding: const EdgeInsets.all(8.0),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -260,7 +260,7 @@ class _UsersState extends BaseState<Users> {
     }
     String? countryCode = countryCodeMap[user.countryCode];
     String formattedPhone = user.phone != null && user.phone!.isNotEmpty
-        ? (countryCode!.isNotEmpty ? '$countryCode ${user.phone}' : user.phone!)
+        ? (user.countryCode!.isNotEmpty &&  countryCode!.isNotEmpty ? '$countryCode ${user.phone}' : user.phone!)
         : '';
 
     return TableRow(
@@ -398,9 +398,10 @@ class _UsersState extends BaseState<Users> {
   }
 
   Widget _buildCard(tapi.TwinUser entity) {
+    
     String? countryCode = countryCodeMap[entity.countryCode];
-    String formattedPhone = entity.phone != null && entity.phone!.isNotEmpty
-        ? (countryCode!.isNotEmpty
+    String formattedPhone = entity.phone != null && entity.phone!.isNotEmpty 
+        ?  (entity.countryCode!.isNotEmpty && countryCode!.isNotEmpty
             ? '$countryCode ${entity.phone}'
             : entity.phone!)
         : '';
@@ -658,7 +659,6 @@ class _UsersState extends BaseState<Users> {
           ],
         ),
       );
-      // debugPrint(qres.body!.values.toString());
       if (validateResponse(qres)) {
         totalCount = qres.body!.total;
         refresh(
@@ -668,6 +668,8 @@ class _UsersState extends BaseState<Users> {
         );
       }
     });
+
+ 
 
     loading = false;
     refresh();
