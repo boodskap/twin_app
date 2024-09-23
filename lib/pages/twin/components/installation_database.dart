@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:twin_app/core/session_variables.dart';
+import 'package:twin_app/core/twin_helper.dart';
 import 'package:twin_app/pages/twin/components/widgets/database_content_page.dart';
 import 'package:twin_app/pages/twin/components/widgets/installation_database_snippet.dart';
 import 'package:twin_app/widgets/buy_button.dart';
@@ -26,6 +27,7 @@ class InstallationDatabase extends StatefulWidget {
 class _InstallationDatabaseState extends BaseState<InstallationDatabase> {
   final List<tapi.Device> _entities = [];
   final List<Widget> _cards = [];
+  final Map<String, tapi.DeviceModel> _models = <String, tapi.DeviceModel>{};
   String _search = '';
   tapi.DeviceModel? _selectedDeviceModel;
   bool _canEdit = false;
@@ -142,12 +144,41 @@ class _InstallationDatabaseState extends BaseState<InstallationDatabase> {
     );
   }
 
-  Widget _buildCard(tapi.Device e) {
+  Future<String> getImageId(tapi.Device e) async {
+    String imageId = (e.images?.isNotEmpty ?? false) ? e.images!.first : '';
+
+    if (imageId.isEmpty) {
+      imageId = (_selectedDeviceModel?.images?.isNotEmpty ?? false)
+          ? _selectedDeviceModel!.images!.first
+          : '';
+    }
+
+    if (imageId.isEmpty) {
+      imageId = (null != _models[e.modelId])
+          ? (_models[e.modelId]?.images?.first ?? '')
+          : '';
+    }
+
+    if (imageId.isEmpty) {
+      tapi.DeviceModel? dm = await TwinHelper.getDeviceModel(e.modelId);
+      imageId = (dm?.images?.isNotEmpty ?? false) ? dm!.images!.first : '';
+      if (null != dm) {
+        _models[dm.id] = dm;
+      }
+    }
+
+    return imageId;
+  }
+
+  Future<Widget> _buildCard(tapi.Device e) async {
     bool editable = _canEdit;
     if (!editable) {
       editable = _editable[e.id] ?? false;
     }
     double width = MediaQuery.of(context).size.width / 8;
+
+    String imageId = await getImageId(e);
+
     return SizedBox(
       width: width,
       height: width,
@@ -213,10 +244,10 @@ class _InstallationDatabaseState extends BaseState<InstallationDatabase> {
                 children: [
                   Align(
                     alignment: Alignment.center,
-                    child: (null != e.images && e.images!.isNotEmpty)
+                    child: (imageId.isNotEmpty)
                         ? TwinImageHelper.getCachedImage(
                             e.domainKey,
-                            e.images!.first,
+                            imageId,
                             width: width / 2,
                             height: width / 2,
                           )
@@ -375,7 +406,7 @@ class _InstallationDatabaseState extends BaseState<InstallationDatabase> {
       for (tapi.Device e in _entities) {
         _editable[e.id] = await super.canEdit(clientIds: e.clientIds);
 
-        _cards.add(_buildCard(e));
+        _cards.add(await _buildCard(e));
       }
     });
 
@@ -384,7 +415,7 @@ class _InstallationDatabaseState extends BaseState<InstallationDatabase> {
   }
 
   Future _checkExhausted() async {
-    _exhausted = await hasDeviceLibrariesExhausted();
+    _exhausted = await hasDevicesExhausted();
     refresh();
   }
 

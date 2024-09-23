@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:pulse_admin_api/api/pulse_admin.swagger.dart';
 import 'package:twin_app/core/session_variables.dart';
-import 'package:twin_app/pages/pulse/widgets/add_edit_email_group.dart';
+import 'package:twin_app/pages/pulse/widgets/add_edit_phone_group.dart';
 import 'package:twin_app/pages/pulse/widgets/custom_badge.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:twin_app/widgets/commons/secondary_button.dart';
@@ -8,19 +9,19 @@ import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/twinned_session.dart';
 import 'package:pulse_admin_api/pulse_admin_api.dart' as pulse;
 
-class EmailGroupPage extends StatefulWidget {
-  const EmailGroupPage({super.key});
+class VoiceGroupPage extends StatefulWidget {
+  const VoiceGroupPage({super.key});
 
   @override
-  State<EmailGroupPage> createState() => _EmailGroupPageState();
+  State<VoiceGroupPage> createState() => _VoiceGroupPageState();
 }
 
-class _EmailGroupPageState extends BaseState<EmailGroupPage> {
+class _VoiceGroupPageState extends BaseState<VoiceGroupPage> {
   String _search = '*';
-  List<String> emailList = [];
+  List<PhoneNumber> VoiceList = [];
   String name = "";
   final List<Widget> _children = [];
-     final TextEditingController _searchTextController = TextEditingController();
+   final TextEditingController _searchTextController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,8 +35,8 @@ class _EmailGroupPageState extends BaseState<EmailGroupPage> {
                 message: "Refresh",
                 child: IconButton(
                   onPressed: () async {
-                    _searchTextController.text = "";
                     _search = "*";
+                    _searchTextController.text = "";
                     await _load();
                   },
                   icon: const Icon(Icons.refresh),
@@ -50,7 +51,7 @@ class _EmailGroupPageState extends BaseState<EmailGroupPage> {
                 labelKey: 'Add New',
                 onPressed: () async {
                   _reset();
-                  await _showEmailGroupDialog('Create', null);
+                  await _showVoiceGroupDialog('Create', null);
                 },
               ),
               divider(horizontal: true),
@@ -62,7 +63,7 @@ class _EmailGroupPageState extends BaseState<EmailGroupPage> {
                   leading: const Icon(Icons.search),
                   textStyle: WidgetStatePropertyAll(theme.getStyle()),
                   hintStyle: WidgetStatePropertyAll(theme.getStyle()),
-                  hintText: "Search Emails",
+                  hintText: "Search Voices",
                   onChanged: (value) async {
                     _search = value.trim().isNotEmpty ? value.trim() : '*';
                     await _load();
@@ -89,15 +90,15 @@ class _EmailGroupPageState extends BaseState<EmailGroupPage> {
     );
   }
 
-  bool canCreateOrUpdate(pulse.EmailGroup? entity) {
+  bool canCreateOrUpdate(pulse.VoiceGroup? entity) {
     if (entity != null) {
-      return entity.name.isNotEmpty && entity.list.isNotEmpty;
+      return entity.name.isNotEmpty && entity.phoneList.isNotEmpty;
     } else {
-      return name.isNotEmpty && emailList.isNotEmpty;
+      return name.isNotEmpty && VoiceList.isNotEmpty;
     }
   }
 
-  Widget _buildChild(pulse.EmailGroup entity) {
+  Widget _buildChild(pulse.VoiceGroup entity) {
     return SizedBox(
       width: 300,
       height: 200,
@@ -112,7 +113,7 @@ class _EmailGroupPageState extends BaseState<EmailGroupPage> {
                     message: 'Edit ${entity.name}',
                     child: IconButton(
                         onPressed: () async {
-                          await _showEmailGroupDialog('Update', entity);
+                          await _showVoiceGroupDialog('Update', entity);
                         },
                         icon: const Icon(Icons.edit))),
                 Tooltip(
@@ -133,8 +134,8 @@ class _EmailGroupPageState extends BaseState<EmailGroupPage> {
             ),
             divider(),
             CustomBadge(
-                text: entity.list.length == 1 ? 'Member' : 'Members',
-                hintText: entity.list.length.toString(),
+                text: entity.phoneList.length == 1 ? 'Member' : 'Members',
+                hintText: entity.phoneList.length.toString(),
                 badgeColor: theme.getPrimaryColor()),
           ],
         ),
@@ -142,17 +143,17 @@ class _EmailGroupPageState extends BaseState<EmailGroupPage> {
     );
   }
 
-  Future _delete(pulse.EmailGroup group) async {
+  Future _delete(pulse.VoiceGroup group) async {
     await confirm(
       title: 'Delete ${group.name}',
-      message: 'Are you sure you want to delete this email group?',
+      message: 'Are you sure you want to delete this Voice group?',
       onPressed: () async {
         await execute(() async {
-          var res = await TwinnedSession.instance.pulseAdmin.deleteEmailGroup(
+          var res = await TwinnedSession.instance.pulseAdmin.deleteVoiceGroup(
               apikey: TwinnedSession.instance.authToken, groupId: group.id);
 
           if (validateResponse(res)) {
-            alert('Email Group ${group.name}', 'Deleted Successfully');
+            alert('Voice Group ${group.name}', 'Deleted Successfully');
           }
         });
       },
@@ -162,14 +163,13 @@ class _EmailGroupPageState extends BaseState<EmailGroupPage> {
     });
   }
 
-  Future<void> _showEmailGroupDialog(
-      String type, pulse.EmailGroup? entity) async {
+  Future<void> _showVoiceGroupDialog(String type, pulse.VoiceGroup? entity) async {
     await showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           title: Text(
-            '$type Email Group',
+            '$type Voice Group',
             style: theme.getStyle().copyWith(
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
@@ -179,8 +179,8 @@ class _EmailGroupPageState extends BaseState<EmailGroupPage> {
           content: Container(
             width: MediaQuery.of(context).size.width * 0.3,
             height: MediaQuery.of(context).size.height * 0.6,
-            child: AddEditEmailGroup(
-              emailGroup: entity,
+            child: AddEditPhoneGroup(
+              VoiceGroup: entity,
               onNameSaved: (String value) {
                 setState(() {
                   if (entity == null) {
@@ -190,20 +190,20 @@ class _EmailGroupPageState extends BaseState<EmailGroupPage> {
                   }
                 });
               },
-              onEmailSaved: (List<String> email) {
+              onPhoneNumberSaved: (List<PhoneNumber> Voice) {
                 setState(() {
                   if (entity == null) {
-                    emailList = email;
+                    VoiceList = Voice;
                   } else {
-                    entity = entity!.copyWith(list: email);
+                    entity = entity!.copyWith(phoneList: Voice);
                   }
-                  emailList = email;
+                  VoiceList = Voice;
                 });
               },
             ),
           ),
           actions: [
-             Divider(
+            Divider(
               color: theme.getPrimaryColor(),
               thickness: 1.0,
             ),
@@ -221,7 +221,7 @@ class _EmailGroupPageState extends BaseState<EmailGroupPage> {
                   labelKey: type,
                   onPressed: () async {
                     if (canCreateOrUpdate(entity)) {
-                      await _save(entity); 
+                      await _save(entity);
                     } else {
                       alert('Warning', 'Please fill in all fields.');
                     }
@@ -242,12 +242,12 @@ class _EmailGroupPageState extends BaseState<EmailGroupPage> {
     _children.clear();
     refresh();
     await execute(() async {
-      var res = await TwinnedSession.instance.pulseAdmin.searchEmailGroup(
+      var res = await TwinnedSession.instance.pulseAdmin.searchVoiceGroup(
           apikey: TwinnedSession.instance.authToken,
           body: pulse.SearchReq(search: _search, page: 0, size: 25));
 
       if (validateResponse(res)) {
-        for (pulse.EmailGroup entity in res.body?.values ?? []) {
+        for (pulse.VoiceGroup entity in res.body?.values ?? []) {
           _children.add(_buildChild(entity));
         }
       }
@@ -261,33 +261,31 @@ class _EmailGroupPageState extends BaseState<EmailGroupPage> {
     _load();
   }
 
-  Future _save(pulse.EmailGroup? groupEmail) async {
+  Future _save(pulse.VoiceGroup? groupVoice) async {
     if (loading) return;
     loading = true;
-  late pulse.EmailGroupInfo _config;
-   
-     if (null == groupEmail) {
-      _config =  pulse.EmailGroupInfo(
+    late pulse.VoiceGroupInfo _config;
+
+    if (null == groupVoice) {
+      _config = pulse.VoiceGroupInfo(
         name: name,
-        list: emailList,
+        phoneList: VoiceList,
       );
     } else {
-      _config = pulse.EmailGroupInfo(
-        name: groupEmail.name,
-        list:groupEmail.list
-      );
+      _config = pulse.VoiceGroupInfo(
+          name: groupVoice.name, phoneList: groupVoice.phoneList);
     }
     await execute(() async {
-      var uRes = await TwinnedSession.instance.pulseAdmin.upsertEmailGroup(
+      var uRes = await TwinnedSession.instance.pulseAdmin.upsertVoiceGroup(
           apikey: TwinnedSession.instance.authToken,
-          groupId: groupEmail != null ? groupEmail.id : null,
+          groupId: groupVoice != null ? groupVoice.id : null,
           body: _config);
       if (validateResponse(uRes)) {
         _close();
-        if (groupEmail == null) {
+        if (groupVoice == null) {
           alert(
             'Success',
-            'Email Group ${_config.name} Created Successfully!',
+            'Voice Group ${_config.name} Created Successfully!',
             titleStyle: theme
                 .getStyle()
                 .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
@@ -296,7 +294,7 @@ class _EmailGroupPageState extends BaseState<EmailGroupPage> {
         } else {
           alert(
             'Success',
-            'Email Group ${_config.name} Updated Successfully!',
+            'Voice Group ${_config.name} Updated Successfully!',
             titleStyle: theme
                 .getStyle()
                 .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
@@ -314,12 +312,12 @@ class _EmailGroupPageState extends BaseState<EmailGroupPage> {
     Navigator.of(context).pop();
   }
 
-   void _reset() {
-   setState(() {
-     name = "";
-     emailList = [];
-   });
+  void _reset() {
+    setState(() {
+      name = "";
+      VoiceList = [];
+    });
   }
 
- 
+  
 }

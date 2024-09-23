@@ -22,7 +22,9 @@ import 'package:twin_app/pages/branding/landing_page.dart';
 import 'package:twin_app/pages/dashboard.dart';
 import 'package:twin_app/pages/nocode_builder.dart';
 import 'package:twin_app/pages/pulse/email_tab.dart';
+import 'package:twin_app/pages/pulse/sms_tab.dart';
 import 'package:twin_app/pages/pulse/template.dart';
+import 'package:twin_app/pages/pulse/voice_tab.dart';
 import 'package:twin_app/pages/query_console.dart';
 import 'package:twin_app/pages/pulse/admin/manage_gateways.dart';
 import 'package:twin_app/pages/pulse/email.dart';
@@ -181,8 +183,20 @@ class _TwinAppState extends State<TwinApp> {
             Platform.isIOS ||
             MediaQuery.of(context).size.width <= 800)) {
       session.smallScreen = true;
+    } else if (kIsWeb &&
+        (defaultTargetPlatform == TargetPlatform.iOS ||
+            defaultTargetPlatform == TargetPlatform.android)) {
+      session.smallScreen = true;
     } else {
       session.smallScreen = false;
+    }
+
+    if (session.smallScreen && MediaQuery.of(context).size.width >= 1600) {
+      session.smallScreen = false;
+    }
+
+    if (!session.smallScreen && MediaQuery.of(context).size.width <= 800) {
+      session.smallScreen = true;
     }
 
     return MaterialApp.router(
@@ -967,26 +981,26 @@ class HomeScreenState extends BaseState<HomeScreen> {
       ),
       session.TwinMenuItem(
         id: TwinAppMenu.pulseSms,
-        text: 'SMS Logs',
+        text: 'SMS',
         icon: Icons.sms,
         bottomMenus: _pulseBottomMenus(),
         isMenuVisible: () {
           return session.isAdmin();
         },
         onMenuSelected: (BuildContext context) async {
-          return const SmsPage();
+          return const SMSTabPage();
         },
       ),
       session.TwinMenuItem(
         id: TwinAppMenu.pulseVoice,
-        text: 'Voicemail Logs',
+        text: 'Voice',
         icon: Icons.voicemail,
         bottomMenus: _pulseBottomMenus(),
         isMenuVisible: () {
           return session.isAdmin();
         },
         onMenuSelected: (BuildContext context) async {
-          return const VoicePage();
+          return const VoiceTabPage();
         },
       ),
       session.TwinMenuItem(

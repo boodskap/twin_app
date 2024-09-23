@@ -1,6 +1,7 @@
 import 'package:flutter/Material.dart';
 import 'package:flutter/material.dart';
 import 'package:twin_app/core/session_variables.dart';
+import 'package:twin_app/core/twin_helper.dart';
 import 'package:twin_app/pages/twin/components/widgets/asset_content_page.dart';
 import 'package:twin_app/pages/twin/components/widgets/asset_snippet.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
@@ -27,6 +28,8 @@ class Assets extends StatefulWidget {
 class _AssetsState extends BaseState<Assets> {
   final List<tapi.Asset> _entities = [];
   final List<Widget> _cards = [];
+  final Map<String, tapi.DeviceModel> _models = <String, tapi.DeviceModel>{};
+  final Map<String, tapi.Device> _devices = <String, tapi.Device>{};
   String _search = '';
   tapi.Premise? _selectedPremise;
   tapi.Facility? _selectedFacility;
@@ -187,15 +190,71 @@ class _AssetsState extends BaseState<Assets> {
     });
   }
 
-  Widget _buildCard(tapi.Asset e) {
+  Future<String> getImageId(tapi.Device e) async {
+    String imageId = (e.images?.isNotEmpty ?? false) ? e.images!.first : '';
+
+    if (imageId.isEmpty) {
+      imageId = (null != _models[e.modelId])
+          ? (_models[e.modelId]?.images?.first ?? '')
+          : '';
+    }
+
+    if (imageId.isEmpty) {
+      tapi.DeviceModel? dm = await TwinHelper.getDeviceModel(e.modelId);
+      imageId = (dm?.images?.isNotEmpty ?? false) ? dm!.images!.first : '';
+      if (null != dm) {
+        _models[dm.id] = dm;
+      }
+    }
+
+    return imageId;
+  }
+
+  Future<Widget> getDeviceChild(String deviceId) async {
+    tapi.Device? device = _devices[deviceId];
+    if (null == device) {
+      device = await TwinHelper.getDevice(deviceId);
+    }
+    String imageId = await getImageId(device!);
+    return Chip(
+      label: Text(
+        device!.name,
+        style: theme
+            .getStyle()
+            .copyWith(fontSize: 10, fontWeight: FontWeight.bold),
+      ),
+      avatar: imageId.isEmpty
+          ? Icon(Icons.image)
+          : TwinImageHelper.getCachedDomainImage(imageId),
+    );
+  }
+
+  Future<Widget> _buildCard(tapi.Asset e) async {
     bool editable = _canEdit;
+    double width = MediaQuery.of(context).size.width / 8;
+    List<Widget> children = [];
+
     if (!editable) {
       editable = _editable[e.id] ?? false;
     }
-    double width = MediaQuery.of(context).size.width / 8;
+
+    if (null != e.devices && e.devices!.isNotEmpty) {
+      for (String id in e.devices!) {
+        children.add(await getDeviceChild(id));
+      }
+    } else {
+      children.add(Chip(
+          label: Text(
+        'No device attached',
+        style: theme
+            .getStyle()
+            .copyWith(fontSize: 10, fontWeight: FontWeight.bold),
+      )));
+    }
+
     return SizedBox(
       width: width,
-      height: width,
+      height: width * 1.25,
       child: InkWell(
         onDoubleTap: () async {
           if (_canEdit) {
@@ -269,13 +328,22 @@ class _AssetsState extends BaseState<Assets> {
                     ),
                   ),
                 ),
-                if (null != e.images && e.images!.isNotEmpty)
-                  Align(
-                    alignment: Alignment.center,
-                    child: TwinImageHelper.getCachedImage(
-                        e.domainKey, e.images!.first,
-                        width: width / 2, height: width / 2),
-                  )
+                Align(
+                  alignment: Alignment.center,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        if (null != e.images && e.images!.isNotEmpty)
+                          TwinImageHelper.getCachedImage(
+                              e.domainKey, e.images!.first,
+                              width: width / 2, height: width / 2),
+                        ...children,
+                      ],
+                    ),
+                  ),
+                )
               ],
             ),
           ),
@@ -383,7 +451,7 @@ class _AssetsState extends BaseState<Assets> {
       for (tapi.Asset e in _entities) {
         _editable[e.id] = await super.canEdit(clientIds: e.clientIds);
 
-        _cards.add(_buildCard(e));
+        _cards.add(await _buildCard(e));
       }
     });
 

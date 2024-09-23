@@ -1,9 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter/Material.dart';
-import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:twin_app/app.dart';
 import 'package:twin_app/core/session_variables.dart';
+import 'package:twin_commons/core/twinned_session.dart';
 import 'package:twin_commons/util/nocode_utils.dart';
 import 'package:twin_commons/core/storage.dart';
 import 'package:twinned_api/twinned_api.dart' as tapi;
@@ -135,8 +135,8 @@ class TwinHelper {
     ncapi.Organization? entity;
 
     await execute(() async {
-      var res = await config.nocode
-          .getOrganization(token: session?.authToken, orgId: orgId);
+      var res = await config.nocode.getOrganization(
+          token: TwinnedSession.instance.authToken, orgId: orgId);
       if (TwinUtils.validateResponse(res)) {
         entity = res.body?.entity;
       }
@@ -149,8 +149,22 @@ class TwinHelper {
     tapi.DeviceModel? entity;
 
     await execute(() async {
+      var res = await config.twinned.getDeviceModel(
+          apikey: TwinnedSession.instance.authToken, modelId: id);
+      if (TwinUtils.validateResponse(res)) {
+        entity = res.body?.entity;
+      }
+    });
+
+    return entity;
+  }
+
+  static Future<tapi.Device?> getDevice(String id) async {
+    tapi.Device? entity;
+
+    await execute(() async {
       var res = await config.twinned
-          .getDeviceModel(apikey: session?.authToken, modelId: id);
+          .getDevice(apikey: TwinnedSession.instance.authToken, deviceId: id);
       if (TwinUtils.validateResponse(res)) {
         entity = res.body?.entity;
       }
@@ -165,7 +179,8 @@ class TwinHelper {
 
     await execute(() async {
       var res = await config.twinned.getScrappingTables(
-          apikey: session?.authToken, body: tapi.GetReq(ids: ids));
+          apikey: TwinnedSession.instance.authToken,
+          body: tapi.GetReq(ids: ids));
       if (TwinUtils.validateResponse(res)) {
         entities.addAll(res.body?.values ?? []);
       }

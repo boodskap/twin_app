@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/core/twin_helper.dart';
-import 'package:twin_app/pages/twin/components/widgets/utils/twin_app_utils.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:twin_app/widgets/commons/secondary_button.dart';
 import 'package:twin_commons/core/twinned_session.dart';
@@ -13,8 +12,8 @@ import 'package:twin_commons/core/twin_image_helper.dart';
 import 'package:twin_commons/widgets/common/label_text_field.dart';
 import 'dart:math' as math;
 import 'package:twinned_api/twinned_api.dart' as twin;
-import 'package:twinned_widgets/core/multi_assetmodel_dropdown.dart';
 import 'package:twinned_widgets/core/multi_devicemodel_dropdown.dart';
+import 'package:uuid/uuid.dart';
 
 class CreateEditAssetLibrary extends StatefulWidget {
   final twin.AssetModel? assetModel;
@@ -97,20 +96,28 @@ class _CreateEditAssetLibraryState extends BaseState<CreateEditAssetLibrary>
           ),
           divider(),
           MultiDeviceModelDropdown(
-              style: theme.getStyle(),
-              selectedItems: _assetModelInfo.allowedDeviceModels?.map((d) {
-                    return d.deviceModelId;
-                  }).toList() ??
-                  [],
-              onDeviceModelsSelected: (models) {
+            key: Key(Uuid().v4()),
+            style: theme.getStyle(),
+            selectedItems: _assetModelInfo.allowedDeviceModels?.map((d) {
+                  return d.deviceModelId;
+                }).toList() ??
+                [],
+            onDeviceModelsSelected: (models) {
+              setState(() {
                 var adModels = models.map((e) {
                   return twin.AssetDeviceModel(deviceModelId: e.id);
                 }).toList();
+
                 _assetDeviceModels.clear();
                 _assetDeviceModels.addAll(adModels);
-                _prefill();
-              },
-              allowDuplicates: false),
+
+                _assetModelInfo =
+                    _assetModelInfo.copyWith(allowedDeviceModels: adModels);
+              });
+              _prefill();
+            },
+            allowDuplicates: false,
+          ),
           divider(),
           Center(
             child: Card(
@@ -172,9 +179,11 @@ class _CreateEditAssetLibraryState extends BaseState<CreateEditAssetLibrary>
   }
 
   bool _canSave() {
-    if (_assetModelInfo.name.trim().length < 3 || _assetDeviceModels.isEmpty)
-      return false;
-    return true;
+    bool isNameValid = _assetModelInfo.name.trim().length >= 3;
+
+    bool hasDeviceModels = _assetDeviceModels.isNotEmpty;
+
+    return isNameValid && hasDeviceModels;
   }
 
   Future _uploadImage() async {
