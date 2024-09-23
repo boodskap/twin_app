@@ -24,15 +24,8 @@ class _DeviceLibraryState extends BaseState<DeviceLibrary> {
   final List<tapi.DeviceModel> _entities = [];
   final List<Widget> _cards = [];
   String _search = '';
-  bool _canEdit = false;
-  Map<String, bool> _editable = Map<String, bool>();
-  bool _exhausted = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _checkCanEdit();
-  }
+  final Map<String, bool> _editable = Map<String, bool>();
+  bool _exhausted = false;
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +35,7 @@ class _DeviceLibraryState extends BaseState<DeviceLibrary> {
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            BusyIndicator(),
+            const BusyIndicator(),
             IconButton(
                 onPressed: () {
                   _load();
@@ -62,7 +55,7 @@ class _DeviceLibraryState extends BaseState<DeviceLibrary> {
             if (!_exhausted)
               PrimaryButton(
                 labelKey: 'Create New',
-                leading: Icon(
+                leading: const Icon(
                   Icons.add,
                   color: Colors.white,
                 ),
@@ -70,12 +63,19 @@ class _DeviceLibraryState extends BaseState<DeviceLibrary> {
               ),
             divider(horizontal: true),
             ElevatedButton(
-              onPressed: confirmWipeAllData,
+              onPressed: isAdmin() ? confirmWipeAllData : null,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                minimumSize: Size(150, 50),
+              ),
               child: Wrap(
                 crossAxisAlignment: WrapCrossAlignment.center,
                 spacing: 5,
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.auto_delete_rounded,
                     color: Colors.white,
                   ),
@@ -87,13 +87,6 @@ class _DeviceLibraryState extends BaseState<DeviceLibrary> {
                         ),
                   ),
                 ],
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5),
-                ),
-                minimumSize: Size(150, 50),
               ),
             ),
             divider(horizontal: true),
@@ -145,18 +138,17 @@ class _DeviceLibraryState extends BaseState<DeviceLibrary> {
     );
   }
 
-  Widget _buildCard(tapi.DeviceModel e) {
+  Future<Widget> _buildCard(tapi.DeviceModel e) async {
+    debugPrint('Model:${e.name} ClientIds:${e.clientIds}');
     double width = MediaQuery.of(context).size.width / 8;
-    bool editable = _canEdit;
-    if (!editable) {
-      editable = _editable[e.id] ?? false;
-    }
+    bool editable = _editable[e.id] ?? false;
+
     return SizedBox(
       width: width,
       height: width,
       child: InkWell(
         onDoubleTap: () {
-          if (_canEdit) {
+          if (editable) {
             _edit(e, "");
           }
         },
@@ -184,19 +176,19 @@ class _DeviceLibraryState extends BaseState<DeviceLibrary> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       InkWell(
-                        onTap: _canEdit ? () => _edit(e, "") : null,
+                        onTap: editable ? () => _edit(e, "") : null,
                         child: Icon(
                           Icons.edit,
                           color:
-                              _canEdit ? theme.getPrimaryColor() : Colors.grey,
+                              editable ? theme.getPrimaryColor() : Colors.grey,
                         ),
                       ),
                       InkWell(
-                        onTap: _canEdit ? () => _delete(e) : null,
+                        onTap: editable ? () => _delete(e) : null,
                         child: Icon(
                           Icons.delete_forever,
                           color:
-                              _canEdit ? theme.getPrimaryColor() : Colors.grey,
+                              editable ? theme.getPrimaryColor() : Colors.grey,
                         ),
                       ),
                     ],
@@ -293,15 +285,6 @@ class _DeviceLibraryState extends BaseState<DeviceLibrary> {
     await _load();
   }
 
-  Future<void> _checkCanEdit() async {
-    List<String> clientIds = await getClientIds();
-    bool canEditResult = await canEdit(clientIds: clientIds);
-
-    setState(() {
-      _canEdit = canEditResult;
-    });
-  }
-
   Future _addEditDeviceModelDialog({tapi.DeviceModel? deviceModel}) async {
     await super.alertDialog(
       titleStyle:
@@ -385,7 +368,7 @@ class _DeviceLibraryState extends BaseState<DeviceLibrary> {
 
       for (tapi.DeviceModel e in _entities) {
         _editable[e.id] = await super.canEdit(clientIds: e.clientIds);
-        _cards.add(_buildCard(e));
+        _cards.add(await _buildCard(e));
       }
     });
 

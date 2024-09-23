@@ -255,17 +255,14 @@ class _FacilitiesState extends BaseState<Facilities> {
   }
 
   Future _edit(tapi.Facility e) async {
-    var res = await TwinnedSession.instance.twin.getFacility(
-        facilityId: e.id, apikey: TwinnedSession.instance.authToken);
     await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => FacilityContentPage(
-          facility: res.body!.entity!,
+          facility: e,
           key: Key(
             Uuid().v4(),
           ),
-          type: InfraType.facility,
         ),
       ),
     );

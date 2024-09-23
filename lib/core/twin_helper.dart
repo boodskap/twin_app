@@ -146,6 +146,23 @@ class TwinHelper {
     return entity;
   }
 
+  static Future<List<tapi.DeviceModel>> getDeviceModels(
+      {String search = '*', int page = 0, int size = 10000}) async {
+    List<tapi.DeviceModel> models = [];
+
+    await execute(() async {
+      var res = await config.twinned.searchDeviceModels(
+        apikey: TwinnedSession.instance.authToken,
+        body: tapi.SearchReq(search: search, page: page, size: size),
+      );
+      if (TwinUtils.validateResponse(res)) {
+        models.addAll(res.body?.values ?? []);
+      }
+    });
+
+    return models;
+  }
+
   static Future<tapi.DeviceModel?> getDeviceModel(String id) async {
     tapi.DeviceModel? entity;
 

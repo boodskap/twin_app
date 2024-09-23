@@ -1,9 +1,8 @@
 import 'package:flutter/Material.dart';
 import 'package:flutter/material.dart';
 import 'package:twin_app/core/session_variables.dart';
-import 'package:twin_app/pages/twin/components/widgets/asset_device.dart';
 import 'package:twin_app/pages/twin/components/widgets/client_infratsructure_widget.dart';
-import 'package:twin_app/pages/twin/components/widgets/device_info_snippet.dart';
+import 'package:twin_app/pages/twin/components/widgets/facilities_content_page.dart';
 import 'package:twin_app/pages/twin/components/widgets/facility_snippet.dart';
 import 'package:twin_app/pages/twin/components/widgets/roles_infrastructure_widget.dart';
 import 'package:twin_app/pages/twin/components/widgets/utils.dart';
@@ -20,19 +19,12 @@ import 'package:twinned_widgets/core/top_bar.dart';
 import 'package:uuid/uuid.dart';
 
 class PremiseContentPage extends StatefulWidget {
-  final InfraType type;
-  final Premise? premise;
-  final Facility? facility;
-  final Floor? floor;
-  final Asset? asset;
+  final Premise premise;
 
-  const PremiseContentPage(
-      {super.key,
-      required this.type,
-      this.premise,
-      this.facility,
-      this.floor,
-      this.asset});
+  const PremiseContentPage({
+    super.key,
+    required this.premise,
+  });
 
   @override
   State<PremiseContentPage> createState() => _PremiseContentPageState();
@@ -72,69 +64,24 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
 
   @override
   void initState() {
-    switch (widget.type) {
-      case InfraType.premise:
-        domainKey = widget.premise!.domainKey;
-        heading = 'Premise';
-        name = widget.premise!.name;
-        selectedImage = 0;
-        imageIds = widget.premise!.images ?? [];
-        _name.text = widget.premise!.name;
-        _desc.text = widget.premise!.description ?? '';
-        _tags.text = (widget.premise!.tags ?? []).join(' ');
-        _pickedLocation = widget.premise!.location;
-        rolesSelected = widget.premise!.roles!;
-        clientsSelected = widget.premise!.clientIds!;
-        break;
-      case InfraType.facility:
-        domainKey = widget.facility!.domainKey;
-        heading = 'Facility';
-        name = widget.facility!.name;
-        selectedImage = 0;
-        imageIds = widget.facility!.images ?? [];
-        _name.text = widget.facility!.name;
-        _desc.text = widget.facility!.description ?? '';
-        _tags.text = (widget.facility!.tags ?? []).join(' ');
-        _pickedLocation = widget.facility!.location;
-        rolesSelected = widget.facility!.roles!;
-        clientsSelected = widget.facility!.clientIds!;
-        break;
-      case InfraType.floor:
-        domainKey = widget.floor!.domainKey;
-        heading = 'Floor';
-        name = widget.floor!.name;
-        if (null != widget.floor!.floorPlan &&
-            widget.floor!.floorPlan!.isNotEmpty) {
-          imageIds.add(widget.floor!.floorPlan!);
-        }
-        _name.text = widget.floor!.name;
-        _desc.text = widget.floor!.description ?? '';
-        _tags.text = (widget.floor!.tags ?? []).join(' ');
-        _pickedLocation = widget.floor!.location;
-        rolesSelected = widget.floor!.roles!;
-        clientsSelected = widget.floor!.clientIds!;
-        break;
-      case InfraType.asset:
-        domainKey = widget.asset!.domainKey;
-        heading = 'Asset';
-        name = widget.asset!.name;
-        selectedImage = 0;
-        imageIds = widget.asset!.images ?? [];
-        _name.text = widget.asset!.name;
-        _desc.text = widget.asset!.description ?? '';
-        _tags.text = (widget.asset!.tags ?? []).join(' ');
-        _pickedLocation = widget.asset!.location;
-        rolesSelected = widget.asset!.roles!;
-        clientsSelected = widget.asset!.clientIds!;
-        break;
-    }
+    super.initState();
+
+    domainKey = widget.premise.domainKey;
+    heading = 'Premise';
+    name = widget.premise.name;
+    selectedImage = 0;
+    imageIds = widget.premise.images ?? [];
+    _name.text = widget.premise.name;
+    _desc.text = widget.premise.description ?? '';
+    _tags.text = (widget.premise.tags ?? []).join(' ');
+    _pickedLocation = widget.premise.location;
+    rolesSelected = widget.premise.roles!;
+    clientsSelected = widget.premise.clientIds;
 
     if (null != _pickedLocation) {
       _location.text =
           '${_pickedLocation!.coordinates[0]}, ${_pickedLocation!.coordinates[1]}';
     }
-
-    super.initState();
   }
 
   @override
@@ -164,43 +111,12 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
     _devices.clear();
 
     await execute(() async {
-      switch (widget.type) {
-        case InfraType.premise:
-          var res = await TwinnedSession.instance.twin.searchFacilities(
-              apikey: TwinnedSession.instance.authToken,
-              premiseId: widget.premise!.id,
-              body: SearchReq(search: search, page: 0, size: 10000));
-          if (validateResponse(res)) {
-            _facilities.addAll(res.body!.values!);
-          }
-          break;
-        case InfraType.facility:
-          var res = await TwinnedSession.instance.twin.searchFloors(
-              apikey: TwinnedSession.instance.authToken,
-              facilityId: widget.facility!.id,
-              body: SearchReq(search: search, page: 0, size: 10000));
-          if (validateResponse(res)) {
-            _floors.addAll(res.body!.values!);
-          }
-          break;
-        case InfraType.floor:
-          var res = await TwinnedSession.instance.twin.searchAssets(
-              apikey: TwinnedSession.instance.authToken,
-              floorId: widget.floor!.id,
-              body: SearchReq(search: search, page: 0, size: 10000));
-          if (validateResponse(res)) {
-            _assets.addAll(res.body!.values!);
-          }
-          break;
-        case InfraType.asset:
-          var res = await TwinnedSession.instance.twin.searchDevices(
-              apikey: TwinnedSession.instance.authToken,
-              assetId: widget.asset!.id,
-              body: SearchReq(search: search, page: 0, size: 10000));
-          if (validateResponse(res)) {
-            _devices.addAll(res.body!.values!);
-          }
-          break;
+      var res = await TwinnedSession.instance.twin.searchFacilities(
+          apikey: TwinnedSession.instance.authToken,
+          premiseId: widget.premise.id,
+          body: SearchReq(search: search, page: 0, size: 10000));
+      if (validateResponse(res)) {
+        _facilities.addAll(res.body!.values!);
       }
     });
 
@@ -210,40 +126,11 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
 
   Future _upload() async {
     await execute(() async {
-      ImageFileEntityRes? res;
-
-      switch (widget.type) {
-        case InfraType.premise:
-          res = await TwinImageHelper.uploadPremiseImage(
-              premiseId: widget.premise!.id);
-          if (null != res) {
-            imageId = res.entity!.id;
-            widget.premise!.images!.add(imageId);
-          }
-          break;
-        case InfraType.facility:
-          res = await TwinImageHelper.uploadFacilityImage(
-              facilityId: widget.facility!.id);
-          if (null != res) {
-            imageId = res.entity!.id;
-            widget.facility!.images!.add(imageId);
-          }
-          break;
-        case InfraType.floor:
-          res =
-              await TwinImageHelper.uploadFloorImage(floorId: widget.floor!.id);
-          if (null != res) {
-            imageId = res.entity!.id;
-          }
-          break;
-        case InfraType.asset:
-          res =
-              await TwinImageHelper.uploadAssetImage(assetId: widget.asset!.id);
-          if (null != res) {
-            imageId = res.entity!.id;
-            widget.asset!.images!.add(imageId);
-          }
-          break;
+      ImageFileEntityRes? res = await TwinImageHelper.uploadPremiseImage(
+          premiseId: widget.premise.id);
+      if (null != res) {
+        imageId = res.entity!.id;
+        widget.premise.images!.add(imageId);
       }
 
       if (imageId.isNotEmpty) {
@@ -265,19 +152,7 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
             var res = await TwinnedSession.instance.twin.deleteImage(
                 apikey: TwinnedSession.instance.authToken, id: imageId);
             if (res.body!.ok) {
-              switch (widget.type) {
-                case InfraType.premise:
-                  widget.premise!.images!.remove(imageId);
-                  break;
-                case InfraType.facility:
-                  widget.facility!.images!.remove(imageId);
-                  break;
-                case InfraType.floor:
-                  break;
-                case InfraType.asset:
-                  widget.asset!.images!.remove(imageId);
-                  break;
-              }
+              widget.premise.images!.remove(imageId);
               setState(() {
                 imageId = '';
                 infraImage = const Icon(
@@ -414,247 +289,17 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
     }
   }
 
-  Widget _buildFacility(Facility e) {
-    int idx = e.selectedImage ?? 0;
-    if (idx < 0) idx = 0;
-    String imageId = '';
-    if (null != e.images && e.images!.length > idx) {
-      imageId = e.images![idx];
-    }
-    Widget image = imageId.isNotEmpty
-        ? TwinImageHelper.getCachedImage(e.domainKey, imageId)
-        : _missingImage;
-
-    return Card(
-      elevation: 10,
-      child: InkWell(
-        onDoubleTap: () async {
-          await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => PremiseContentPage(
-                key: Key(const Uuid().v4()),
-                type: InfraType.facility,
-                facility: e,
-              ),
-            ),
-          );
-          await _load();
-        },
-        child: Container(
-          color: Colors.white,
-          child: Row(
-            children: [
-              SizedBox(
-                  width: 100,
-                  height: 100,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: image,
-                  )),
-              divider(horizontal: true),
-              Center(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Column(
-                      children: [
-                        Text(
-                          e.name,
-                          style: theme.getStyle().copyWith(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                        ),
-                        Text(
-                          e.description ?? "",
-                          style: theme.getStyle().copyWith(fontSize: 16),
-                        ),
-                      ],
-                    ),
-                    SizedBox(width: 10),
-                  ],
-                ),
-              )
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFloor(Floor e) {
-    String imageId = '';
-    if (null != e.floorPlan && e.floorPlan!.isNotEmpty) {
-      imageId = e.floorPlan!;
-    }
-    Widget image = imageId.isNotEmpty
-        ? TwinImageHelper.getCachedImage(e.domainKey, imageId)
-        : _missingImage;
-
-    return Card(
-      elevation: 10,
-      child: InkWell(
-        onDoubleTap: () async {
-          await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => PremiseContentPage(
-                key: Key(const Uuid().v4()),
-                type: InfraType.floor,
-                floor: e,
-              ),
-            ),
-          );
-          await _load();
-        },
-        child: Container(
-          color: Colors.white,
-          child: Row(
-            children: [
-              SizedBox(
-                  width: 100,
-                  height: 100,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: image,
-                  )),
-              divider(horizontal: true),
-              Center(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Column(
-                      children: [
-                        Text(
-                          e.name,
-                          style: theme.getStyle().copyWith(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                        ),
-                        Text(
-                          e.description ?? "",
-                          style: theme.getStyle().copyWith(fontSize: 16),
-                        ),
-                      ],
-                    ),
-                    SizedBox(width: 10),
-                  ],
-                ),
-              )
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAsset(Asset e) {
-    int idx = e.selectedImage ?? 0;
-    String imageId = '';
-    if (null != e.images && e.images!.length > idx) {
-      imageId = e.images![idx];
-    }
-    Widget image = imageId.isNotEmpty
-        ? TwinImageHelper.getCachedImage(e.domainKey, imageId)
-        : _missingImage;
-
-    return Card(
-      elevation: 10,
-      child: InkWell(
-        onDoubleTap: () async {
-          await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => PremiseContentPage(
-                key: Key(const Uuid().v4()),
-                type: InfraType.asset,
-                asset: e,
-              ),
-            ),
-          );
-          await _load();
-        },
-        child: Container(
-          color: Colors.white,
-          child: Row(
-            children: [
-              SizedBox(
-                  width: 100,
-                  height: 100,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: image,
-                  )),
-              divider(horizontal: true),
-              Center(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Column(
-                      children: [
-                        Text(
-                          e.name,
-                          style: theme.getStyle().copyWith(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                        ),
-                        Text(
-                          e.description ?? "",
-                          style: theme.getStyle().copyWith(fontSize: 16),
-                        ),
-                      ],
-                    ),
-                    SizedBox(width: 10),
-                  ],
-                ),
-              )
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDevice(Device e) {
-    return Card(
-      elevation: 10,
-      child: Container(
-        color: Colors.white,
-        child: DeviceInfoSnippet(
-          device: e,
-          axis: Axis.horizontal,
-        ),
-      ),
-    );
-  }
-
   void _close() {
     Navigator.pop(context);
   }
 
   Future _save() async {
-    switch (widget.type) {
-      case InfraType.premise:
-        await _savePremise();
-        break;
-      case InfraType.facility:
-        await _saveFacility();
-        break;
-      case InfraType.floor:
-        await _saveFloor();
-        break;
-      case InfraType.asset:
-        await _saveAsset();
-        break;
-    }
+    await _savePremise();
   }
 
   Future _savePremise() async {
     await execute(() async {
-      PremiseInfo body = Utils.premiseInfo(widget.premise!,
+      PremiseInfo body = Utils.premiseInfo(widget.premise,
           name: _name.text,
           description: _desc.text,
           tags: _tags.text.trim().split(' '),
@@ -665,7 +310,7 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
 
       var res = await TwinnedSession.instance.twin.updatePremise(
           apikey: TwinnedSession.instance.authToken,
-          premiseId: widget.premise!.id,
+          premiseId: widget.premise.id,
           body: body);
 
       if (validateResponse(res)) {
@@ -677,106 +322,6 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
                 .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
       }
     });
-  }
-
-  Future _saveFacility() async {
-    await execute(() async {
-      FacilityInfo body = Utils.facilityInfo(widget.facility!,
-          name: _name.text,
-          description: _desc.text,
-          tags: _tags.text.trim().split(' '),
-          selectedImage: selectedImage,
-          location: _pickedLocation,
-          roles: rolesSelected,
-          clientIds: clientsSelected);
-
-      var res = await TwinnedSession.instance.twin.updateFacility(
-          apikey: TwinnedSession.instance.authToken,
-          facilityId: widget.facility!.id,
-          body: body);
-
-      if (validateResponse(res)) {
-        _close();
-        alert('Facility - ${res.body!.entity!.name}', ' Saved successfully!',
-            contentStyle: theme.getStyle(),
-            titleStyle: theme
-                .getStyle()
-                .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
-      }
-    });
-  }
-
-  Future _saveFloor() async {
-    await execute(() async {
-      FloorInfo body = Utils.floorInfo(widget.floor!,
-          name: _name.text,
-          description: _desc.text,
-          tags: _tags.text.trim().split(' '),
-          location: _pickedLocation,
-          floorPlan: imageId,
-          roles: rolesSelected,
-          clientIds: clientsSelected);
-
-      var res = await TwinnedSession.instance.twin.updateFloor(
-          apikey: TwinnedSession.instance.authToken,
-          floorId: widget.floor!.id,
-          body: body);
-
-      if (validateResponse(res)) {
-        _close();
-        alert('Floor - ${res.body!.entity!.name}', ' Saved successfully!',
-            contentStyle: theme.getStyle(),
-            titleStyle: theme
-                .getStyle()
-                .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
-      }
-    });
-  }
-
-  Future _saveAsset() async {
-    await execute(() async {
-      AssetInfo body = Utils.assetInfo(widget.asset!,
-          name: _name.text,
-          description: _desc.text,
-          tags: _tags.text.trim().split(' '),
-          selectedImage: selectedImage,
-          location: _pickedLocation,
-          roles: rolesSelected,
-          clientIds: clientsSelected);
-
-      var res = await TwinnedSession.instance.twin.updateAsset(
-          apikey: TwinnedSession.instance.authToken,
-          assetId: widget.asset!.id,
-          body: body);
-
-      if (validateResponse(res)) {
-        _close();
-        alert('Asset - ${res.body!.entity!.name}', ' Saved successfully!',
-            contentStyle: theme.getStyle(),
-            titleStyle: theme
-                .getStyle()
-                .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
-      }
-    });
-  }
-
-  Future _editAsset() async {
-    await showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) {
-          return AlertDialog(
-            scrollable: true,
-            content: SizedBox(
-              width: MediaQuery.of(context).size.width / 2,
-              height: 670,
-              child: AssetDevice(
-                asset: widget.asset!,
-              ),
-            ),
-          );
-        });
-    await _load();
   }
 
   @override
@@ -798,7 +343,7 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
                 child: LabelTextField(
                   style: theme.getStyle(),
                   labelTextStyle: theme.getStyle(),
-                  label: _getLabelName(widget.type),
+                  label: _getLabelName(InfraType.premise),
                   controller: _name,
                 ),
               ),
@@ -901,58 +446,15 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
                                 child: IntrinsicHeight(
                                   child: Column(
                                     children: <Widget>[
-                                      if (widget.type == InfraType.premise)
-                                        Align(
-                                          alignment: Alignment.topRight,
-                                          child: Text(
-                                            "${widget.premise!.name} - Facilities",
-                                            style: theme
-                                                .getStyle()
-                                                .copyWith(fontSize: 20),
-                                          ),
+                                      Align(
+                                        alignment: Alignment.topRight,
+                                        child: Text(
+                                          "${widget.premise.name} - Facilities",
+                                          style: theme
+                                              .getStyle()
+                                              .copyWith(fontSize: 20),
                                         ),
-                                      if (widget.type == InfraType.facility)
-                                        Align(
-                                          alignment: Alignment.topRight,
-                                          child: Text(
-                                            "${widget.facility!.name} - Floors",
-                                            style: theme
-                                                .getStyle()
-                                                .copyWith(fontSize: 20),
-                                          ),
-                                        ),
-                                      if (widget.type == InfraType.floor)
-                                        Align(
-                                          alignment: Alignment.topRight,
-                                          child: Text(
-                                            "${widget.floor!.name} - Assets",
-                                            style: theme
-                                                .getStyle()
-                                                .copyWith(fontSize: 20),
-                                          ),
-                                        ),
-                                      if (widget.type == InfraType.asset)
-                                        Align(
-                                          alignment: Alignment.topRight,
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.end,
-                                            children: [
-                                              Text(
-                                                "${widget.asset!.name} - Devices",
-                                                style: theme
-                                                    .getStyle()
-                                                    .copyWith(fontSize: 20),
-                                              ),
-                                              divider(horizontal: true),
-                                              IconButton(
-                                                  onPressed: () async {
-                                                    await _editAsset();
-                                                  },
-                                                  icon: const Icon(Icons.edit)),
-                                            ],
-                                          ),
-                                        ),
+                                      ),
                                       Row(
                                         children: [
                                           Tooltip(
@@ -991,7 +493,7 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
                                                   .width,
                                               child: SearchBar(
                                                   hintText: _getSearchHint(
-                                                      widget.type),
+                                                      InfraType.premise),
                                                   hintStyle:
                                                       WidgetStatePropertyAll(
                                                           theme.getStyle()),
@@ -1009,8 +511,7 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
                                         ],
                                       ),
                                       divider(),
-                                      if (canCreate() &&
-                                          widget.type == InfraType.premise)
+                                      if (canCreate())
                                         Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.end,
@@ -1030,15 +531,8 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
                                           ],
                                         ),
                                       divider(),
-                                      if (widget.type == InfraType.premise)
-                                        ..._facilities
-                                            .map((e) => _buildFacility(e)),
-                                      if (widget.type == InfraType.facility)
-                                        ..._floors.map((e) => _buildFloor(e)),
-                                      if (widget.type == InfraType.floor)
-                                        ..._assets.map((e) => _buildAsset(e)),
-                                      if (widget.type == InfraType.asset)
-                                        ..._devices.map((e) => _buildDevice(e)),
+                                      ..._facilities
+                                          .map((e) => _buildFacility(e)),
                                     ],
                                   ),
                                 ),
@@ -1085,11 +579,80 @@ class _PremiseContentPageState extends BaseState<PremiseContentPage> {
     );
   }
 
+  Widget _buildFacility(Facility e) {
+    int idx = e.selectedImage ?? 0;
+    if (idx < 0) idx = 0;
+    String imageId = '';
+    if (null != e.images && e.images!.length > idx) {
+      imageId = e.images![idx];
+    }
+    Widget image = imageId.isNotEmpty
+        ? TwinImageHelper.getCachedImage(e.domainKey, imageId)
+        : _missingImage;
+
+    return Card(
+      elevation: 10,
+      child: InkWell(
+        onDoubleTap: () async {
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => FacilityContentPage(
+                key: Key(const Uuid().v4()),
+                premise: widget.premise,
+                facility: e,
+              ),
+            ),
+          );
+          await _load();
+        },
+        child: Container(
+          color: Colors.white,
+          child: Row(
+            children: [
+              SizedBox(
+                  width: 100,
+                  height: 100,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: image,
+                  )),
+              divider(horizontal: true),
+              Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Column(
+                      children: [
+                        Text(
+                          e.name,
+                          style: theme.getStyle().copyWith(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                        ),
+                        Text(
+                          e.description ?? "",
+                          style: theme.getStyle().copyWith(fontSize: 16),
+                        ),
+                      ],
+                    ),
+                    SizedBox(width: 10),
+                  ],
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   void _addEditFacilityDialog({Facility? facility}) async {
     var res;
     Premise? selectedPremise;
 
-    if (facility != null && widget.premise != null) {
+    if (facility != null) {
       res = await TwinnedSession.instance.twin.getPremise(
         premiseId: facility.premiseId,
         apikey: TwinnedSession.instance.authToken,

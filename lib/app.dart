@@ -1162,9 +1162,9 @@ class HomeScreenState extends BaseState<HomeScreen> {
         session.screens.clear();
         session.screenMenus.clear();
 
-        var sRes = await TwinnedSession.instance.twin.listDashboardScreens(
+        var sRes = await TwinnedSession.instance.twin.searchDashboardScreens(
           apikey: session.orgs[session.selectedOrg].twinAuthToken,
-          body: tapi.ListReq(size: 25, page: 0),
+          body: const tapi.SearchReq(search: '*', size: 25, page: 0),
         );
         if (TwinHelper.validateResponse(sRes)) {
           session.screens.addAll(sRes.body?.values ?? []);

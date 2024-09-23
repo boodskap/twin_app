@@ -197,9 +197,9 @@ class _CreateEditAssetLibraryState extends BaseState<CreateEditAssetLibrary>
   }
 
   Future _prefill() async {
-    if (TwinnedSession.instance.isClient()) {
-      final List<String> ids = await TwinnedSession.instance.getClientIds();
-      _assetModelInfo.copyWith(clientIds: ids);
+    if (isClient()) {
+      _assetModelInfo =
+          _assetModelInfo.copyWith(clientIds: await getClientIds());
     }
 
     List<twin.AssetDeviceModel> adModels = [];
@@ -231,7 +231,7 @@ class _CreateEditAssetLibraryState extends BaseState<CreateEditAssetLibrary>
       adModels.add(adm.copyWith(scrappingTables: asTables));
     }
 
-    _assetModelInfo.copyWith(allowedDeviceModels: adModels);
+    _assetModelInfo = _assetModelInfo.copyWith(allowedDeviceModels: adModels);
   }
 
   Future _update() async {

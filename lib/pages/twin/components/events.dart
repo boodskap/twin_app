@@ -24,15 +24,12 @@ class _EventsState extends BaseState<Events> {
   final List<Widget> _cards = [];
   String _search = '';
   tapi.DeviceModel? _selectedDeviceModel;
-
-  bool _canEdit = false;
   Map<String, bool> _editable = Map<String, bool>();
   tapi.EventInfo? body;
 
   @override
   void initState() {
     super.initState();
-    _checkCanEdit();
   }
 
   @override
@@ -128,10 +125,7 @@ class _EventsState extends BaseState<Events> {
   }
 
   Widget _buildCard(tapi.Event e) {
-    bool editable = _canEdit;
-    if (!editable) {
-      editable = _editable[e.id] ?? false;
-    }
+    bool editable = _editable[e.id] ?? false;
     double width = MediaQuery.of(context).size.width / 8;
     Widget imageWidget;
     if (e.icon != null && e.icon!.isNotEmpty) {
@@ -154,7 +148,7 @@ class _EventsState extends BaseState<Events> {
       height: width,
       child: InkWell(
         onDoubleTap: () {
-          if (_canEdit) {
+          if (editable) {
             _edit(e);
           }
         },
@@ -185,47 +179,48 @@ class _EventsState extends BaseState<Events> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Tooltip(
-                          message: "Upload Image",
-                          child: IconButton(
-                            icon: Icon(
-                              Icons.upload,
-                              color: theme.getPrimaryColor(),
+                        if (editable)
+                          Tooltip(
+                            message: "Upload Image",
+                            child: IconButton(
+                              icon: Icon(
+                                Icons.upload,
+                                color: theme.getPrimaryColor(),
+                              ),
+                              onPressed: () {
+                                _uploadImage(e);
+                              },
                             ),
-                            onPressed: () {
-                              _uploadImage(e);
-                            },
                           ),
-                        ),
                         InkWell(
-                          onTap: _canEdit
+                          onTap: editable
                               ? () {
                                   _edit(e);
                                 }
                               : null,
                           child: Tooltip(
                             message:
-                                _canEdit ? "Update" : "No Permission to Edit",
+                                editable ? "Update" : "No Permission to Edit",
                             child: Icon(
                               Icons.edit,
-                              color: _canEdit
+                              color: editable
                                   ? theme.getPrimaryColor()
                                   : Colors.grey,
                             ),
                           ),
                         ),
                         InkWell(
-                          onTap: _canEdit
+                          onTap: editable
                               ? () {
                                   _delete(e);
                                 }
                               : null,
                           child: Tooltip(
                             message:
-                                _canEdit ? "Delete" : "No Permission to Delete",
+                                editable ? "Delete" : "No Permission to Delete",
                             child: Icon(
                               Icons.delete_forever,
-                              color: _canEdit
+                              color: editable
                                   ? theme.getPrimaryColor()
                                   : Colors.grey,
                             ),
@@ -245,15 +240,6 @@ class _EventsState extends BaseState<Events> {
         ),
       ),
     );
-  }
-
-  Future<void> _checkCanEdit() async {
-    List<String> clientIds = await getClientIds();
-    bool canEditResult = await canEdit(clientIds: clientIds);
-
-    setState(() {
-      _canEdit = canEditResult;
-    });
   }
 
   Future<void> _getBasicInfo(BuildContext context, String title,

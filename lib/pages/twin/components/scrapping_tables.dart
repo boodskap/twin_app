@@ -21,14 +21,7 @@ class _ScrappingTablesState extends BaseState<ScrappingTables> {
   final List<tapi.ScrappingTable> _entities = [];
   final List<Widget> _cards = [];
   String _search = '';
-  bool _canEdit = false;
   Map<String, bool> _editable = Map<String, bool>();
-
-  @override
-  void initState() {
-    super.initState();
-    _checkCanEdit();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +44,7 @@ class _ScrappingTablesState extends BaseState<ScrappingTables> {
                 Icons.add,
                 color: Colors.white,
               ),
-              onPressed: (isAdmin()) ? _create : null,
+              onPressed: (isAdmin() || isClientAdmin()) ? _create : null,
             ),
             divider(horizontal: true),
             SizedBox(
@@ -104,10 +97,7 @@ class _ScrappingTablesState extends BaseState<ScrappingTables> {
   }
 
   Widget _buildCard(tapi.ScrappingTable e) {
-    bool editable = _canEdit;
-    if (!editable) {
-      editable = _editable[e.id] ?? false;
-    }
+    bool editable = _editable[e.id] ?? false;
     return InkWell(
       onDoubleTap: () {
         if (editable) {
@@ -147,31 +137,31 @@ class _ScrappingTablesState extends BaseState<ScrappingTables> {
                   Row(
                     children: [
                       Tooltip(
-                        message: _canEdit ? "Update" : "No Permission to Edit",
+                        message: editable ? "Update" : "No Permission to Edit",
                         child: InkWell(
-                          onTap: _canEdit
+                          onTap: editable
                               ? () {
                                   _edit(e);
                                 }
                               : null,
                           child: Icon(
                             Icons.edit,
-                            color: _canEdit ? Colors.white : Colors.grey,
+                            color: editable ? Colors.white : Colors.grey,
                           ),
                         ),
                       ),
                       Tooltip(
                         message:
-                            _canEdit ? "Delete" : "No Permission to Delete",
+                            editable ? "Delete" : "No Permission to Delete",
                         child: InkWell(
-                          onTap: _canEdit
+                          onTap: editable
                               ? () {
                                   confirmDeletion(context, e);
                                 }
                               : null,
                           child: Icon(
                             Icons.delete_forever,
-                            color: _canEdit ? Colors.white : Colors.grey,
+                            color: editable ? Colors.white : Colors.grey,
                           ),
                         ),
                       ),
@@ -317,14 +307,6 @@ class _ScrappingTablesState extends BaseState<ScrappingTables> {
     return rows;
   }
 
-  Future<void> _checkCanEdit() async {
-    bool canEditResult = await isAdmin();
-
-    setState(() {
-      _canEdit = canEditResult;
-    });
-  }
-
   Future _create() async {
     await Navigator.push(
       context,
@@ -431,7 +413,7 @@ class _ScrappingTablesState extends BaseState<ScrappingTables> {
       }
 
       for (tapi.ScrappingTable e in _entities) {
-        _editable[e.id] = await super.isAdmin();
+        _editable[e.id] = await canEdit(clientIds: e.clientIds);
         _cards.add(_buildCard(e));
       }
     });

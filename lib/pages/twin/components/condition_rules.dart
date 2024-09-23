@@ -24,13 +24,11 @@ class _ConditionRulesState extends BaseState<ConditionRules> {
   tapi.DeviceModel? _selectedDeviceModel;
   Set<String> _selectedModel = {};
   Map<String, String> _modelNames = {};
-  bool _canEdit = false;
   Map<String, bool> _editable = Map<String, bool>();
 
   @override
   void initState() {
     super.initState();
-    _checkCanEdit();
   }
 
   @override
@@ -157,14 +155,12 @@ class _ConditionRulesState extends BaseState<ConditionRules> {
       text: e.values?.join('\n') ?? '',
     );
 
-    bool editable = _canEdit;
-    if (!editable) {
-      editable = _editable[e.id] ?? false;
-    }
+    bool editable = _editable[e.id] ?? false;
     double width = MediaQuery.of(context).size.width / 8;
+
     return InkWell(
       onDoubleTap: () {
-        if (_canEdit) {
+        if (editable) {
           _edit(e);
         }
       },
@@ -200,16 +196,16 @@ class _ConditionRulesState extends BaseState<ConditionRules> {
                         children: [
                           Tooltip(
                             message:
-                                _canEdit ? "Update" : "No Permission to Edit",
+                                editable ? "Update" : "No Permission to Edit",
                             child: InkWell(
-                              onTap: _canEdit
+                              onTap: editable
                                   ? () {
                                       _edit(e);
                                     }
                                   : null,
                               child: Icon(
                                 Icons.edit,
-                                color: _canEdit
+                                color: editable
                                     ? theme.getPrimaryColor()
                                     : Colors.grey,
                               ),
@@ -217,16 +213,16 @@ class _ConditionRulesState extends BaseState<ConditionRules> {
                           ),
                           Tooltip(
                             message:
-                                _canEdit ? "Delete" : "No Permission to Delete",
+                                editable ? "Delete" : "No Permission to Delete",
                             child: InkWell(
-                              onTap: _canEdit
+                              onTap: editable
                                   ? () {
                                       _confirmDeletionDialog(context, e);
                                     }
                                   : null,
                               child: Icon(
                                 Icons.delete_forever_rounded,
-                                color: _canEdit
+                                color: editable
                                     ? theme.getPrimaryColor()
                                     : Colors.grey,
                               ),
@@ -425,15 +421,6 @@ class _ConditionRulesState extends BaseState<ConditionRules> {
     );
   }
 
-  Future<void> _checkCanEdit() async {
-    List<String> clientIds = await getClientIds();
-    bool canEditResult = await canEdit(clientIds: clientIds);
-
-    setState(() {
-      _canEdit = canEditResult;
-    });
-  }
-
   Future _getDeviceModel() async {
     await execute(() async {
       for (var modelId in _selectedModel) {
@@ -555,10 +542,10 @@ class _ConditionRulesState extends BaseState<ConditionRules> {
         _entities.removeAt(index);
         _cards.removeAt(index);
         alert("Conditions Rules - ${e.name}", "Deleted Successfully!",
-                contentStyle: theme.getStyle(),
-                titleStyle: theme
-                    .getStyle()
-                    .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
+            contentStyle: theme.getStyle(),
+            titleStyle: theme
+                .getStyle()
+                .copyWith(fontSize: 18, fontWeight: FontWeight.bold));
       }
     });
     loading = false;

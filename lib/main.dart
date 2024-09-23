@@ -21,7 +21,7 @@ void main() async {
 
   start(
     appTitle: 'My Twin App',
-    flavour: 'dev',
+    flavour: 'prod',
     homeMenu: TwinAppMenu.home,
     homeMenuTitle: 'Home',
     disableTwinApp: false,
@@ -106,9 +106,9 @@ Future _loadCustomDashboards() async {
   debugPrint('MY ORGANIZATIONS: ${session.orgs}');
   await TwinHelper.execute(() async {
     session.screens.clear();
-    var sRes = await TwinnedSession.instance.twin.listDashboardScreens(
+    var sRes = await TwinnedSession.instance.twin.searchDashboardScreens(
       apikey: session.orgs[session.selectedOrg].twinAuthToken,
-      body: tapi.ListReq(size: 25, page: 0),
+      body: const tapi.SearchReq(search: '*', size: 25, page: 0),
     );
     if (TwinHelper.validateResponse(sRes)) {
       session.screens.addAll(sRes.body?.values ?? []);

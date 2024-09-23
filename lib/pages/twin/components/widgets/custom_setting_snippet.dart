@@ -238,9 +238,9 @@ class _CustomSettingsSnipperState extends BaseState<CustomSettingsSnippet> {
     _scrappingTables.clear();
 
     execute(() async {
-      var sRes = await TwinnedSession.instance.twin.listScrappingTables(
+      var sRes = await TwinnedSession.instance.twin.searchScrappingTables(
           apikey: TwinnedSession.instance.authToken,
-          body: const twin.ListReq(page: 0, size: 10000));
+          body: const twin.SearchReq(search: '*', page: 0, size: 10000));
 
       if (validateResponse(sRes)) {
         refresh(sync: () {

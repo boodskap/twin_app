@@ -58,10 +58,10 @@ class _VisualAlarmStatePageState extends BaseState<VisualAlarmStatePage> {
 
   @override
   void setup() async {
-    var res = await TwinnedSession.instance.twin.listConditions(
+    var res = await TwinnedSession.instance.twin.searchConditions(
       apikey: TwinnedSession.instance.authToken,
       modelId: widget.alarm.modelId,
-      body: const tapi.ListReq(page: 0, size: 10000),
+      body: const tapi.SearchReq(search: '*', page: 0, size: 10000),
     );
 
     if (validateResponse(res)) {
