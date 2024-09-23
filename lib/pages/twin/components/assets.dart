@@ -33,7 +33,6 @@ class _AssetsState extends BaseState<Assets> {
   String _search = '';
   tapi.Premise? _selectedPremise;
   tapi.Facility? _selectedFacility;
-  tapi.AssetModel? _selectedAssetModel;
   tapi.Floor? _selectedFloor;
   bool _canEdit = false;
   Map<String, bool> _editable = Map<String, bool>();
@@ -193,10 +192,10 @@ class _AssetsState extends BaseState<Assets> {
   Future<String> getImageId(tapi.Device e) async {
     String imageId = (e.images?.isNotEmpty ?? false) ? e.images!.first : '';
 
-    if (imageId.isEmpty) {
-      imageId = (null != _models[e.modelId])
-          ? (_models[e.modelId]?.images?.first ?? '')
-          : '';
+    if (imageId.isEmpty &&
+        null != _models[e.modelId] &&
+        (_models[e.modelId]?.images?.isNotEmpty ?? false)) {
+      imageId = _models[e.modelId]?.images?.first ?? '';
     }
 
     if (imageId.isEmpty) {
@@ -214,11 +213,12 @@ class _AssetsState extends BaseState<Assets> {
     tapi.Device? device = _devices[deviceId];
     if (null == device) {
       device = await TwinHelper.getDevice(deviceId);
+      _devices[deviceId] = device!;
     }
-    String imageId = await getImageId(device!);
+    String imageId = await getImageId(device);
     return Chip(
       label: Text(
-        device!.name,
+        device.name,
         style: theme
             .getStyle()
             .copyWith(fontSize: 10, fontWeight: FontWeight.bold),
