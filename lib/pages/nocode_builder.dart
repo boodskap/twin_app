@@ -39,11 +39,16 @@ class _NocodeBuilderPageState extends BaseState<NocodeBuilderPage> {
   }
 
   Future<void> _getBasicInfo(BuildContext context, String title,
-      {required DashboardBasicInfoCallback onPressed}) async {
-    String nameText = '';
-    String titleText = '';
-    String descText = '';
-    String tagsText = '';
+      {String nameText = '',
+      String titleText = '',
+      String descText = '',
+      String tagsText = '',
+      required DashboardBasicInfoCallback onPressed}) async {
+    TextEditingController nameC = TextEditingController(text: nameText);
+    TextEditingController titleC = TextEditingController(text: titleText);
+    TextEditingController descC = TextEditingController(text: descText);
+    TextEditingController tagsC = TextEditingController(text: tagsText);
+
     return showDialog(
         context: context,
         barrierDismissible: false,
@@ -68,6 +73,7 @@ class _NocodeBuilderPageState extends BaseState<NocodeBuilderPage> {
                 children: [
                   TextField(
                     style: theme.getStyle(),
+                    controller: nameC,
                     onChanged: (value) {
                       setState(() {
                         nameText = value;
@@ -82,6 +88,7 @@ class _NocodeBuilderPageState extends BaseState<NocodeBuilderPage> {
                   ),
                   TextField(
                     style: theme.getStyle(),
+                    controller: titleC,
                     onChanged: (value) {
                       setState(() {
                         titleText = value;
@@ -96,6 +103,7 @@ class _NocodeBuilderPageState extends BaseState<NocodeBuilderPage> {
                   ),
                   TextField(
                     style: theme.getStyle(),
+                    controller: descC,
                     onChanged: (value) {
                       setState(() {
                         descText = value;
@@ -110,6 +118,7 @@ class _NocodeBuilderPageState extends BaseState<NocodeBuilderPage> {
                   ),
                   TextField(
                     style: theme.getStyle(),
+                    controller: tagsC,
                     onChanged: (value) {
                       setState(() {
                         tagsText = value;
@@ -187,6 +196,103 @@ class _NocodeBuilderPageState extends BaseState<NocodeBuilderPage> {
                 tags: tags.split(' '),
                 rows: [],
                 clientIds: await getClientIds(),
+              ));
+          if (validateResponse(res)) {
+            await _edit(res.body!.entity!);
+          }
+        });
+      },
+    );
+    loading = false;
+    refresh();
+  }
+
+  Future _update(tapi.DashboardScreen e) async {
+    if (loading) return;
+    loading = true;
+    await _getBasicInfo(
+      context,
+      'Update ${e.name}',
+      nameText: e.name,
+      descText: e.description ?? '',
+      titleText: e.name,
+      tagsText: e.tags?.join(" ") ?? '',
+      onPressed: (name, title, description, tags) async {
+        await execute(() async {
+          var res = await TwinnedSession.instance.twin.updateDashboardScreen(
+              apikey: TwinnedSession.instance.authToken,
+              screenId: e.id,
+              body: twinned.DashboardScreenInfo(
+                name: name,
+                titleConfig: twinned.TitleConfig(title: title),
+                description: description,
+                tags: tags.split(' '),
+                rows: e.rows,
+                clientIds: e.clientIds,
+                roles: e.roles,
+                paddingConfig: e.paddingConfig,
+                bannerHeight: e.bannerHeight,
+                bannerImageFit: e.bannerImageFit,
+                priority: e.priority,
+                marginConfig: e.marginConfig,
+                screenBorderConfig: e.screenBorderConfig,
+                crossAxisAlignment: e.crossAxisAlignment,
+                mainAxisAlignment: e.mainAxisAlignment,
+                bannerImage: e.bannerImage,
+                bgColor: e.bgColor,
+                bgImage: e.bgImage,
+                bgImageFit: e.bgImageFit,
+                mainAxisSize: e.mainAxisSize,
+                scrollDirection: e.scrollDirection,
+                spacing: e.spacing,
+              ));
+          if (validateResponse(res)) {
+            await _edit(res.body!.entity!);
+          }
+        });
+      },
+    );
+    loading = false;
+    refresh();
+  }
+
+  Future _clone(tapi.DashboardScreen e) async {
+    if (loading) return;
+    loading = true;
+    await _getBasicInfo(
+      context,
+      'Update ${e.name}',
+      nameText: e.name,
+      descText: e.description ?? '',
+      titleText: e.name,
+      tagsText: e.tags?.join(" ") ?? '',
+      onPressed: (name, title, description, tags) async {
+        await execute(() async {
+          var res = await TwinnedSession.instance.twin.createDashboardScreen(
+              apikey: TwinnedSession.instance.authToken,
+              body: twinned.DashboardScreenInfo(
+                name: name,
+                titleConfig: twinned.TitleConfig(title: title),
+                description: description,
+                tags: tags.split(' '),
+                rows: e.rows,
+                clientIds: e.clientIds,
+                roles: e.roles,
+                paddingConfig: e.paddingConfig,
+                bannerHeight: e.bannerHeight,
+                bannerImageFit: e.bannerImageFit,
+                priority: e.priority,
+                marginConfig: e.marginConfig,
+                screenBorderConfig: e.screenBorderConfig,
+                crossAxisAlignment: e.crossAxisAlignment,
+                mainAxisAlignment: e.mainAxisAlignment,
+                bannerImage: e.bannerImage,
+                bgColor: e.bgColor,
+                bgImage: e.bgImage,
+                bgImageFit: e.bgImageFit,
+                mainAxisSize: e.mainAxisSize,
+                scrollDirection: e.scrollDirection,
+                spacing: e.spacing,
               ));
           if (validateResponse(res)) {
             await _edit(res.body!.entity!);
@@ -304,30 +410,45 @@ class _NocodeBuilderPageState extends BaseState<NocodeBuilderPage> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
                     )),
+                Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                      entity.name,
+                      // clippedName,
+                      style: theme.getStyle().copyWith(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
+                      overflow: TextOverflow.ellipsis,
+                    )),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Expanded(
-                      flex: 4,
-                      child: Text(
-                        entity.name,
-                        // clippedName,
-                        style: theme.getStyle().copyWith(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                            ),
-                        overflow: TextOverflow.ellipsis,
+                    IconButton(
+                      onPressed: () {
+                        _update(entity);
+                      },
+                      icon: Icon(
+                        Icons.edit,
+                        color: theme.getPrimaryColor(),
                       ),
                     ),
-                    Expanded(
-                      flex: 1,
-                      child: IconButton(
-                        onPressed: () {
-                          confirmDeletion(context, entity);
-                        },
-                        icon: Icon(
-                          Icons.delete,
-                          color: theme.getPrimaryColor(),
-                        ),
+                    IconButton(
+                      onPressed: () {
+                        _clone(entity);
+                      },
+                      icon: Icon(
+                        Icons.copy,
+                        color: theme.getPrimaryColor(),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        confirmDeletion(context, entity);
+                      },
+                      icon: Icon(
+                        Icons.delete,
+                        color: theme.getPrimaryColor(),
                       ),
                     ),
                   ],
@@ -468,7 +589,7 @@ class _NocodeBuilderPageState extends BaseState<NocodeBuilderPage> {
                   onPressed: () async {
                     await _addNew();
                   },
-                  labelKey: 'Add New',
+                  labelKey: 'Create New',
                 ),
               ),
             divider(horizontal: true),

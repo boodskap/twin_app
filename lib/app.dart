@@ -183,8 +183,20 @@ class _TwinAppState extends State<TwinApp> {
             Platform.isIOS ||
             MediaQuery.of(context).size.width <= 800)) {
       session.smallScreen = true;
+    } else if (kIsWeb &&
+        (defaultTargetPlatform == TargetPlatform.iOS ||
+            defaultTargetPlatform == TargetPlatform.android)) {
+      session.smallScreen = true;
     } else {
       session.smallScreen = false;
+    }
+
+    if (session.smallScreen && MediaQuery.of(context).size.width >= 1600) {
+      session.smallScreen = false;
+    }
+
+    if (!session.smallScreen && MediaQuery.of(context).size.width <= 800) {
+      session.smallScreen = true;
     }
 
     return MaterialApp.router(
