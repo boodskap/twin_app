@@ -21,12 +21,30 @@ class _GroupAssetsState extends BaseState<GroupAssets> {
   final List<Asset> _selected = [];
 
   @override
-  void setup() async {
-    await _search('*');
+  void setup() {
+    _load();
   }
 
   bool _isSelected(Asset asset) {
     return _selected.any((element) => element.id == asset.id);
+  }
+
+  Future _load() async {
+    _selected.clear();
+    _assets.clear();
+
+    await execute(() async {
+      var res = await TwinnedSession.instance.twin.getAssets(
+          apikey: TwinnedSession.instance.authToken,
+          body: GetReq(ids: widget.group.assetIds));
+      if (validateResponse(res)) {
+        _selected.addAll(res.body?.values ?? []);
+      }
+    });
+
+    refresh();
+
+    await _search('*');
   }
 
   Future _search(String search) async {
@@ -40,9 +58,6 @@ class _GroupAssetsState extends BaseState<GroupAssets> {
           body: SearchReq(search: search, page: 0, size: 100));
       if (validateResponse(res)) {
         for (var asset in res.body!.values!) {
-          if (widget.group.assetIds.contains(asset.id)) {
-            _selected.add(asset);
-          }
           if (!_isSelected(asset)) {
             _assets.add(asset);
           }
@@ -63,12 +78,13 @@ class _GroupAssetsState extends BaseState<GroupAssets> {
             _selected.add(_assets.removeAt(idx));
           });
         },
-        child: Card(
-          elevation: 5,
-          child: Container(
-            color: Colors.white,
-            child: Stack(children: [
-              Align(
+        child: SizedBox(
+          width: 250,
+          child: Card(
+            elevation: 5,
+            child: Container(
+              color: Colors.white,
+              child: Align(
                 alignment: Alignment.center,
                 child: Padding(
                   padding: const EdgeInsets.only(left: 8.0, top: 2.0),
@@ -80,7 +96,7 @@ class _GroupAssetsState extends BaseState<GroupAssets> {
                   ),
                 ),
               ),
-            ]),
+            ),
           ),
         ),
       ),
@@ -88,35 +104,38 @@ class _GroupAssetsState extends BaseState<GroupAssets> {
   }
 
   Widget _buildSelectedAsset(int idx) {
-    return Card(
-      elevation: 5,
-      child: Container(
-        color: Colors.white,
-        child: Stack(children: [
-          Align(
-            alignment: Alignment.center,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                _selected[idx].name,
-                style: theme.getStyle().copyWith(
-                    overflow: TextOverflow.ellipsis,
-                    fontWeight: FontWeight.bold),
+    return SizedBox(
+      width: 250,
+      child: Card(
+        elevation: 5,
+        child: Container(
+          color: Colors.white,
+          child: Stack(children: [
+            Align(
+              alignment: Alignment.center,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  _selected[idx].name,
+                  style: theme.getStyle().copyWith(
+                      overflow: TextOverflow.ellipsis,
+                      fontWeight: FontWeight.bold),
+                ),
               ),
             ),
-          ),
-          Align(
-            alignment: Alignment.topRight,
-            child: Tooltip(
-              message: 'Disassociate from ${widget.group.name}',
-              child: IconButton(
-                  onPressed: () {
-                    _disassociate(idx);
-                  },
-                  icon: const Icon(Icons.link_off)),
+            Align(
+              alignment: Alignment.topRight,
+              child: Tooltip(
+                message: 'Disassociate from ${widget.group.name}',
+                child: IconButton(
+                    onPressed: () {
+                      _disassociate(idx);
+                    },
+                    icon: const Icon(Icons.link_off)),
+              ),
             ),
-          ),
-        ]),
+          ]),
+        ),
       ),
     );
   }
@@ -133,6 +152,8 @@ class _GroupAssetsState extends BaseState<GroupAssets> {
         clientIds = await getClientIds();
       }
 
+      debugPrint('Saving associated assets ${widget.group.assetIds}');
+
       var res = await TwinnedSession.instance.twin.updateAssetGroup(
           apikey: TwinnedSession.instance.authToken,
           assetGroupId: widget.group.id,
@@ -145,6 +166,7 @@ class _GroupAssetsState extends BaseState<GroupAssets> {
             clientIds: clientIds,
           ));
       if (validateResponse(res)) {
+        debugPrint('Saved associated assets ${res.body?.entity?.assetIds}');
         await alert(
           "Asset Group - ${widget.group.name}",
           'Saved successfully!',
@@ -179,6 +201,17 @@ class _GroupAssetsState extends BaseState<GroupAssets> {
 
   @override
   Widget build(BuildContext context) {
+    List<Widget> availableChildren = [];
+    List<Widget> selectedChildren = [];
+
+    for (int i = 0; i < _assets.length; i++) {
+      availableChildren.add(_buildAsset(i));
+    }
+
+    for (int i = 0; i < _selected.length; i++) {
+      selectedChildren.add(_buildSelectedAsset(i));
+    }
+
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
@@ -220,16 +253,13 @@ class _GroupAssetsState extends BaseState<GroupAssets> {
             height: 165,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
-              child: GridView.builder(
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 8,
-                      childAspectRatio: 1,
-                      crossAxisSpacing: 8,
-                      mainAxisSpacing: 8),
-                  itemCount: _assets.length,
-                  itemBuilder: (ctx, idx) {
-                    return _buildAsset(idx);
-                  }),
+              child: SingleChildScrollView(
+                child: Wrap(
+                  spacing: 5,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: availableChildren,
+                ),
+              ),
             ),
           ),
           divider(),
@@ -245,16 +275,13 @@ class _GroupAssetsState extends BaseState<GroupAssets> {
             height: 300,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
-              child: GridView.builder(
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 5,
-                      childAspectRatio: 1,
-                      crossAxisSpacing: 8,
-                      mainAxisSpacing: 8),
-                  itemCount: _selected.length,
-                  itemBuilder: (ctx, idx) {
-                    return _buildSelectedAsset(idx);
-                  }),
+              child: SingleChildScrollView(
+                child: Wrap(
+                  spacing: 5,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: selectedChildren,
+                ),
+              ),
             ),
           ),
           Row(
