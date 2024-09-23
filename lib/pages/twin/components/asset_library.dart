@@ -212,7 +212,7 @@ class _AssetLibraryState extends BaseState<AssetLibrary> {
     await super.alertDialog(
       titleStyle:
           theme.getStyle().copyWith(fontSize: 20, fontWeight: FontWeight.bold),
-      title: 'New Asset Type',
+      title: 'New Asset Library',
       width: MediaQuery.of(context).size.width / 2 + 100,
       height: MediaQuery.of(context).size.height / 2 + 100,
       body: const CreateEditAssetLibrary(),

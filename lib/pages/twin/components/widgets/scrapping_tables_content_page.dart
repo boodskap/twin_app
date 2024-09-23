@@ -325,7 +325,7 @@ class _ScrappingTablesContentPageState
       body: Column(
         children: [
           TopBar(
-            title: 'Digital Twin - Setting - ${widget.model?.name}',
+            title: 'Digital Twin - Scrapping Tables - ${widget.model?.name}',
             style: theme.getStyle().copyWith(
                 color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
           ),

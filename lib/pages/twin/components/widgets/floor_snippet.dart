@@ -62,6 +62,7 @@ class _FloorSnippetState extends BaseState<FloorSnippet> {
   @override
   void initState() {
     super.initState();
+  
     if (widget.selectedPremise != null) {
       _floor = _floor.copyWith(
         premiseId: widget.selectedPremise!.id,

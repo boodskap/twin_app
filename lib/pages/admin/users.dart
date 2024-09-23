@@ -335,7 +335,7 @@ class _UsersState extends BaseState<Users> {
                     ),
                   ),
                 ),
-              if (!isAdminStatus)
+              if (!isAdminStatus&&user.clientIds.isNotEmpty)
                 Tooltip(
                   message: isClientAdminStatus
                       ? 'Remove ClientAdmin Privilege'
