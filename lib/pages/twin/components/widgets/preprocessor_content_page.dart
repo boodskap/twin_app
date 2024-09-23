@@ -84,7 +84,7 @@ class _PreprocessorContentPageState extends BaseState<PreprocessorContentPage> {
 
   Future _save({bool shouldPop = false}) async {
     await execute(() async {
-      List<String> clientIds = [];
+      List<String> clientIds = widget.preprocessor?.clientIds ?? [];
       if (isClient()) {
         clientIds = await getClientIds();
       }

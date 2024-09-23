@@ -23,14 +23,7 @@ class _PreprocessorsState extends BaseState<Preprocessors> {
   final List<tapi.Preprocessor> _entities = [];
   final List<Widget> _cards = [];
   String _search = '';
-  bool _canEdit = false;
   Map<String, bool> _editable = Map<String, bool>();
-
-  @override
-  void initState() {
-    super.initState();
-    _checkCanEdit();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +46,7 @@ class _PreprocessorsState extends BaseState<Preprocessors> {
                 Icons.add,
                 color: Colors.white,
               ),
-              onPressed: isAdmin()
+              onPressed: (isAdmin() || isClientAdmin())
                   ? () {
                       _create();
                     }
@@ -110,10 +103,7 @@ class _PreprocessorsState extends BaseState<Preprocessors> {
   }
 
   Widget _buildCard(tapi.Preprocessor e) {
-    bool editable = _canEdit;
-    if (!editable) {
-      editable = _editable[e.id] ?? false;
-    }
+    bool editable = _editable[e.id] ?? false;
     double width = MediaQuery.of(context).size.width / 8;
     return SizedBox(
       width: width,
@@ -152,33 +142,33 @@ class _PreprocessorsState extends BaseState<Preprocessors> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         InkWell(
-                            onTap: _canEdit
+                            onTap: editable
                                 ? () {
                                     _edit(e);
                                   }
                                 : null,
                             child: Tooltip(
                               message:
-                                  _canEdit ? "Update" : "No Permission to Edit",
+                                  editable ? "Update" : "No Permission to Edit",
                               child: Icon(
                                 Icons.edit,
-                                color: _canEdit
+                                color: editable
                                     ? theme.getPrimaryColor()
                                     : Colors.grey,
                               ),
                             )),
                         InkWell(
-                          onTap: _canEdit
+                          onTap: editable
                               ? () {
                                   _delete(e);
                                 }
                               : null,
                           child: Tooltip(
                             message:
-                                _canEdit ? "Delete" : "No Permission to Delete",
+                                editable ? "Delete" : "No Permission to Delete",
                             child: Icon(
                               Icons.delete_forever,
-                              color: _canEdit
+                              color: editable
                                   ? theme.getPrimaryColor()
                                   : Colors.grey,
                             ),
@@ -196,18 +186,13 @@ class _PreprocessorsState extends BaseState<Preprocessors> {
     );
   }
 
-  Future<void> _checkCanEdit() async {
-    bool canEditResult = await isAdmin();
-
-    setState(() {
-      _canEdit = canEditResult;
-    });
-  }
-
   Future _create() async {
     if (loading) return;
     loading = true;
-
+    List<String> clientIds = [];
+    if (isClient()) {
+      clientIds = await getClientIds();
+    }
     await _getPreprocessorInfo(context, 'New Preprocessor',
         onPressed: (name, desc, className) async {
       var mRes = await TwinnedSession.instance.twin.createPreprocessor(
@@ -217,7 +202,8 @@ class _PreprocessorsState extends BaseState<Preprocessors> {
             description: desc,
             tags: [],
             className: className!,
-            clientIds: await getClientIds(),
+            clientIds: clientIds,
+            code: 'return data;',
           ));
       if (validateResponse(mRes)) {
         await _edit(mRes.body!.entity!);
@@ -390,7 +376,7 @@ class _PreprocessorsState extends BaseState<Preprocessors> {
       }
 
       for (tapi.Preprocessor e in _entities) {
-        _editable[e.id] = await super.isAdmin();
+        _editable[e.id] = await canEdit(clientIds: e.clientIds);
 
         _cards.add(_buildCard(e));
       }
