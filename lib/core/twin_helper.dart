@@ -10,6 +10,7 @@ import 'package:twinned_api/twinned_api.dart' as tapi;
 import 'package:verification_api/api/verification.swagger.dart' as vapi;
 import 'package:nocode_api/api/nocode.swagger.dart' as ncapi;
 import 'package:chopper/chopper.dart' as chopper;
+import 'package:twin_app/auth.dart';
 
 class TwinHelper {
   static void registerNoCode() {}
@@ -187,5 +188,11 @@ class TwinHelper {
     });
 
     return entities;
+  }
+
+  static Future<void> navigateToLogin(StreamAuth auth) async {
+    selectedMenu = homeMenu;
+    selectedMenuTitle = '';
+    await auth.signOut();
   }
 }
