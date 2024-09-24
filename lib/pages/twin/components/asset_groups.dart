@@ -15,11 +15,13 @@ typedef BasicInfoCallback = Future<void> Function(
     String name, String? description, String? tags);
 
 class AssetGroupList extends StatefulWidget {
+  final twinned.AssetGroupInfoTarget target;
   final double cardWidth;
   final double cardHeight;
 
   const AssetGroupList({
     super.key,
+    required this.target,
     this.cardWidth = 200,
     this.cardHeight = 200,
   });
@@ -30,24 +32,14 @@ class AssetGroupList extends StatefulWidget {
 
 class _AssetGroupListState extends BaseState<AssetGroupList> {
   final List<twinned.AssetGroup> _groups = [];
-  bool _canEdit = false;
   Map<String, bool> _editable = Map<String, bool>();
-  @override
-  void initState() {
-    super.initState();
-    _checkCanEdit();
-  }
 
   @override
   Widget build(BuildContext context) {
     final List<Widget> cards = [];
 
     for (var group in _groups) {
-      bool editable = _canEdit;
-      if (!editable) {
-        editable = _editable[group.id] ?? false;
-      }
-      _editable[group.id] = super.isAdmin();
+      bool editable = _editable[group.id] ?? false;
       Widget? image;
       if (group.icon != null && group.icon!.isNotEmpty) {
         image = TwinImageHelper.getCachedImage(group.domainKey, group.icon!);
@@ -93,16 +85,16 @@ class _AssetGroupListState extends BaseState<AssetGroupList> {
                 Positioned(
                   left: 8,
                   child: Tooltip(
-                    message: _canEdit ? "Delete" : "No Permission to Delete",
+                    message: editable ? "Delete" : "No Permission to Delete",
                     child: IconButton(
-                      onPressed: _canEdit
+                      onPressed: editable
                           ? () async {
                               await _delete(group);
                             }
                           : null,
                       icon: Icon(
                         Icons.delete_forever,
-                        color: _canEdit ? theme.getPrimaryColor() : Colors.grey,
+                        color: editable ? theme.getPrimaryColor() : Colors.grey,
                       ),
                     ),
                   ),
@@ -110,16 +102,16 @@ class _AssetGroupListState extends BaseState<AssetGroupList> {
                 Positioned(
                   right: 45,
                   child: Tooltip(
-                    message: _canEdit ? "Update" : "No Permission to Edit",
+                    message: editable ? "Update" : "No Permission to Edit",
                     child: IconButton(
-                      onPressed: _canEdit
+                      onPressed: editable
                           ? () async {
                               await _editGroup(group);
                             }
                           : null,
                       icon: Icon(
                         Icons.edit,
-                        color: _canEdit ? theme.getPrimaryColor() : Colors.grey,
+                        color: editable ? theme.getPrimaryColor() : Colors.grey,
                       ),
                     ),
                   ),
@@ -127,16 +119,16 @@ class _AssetGroupListState extends BaseState<AssetGroupList> {
                 Positioned(
                   right: 8,
                   child: Tooltip(
-                    message: _canEdit ? "Upload" : "No Permission to Upload",
+                    message: editable ? "Upload" : "No Permission to Upload",
                     child: IconButton(
-                      onPressed: _canEdit
+                      onPressed: editable
                           ? () async {
                               await _upload(group);
                             }
                           : null,
                       icon: Icon(
                         Icons.upload,
-                        color: _canEdit ? theme.getPrimaryColor() : Colors.grey,
+                        color: editable ? theme.getPrimaryColor() : Colors.grey,
                       ),
                     ),
                   ),
@@ -164,10 +156,14 @@ class _AssetGroupListState extends BaseState<AssetGroupList> {
             ),
             divider(horizontal: true),
             PrimaryButton(
-              labelKey: "Add New",
-              onPressed: isAdmin()
-                  ? () async {
-                      await _addNew();
+              labelKey: 'Create New',
+              leading: Icon(
+                Icons.add,
+                color: Colors.white,
+              ),
+              onPressed: (canCreate())
+                  ? () {
+                      _addNew();
                     }
                   : null,
             ),
@@ -196,32 +192,26 @@ class _AssetGroupListState extends BaseState<AssetGroupList> {
     );
   }
 
-  Future<void> _checkCanEdit() async {
-    bool canEditResult = await isAdmin();
-
-    setState(() {
-      _canEdit = canEditResult;
-    });
-  }
-
   Future<void> _load() async {
     if (loading) return;
     loading = true;
     _groups.clear();
 
     await execute(() async {
-      final res = await TwinnedSession.instance.twin.listAssetGroups(
+      final res = await TwinnedSession.instance.twin.searchAssetGroups(
         apikey: TwinnedSession.instance.authToken,
-        myGroups: false,
-        body: const twinned.ListReq(page: 0, size: 10000),
+        myGroups: widget.target == twinned.AssetGroupInfoTarget.user,
+        body: const twinned.SearchReq(search: '*', page: 0, size: 10000),
       );
 
       if (validateResponse(res)) {
-        setState(() {
-          _groups.addAll(res.body!.values!);
-        });
+        _groups.addAll(res.body!.values!);
       }
     });
+
+    for (twinned.AssetGroup ag in _groups) {
+      _editable[ag.id] = await canEdit(clientIds: ag.clientIds);
+    }
 
     loading = false;
     refresh();
@@ -242,7 +232,7 @@ class _AssetGroupListState extends BaseState<AssetGroupList> {
               description: description,
               tags: (tags ?? '').split(' '),
               icon: '',
-              target: twinned.AssetGroupInfoTarget.app,
+              target: widget.target,
               assetIds: [],
               clientIds: await getClientIds(),
             ),
@@ -430,7 +420,7 @@ class _AssetGroupListState extends BaseState<AssetGroupList> {
             description: group.description,
             tags: group.tags,
             icon: res!.entity!.id,
-            target: twinned.AssetGroupInfoTarget.app,
+            target: widget.target,
             assetIds: group.assetIds,
             clientIds: await getClientIds(),
           ),

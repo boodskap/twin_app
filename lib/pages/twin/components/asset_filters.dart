@@ -16,10 +16,16 @@ import 'package:twinned_widgets/core/device_model_dropdown.dart';
 import 'package:twinned_widgets/core/top_bar.dart';
 
 class AssetFilterList extends StatefulWidget {
+  final twinned.DataFilterInfoTarget target;
   final double cardWidth;
   final double cardHeight;
-  const AssetFilterList(
-      {super.key, this.cardWidth = 200, this.cardHeight = 200});
+
+  const AssetFilterList({
+    super.key,
+    required this.target,
+    this.cardWidth = 200,
+    this.cardHeight = 200,
+  });
 
   @override
   State<AssetFilterList> createState() => _AssetFilterListState();
@@ -29,25 +35,14 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
   final List<twinned.DataFilter> _dataFilters = [];
   final List<twinned.FieldFilter> _fieldFilters = [];
   tapi.DeviceModel? _selectedDeviceModel;
-  bool _canEdit = false;
   Map<String, bool> _editable = Map<String, bool>();
-
-  @override
-  void initState() {
-    super.initState();
-    _checkCanEdit();
-  }
 
   @override
   Widget build(BuildContext context) {
     final List<Widget> cards = [];
 
     for (var group in _fieldFilters) {
-      bool editable = _canEdit;
-      if (!editable) {
-        editable = _editable[group.id] ?? false;
-      }
-      _editable[group.id] = super.isAdmin();
+      bool editable = _editable[group.id] ?? false;
       Widget? image;
       if (null != group.icon && group.icon!.isNotEmpty) {
         image = TwinImageHelper.getCachedImage(group.domainKey, group.icon!);
@@ -60,6 +55,9 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
                 title: 'Generic Filter - ${group.name}',
                 body: FieldFilterSnippet(
                   fieldFilter: group,
+                  target: widget.target == twinned.DataFilterInfoTarget.app
+                      ? twinned.FieldFilterInfoTarget.app
+                      : twinned.FieldFilterInfoTarget.user,
                 ),
               );
               await _load();
@@ -95,9 +93,9 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
                   Positioned(
                     left: 8,
                     child: Tooltip(
-                      message: _canEdit ? "Delete" : "No Permission to Delete",
+                      message: editable ? "Delete" : "No Permission to Delete",
                       child: IconButton(
-                        onPressed: _canEdit
+                        onPressed: editable
                             ? () async {
                                 await _deleteField(group);
                               }
@@ -105,7 +103,7 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
                         icon: Icon(
                           Icons.delete_forever,
                           color:
-                              _canEdit ? theme.getPrimaryColor() : Colors.grey,
+                              editable ? theme.getPrimaryColor() : Colors.grey,
                         ),
                       ),
                     ),
@@ -113,9 +111,9 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
                   Positioned(
                     right: 45,
                     child: Tooltip(
-                      message: _canEdit ? "Update" : "No Permission to Edit",
+                      message: editable ? "Update" : "No Permission to Edit",
                       child: IconButton(
-                        onPressed: _canEdit
+                        onPressed: editable
                             ? () async {
                                 await alertDialog(
                                   titleStyle: theme.getStyle().copyWith(
@@ -124,6 +122,10 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
                                   title: 'Generic Filter - ${group.name}',
                                   body: FieldFilterSnippet(
                                     fieldFilter: group,
+                                    target: widget.target ==
+                                            twinned.DataFilterInfoTarget.app
+                                        ? twinned.FieldFilterInfoTarget.app
+                                        : twinned.FieldFilterInfoTarget.user,
                                   ),
                                 );
                                 await _load();
@@ -132,7 +134,7 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
                         icon: Icon(
                           Icons.edit,
                           color:
-                              _canEdit ? theme.getPrimaryColor() : Colors.grey,
+                              editable ? theme.getPrimaryColor() : Colors.grey,
                         ),
                       ),
                     ),
@@ -141,16 +143,16 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
                       right: 8,
                       child: Tooltip(
                         message:
-                            _canEdit ? "Upload" : "No Permission to Upload",
+                            editable ? "Upload" : "No Permission to Upload",
                         child: IconButton(
-                            onPressed: _canEdit
+                            onPressed: editable
                                 ? () async {
                                     await _uploadField(group);
                                   }
                                 : null,
                             icon: Icon(
                               Icons.upload,
-                              color: _canEdit
+                              color: editable
                                   ? theme.getPrimaryColor()
                                   : Colors.grey,
                             )),
@@ -166,11 +168,7 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
       if (null != group.icon && group.icon!.isNotEmpty) {
         image = TwinImageHelper.getCachedImage(group.domainKey, group.icon!);
       }
-      bool editable = _canEdit;
-      if (!editable) {
-        editable = _editable[group.id] ?? false;
-      }
-      _editable[group.id] = super.isAdmin();
+      bool editable = _editable[group.id] ?? false;
       cards.add(InkWell(
           onDoubleTap: () async {
             if (editable) {
@@ -214,9 +212,9 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
                   Positioned(
                     left: 8,
                     child: Tooltip(
-                      message: _canEdit ? "Delete" : "No Permission to Delete",
+                      message: editable ? "Delete" : "No Permission to Delete",
                       child: IconButton(
-                        onPressed: _canEdit
+                        onPressed: editable
                             ? () async {
                                 await _delete(group);
                               }
@@ -224,7 +222,7 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
                         icon: Icon(
                           Icons.delete_forever,
                           color:
-                              _canEdit ? theme.getPrimaryColor() : Colors.grey,
+                              editable ? theme.getPrimaryColor() : Colors.grey,
                         ),
                       ),
                     ),
@@ -232,9 +230,9 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
                   Positioned(
                     right: 45,
                     child: Tooltip(
-                      message: _canEdit ? "Update" : "No Permission to Edit",
+                      message: editable ? "Update" : "No Permission to Edit",
                       child: IconButton(
-                        onPressed: _canEdit
+                        onPressed: editable
                             ? () async {
                                 await _editGroup(group);
                               }
@@ -242,7 +240,7 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
                         icon: Icon(
                           Icons.edit,
                           color:
-                              _canEdit ? theme.getPrimaryColor() : Colors.grey,
+                              editable ? theme.getPrimaryColor() : Colors.grey,
                         ),
                       ),
                     ),
@@ -251,16 +249,16 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
                       right: 8,
                       child: Tooltip(
                         message:
-                            _canEdit ? "Upload" : "No Permission to Upload",
+                            editable ? "Upload" : "No Permission to Upload",
                         child: IconButton(
-                          onPressed: _canEdit
+                          onPressed: editable
                               ? () async {
                                   await _upload(group);
                                 }
                               : null,
                           icon: Icon(
                             Icons.upload,
-                            color: _canEdit
+                            color: editable
                                 ? theme.getPrimaryColor()
                                 : Colors.grey,
                           ),
@@ -299,7 +297,7 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
             divider(horizontal: true),
             PrimaryButton(
               labelKey: "Add New",
-              onPressed: (_selectedDeviceModel != null && isAdmin())
+              onPressed: (_selectedDeviceModel != null)
                   ? () async {
                       await _addNew();
                     }
@@ -307,13 +305,10 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
             ),
             divider(horizontal: true),
             PrimaryButton(
-              labelKey: "Add Generic",
-              onPressed: (isAdmin())
-                  ? () async {
-                      await _addNewField();
-                    }
-                  : null,
-            ),
+                labelKey: "Add Generic",
+                onPressed: () async {
+                  await _addNewField();
+                }),
             divider(horizontal: true),
           ],
         ),
@@ -342,14 +337,6 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
     );
   }
 
-  Future<void> _checkCanEdit() async {
-    bool canEditResult = await isAdmin();
-
-    setState(() {
-      _canEdit = canEditResult;
-    });
-  }
-
   Future _load() async {
     await _loadFieldFilters();
     await _loadDataFilters();
@@ -364,11 +351,13 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
       var res = await TwinnedSession.instance.twin.searchDataFilters(
           apikey: TwinnedSession.instance.authToken,
           modelId: _selectedDeviceModel?.id,
+          myFilters: widget.target == twinned.DataFilterInfoTarget.user,
           body: const twinned.SearchReq(search: '*', page: 0, size: 10000));
       if (validateResponse(res)) {
-        refresh(sync: () {
-          _dataFilters.addAll(res.body!.values!);
-        });
+        _dataFilters.addAll(res.body!.values!);
+        for (var g in _dataFilters) {
+          _editable[g.id] = await canEdit(clientIds: g.clientIds);
+        }
       }
     });
 
@@ -384,11 +373,13 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
     await execute(() async {
       var res = await TwinnedSession.instance.twin.searchFieldFilters(
           apikey: TwinnedSession.instance.authToken,
+          myFilters: widget.target == twinned.DataFilterInfoTarget.user,
           body: const twinned.SearchReq(search: '*', page: 0, size: 10000));
       if (validateResponse(res)) {
-        refresh(sync: () {
-          _fieldFilters.addAll(res.body!.values!);
-        });
+        _fieldFilters.addAll(res.body!.values!);
+        for (var g in _fieldFilters) {
+          _editable[g.id] = await canEdit(clientIds: g.clientIds);
+        }
       }
     });
 
@@ -408,6 +399,7 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
               modelId: _selectedDeviceModel!.id,
               name: name,
               label: name,
+              target: widget.target,
               description: description,
               tags: (tags ?? '').split(' '),
               matchGroups: [],
@@ -436,7 +428,11 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
             .getStyle()
             .copyWith(fontSize: 20, fontWeight: FontWeight.bold),
         title: 'New Generic Filter',
-        body: const FieldFilterSnippet());
+        body: FieldFilterSnippet(
+          target: widget.target == twinned.DataFilterInfoTarget.app
+              ? twinned.FieldFilterInfoTarget.app
+              : twinned.FieldFilterInfoTarget.user,
+        ));
     _loadFieldFilters();
   }
 
@@ -630,6 +626,7 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
               modelId: filter.modelId,
               name: filter.name,
               label: filter.label,
+              target: widget.target,
               matchGroups: filter.matchGroups,
               icon: res.entity!.id,
               tags: filter.tags,
@@ -666,6 +663,9 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
             body: twinned.FieldFilterInfo(
               name: filter.name,
               description: filter.description,
+              target: widget.target == twinned.DataFilterInfoTarget.app
+                  ? twinned.FieldFilterInfoTarget.app
+                  : twinned.FieldFilterInfoTarget.user,
               tags: filter.tags,
               icon: res.entity!.id,
               fieldType: twinned.FieldFilterInfoFieldType.values
@@ -771,6 +771,9 @@ class _AssetFilterContentState extends BaseState<AssetFilterContent> {
             modelId: widget.filter.modelId,
             name: _name.text,
             label: _name.text,
+            target: widget.filter.target == twinned.FieldFilterInfoTarget.app
+                ? twinned.DataFilterInfoTarget.app
+                : twinned.DataFilterInfoTarget.user,
             matchGroups: widget.filter.matchGroups,
             icon: widget.filter.icon,
             tags: _tags.text.split(' '),
@@ -893,7 +896,7 @@ class _AssetFilterContentState extends BaseState<AssetFilterContent> {
   List<Widget> _buildGroups(BuildContext context) {
     List<Widget> children = [];
 
-    for (int i = 0; i < widget.filter.matchGroups!.length; i++) {
+    for (int i = 0; i < widget.filter.matchGroups.length; i++) {
       children.add(_MatchGroupFilterWidget(
           parent: this, filter: widget.filter, index: i));
       children.add(divider());
@@ -908,10 +911,9 @@ class _AssetFilterContentState extends BaseState<AssetFilterContent> {
 
 class _MatchGroupFilterWidget extends StatefulWidget {
   final _AssetFilterContentState parent;
-  twinned.DataFilter filter;
+  final twinned.DataFilter filter;
   final int index;
   _MatchGroupFilterWidget({
-    super.key,
     required this.parent,
     required this.filter,
     required this.index,
@@ -924,12 +926,12 @@ class _MatchGroupFilterWidget extends StatefulWidget {
 
 class _MatchGroupFilterWidgetState extends BaseState<_MatchGroupFilterWidget> {
   List<DropdownMenuEntry<twinned.Condition>> _conditions = [];
-  twinned.Condition? selectedConition;
+  twinned.Condition? selectedCondition;
   Map<String, Widget> _selected = {};
 
   void _addCondition() {
     setState(() {
-      String id = selectedConition!.id;
+      String id = selectedCondition!.id;
       List<String> ids = [];
       ids.addAll(widget.filter.matchGroups[widget.index].conditionIds!);
       ids.add(id);
@@ -937,7 +939,7 @@ class _MatchGroupFilterWidgetState extends BaseState<_MatchGroupFilterWidget> {
           widget.filter.matchGroups[widget.index].copyWith(conditionIds: ids);
       _selected[id] = Chip(
         label: Text(
-          selectedConition!.name,
+          selectedCondition!.name,
           style: theme.getStyle(),
         ),
         onDeleted: () {
@@ -997,12 +999,12 @@ class _MatchGroupFilterWidgetState extends BaseState<_MatchGroupFilterWidget> {
                             divider(),
                             if (_conditions.isNotEmpty)
                               DropdownMenu<twinned.Condition>(
-                                initialSelection: selectedConition,
+                                initialSelection: selectedCondition,
                                 dropdownMenuEntries: _conditions,
                                 enableSearch: true,
                                 onSelected: (condition) {
                                   setState(() {
-                                    selectedConition = condition;
+                                    selectedCondition = condition;
                                   });
                                 },
                               ),
@@ -1011,10 +1013,10 @@ class _MatchGroupFilterWidgetState extends BaseState<_MatchGroupFilterWidget> {
                                   style: theme.getStyle()),
                             divider(horizontal: true),
                             if (_conditions.isNotEmpty &&
-                                null != selectedConition &&
+                                null != selectedCondition &&
                                 !widget.filter.matchGroups[widget.index]
                                     .conditionIds!
-                                    .contains(selectedConition!.id))
+                                    .contains(selectedCondition!.id))
                               IconButton(
                                   onPressed: () {
                                     _addCondition();
@@ -1106,7 +1108,7 @@ class _MatchGroupFilterWidgetState extends BaseState<_MatchGroupFilterWidget> {
           }
         }
         if (conditions.isNotEmpty) {
-          selectedConition = conditions.first.value;
+          selectedCondition = conditions.first.value;
         }
         setState(() {
           _conditions.clear();

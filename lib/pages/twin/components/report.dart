@@ -14,10 +14,13 @@ import 'package:twinned_api/twinned_api.dart' as tapi;
 import 'package:twinned_widgets/core/device_model_dropdown.dart';
 
 class AssetReportList extends StatefulWidget {
+  final twinned.ReportInfoTarget target;
   final double cardWidth;
   final double cardHeight;
+
   const AssetReportList({
     super.key,
+    required this.target,
     this.cardWidth = 200,
     this.cardHeight = 200,
   });
@@ -30,14 +33,7 @@ class _AssetReportListState extends BaseState<AssetReportList> {
   final List<twinned.Report> _reports = [];
   final List<Widget> _cards = [];
   tapi.DeviceModel? _selectedDeviceModel;
-  bool _canEdit = false;
   Map<String, bool> _editable = Map<String, bool>();
-
-  @override
-  void initState() {
-    super.initState();
-    _checkCanEdit();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -104,10 +100,7 @@ class _AssetReportListState extends BaseState<AssetReportList> {
   }
 
   Widget buildCard(twinned.Report report) {
-    bool editable = _canEdit;
-    if (!editable) {
-      editable = _editable[report.id] ?? false;
-    }
+    bool editable = _editable[report.id] ?? false;
     Widget? image;
     if (null != report.icon && report.icon!.isNotEmpty) {
       image = TwinImageHelper.getCachedImage(report.domainKey, report.icon!);
@@ -115,7 +108,7 @@ class _AssetReportListState extends BaseState<AssetReportList> {
 
     return InkWell(
       onDoubleTap: () async {
-        if (_canEdit) {
+        if (editable) {
           await _edit(report);
         }
       },
@@ -154,32 +147,32 @@ class _AssetReportListState extends BaseState<AssetReportList> {
               Positioned(
                   left: 8,
                   child: Tooltip(
-                    message: _canEdit ? "Delete" : "No Permission to Delete",
+                    message: editable ? "Delete" : "No Permission to Delete",
                     child: IconButton(
-                      onPressed: _canEdit
+                      onPressed: editable
                           ? () {
                               _delete(report);
                             }
                           : null,
                       icon: Icon(
                         Icons.delete_forever,
-                        color: _canEdit ? theme.getPrimaryColor() : Colors.grey,
+                        color: editable ? theme.getPrimaryColor() : Colors.grey,
                       ),
                     ),
                   )),
               Positioned(
                 right: 45,
                 child: Tooltip(
-                  message: _canEdit ? "Update" : "No Permission to Edit",
+                  message: editable ? "Update" : "No Permission to Edit",
                   child: IconButton(
-                    onPressed: _canEdit
+                    onPressed: editable
                         ? () async {
                             await _edit(report);
                           }
                         : null,
                     icon: Icon(
                       Icons.edit,
-                      color: _canEdit ? theme.getPrimaryColor() : Colors.grey,
+                      color: editable ? theme.getPrimaryColor() : Colors.grey,
                     ),
                   ),
                 ),
@@ -187,9 +180,9 @@ class _AssetReportListState extends BaseState<AssetReportList> {
               Positioned(
                   right: 8,
                   child: Tooltip(
-                    message: _canEdit ? "Upload" : "No Permission to Upload",
+                    message: editable ? "Upload" : "No Permission to Upload",
                     child: IconButton(
-                        onPressed: _canEdit
+                        onPressed: editable
                             ? () {
                                 _upload(report);
                               }
@@ -197,7 +190,7 @@ class _AssetReportListState extends BaseState<AssetReportList> {
                         icon: Icon(
                           Icons.upload,
                           color:
-                              _canEdit ? theme.getPrimaryColor() : Colors.grey,
+                              editable ? theme.getPrimaryColor() : Colors.grey,
                         )),
                   )),
             ],
@@ -205,15 +198,6 @@ class _AssetReportListState extends BaseState<AssetReportList> {
         ),
       ),
     );
-  }
-
-  Future<void> _checkCanEdit() async {
-    List<String> clientIds = await getClientIds();
-    bool canEditResult = await canEdit(clientIds: clientIds);
-
-    setState(() {
-      _canEdit = canEditResult;
-    });
   }
 
   Future _load() async {
@@ -233,6 +217,7 @@ class _AssetReportListState extends BaseState<AssetReportList> {
       var res = await TwinnedSession.instance.twin.searchReports(
           apikey: TwinnedSession.instance.authToken,
           modelId: modelId,
+          myReports: widget.target == twinned.ReportInfoTarget.user,
           body: const twinned.SearchReq(search: '*', page: 0, size: 10000));
 
       if (validateResponse(res)) {
@@ -269,6 +254,7 @@ class _AssetReportListState extends BaseState<AssetReportList> {
               includeDevice: false,
               includeAsset: true,
               fields: [],
+              target: widget.target,
               clientIds: await getClientIds(),
             ));
         if (validateResponse(res)) {
@@ -458,6 +444,7 @@ class _AssetReportListState extends BaseState<AssetReportList> {
               icon: res.entity!.id,
               tags: filter.tags,
               description: filter.description,
+              target: widget.target,
               clientIds: clientIds ?? filter.clientIds,
             ));
 
@@ -544,6 +531,9 @@ class _ReportContentWidgetState extends BaseState<ReportContentWidget> {
             tz: DateTime.now().timeZoneName,
             humanDateFormat: false,
             fields: widget.report.fields,
+            target: widget.report.target == twinned.ReportTarget.app
+                ? twinned.ReportInfoTarget.app
+                : twinned.ReportInfoTarget.user,
             clientIds: await getClientIds(),
           ));
       if (validateResponse(res)) {

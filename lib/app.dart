@@ -32,6 +32,9 @@ import 'package:twin_app/pages/pulse/sms.dart';
 import 'package:twin_app/pages/pulse/voice.dart';
 import 'package:twin_app/pages/roles_page.dart';
 import 'package:twin_app/pages/twin/components.dart';
+import 'package:twin_app/pages/twin/components/asset_filters.dart';
+import 'package:twin_app/pages/twin/components/asset_groups.dart';
+import 'package:twin_app/pages/twin/components/report.dart';
 import 'package:twin_app/pages/twin/organization_page.dart';
 import 'package:twin_app/router.dart';
 import 'package:twin_app/widgets/client_snippet.dart';
@@ -75,7 +78,11 @@ enum TwinAppMenu {
   pulseSms,
   pulseVoice,
   pulseGateway,
-  pulseTemplate;
+  pulseTemplate,
+  myGroups,
+  myFilters,
+  myReports,
+  ;
 }
 
 class CustomMenu {
@@ -697,6 +704,39 @@ class HomeScreenState extends BaseState<HomeScreen> {
         },
         onMenuSelected: (ctx) async {
           return SizedBox.shrink();
+        },
+      ),
+      session.TwinMenuItem(
+        text: 'My Groups',
+        id: TwinAppMenu.myGroups,
+        icon: Icons.group_add,
+        isMenuVisible: () {
+          return null != user;
+        },
+        onMenuSelected: (ctx) async {
+          return AssetGroupList(target: tapi.AssetGroupInfoTarget.user);
+        },
+      ),
+      session.TwinMenuItem(
+        text: 'My Filters',
+        id: TwinAppMenu.myFilters,
+        icon: Icons.filter_alt_sharp,
+        isMenuVisible: () {
+          return null != user;
+        },
+        onMenuSelected: (ctx) async {
+          return AssetFilterList(target: tapi.DataFilterInfoTarget.user);
+        },
+      ),
+      session.TwinMenuItem(
+        text: 'My Reports',
+        id: TwinAppMenu.myReports,
+        icon: Icons.menu_book,
+        isMenuVisible: () {
+          return null != user;
+        },
+        onMenuSelected: (ctx) async {
+          return AssetReportList(target: tapi.ReportInfoTarget.user);
         },
       ),
       session.TwinMenuItem(
