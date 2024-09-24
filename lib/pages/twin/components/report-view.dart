@@ -27,7 +27,6 @@ class _ReportViewGridState extends BaseState<ReportViewGrid> {
   int totalCount = 0;
   final List<DeviceData> _twinReportsData = [];
   String _searchQuery = '*';
-  TwinUser? user;
   List<String> dataFields = [];
   List<String> gridFieldHeader = [];
   List<String> defaultGridHeader = [];
@@ -426,9 +425,7 @@ class _ReportViewGridState extends BaseState<ReportViewGrid> {
     if (loading) return;
     loading = true;
     _twinReportsData.clear();
-    await execute(() async {
-      user = await TwinnedSession.instance.getUser();
-    });
+   
     await execute(() async {
       var qres = await TwinnedSession.instance.twin.queryEqlDeviceData(
         apikey: TwinnedSession.instance.authToken,
