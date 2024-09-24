@@ -164,9 +164,9 @@ class _AssetReportListState extends BaseState<AssetReportList> {
               Positioned(
                 right: 82,
                 child: Tooltip(
-                  message: _canEdit ? "View" : "No Permission to Edit",
+                  message: editable ? "View" : "No Permission to Edit",
                   child: IconButton(
-                    onPressed: _canEdit
+                    onPressed: editable
                         ? () {
                             Navigator.push(
                                 context,
@@ -179,7 +179,7 @@ class _AssetReportListState extends BaseState<AssetReportList> {
                         : null,
                     icon: Icon(
                       Icons.remove_red_eye,
-                      color: _canEdit ? theme.getPrimaryColor() : Colors.grey,
+                      color: editable ? theme.getPrimaryColor() : Colors.grey,
                     ),
                   ),
                 ),

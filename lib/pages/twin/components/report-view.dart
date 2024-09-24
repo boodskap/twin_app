@@ -114,7 +114,7 @@ class _ReportViewGridState extends BaseState<ReportViewGrid> {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             TopBar(
-              title: ' Report',
+              title: 'Custom Report View',
               style: theme.getStyle().copyWith(
                     color: Colors.white,
                     fontSize: 18,
