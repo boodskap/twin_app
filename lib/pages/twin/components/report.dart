@@ -2,6 +2,7 @@ import 'package:flutter/Material.dart';
 import 'package:flutter/material.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/pages/twin/components/asset_groups.dart';
+import 'package:twin_app/pages/twin/components/report-view.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:twin_app/widgets/commons/secondary_button.dart';
 import 'package:twin_commons/core/base_state.dart';
@@ -167,6 +168,29 @@ class _AssetReportListState extends BaseState<AssetReportList> {
                       ),
                     ),
                   )),
+              Positioned(
+                right: 82,
+                child: Tooltip(
+                  message: _canEdit ? "View" : "No Permission to Edit",
+                  child: IconButton(
+                    onPressed: _canEdit
+                        ? () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => ReportViewGrid(
+                                      entity: report,
+                                    )));
+                            
+                          }
+                        : null,
+                    icon: Icon(
+                      Icons.remove_red_eye,
+                      color: _canEdit ? theme.getPrimaryColor() : Colors.grey,
+                    ),
+                  ),
+                ),
+              ),
               Positioned(
                 right: 45,
                 child: Tooltip(
