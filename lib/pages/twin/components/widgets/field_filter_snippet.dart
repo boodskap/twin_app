@@ -10,9 +10,11 @@ import 'package:twinned_api/api/twinned.swagger.dart' as twinned;
 import 'package:twin_app/core/session_variables.dart';
 
 class FieldFilterSnippet extends StatefulWidget {
+  final twinned.FieldFilterInfoTarget target;
   final twinned.FieldFilter? fieldFilter;
   const FieldFilterSnippet({
     super.key,
+    required this.target,
     this.fieldFilter,
   });
 
@@ -206,16 +208,9 @@ class _FieldFilterSnippetState extends BaseState<FieldFilterSnippet> {
       clientIds = await getClientIds();
     }
 
-    twinned.FieldFilterInfoTarget target = twinned.FieldFilterInfoTarget.app;
-
-    if (null != widget.fieldFilter) {
-      target = twinned.FieldFilterInfoTarget.values
-          .byName(widget.fieldFilter!.target.name);
-    }
-
     twinned.FieldFilterInfo body = twinned.FieldFilterInfo(
       name: name,
-      target: target,
+      target: widget.target,
       description: _desc.text.trim(),
       tags: _tags.text.trim().split(' '),
       condition: condition,

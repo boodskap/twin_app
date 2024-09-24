@@ -15,11 +15,13 @@ typedef BasicInfoCallback = Future<void> Function(
     String name, String? description, String? tags);
 
 class AssetGroupList extends StatefulWidget {
+  final twinned.AssetGroupInfoTarget target;
   final double cardWidth;
   final double cardHeight;
 
   const AssetGroupList({
     super.key,
+    required this.target,
     this.cardWidth = 200,
     this.cardHeight = 200,
   });
@@ -198,7 +200,7 @@ class _AssetGroupListState extends BaseState<AssetGroupList> {
     await execute(() async {
       final res = await TwinnedSession.instance.twin.searchAssetGroups(
         apikey: TwinnedSession.instance.authToken,
-        myGroups: false,
+        myGroups: widget.target == twinned.AssetGroupInfoTarget.user,
         body: const twinned.SearchReq(search: '*', page: 0, size: 10000),
       );
 
@@ -230,7 +232,7 @@ class _AssetGroupListState extends BaseState<AssetGroupList> {
               description: description,
               tags: (tags ?? '').split(' '),
               icon: '',
-              target: twinned.AssetGroupInfoTarget.app,
+              target: widget.target,
               assetIds: [],
               clientIds: await getClientIds(),
             ),
@@ -418,7 +420,7 @@ class _AssetGroupListState extends BaseState<AssetGroupList> {
             description: group.description,
             tags: group.tags,
             icon: res!.entity!.id,
-            target: twinned.AssetGroupInfoTarget.app,
+            target: widget.target,
             assetIds: group.assetIds,
             clientIds: await getClientIds(),
           ),
