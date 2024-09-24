@@ -79,7 +79,11 @@ class _ComponentsState extends BaseState<Components> {
     _list.add(
         _createChild(icon: Icons.view_comfy, title: 'Assets', page: Assets()));
     _list.add(_createChild(
-        icon: Icons.group_add, title: 'Asset Groups', page: AssetGroupList()));
+        icon: Icons.group_add,
+        title: 'Asset Groups',
+        page: AssetGroupList(
+          target: tapi.AssetGroupInfoTarget.app,
+        )));
     _list.add(_createChild(
         icon: Icons.filter_alt_sharp,
         title: 'Asset Filters',
@@ -89,7 +93,9 @@ class _ComponentsState extends BaseState<Components> {
     _list.add(_createChild(
         icon: Icons.menu_book,
         title: 'Custom Reports',
-        page: AssetReportList()));
+        page: AssetReportList(
+          target: tapi.ReportInfoTarget.app,
+        )));
 
     _children.addAll(_list);
   }

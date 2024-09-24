@@ -38,11 +38,6 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
   Map<String, bool> _editable = Map<String, bool>();
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final List<Widget> cards = [];
 
@@ -60,6 +55,9 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
                 title: 'Generic Filter - ${group.name}',
                 body: FieldFilterSnippet(
                   fieldFilter: group,
+                  target: widget.target == twinned.DataFilterInfoTarget.app
+                      ? twinned.FieldFilterInfoTarget.app
+                      : twinned.FieldFilterInfoTarget.user,
                 ),
               );
               await _load();
@@ -124,6 +122,10 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
                                   title: 'Generic Filter - ${group.name}',
                                   body: FieldFilterSnippet(
                                     fieldFilter: group,
+                                    target: widget.target ==
+                                            twinned.DataFilterInfoTarget.app
+                                        ? twinned.FieldFilterInfoTarget.app
+                                        : twinned.FieldFilterInfoTarget.user,
                                   ),
                                 );
                                 await _load();
@@ -349,6 +351,7 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
       var res = await TwinnedSession.instance.twin.searchDataFilters(
           apikey: TwinnedSession.instance.authToken,
           modelId: _selectedDeviceModel?.id,
+          myFilters: widget.target == twinned.DataFilterInfoTarget.user,
           body: const twinned.SearchReq(search: '*', page: 0, size: 10000));
       if (validateResponse(res)) {
         _dataFilters.addAll(res.body!.values!);
@@ -370,6 +373,7 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
     await execute(() async {
       var res = await TwinnedSession.instance.twin.searchFieldFilters(
           apikey: TwinnedSession.instance.authToken,
+          myFilters: widget.target == twinned.DataFilterInfoTarget.user,
           body: const twinned.SearchReq(search: '*', page: 0, size: 10000));
       if (validateResponse(res)) {
         _fieldFilters.addAll(res.body!.values!);
@@ -424,7 +428,11 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
             .getStyle()
             .copyWith(fontSize: 20, fontWeight: FontWeight.bold),
         title: 'New Generic Filter',
-        body: const FieldFilterSnippet());
+        body: FieldFilterSnippet(
+          target: widget.target == twinned.DataFilterInfoTarget.app
+              ? twinned.FieldFilterInfoTarget.app
+              : twinned.FieldFilterInfoTarget.user,
+        ));
     _loadFieldFilters();
   }
 
@@ -655,8 +663,9 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
             body: twinned.FieldFilterInfo(
               name: filter.name,
               description: filter.description,
-              target: twinned.FieldFilterInfoTarget.values
-                  .byName(filter.target.name),
+              target: widget.target == twinned.DataFilterInfoTarget.app
+                  ? twinned.FieldFilterInfoTarget.app
+                  : twinned.FieldFilterInfoTarget.user,
               tags: filter.tags,
               icon: res.entity!.id,
               fieldType: twinned.FieldFilterInfoFieldType.values
@@ -762,8 +771,9 @@ class _AssetFilterContentState extends BaseState<AssetFilterContent> {
             modelId: widget.filter.modelId,
             name: _name.text,
             label: _name.text,
-            target: twinned.DataFilterInfoTarget.values
-                .byName(widget.filter.target.name),
+            target: widget.filter.target == twinned.FieldFilterInfoTarget.app
+                ? twinned.DataFilterInfoTarget.app
+                : twinned.DataFilterInfoTarget.user,
             matchGroups: widget.filter.matchGroups,
             icon: widget.filter.icon,
             tags: _tags.text.split(' '),
