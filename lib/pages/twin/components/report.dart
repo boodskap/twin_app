@@ -269,6 +269,7 @@ class _AssetReportListState extends BaseState<AssetReportList> {
               includeDevice: false,
               includeAsset: true,
               fields: [],
+              target: twinned.ReportInfoTarget.app,
               clientIds: await getClientIds(),
             ));
         if (validateResponse(res)) {
@@ -458,6 +459,7 @@ class _AssetReportListState extends BaseState<AssetReportList> {
               icon: res.entity!.id,
               tags: filter.tags,
               description: filter.description,
+              target: twinned.ReportInfoTarget.app,
               clientIds: clientIds ?? filter.clientIds,
             ));
 
@@ -544,6 +546,7 @@ class _ReportContentWidgetState extends BaseState<ReportContentWidget> {
             tz: DateTime.now().timeZoneName,
             humanDateFormat: false,
             fields: widget.report.fields,
+            target: twinned.ReportInfoTarget.app,
             clientIds: await getClientIds(),
           ));
       if (validateResponse(res)) {
