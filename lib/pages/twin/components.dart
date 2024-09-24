@@ -1,6 +1,4 @@
 import 'package:flutter/Material.dart';
-import 'package:accordion/accordion.dart';
-import 'package:accordion/controllers.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/pages/twin/components/asset_filters.dart';
 import 'package:twin_app/pages/twin/components/asset_groups.dart';
@@ -20,7 +18,7 @@ import 'package:twin_app/pages/twin/components/visual_alarms.dart';
 import 'package:twin_app/pages/twin/components/visual_displays.dart';
 import 'package:twin_app/pages/wrapper_page.dart';
 import 'package:twin_commons/core/base_state.dart';
-import 'package:twin_commons/core/busy_indicator.dart';
+import 'package:twinned_api/twinned_api.dart' as tapi;
 
 class Components extends StatefulWidget {
   const Components({super.key});
@@ -30,7 +28,6 @@ class Components extends StatefulWidget {
 }
 
 class _ComponentsState extends BaseState<Components> {
-  static const double iconSize = 20.0;
   final List<Widget> _list = [];
   final List<Widget> _children = [];
 
@@ -86,7 +83,9 @@ class _ComponentsState extends BaseState<Components> {
     _list.add(_createChild(
         icon: Icons.filter_alt_sharp,
         title: 'Asset Filters',
-        page: AssetFilterList()));
+        page: AssetFilterList(
+          target: tapi.DataFilterInfoTarget.app,
+        )));
     _list.add(_createChild(
         icon: Icons.menu_book,
         title: 'Custom Reports',

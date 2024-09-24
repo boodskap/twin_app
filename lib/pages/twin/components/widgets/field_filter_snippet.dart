@@ -206,8 +206,16 @@ class _FieldFilterSnippetState extends BaseState<FieldFilterSnippet> {
       clientIds = await getClientIds();
     }
 
+    twinned.FieldFilterInfoTarget target = twinned.FieldFilterInfoTarget.app;
+
+    if (null != widget.fieldFilter) {
+      target = twinned.FieldFilterInfoTarget.values
+          .byName(widget.fieldFilter!.target.name);
+    }
+
     twinned.FieldFilterInfo body = twinned.FieldFilterInfo(
       name: name,
+      target: target,
       description: _desc.text.trim(),
       tags: _tags.text.trim().split(' '),
       condition: condition,
