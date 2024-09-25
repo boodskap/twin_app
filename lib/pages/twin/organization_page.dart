@@ -30,17 +30,16 @@ class OrganizationPage extends StatefulWidget {
 class _OrganizationPageState extends BaseState<OrganizationPage> {
   nocode.Organization? _organization;
   tapi.TwinSysInfo? _twinSysInfo;
-  bool _exhausted = true;
+  bool _exhausted = false;
   late Widget logoImage;
 
   @override
   void initState() {
+    super.initState();
     logoImage = Image.asset(
       'images/logo-large.png',
       fit: BoxFit.contain,
     );
-
-    super.initState();
   }
 
   @override
