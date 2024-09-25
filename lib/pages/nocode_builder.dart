@@ -25,7 +25,7 @@ class NocodeBuilderPage extends StatefulWidget {
 class _NocodeBuilderPageState extends BaseState<NocodeBuilderPage> {
   final List<Widget> _cards = [];
   final List<twinned.DashboardScreen> _entities = [];
-  bool _exhausted = true;
+  bool _exhausted = false;
 
   @override
   void initState() {

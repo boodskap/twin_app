@@ -40,7 +40,7 @@ class _UsersState extends BaseState<Users> {
   bool _isCardView = false;
   List<String> rolesSelected = [];
   List<String> clientSelected = [];
-  bool _exhausted = true;
+  bool _exhausted = false;
   late StreamAuth auth;
 
   @override
@@ -323,8 +323,7 @@ class _UsersState extends BaseState<Users> {
                                 validateResponse(res);
                                 _load();
                               }
-                                 TwinHelper.navigateToLogin(auth);
-
+                              TwinHelper.navigateToLogin(auth);
                             });
                           });
                     },
@@ -335,7 +334,7 @@ class _UsersState extends BaseState<Users> {
                     ),
                   ),
                 ),
-              if (!isAdminStatus&&user.clientIds.isNotEmpty)
+              if (!isAdminStatus && user.clientIds.isNotEmpty)
                 Tooltip(
                   message: isClientAdminStatus
                       ? 'Remove ClientAdmin Privilege'
@@ -362,7 +361,6 @@ class _UsersState extends BaseState<Users> {
                                         clientId: user.clientIds!.first);
                                 validateResponse(res);
                                 _load();
-                                 
                               } else {
                                 var res = await TwinnedSession.instance.twin
                                     .setClientAdmin(
@@ -589,8 +587,6 @@ class _UsersState extends BaseState<Users> {
       },
     );
   }
-
-
 
   void _removeEntity(String id) async {
     if (loading) return;
