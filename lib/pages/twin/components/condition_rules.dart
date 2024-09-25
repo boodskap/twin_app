@@ -64,7 +64,7 @@ class _ConditionRulesState extends BaseState<ConditionRules> {
                 Icons.add,
                 color: Colors.white,
               ),
-              onPressed: (canCreate()) ? _create : null,
+              onPressed: (canCreate()&&_selectedDeviceModel!=null) ? _create : null,
             ),
             divider(horizontal: true),
             SizedBox(
