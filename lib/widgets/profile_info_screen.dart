@@ -101,12 +101,31 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
                       fontWeight: FontWeight.bold,
                     ),
                 controller: _tabController,
-                tabs: const [
-                  Tab(text: 'Personal Details'),
-                  Tab(text: 'Change Password'),
-                  Tab(
-                    text: 'Subscriptions',
-                  ),
+                tabs: [
+                  if (!smallScreen) Tab(text: 'Personal Details'),
+                  if (!smallScreen) Tab(text: 'Change Password'),
+                  if (!smallScreen)
+                    Tab(
+                      text: 'Subscriptions',
+                    ),
+                  if (smallScreen)
+                    Tab(
+                      child: Icon(
+                        Icons.person_3_rounded,
+                      ),
+                    ),
+                  if (smallScreen)
+                    Tab(
+                      child: Icon(
+                        Icons.phonelink_lock_rounded,
+                      ),
+                    ),
+                  if (smallScreen)
+                    Tab(
+                      child: Icon(
+                        Icons.event_available_rounded,
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -155,10 +174,11 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
                                           fontWeight: FontWeight.bold)),
                                   Row(
                                     children: [
-                                      PrimaryButton(
-                                        labelKey: 'Delete My Account',
-                                        onPressed: _deleteMyAccount,
-                                      ),
+                                      if (!smallScreen)
+                                        PrimaryButton(
+                                          labelKey: 'Delete My Account',
+                                          onPressed: _deleteMyAccount,
+                                        ),
                                       divider(horizontal: true),
                                       Tooltip(
                                         message: "Edit ",
@@ -323,8 +343,13 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
                                         SizedBox(
                                           height: 20,
                                         ),
-
-                                        // Divider(),
+                                        if (smallScreen)
+                                          Center(
+                                            child: PrimaryButton(
+                                              labelKey: 'Delete My Account',
+                                              onPressed: _deleteMyAccount,
+                                            ),
+                                          ),
                                       ],
                                     ),
                                   ),
