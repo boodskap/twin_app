@@ -391,6 +391,10 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
     if (loading) return;
     loading = true;
     await execute(() async {
+      List<String> clientIds = [];
+      if (isClient()) {
+        clientIds = await getClientIds();
+      }
       await _getBasicInfo(context, 'New Asset Filter',
           onPressed: (String name, String? description, String? tags) async {
         var res = await TwinnedSession.instance.twin.createDataFilter(
@@ -403,7 +407,7 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
               description: description,
               tags: (tags ?? '').split(' '),
               matchGroups: [],
-              clientIds: await getClientIds(),
+              clientIds: clientIds,
             ));
         if (validateResponse(res)) {
           await _load();
@@ -631,7 +635,7 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
               icon: res.entity!.id,
               tags: filter.tags,
               description: filter.description,
-              clientIds: await getClientIds(),
+              clientIds: filter.clientIds,
             ));
 
         if (validateResponse(rRes)) {
@@ -771,14 +775,14 @@ class _AssetFilterContentState extends BaseState<AssetFilterContent> {
             modelId: widget.filter.modelId,
             name: _name.text,
             label: _name.text,
-            target: widget.filter.target == twinned.FieldFilterInfoTarget.app
+            target: widget.filter.target == twinned.DataFilterTarget.app
                 ? twinned.DataFilterInfoTarget.app
                 : twinned.DataFilterInfoTarget.user,
             matchGroups: widget.filter.matchGroups,
             icon: widget.filter.icon,
             tags: _tags.text.split(' '),
             description: _desc.text,
-            clientIds: await getClientIds(),
+            clientIds: widget.filter.clientIds,
           ));
       if (validateResponse(res)) {
         await alert(

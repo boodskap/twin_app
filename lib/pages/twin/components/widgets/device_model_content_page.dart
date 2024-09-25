@@ -331,7 +331,7 @@ class _DeviceModelContentPageState extends BaseState<DeviceModelContentPage> {
           widget.model = res.body!.entity!;
         });
         await alert(
-            'Device Model - ${widget.model!.name}', 'Saved successfully!',
+            'Device Library - ${widget.model!.name}', 'Saved successfully!',
             contentStyle: theme.getStyle(),
             titleStyle: theme
                 .getStyle()
@@ -383,7 +383,7 @@ class _DeviceModelContentPageState extends BaseState<DeviceModelContentPage> {
             if (validateResponse(res)) {
               widget.model!.images!.remove(image);
               setup();
-              alert('Image', 'Device model image deleted',
+              alert('Image', 'Device library image deleted',
                   contentStyle: theme.getStyle(),
                   titleStyle: theme
                       .getStyle()
@@ -745,7 +745,7 @@ class _DeviceModelContentPageState extends BaseState<DeviceModelContentPage> {
       body: Column(
         children: [
           TopBar(
-            title: 'Digital Twin - Device Model',
+            title: 'Digital Twin - Device Library',
             style: theme.getStyle().copyWith(
                 color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
           ),
