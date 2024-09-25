@@ -17,7 +17,7 @@ void main() async {
   if (!kIsWeb) {
     FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   }
-
+  
   start(
     appTitle: 'My Twin App',
     flavour: 'dev',
