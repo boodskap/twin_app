@@ -289,6 +289,15 @@ class _GroupAssetsState extends BaseState<GroupAssets> {
             children: [
               const BusyIndicator(),
               divider(horizontal: true),
+              if(smallScreen)
+               SecondaryButton(
+                minimumSize: Size(50, 50),
+                labelKey: "Close",
+                onPressed: () {
+                  _close();
+                },
+              ),
+              if(!smallScreen)
               SecondaryButton(
                 labelKey: "Close",
                 onPressed: () {
@@ -296,6 +305,15 @@ class _GroupAssetsState extends BaseState<GroupAssets> {
                 },
               ),
               divider(horizontal: true),
+              if(smallScreen)
+              PrimaryButton(
+                 minimumSize: Size(50, 50),
+                labelKey: "Save",
+                onPressed: () async {
+                  await _save();
+                },
+              ),
+               if(!smallScreen)
               PrimaryButton(
                 labelKey: "Save",
                 onPressed: () async {
