@@ -375,31 +375,61 @@ class _AssetGroupListState extends BaseState<AssetGroupList> {
             ),
           ),
           actions: <Widget>[
-            SecondaryButton(
-              labelKey: "Cancel",
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
+            if (smallScreen)
+              SecondaryButton(
+                minimumSize: Size(50, 50),
+                labelKey: "Cancel",
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            if (!smallScreen)
+              SecondaryButton(
+                labelKey: "Cancel",
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
             divider(horizontal: true),
-            PrimaryButton(
-              labelKey: "OK",
-              onPressed: () {
-                if (nameText!.length < 3) {
-                  alert(
-                    'Invalid',
-                    'Name is required and should be minimum 3 characters',
-                    titleStyle: theme
-                        .getStyle()
-                        .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
-                    contentStyle: theme.getStyle(),
-                  );
-                  return;
-                }
-                onPressed(nameText!, descText, tagsText);
-                Navigator.pop(context);
-              },
-            ),
+            if (smallScreen)
+              PrimaryButton(
+                minimumSize: Size(50, 50),
+                labelKey: "OK",
+                onPressed: () {
+                  if (nameText!.length < 3) {
+                    alert(
+                      'Invalid',
+                      'Name is required and should be minimum 3 characters',
+                      titleStyle: theme
+                          .getStyle()
+                          .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+                      contentStyle: theme.getStyle(),
+                    );
+                    return;
+                  }
+                  onPressed(nameText!, descText, tagsText);
+                  Navigator.pop(context);
+                },
+              ),
+            if (!smallScreen)
+              PrimaryButton(
+                labelKey: "OK",
+                onPressed: () {
+                  if (nameText!.length < 3) {
+                    alert(
+                      'Invalid',
+                      'Name is required and should be minimum 3 characters',
+                      titleStyle: theme
+                          .getStyle()
+                          .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+                      contentStyle: theme.getStyle(),
+                    );
+                    return;
+                  }
+                  onPressed(nameText!, descText, tagsText);
+                  Navigator.pop(context);
+                },
+              ),
           ],
         );
       },
