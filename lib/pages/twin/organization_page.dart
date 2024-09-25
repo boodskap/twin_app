@@ -30,7 +30,6 @@ class OrganizationPage extends StatefulWidget {
 class _OrganizationPageState extends BaseState<OrganizationPage> {
   nocode.Organization? _organization;
   tapi.TwinSysInfo? _twinSysInfo;
-  bool _exhausted = false;
   late Widget logoImage;
 
   @override
@@ -203,16 +202,15 @@ class _OrganizationPageState extends BaseState<OrganizationPage> {
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            if (_exhausted)
-              BuyButton(
-                  label: 'Buy More License',
-                  tooltip:
-                      'Utilized ${orgPlan?.totalDevicesCount ?? '-'} licenses',
-                  style: theme.getStyle().copyWith(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      color: Colors.blue),
-                  onPressed: _buyAddon),
+            BuyButton(
+                label: 'Buy AddOns',
+                tooltip:
+                    'Utilized ${orgPlan?.totalDevicesCount ?? '-'} licenses',
+                style: theme.getStyle().copyWith(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: Colors.blue),
+                onPressed: _buyAddon),
             const BusyIndicator(),
             divider(horizontal: true),
             PrimaryButton(
@@ -832,13 +830,7 @@ class _OrganizationPageState extends BaseState<OrganizationPage> {
             ),
           );
         });
-    await _checkExhausted();
     await _load();
-  }
-
-  Future _checkExhausted() async {
-    _exhausted = await hasUsersExhausted();
-    refresh();
   }
 
   Future _load() async {

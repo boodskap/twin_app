@@ -984,7 +984,9 @@ class HomeScreenState extends BaseState<HomeScreen> {
         icon: Icons.monetization_on,
         bottomMenus: _billingBottomMenus(),
         isMenuVisible: () {
-          return session.isAdmin();
+          //return session.isAdmin();
+          //TODO implement this
+          return false;
         },
         onMenuSelected: (BuildContext context) async {
           return const Invoices();
@@ -996,7 +998,9 @@ class HomeScreenState extends BaseState<HomeScreen> {
         icon: Icons.shopping_cart,
         bottomMenus: _billingBottomMenus(),
         isMenuVisible: () {
-          return session.isAdmin();
+          //TODO implement this
+          //return session.isAdmin();
+          return false;
         },
         onMenuSelected: (BuildContext context) async {
           return const Orders();
