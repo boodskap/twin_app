@@ -133,8 +133,7 @@ class _ReportViewGridState extends BaseState<ReportViewGrid> {
                           ? Center(
                               child: CircularProgressIndicator(),
                             )
-                          : Container(
-                              width: double.infinity,
+                          : Expanded(
                               child: SingleChildScrollView(
                                 scrollDirection: Axis.vertical,
                                 child: Container(
