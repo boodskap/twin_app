@@ -31,7 +31,7 @@ class _InstallationDatabaseState extends BaseState<InstallationDatabase> {
   String _search = '';
   tapi.DeviceModel? _selectedDeviceModel;
   Map<String, bool> _editable = Map<String, bool>();
-  bool _exhausted = true;
+  bool _exhausted = false;
 
   @override
   void initState() {

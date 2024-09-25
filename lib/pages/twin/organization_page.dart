@@ -30,7 +30,7 @@ class OrganizationPage extends StatefulWidget {
 class _OrganizationPageState extends BaseState<OrganizationPage> {
   nocode.Organization? _organization;
   tapi.TwinSysInfo? _twinSysInfo;
-  bool _exhausted = true;
+  bool _exhausted = false;
   @override
   Widget build(BuildContext context) {
     if (null == _organization || null == _twinSysInfo) {
