@@ -8,7 +8,6 @@ import 'package:twin_commons/core/twinned_session.dart';
 import 'package:verification_api/api/verification.swagger.dart' as vapi;
 import 'package:twinned_api/twinned_api.dart' as tapi;
 import 'dart:io' show Platform;
-
 import 'app.dart';
 import 'flavors/flavor_config.dart';
 
@@ -18,10 +17,10 @@ void main() async {
   if (!kIsWeb) {
     FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   }
-
+  
   start(
     appTitle: 'My Twin App',
-    flavour: 'prod',
+    flavour: 'dev',
     homeMenu: TwinAppMenu.home,
     homeMenuTitle: 'Home',
     disableTwinApp: false,

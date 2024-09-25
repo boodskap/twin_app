@@ -608,7 +608,7 @@ class _AlarmsNotificationsGridState extends BaseState<AlarmsNotificationsGrid> {
         body: EqlSearch(
           source: [],
           page: 0,
-          size: 25,
+          size: 9999,
           sort: {"updatedStamp": "desc"},
           mustConditions: [
             {

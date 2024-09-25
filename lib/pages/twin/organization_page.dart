@@ -31,6 +31,17 @@ class _OrganizationPageState extends BaseState<OrganizationPage> {
   nocode.Organization? _organization;
   tapi.TwinSysInfo? _twinSysInfo;
   bool _exhausted = false;
+  late Widget logoImage;
+
+  @override
+  void initState() {
+    super.initState();
+    logoImage = Image.asset(
+      'images/logo-large.png',
+      fit: BoxFit.contain,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (null == _organization || null == _twinSysInfo) {
@@ -61,16 +72,23 @@ class _OrganizationPageState extends BaseState<OrganizationPage> {
                   elevation: 5,
                   child: Stack(
                     children: [
-                      if (_organization?.icon?.isNotEmpty ?? false)
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(10.0, 30, 10, 10),
-                          child: TwinImageHelper.getDomainImage(
-                              _organization!.icon!),
+                      if (_organization!.logo!.isNotEmpty)
+                        Align(
+                          alignment: Alignment.center,
+                          child: SizedBox(
+                            width: 250,
+                            height: 250,
+                            child: TwinImageHelper.getCachedDomainImage(
+                                _organization!.logo!),
+                          ),
                         ),
                       Align(
                           alignment: Alignment.topRight,
                           child: IconButton(
-                              onPressed: () {}, icon: Icon(Icons.upload))),
+                              onPressed: () async {
+                                await _uploadImage();
+                              },
+                              icon: Icon(Icons.upload))),
                     ],
                   ),
                 ),
@@ -470,6 +488,58 @@ class _OrganizationPageState extends BaseState<OrganizationPage> {
       settings: o.settings,
       website: o.website,
     );
+  }
+
+  Future<void> _uploadImage() async {
+    if (loading) return;
+    loading = true;
+    bool uploaded = false;
+    String? tempImageId;
+
+    await execute(() async {
+      var uRes = await TwinImageHelper.uploadDomainImage();
+      if (null != uRes && null != uRes.entity) {
+        tempImageId = uRes.entity!.id;
+      }
+    });
+
+    if (tempImageId != null) {
+      refresh(
+        sync: () {
+          uploaded = true;
+          _organization = _organization!.copyWith(logo: tempImageId!);
+        },
+      );
+    }
+
+    loading = false;
+    if (uploaded) {
+      await _updateOrgInfo(tempImageId!);
+    }
+  }
+
+  Future _updateOrgInfo(String logoImageId) async {
+    if (loading) return;
+    loading = true;
+    await execute(() async {
+      var res = await TwinnedSession.instance.nocode.updateOrganization(
+        token: TwinnedSession.instance.noCodeAuthToken,
+        orgId: _organization!.id,
+        body: getInfo().copyWith(logo: logoImageId),
+      );
+      if (validateResponse(res)) {
+        alert(
+          'Organization Image Uploaded',
+          'Successfully',
+          titleStyle: theme
+              .getStyle()
+              .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
+          contentStyle: theme.getStyle(),
+        );
+      }
+    });
+    loading = false;
+    refresh();
   }
 
   void wipeAllData() async {
