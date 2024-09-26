@@ -295,23 +295,46 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
                   }),
             ),
             divider(horizontal: true),
-            PrimaryButton(
-              labelKey: "Add New",
-              onPressed: (_selectedDeviceModel != null)
-                  ? () async {
-                      await _addNew();
-                    }
-                  : null,
-            ),
+            if (!smallScreen)
+              PrimaryButton(
+                labelKey: "Add New",
+                onPressed: (_selectedDeviceModel != null)
+                    ? () async {
+                        await _addNew();
+                      }
+                    : null,
+              ),
             divider(horizontal: true),
-            PrimaryButton(
-                labelKey: "Add Generic",
-                onPressed: () async {
-                  await _addNewField();
-                }),
+            if (!smallScreen)
+              PrimaryButton(
+                  labelKey: "Add Generic",
+                  onPressed: () async {
+                    await _addNewField();
+                  }),
             divider(horizontal: true),
           ],
         ),
+        if (smallScreen)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              PrimaryButton(
+                labelKey: "Add New",
+                onPressed: (_selectedDeviceModel != null)
+                    ? () async {
+                        await _addNew();
+                      }
+                    : null,
+              ),
+              divider(horizontal: true),
+              PrimaryButton(
+                  labelKey: "Add Generic",
+                  onPressed: () async {
+                    await _addNewField();
+                  }),
+            ],
+          ),
+        divider(),
         if (cards.isEmpty)
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -325,12 +348,25 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
                 ),
             ],
           ),
-        if (cards.isNotEmpty)
+        if (cards.isNotEmpty && !smallScreen)
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: cards,
+            ),
+          ),
+        if (cards.isNotEmpty && smallScreen)
+          Expanded(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: Wrap(
+                direction: Axis.vertical,
+                spacing: 8.0,
+                runSpacing: 8.0,
+                alignment: WrapAlignment.center,
+                children: cards,
+              ),
             ),
           ),
       ],
@@ -414,10 +450,14 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
           alert(
             'DataFilter - ${res.body!.entity!.name} ',
             'Created successfully!',
-            titleStyle: theme
-                .getStyle()
-                .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
-            contentStyle: theme.getStyle(),
+            titleStyle: theme.getStyle().copyWith(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+            contentStyle: theme.getStyle().copyWith(
+                  color: Colors.black,
+                ),
           );
         }
       });
@@ -428,9 +468,11 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
 
   Future<void> _addNewField() async {
     await alertDialog(
-        titleStyle: theme
-            .getStyle()
-            .copyWith(fontSize: 20, fontWeight: FontWeight.bold),
+        titleStyle: theme.getStyle().copyWith(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
         title: 'New Generic Filter',
         body: FieldFilterSnippet(
           target: widget.target == twinned.DataFilterInfoTarget.app
@@ -462,10 +504,14 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
               alert(
                 "DataFilter - ${e.name}",
                 "Deleted successfully!",
-                titleStyle: theme
-                    .getStyle()
-                    .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
-                contentStyle: theme.getStyle(),
+                titleStyle: theme.getStyle().copyWith(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                contentStyle: theme.getStyle().copyWith(
+                      color: Colors.black,
+                    ),
               );
             }
           });
@@ -497,10 +543,14 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
               alert(
                 "Field Filter - ${e.name}",
                 "Deleted successfully!",
-                titleStyle: theme
-                    .getStyle()
-                    .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
-                contentStyle: theme.getStyle(),
+                titleStyle: theme.getStyle().copyWith(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                contentStyle: theme.getStyle().copyWith(
+                      color: Colors.black,
+                    ),
               );
             }
           });
@@ -643,10 +693,14 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
           alert(
             'Filter - ${rRes.body!.entity!.name} ',
             'Updated successfully!',
-            titleStyle: theme
-                .getStyle()
-                .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
-            contentStyle: theme.getStyle(),
+            titleStyle: theme.getStyle().copyWith(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+            contentStyle: theme.getStyle().copyWith(
+                  color: Colors.black,
+                ),
           );
         }
       }
@@ -689,10 +743,14 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
           alert(
             'Filter - ${rRes.body!.entity!.name} ',
             'Updated successfully!',
-            titleStyle: theme
-                .getStyle()
-                .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
-            contentStyle: theme.getStyle(),
+            titleStyle: theme.getStyle().copyWith(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+            contentStyle: theme.getStyle().copyWith(
+                  color: Colors.black,
+                ),
           );
         }
       }
@@ -788,10 +846,14 @@ class _AssetFilterContentState extends BaseState<AssetFilterContent> {
         await alert(
           'Data Filter - ${widget.filter.name}',
           'Saved successfully!',
-          titleStyle: theme
-              .getStyle()
-              .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
-          contentStyle: theme.getStyle(),
+          titleStyle: theme.getStyle().copyWith(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+          contentStyle: theme.getStyle().copyWith(
+                color: Colors.black,
+              ),
         );
         _close();
       }

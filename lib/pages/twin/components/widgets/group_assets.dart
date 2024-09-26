@@ -161,22 +161,23 @@ class _GroupAssetsState extends BaseState<GroupAssets> {
             name: widget.group.name,
             description: widget.group.description,
             tags: widget.group.tags,
-            target: widget.group.target == AssetGroupTarget.app
-                ? AssetGroupInfoTarget.app
-                : AssetGroupInfoTarget.user,
+            target: AssetGroupInfoTarget.app,
             assetIds: widget.group.assetIds,
             clientIds: clientIds,
-            icon: widget.group.icon,
           ));
       if (validateResponse(res)) {
         debugPrint('Saved associated assets ${res.body?.entity?.assetIds}');
         await alert(
           "Asset Group - ${widget.group.name}",
           'Saved successfully!',
-          titleStyle: theme
-              .getStyle()
-              .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
-          contentStyle: theme.getStyle(),
+          titleStyle: theme.getStyle().copyWith(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+          contentStyle: theme.getStyle().copyWith(
+                color: Colors.black,
+              ),
         );
         _close();
       }
@@ -290,7 +291,7 @@ class _GroupAssetsState extends BaseState<GroupAssets> {
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              const BusyIndicator(),
+              if (!smallScreen) const BusyIndicator(),
               divider(horizontal: true),
               if (smallScreen)
                 SecondaryButton(
@@ -323,9 +324,18 @@ class _GroupAssetsState extends BaseState<GroupAssets> {
                     await _save();
                   },
                 ),
-              divider(horizontal: true),
+              if (smallScreen) divider(horizontal: true),
             ],
           ),
+          divider(),
+          if (smallScreen)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const BusyIndicator(),
+                divider(),
+              ],
+            ),
         ],
       ),
     );

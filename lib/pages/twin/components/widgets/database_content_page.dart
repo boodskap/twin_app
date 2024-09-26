@@ -863,20 +863,20 @@ class _DeviceContentPageState extends BaseState<DeviceContentPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        Tooltip(
-                          message: 'Custom View',
-                          child: SizedBox(
-                            width: 30,
-                            height: 30,
-                            child: CustomViewDropdown(
-                              onChanged: (item) {
-                                String customType = MenuItems.getItemType(item);
-                                _showCustomViewPopup(context, customType);
-                              },
-                            ),
-                          ),
-                        ),
-                        divider(horizontal: true),
+                        // Tooltip(
+                        //   message: 'Custom View',
+                        //   child: SizedBox(
+                        //     width: 30,
+                        //     height: 30,
+                        //     child: CustomViewDropdown(
+                        //       onChanged: (item) {
+                        //         String customType = MenuItems.getItemType(item);
+                        //         _showCustomViewPopup(context, customType);
+                        //       },
+                        //     ),
+                        //   ),
+                        // ),
+                        // divider(horizontal: true),
                         Checkbox(
                           value: _hasLocation,
                           onChanged: (value) {
