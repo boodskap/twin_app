@@ -102,30 +102,30 @@ class _ProfileInfoScreenState extends BaseState<ProfileInfoScreen>
                     ),
                 controller: _tabController,
                 tabs: [
-                  if (!smallScreen) Tab(text: 'Personal Details'),
-                  if (!smallScreen) Tab(text: 'Change Password'),
-                  if (!smallScreen)
-                    Tab(
-                      text: 'Subscriptions',
-                    ),
-                  if (smallScreen)
-                    Tab(
-                      child: Icon(
-                        Icons.person_3_rounded,
-                      ),
-                    ),
-                  if (smallScreen)
-                    Tab(
-                      child: Icon(
-                        Icons.phonelink_lock_rounded,
-                      ),
-                    ),
-                  if (smallScreen)
-                    Tab(
-                      child: Icon(
-                        Icons.event_available_rounded,
-                      ),
-                    ),
+                  Tab(
+                    text: smallScreen ? null : 'Personal Details',
+                    icon: smallScreen
+                        ? Icon(
+                            Icons.person_3_rounded,
+                          )
+                        : null,
+                  ),
+                  Tab(
+                    text: smallScreen ? null : 'Change Password',
+                    icon: smallScreen
+                        ? Icon(
+                            Icons.phonelink_lock_rounded,
+                          )
+                        : null,
+                  ),
+                  Tab(
+                    text: smallScreen ? null : 'Subscriptions',
+                    icon: smallScreen
+                        ? Icon(
+                            Icons.event_available_rounded,
+                          )
+                        : null,
+                  ),
                 ],
               ),
             ),

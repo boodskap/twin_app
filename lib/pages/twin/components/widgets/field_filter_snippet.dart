@@ -167,10 +167,14 @@ class _FieldFilterSnippetState extends BaseState<FieldFilterSnippet> {
       alert(
         'Missing Name',
         'Please enter a name',
-        titleStyle: theme
-            .getStyle()
-            .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
-        contentStyle: theme.getStyle(),
+        titleStyle: theme.getStyle().copyWith(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+        contentStyle: theme.getStyle().copyWith(
+              color: Colors.black,
+            ),
       );
       return;
     }
@@ -179,10 +183,14 @@ class _FieldFilterSnippetState extends BaseState<FieldFilterSnippet> {
       alert(
         'Missing Field',
         'Please select a field',
-        titleStyle: theme
-            .getStyle()
-            .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
-        contentStyle: theme.getStyle(),
+        titleStyle: theme.getStyle().copyWith(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+        contentStyle: theme.getStyle().copyWith(
+              color: Colors.black,
+            ),
       );
       return;
     }
@@ -242,10 +250,14 @@ class _FieldFilterSnippetState extends BaseState<FieldFilterSnippet> {
         alert(
           'Filter - ${eRes.body!.entity!.name} ',
           'Saved successfully!',
-          titleStyle: theme
-              .getStyle()
-              .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
-          contentStyle: theme.getStyle(),
+          titleStyle: theme.getStyle().copyWith(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+          contentStyle: theme.getStyle().copyWith(
+                color: Colors.black,
+              ),
         );
       }
     });
@@ -304,9 +316,10 @@ class _FieldFilterSnippetState extends BaseState<FieldFilterSnippet> {
               children: [
                 if (_parameters.isEmpty)
                   Text('No fields found',
-                      style: theme
-                          .getStyle()
-                          .copyWith(fontWeight: FontWeight.bold)),
+                      style: theme.getStyle().copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          )),
                 if (_parameters.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.only(left: 8.0, right: 8.0),
@@ -344,7 +357,9 @@ class _FieldFilterSnippetState extends BaseState<FieldFilterSnippet> {
                                     value: e,
                                     child: Text(
                                       e.name,
-                                      style: theme.getStyle(),
+                                      style: theme.getStyle().copyWith(
+                                            color: Colors.black,
+                                          ),
                                     )))
                                 .toList(),
                             value: selectedField,
@@ -484,16 +499,40 @@ class _FieldFilterSnippetState extends BaseState<FieldFilterSnippet> {
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              const BusyIndicator(),
-              divider(horizontal: true),
-              SecondaryButton(
-                labelKey: "Cancel",
-                onPressed: () {
-                  _close();
-                },
-              ),
+              if (!smallScreen) const BusyIndicator(),
+              if (!smallScreen) divider(horizontal: true),
+              if (!smallScreen)
+                SecondaryButton(
+                  labelKey: "Cancel",
+                  onPressed: () {
+                    _close();
+                  },
+                ),
+              if (smallScreen)
+                SecondaryButton(
+                  labelKey: "Cancel",
+                  onPressed: () {
+                    _close();
+                  },
+                  minimumSize: (Size(
+                    35,
+                    45,
+                  )),
+                ),
               divider(horizontal: true),
               if (selectedCondition != null)
+                if (!smallScreen)
+                  PrimaryButton(
+                    labelKey: "Save",
+                    leading: Icon(
+                      Icons.save,
+                      color: Color(0xFFFFFFFF),
+                    ),
+                    onPressed: () async {
+                      await _save();
+                    },
+                  ),
+              if (smallScreen)
                 PrimaryButton(
                   labelKey: "Save",
                   leading: Icon(
@@ -503,11 +542,21 @@ class _FieldFilterSnippetState extends BaseState<FieldFilterSnippet> {
                   onPressed: () async {
                     await _save();
                   },
+                  minimumSize: (Size(
+                    35,
+                    45,
+                  )),
                 ),
-              divider(horizontal: true),
             ],
           ),
           divider(),
+          if (smallScreen)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const BusyIndicator(),
+              ],
+            ),
         ],
       ),
     ));
