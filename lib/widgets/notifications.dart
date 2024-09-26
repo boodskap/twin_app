@@ -162,153 +162,230 @@ class _AlarmsNotificationsGridState extends BaseState<AlarmsNotificationsGrid> {
   Widget _buildFilterDropdown() {
     return Padding(
       padding: const EdgeInsets.only(top: 12, bottom: 12),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Column(
         children: [
-          Text(
-            "Total Notifications  :  $totalCount",
-            overflow: TextOverflow.ellipsis,
-            style: theme.getStyle().copyWith(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                  color: const Color(0xFF000000),
-                ),
-          ),
-          Wrap(
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Tooltip(
-                message: "Email",
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: _isEmailView ? Colors.blue[200] : Colors.transparent,
-                    shape: BoxShape.circle,
-                  ),
-                  child: IconButton(
-                    icon: Icon(
-                      Icons.email,
-                      color:
-                          _isEmailView ? Colors.black : theme.getPrimaryColor(),
+              Text(
+                "Total Notifications  :  $totalCount",
+                overflow: TextOverflow.ellipsis,
+                style: theme.getStyle().copyWith(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: const Color(0xFF000000),
                     ),
-                    onPressed: () {
-                      setState(() {
-                        _isEmailView = true;
-                        _isSMSView = false;
-                        _isVoiceView = false;
-                      });
-                      _load();
-                    },
-                  ),
-                ),
               ),
-              divider(horizontal: true),
-              Tooltip(
-                message: "SMS",
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: _isSMSView ? Colors.blue[200] : Colors.transparent,
-                    shape: BoxShape.circle,
-                  ),
-                  child: IconButton(
-                    icon: Icon(
-                      Icons.sms,
-                      color:
-                          _isSMSView ? Colors.black : theme.getPrimaryColor(),
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _isEmailView = false;
-                        _isSMSView = true;
-                        _isVoiceView = false;
-                      });
-                      _load();
-                    },
-                  ),
-                ),
-              ),
-              divider(horizontal: true),
-              Tooltip(
-                message: "Voice",
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: _isVoiceView ? Colors.blue[200] : Colors.transparent,
-                    shape: BoxShape.circle,
-                  ),
-                  child: IconButton(
-                    icon: Icon(
-                      Icons.voicemail,
-                      color:
-                          _isVoiceView ? Colors.black : theme.getPrimaryColor(),
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _isEmailView = false;
-                        _isSMSView = false;
-                        _isVoiceView = true;
-                      });
-                      _load();
-                    },
-                  ),
-                ),
-              ),
-              if ((TwinnedSession.instance.isClientAdmin() ||
-                  TwinnedSession.instance.isAdmin())) ...[
-                Padding(
-                  padding: const EdgeInsets.only(top: 4),
-                  child: Checkbox(
-                    activeColor: theme.getPrimaryColor(),
-                    value: isShowAll,
-                    onChanged: (bool? value) {
-                      setState(() {
-                        isShowAll = value!;
-                      });
-                    },
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 9, right: 2),
-                  child: Text("Show All"),
-                ),
-              ],
-              Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: InkWell(
-                    onTap: () {
-                      _load();
-                    },
-                    child: Icon(Icons.refresh,
-                        color: loading ? theme.getPrimaryColor() : null)),
-              ),
-              if (!smallScreen)
-                Padding(
-                  padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-                  child: SizedBox(
-                      width: 250,
-                      height: 40,
-                      child: SearchBar(
-                        hintStyle: WidgetStatePropertyAll(theme.getStyle()),
-                        textStyle: WidgetStatePropertyAll(theme.getStyle()),
-                        hintText: 'Search',
-                        controller: _controller,
-                        trailing: [const BusyIndicator()],
-                        onChanged: (value) {
+              Wrap(
+                children: [
+                  Tooltip(
+                    message: "Email",
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: _isEmailView
+                            ? Colors.blue[200]
+                            : Colors.transparent,
+                        shape: BoxShape.circle,
+                      ),
+                      child: IconButton(
+                        icon: Icon(
+                          Icons.email,
+                          color: _isEmailView
+                              ? Colors.black
+                              : theme.getPrimaryColor(),
+                        ),
+                        onPressed: () {
                           setState(() {
-                            _searchQuery = '*${value.trim()}*';
+                            _isEmailView = true;
+                            _isSMSView = false;
+                            _isVoiceView = false;
                           });
-                          Future.delayed(Duration(milliseconds: 500), () {
-                            _load();
+                          _load();
+                        },
+                      ),
+                    ),
+                  ),
+                  divider(horizontal: true),
+                  Tooltip(
+                    message: "SMS",
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color:
+                            _isSMSView ? Colors.blue[200] : Colors.transparent,
+                        shape: BoxShape.circle,
+                      ),
+                      child: IconButton(
+                        icon: Icon(
+                          Icons.sms,
+                          color: _isSMSView
+                              ? Colors.black
+                              : theme.getPrimaryColor(),
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _isEmailView = false;
+                            _isSMSView = true;
+                            _isVoiceView = false;
+                          });
+                          _load();
+                        },
+                      ),
+                    ),
+                  ),
+                  divider(horizontal: true),
+                  Tooltip(
+                    message: "Voice",
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: _isVoiceView
+                            ? Colors.blue[200]
+                            : Colors.transparent,
+                        shape: BoxShape.circle,
+                      ),
+                      child: IconButton(
+                        icon: Icon(
+                          Icons.voicemail,
+                          color: _isVoiceView
+                              ? Colors.black
+                              : theme.getPrimaryColor(),
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _isEmailView = false;
+                            _isSMSView = false;
+                            _isVoiceView = true;
+                          });
+                          _load();
+                        },
+                      ),
+                    ),
+                  ),
+                  if ((TwinnedSession.instance.isClientAdmin() ||
+                          TwinnedSession.instance.isAdmin()) &&
+                      !smallScreen) ...[
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Checkbox(
+                        activeColor: theme.getPrimaryColor(),
+                        value: isShowAll,
+                        onChanged: (bool? value) {
+                          setState(() {
+                            isShowAll = value!;
                           });
                         },
-                      )),
-                ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 9, right: 2),
+                      child: Text("Show All"),
+                    ),
+                  ],
+                  if (!smallScreen)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8),
+                      child: InkWell(
+                          onTap: () {
+                            _load();
+                          },
+                          child: Icon(Icons.refresh,
+                              color: loading ? theme.getPrimaryColor() : null)),
+                    ),
+                  if (!smallScreen)
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                      child: SizedBox(
+                          width: 250,
+                          height: 40,
+                          child: SearchBar(
+                            hintStyle: WidgetStatePropertyAll(theme.getStyle()),
+                            textStyle: WidgetStatePropertyAll(theme.getStyle()),
+                            hintText: 'Search',
+                            controller: _controller,
+                            trailing: [const BusyIndicator()],
+                            onChanged: (value) {
+                              setState(() {
+                                _searchQuery = '*${value.trim()}*';
+                              });
+                              Future.delayed(Duration(milliseconds: 500), () {
+                                _load();
+                              });
+                            },
+                          )),
+                    ),
+                ],
+              ),
+
+              // DropdownButton<String>(
+              //   value: _selectedFilter,
+              //   items: <String>[
+              //     'Recent',
+              //     'Today',
+              //     'Yesterday',
+              //     'This Week',
+              //     'This Month',
+              //     'Date Range'
+              //   ].map((String value) {
+              //     return DropdownMenuItem<String>(
+              //       value: value,
+              //       child: Text(value),
+              //     );
+              //   }).toList(),
+              //   onChanged: (String? newValue) {
+              //     setState(() {
+              //       _selectedFilter = newValue!;
+              //       if (_selectedFilter != 'Date Range') {
+              //         _selectedDateRange = null;
+              //       }
+              //     });
+              //   },
+              // ),
+              // if (_selectedFilter == 'Date Range')
+              //   TextButton(
+              //     onPressed: () => _selectDateRange(context),
+              //     child: Text('Select Date Range'),
+              //   ),
             ],
           ),
           if (smallScreen)
             Padding(
-              padding: const EdgeInsets.only(top: 8.0, left: 8.0, right: 8.0),
+              padding: const EdgeInsets.only(top: 8.0, left: 5.0, right: 5.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
+                  if ((TwinnedSession.instance.isClientAdmin() ||
+                      TwinnedSession.instance.isAdmin())) ...[
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Checkbox(
+                        activeColor: theme.getPrimaryColor(),
+                        value: isShowAll,
+                        onChanged: (bool? value) {
+                          setState(() {
+                            isShowAll = value!;
+                          });
+                        },
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 9, right: 3),
+                      child: Text("Show All"),
+                    ),
+                  ],
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: InkWell(
+                      onTap: () {
+                        _load();
+                      },
+                      child: Icon(Icons.refresh,
+                          color: loading ? theme.getPrimaryColor() : null),
+                    ),
+                  ),
+                  divider(
+                    horizontal: true,
+                  ),
                   SizedBox(
+                      width: 220,
                       height: 40,
                       child: SearchBar(
                         hintText: "Search",
@@ -326,36 +403,6 @@ class _AlarmsNotificationsGridState extends BaseState<AlarmsNotificationsGrid> {
                 ],
               ),
             ),
-
-          // DropdownButton<String>(
-          //   value: _selectedFilter,
-          //   items: <String>[
-          //     'Recent',
-          //     'Today',
-          //     'Yesterday',
-          //     'This Week',
-          //     'This Month',
-          //     'Date Range'
-          //   ].map((String value) {
-          //     return DropdownMenuItem<String>(
-          //       value: value,
-          //       child: Text(value),
-          //     );
-          //   }).toList(),
-          //   onChanged: (String? newValue) {
-          //     setState(() {
-          //       _selectedFilter = newValue!;
-          //       if (_selectedFilter != 'Date Range') {
-          //         _selectedDateRange = null;
-          //       }
-          //     });
-          //   },
-          // ),
-          // if (_selectedFilter == 'Date Range')
-          //   TextButton(
-          //     onPressed: () => _selectDateRange(context),
-          //     child: Text('Select Date Range'),
-          //   ),
         ],
       ),
     );
@@ -756,7 +803,8 @@ class _AlarmsNotificationsGridState extends BaseState<AlarmsNotificationsGrid> {
           titleTextStyle: theme
               .getStyle()
               .copyWith(fontWeight: FontWeight.bold, fontSize: 20),
-          title: ModelHeaderSection(copyText: prettyJson, title: 'Event Logs Data'),
+          title: ModelHeaderSection(
+              copyText: prettyJson, title: 'Event Logs Data'),
           content: SingleChildScrollView(
             child: Text(
               prettyJson,
@@ -780,7 +828,8 @@ class _AlarmsNotificationsGridState extends BaseState<AlarmsNotificationsGrid> {
 class ModelHeaderSection extends StatefulWidget {
   final String copyText;
   final String title;
-  const ModelHeaderSection({super.key, required this.copyText, required this.title});
+  const ModelHeaderSection(
+      {super.key, required this.copyText, required this.title});
 
   @override
   State<ModelHeaderSection> createState() => _ModelHeaderSectionState();
@@ -793,7 +842,7 @@ class _ModelHeaderSectionState extends State<ModelHeaderSection> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-         Text(widget.title),
+        Text(widget.title),
         Column(
           children: [
             Tooltip(
@@ -805,20 +854,19 @@ class _ModelHeaderSectionState extends State<ModelHeaderSection> {
                 },
               ),
             ),
-             if (_showCopiedText)
-          Padding(
-            padding: const EdgeInsets.only(top: 3),
-            child: Text(
-              'Copied',
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 13,
+            if (_showCopiedText)
+              Padding(
+                padding: const EdgeInsets.only(top: 3),
+                child: Text(
+                  'Copied',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 13,
+                  ),
+                ),
               ),
-            ),
-          ),
           ],
         ),
-       
       ],
     );
   }
