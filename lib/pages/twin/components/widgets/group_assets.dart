@@ -161,9 +161,12 @@ class _GroupAssetsState extends BaseState<GroupAssets> {
             name: widget.group.name,
             description: widget.group.description,
             tags: widget.group.tags,
-            target: AssetGroupInfoTarget.app,
+            target: widget.group.target == AssetGroupTarget.app
+                ? AssetGroupInfoTarget.app
+                : AssetGroupInfoTarget.user,
             assetIds: widget.group.assetIds,
             clientIds: clientIds,
+            icon: widget.group.icon,
           ));
       if (validateResponse(res)) {
         debugPrint('Saved associated assets ${res.body?.entity?.assetIds}');
@@ -289,37 +292,37 @@ class _GroupAssetsState extends BaseState<GroupAssets> {
             children: [
               const BusyIndicator(),
               divider(horizontal: true),
-              if(smallScreen)
-               SecondaryButton(
-                minimumSize: Size(50, 50),
-                labelKey: "Close",
-                onPressed: () {
-                  _close();
-                },
-              ),
-              if(!smallScreen)
-              SecondaryButton(
-                labelKey: "Close",
-                onPressed: () {
-                  _close();
-                },
-              ),
+              if (smallScreen)
+                SecondaryButton(
+                  minimumSize: Size(50, 50),
+                  labelKey: "Close",
+                  onPressed: () {
+                    _close();
+                  },
+                ),
+              if (!smallScreen)
+                SecondaryButton(
+                  labelKey: "Close",
+                  onPressed: () {
+                    _close();
+                  },
+                ),
               divider(horizontal: true),
-              if(smallScreen)
-              PrimaryButton(
-                 minimumSize: Size(50, 50),
-                labelKey: "Save",
-                onPressed: () async {
-                  await _save();
-                },
-              ),
-               if(!smallScreen)
-              PrimaryButton(
-                labelKey: "Save",
-                onPressed: () async {
-                  await _save();
-                },
-              ),
+              if (smallScreen)
+                PrimaryButton(
+                  minimumSize: Size(50, 50),
+                  labelKey: "Save",
+                  onPressed: () async {
+                    await _save();
+                  },
+                ),
+              if (!smallScreen)
+                PrimaryButton(
+                  labelKey: "Save",
+                  onPressed: () async {
+                    await _save();
+                  },
+                ),
               divider(horizontal: true),
             ],
           ),

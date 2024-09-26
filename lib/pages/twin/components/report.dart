@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_app/pages/twin/components/asset_groups.dart';
 import 'package:twin_app/pages/twin/components/report-view.dart';
+import 'package:twin_app/pages/wrapper_page.dart';
 import 'package:twin_app/widgets/commons/primary_button.dart';
 import 'package:twin_app/widgets/commons/secondary_button.dart';
 import 'package:twin_commons/core/base_state.dart';
@@ -171,10 +172,14 @@ class _AssetReportListState extends BaseState<AssetReportList> {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => ReportViewGrid(
-                                      entity: report,
-                                    )));
-                            
+                                    builder: (context) => Scaffold(
+                                          body: WrapperPage(
+                                            title: report.name,
+                                            child: ReportViewGrid(
+                                              entity: report,
+                                            ),
+                                          ),
+                                        )));
                           }
                         : null,
                     icon: Icon(
