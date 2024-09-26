@@ -170,6 +170,7 @@ class _AssetGroupListState extends BaseState<AssetGroupList> {
             divider(horizontal: true),
           ],
         ),
+        divider(),
         if (_groups.isEmpty)
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -180,12 +181,21 @@ class _AssetGroupListState extends BaseState<AssetGroupList> {
                 Text('No asset group found', style: theme.getStyle()),
             ],
           ),
-        if (_groups.isNotEmpty)
+        if (_groups.isNotEmpty && !smallScreen)
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: cards,
+            ),
+          ),
+        if (_groups.isNotEmpty && smallScreen)
+          Expanded(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: Wrap(
+                children: cards,
+              ),
             ),
           ),
       ],
@@ -243,10 +253,14 @@ class _AssetGroupListState extends BaseState<AssetGroupList> {
             await alert(
               'Assert Group - ${res.body!.entity!.name}',
               'Created successfully',
-              titleStyle: theme
-                  .getStyle()
-                  .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
-              contentStyle: theme.getStyle(),
+              titleStyle: theme.getStyle().copyWith(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+              contentStyle: theme.getStyle().copyWith(
+                    color: Colors.black,
+                  ),
             );
           }
         },
@@ -281,10 +295,14 @@ class _AssetGroupListState extends BaseState<AssetGroupList> {
             alert(
               "Asset Group - ${e.name}",
               "Deleted successfully!",
-              titleStyle: theme
-                  .getStyle()
-                  .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
-              contentStyle: theme.getStyle(),
+              titleStyle: theme.getStyle().copyWith(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+              contentStyle: theme.getStyle().copyWith(
+                    color: Colors.black,
+                  ),
             );
           }
           ;
@@ -461,10 +479,14 @@ class _AssetGroupListState extends BaseState<AssetGroupList> {
           await alert(
             'Asset Group - ${rRes.body!.entity!.name}',
             'Saved successfully',
-            titleStyle: theme
-                .getStyle()
-                .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
-            contentStyle: theme.getStyle(),
+            titleStyle: theme.getStyle().copyWith(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+            contentStyle: theme.getStyle().copyWith(
+                  color: Colors.black,
+                ),
           );
         }
       }
