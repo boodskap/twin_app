@@ -206,10 +206,15 @@ class _SubscriptionsPageState extends BaseState<SubscriptionsPage> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(
-                            'Email',
-                            style: theme.getStyle(),
-                          ),
+                          if (!smallScreen)
+                            Text(
+                              'Email',
+                              style: theme.getStyle(),
+                            ),
+                          if (smallScreen)
+                            Icon(
+                              Icons.email,
+                            ),
                           const SizedBox(width: 10),
                           Checkbox(
                             value: reg?.email ?? false,
@@ -232,10 +237,15 @@ class _SubscriptionsPageState extends BaseState<SubscriptionsPage> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(
-                            'SMS',
-                            style: theme.getStyle(),
-                          ),
+                          if (!smallScreen)
+                            Text(
+                              'SMS',
+                              style: theme.getStyle(),
+                            ),
+                          if (smallScreen)
+                            Icon(
+                              Icons.chat,
+                            ),
                           const SizedBox(width: 10),
                           Checkbox(
                             value: reg?.sms ?? false,
@@ -258,10 +268,15 @@ class _SubscriptionsPageState extends BaseState<SubscriptionsPage> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(
-                            'Voice',
-                            style: theme.getStyle(),
-                          ),
+                          if (!smallScreen)
+                            Text(
+                              'Voice',
+                              style: theme.getStyle(),
+                            ),
+                          if (smallScreen)
+                            Icon(
+                              Icons.voicemail_rounded,
+                            ),
                           const SizedBox(width: 10),
                           Checkbox(
                             value: reg?.voice ?? false,

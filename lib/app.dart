@@ -733,7 +733,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
         id: TwinAppMenu.myReports,
         icon: Icons.menu_book,
         isMenuVisible: () {
-          return null != user;
+          return !session.smallScreen;
         },
         onMenuSelected: (ctx) async {
           return AssetReportList(target: tapi.ReportInfoTarget.user);

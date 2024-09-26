@@ -170,10 +170,14 @@ class _GroupAssetsState extends BaseState<GroupAssets> {
         await alert(
           "Asset Group - ${widget.group.name}",
           'Saved successfully!',
-          titleStyle: theme
-              .getStyle()
-              .copyWith(fontSize: 18, fontWeight: FontWeight.bold),
-          contentStyle: theme.getStyle(),
+          titleStyle: theme.getStyle().copyWith(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+          contentStyle: theme.getStyle().copyWith(
+                color: Colors.black,
+              ),
         );
         _close();
       }
@@ -287,24 +291,51 @@ class _GroupAssetsState extends BaseState<GroupAssets> {
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              const BusyIndicator(),
+              if (!smallScreen) const BusyIndicator(),
               divider(horizontal: true),
-              SecondaryButton(
-                labelKey: "Close",
-                onPressed: () {
-                  _close();
-                },
-              ),
+              if (smallScreen)
+                SecondaryButton(
+                  minimumSize: Size(50, 50),
+                  labelKey: "Close",
+                  onPressed: () {
+                    _close();
+                  },
+                ),
+              if (!smallScreen)
+                SecondaryButton(
+                  labelKey: "Close",
+                  onPressed: () {
+                    _close();
+                  },
+                ),
               divider(horizontal: true),
-              PrimaryButton(
-                labelKey: "Save",
-                onPressed: () async {
-                  await _save();
-                },
-              ),
-              divider(horizontal: true),
+              if (smallScreen)
+                PrimaryButton(
+                  minimumSize: Size(50, 50),
+                  labelKey: "Save",
+                  onPressed: () async {
+                    await _save();
+                  },
+                ),
+              if (!smallScreen)
+                PrimaryButton(
+                  labelKey: "Save",
+                  onPressed: () async {
+                    await _save();
+                  },
+                ),
+              if (smallScreen) divider(horizontal: true),
             ],
           ),
+          divider(),
+          if (smallScreen)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const BusyIndicator(),
+                divider(),
+              ],
+            ),
         ],
       ),
     );

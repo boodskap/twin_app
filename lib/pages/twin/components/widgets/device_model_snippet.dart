@@ -247,7 +247,7 @@ class _DeviceModelSnippetState extends BaseState<DeviceModelSnippet> {
                                     Align(
                                         alignment: Alignment.center,
                                         child: Text(
-                                          'Upload Device Model image',
+                                          'Upload Device Library Image',
                                           style: theme.getStyle(),
                                         )),
                                   if (_deviceModelInfo.images!.isNotEmpty)
@@ -378,7 +378,7 @@ class _DeviceModelSnippetState extends BaseState<DeviceModelSnippet> {
           if (!silent) {
             _close();
             alert('Success',
-                'Device Model - ${widget.deviceModel!.name} updated successfully',
+                'Device Library - ${widget.deviceModel!.name} Updated Successfully',
                 contentStyle: theme.getStyle(),
                 titleStyle: theme
                     .getStyle()

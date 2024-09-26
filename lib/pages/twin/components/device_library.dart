@@ -290,7 +290,7 @@ class _DeviceLibraryState extends BaseState<DeviceLibrary> {
       titleStyle:
           theme.getStyle().copyWith(fontWeight: FontWeight.bold, fontSize: 20),
       title:
-          null == deviceModel ? 'Add New Device Model' : 'Update Device Model',
+          null == deviceModel ? 'Add New Device Library' : 'Update Device Library',
       body: DeviceModelSnippet(
         deviceModel: deviceModel,
       ),
@@ -320,7 +320,7 @@ class _DeviceLibraryState extends BaseState<DeviceLibrary> {
     await confirm(
         title: 'Warning',
         message:
-            'Deleting is unrecoverable\nIt may also delete all the related models and components\n\nDo you want to proceed?',
+            'Deleting is unrecoverable\nIt may also delete all the related library and components\n\nDo you want to proceed?',
         titleStyle: theme.getStyle().copyWith(color: Colors.red),
         messageStyle: theme.getStyle(),
         onPressed: () async {
@@ -332,7 +332,7 @@ class _DeviceLibraryState extends BaseState<DeviceLibrary> {
             await _load();
             _entities.removeAt(index);
             _cards.removeAt(index);
-            alert("Device Model - ${e.name}", " Deleted Successfully!",
+            alert("Device Library - ${e.name}", " Deleted Successfully!",
                 contentStyle: theme.getStyle(),
                 titleStyle: theme
                     .getStyle()
