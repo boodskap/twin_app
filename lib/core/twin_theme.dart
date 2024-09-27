@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_commons/util/nocode_utils.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -28,8 +29,9 @@ class TwinTheme {
   }
 
   TextStyle getStyle() {
-    return GoogleFonts.getFont(fontFamily)
-        .copyWith(overflow: TextOverflow.ellipsis);
+    return GoogleFonts.getFont(fontFamily).copyWith(
+        overflow: TextOverflow.ellipsis,
+        color: smallScreen ? Colors.black87 : null);
   }
 
   Decoration getCredentialsPageDecoration() {

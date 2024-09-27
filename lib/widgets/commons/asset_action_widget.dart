@@ -12,8 +12,8 @@ class AssetActionWidget extends StatefulWidget {
   final tapi.DeviceData deviceData;
 
   final OnDeviceTapped? onDeviceTapped;
-  final OnDeviceModelTapped onDeviceModelTapped;
-  final OnAssetModelTapped onAssetModelTapped;
+  final OnDeviceModelTapped? onDeviceModelTapped;
+  final OnAssetModelTapped? onAssetModelTapped;
   final OnAnalyticsTapped onTimeSeriesTapped;
   final OnAnalyticsTapped onTimeSeriesDoubleTapped;
   final Axis direction;
@@ -23,11 +23,11 @@ class AssetActionWidget extends StatefulWidget {
     this.direction = Axis.vertical,
     required this.models,
     required this.deviceData,
-    required this.onDeviceModelTapped,
-    required this.onAssetModelTapped,
     required this.onTimeSeriesTapped,
     required this.onTimeSeriesDoubleTapped,
     this.onDeviceTapped,
+    this.onDeviceModelTapped,
+    this.onAssetModelTapped,
   });
 
   @override
@@ -67,28 +67,32 @@ class _AssetActionWidgetState extends State<AssetActionWidget> {
                   child: Icon(Icons.remove_red_eye)),
             ),
           ),
-        SizedBox(
-          height: 8,
-        ),
-        InkWell(
-          onTap: () {
-            widget.onDeviceModelTapped(dd.modelId, dd);
-          },
-          child: Tooltip(
-              message: 'Filter ${dd.modelName} assets',
-              child: Icon(Icons.memory_rounded)),
-        ),
-        if (dd.assetModelId?.isNotEmpty ?? false)
+        if (null != widget.onDeviceModelTapped)
           SizedBox(
             height: 8,
           ),
-        if (dd.assetModelId?.isNotEmpty ?? false)
+        if (null != widget.onDeviceModelTapped)
           InkWell(
             onTap: () {
-              widget.onAssetModelTapped(dd.assetModelId!, dd);
+              widget.onDeviceModelTapped!(dd.modelId, dd);
             },
             child: Tooltip(
-                message: 'Filter ${dd.assetModel} assets',
+                message: 'Filter device model ${dd.modelName} assets',
+                child: Icon(Icons.memory_rounded)),
+          ),
+        if (null != widget.onAssetModelTapped &&
+            (dd.assetModelId?.isNotEmpty ?? false))
+          SizedBox(
+            height: 8,
+          ),
+        if (null != widget.onAssetModelTapped &&
+            (dd.assetModelId?.isNotEmpty ?? false))
+          InkWell(
+            onTap: () {
+              widget.onAssetModelTapped!(dd.assetModelId!, dd);
+            },
+            child: Tooltip(
+                message: 'Filter asset model ${dd.assetModel} assets',
                 child: Icon(Icons.departure_board_rounded)),
           ),
         if (dd.series?.isNotEmpty ?? false)
@@ -98,7 +102,11 @@ class _AssetActionWidgetState extends State<AssetActionWidget> {
         if (dd.series?.isNotEmpty ?? false)
           InkWell(
             onTap: () {
-              widget.onTimeSeriesTapped(widget.models[dd.modelId]!, dd);
+              if (!smallScreen) {
+                widget.onTimeSeriesTapped(widget.models[dd.modelId]!, dd);
+              } else {
+                widget.onTimeSeriesDoubleTapped(widget.models[dd.modelId]!, dd);
+              }
             },
             onDoubleTap: () {
               widget.onTimeSeriesDoubleTapped(widget.models[dd.modelId]!, dd);

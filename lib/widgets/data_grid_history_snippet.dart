@@ -16,6 +16,7 @@ import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:twin_commons/core/twinned_session.dart';
 import 'package:twin_commons/widgets/default_deviceview.dart';
 import 'package:twinned_api/api/twinned.swagger.dart' as tapi;
+import 'package:timeago/timeago.dart' as timeago;
 
 class DataGridHistorySnippet extends StatefulWidget {
   final bool autoRefresh;
@@ -38,7 +39,6 @@ class DataGridHistorySnippet extends StatefulWidget {
   final bool enableDataFiler;
   final bool enableAlarmFiler;
   final bool enableEventFiler;
-  final bool isTwin;
   final bool oldVersion;
 
   const DataGridHistorySnippet({
@@ -63,7 +63,6 @@ class DataGridHistorySnippet extends StatefulWidget {
     this.enableDataFiler = true,
     this.enableAlarmFiler = true,
     this.enableEventFiler = true,
-    required this.isTwin,
     this.oldVersion = false,
   });
 
@@ -179,7 +178,7 @@ class DataGridHistorySnippetState extends BaseState<DataGridHistorySnippet> {
     }
     return Column(
       children: [
-        if (widget.isTwin || smallScreen)
+        if (smallScreen)
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
@@ -361,6 +360,7 @@ class DataGridHistorySnippetState extends BaseState<DataGridHistorySnippet> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 SizedBox(
+                    width: MediaQuery.of(context).size.width - 50,
                     height: 40,
                     child: SearchBar(
                       hintText: widget.searchHint,
@@ -378,7 +378,7 @@ class DataGridHistorySnippetState extends BaseState<DataGridHistorySnippet> {
               ],
             ),
           ),
-        if (!smallScreen && !widget.isTwin)
+        if (!smallScreen)
           Padding(
             padding: const EdgeInsets.only(top: 10),
             child: Container(
@@ -903,30 +903,29 @@ class DataGridHistorySnippetState extends BaseState<DataGridHistorySnippet> {
                           height: 100,
                           child: CircularProgressIndicator()),
                     if (!loading)
-                      Text(
-                        'No Data',
-                        style: theme.getStyle().copyWith(fontSize: 20),
+                      Center(
+                        child: Text(
+                          'No Data',
+                          style: theme.getStyle().copyWith(fontSize: 20),
+                        ),
                       ),
                   ],
                 ),
               ),
-            if (!loading && _children.isNotEmpty)
-              Flexible(
-                child: SingleChildScrollView(
-                  child: Wrap(
-                    direction: Axis.vertical,
-                    children: _children,
-                  ),
+            Flexible(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: _children,
                 ),
               ),
+            ),
           ],
         ));
   }
 
   void _buildChildren() {
     _children.clear();
-    double colWidth = (MediaQuery.of(context).size.width / 3) / 3.5;
-
+    double colWidth = (MediaQuery.of(context).size.width / 3) / 2.87;
     _children.add(Padding(
       padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
       child: Container(
@@ -936,86 +935,149 @@ class DataGridHistorySnippetState extends BaseState<DataGridHistorySnippet> {
             BoxDecoration(border: Border.all(color: theme.getPrimaryColor())),
       ),
     ));
-
+    List<tapi.GeoLocation> geoLocationList = [];
     for (tapi.DeviceData dd in _data) {
-      refresh(sync: () {
-        _children.add(SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              if (smallScreen)
-                Padding(
-                  padding: const EdgeInsets.only(right: 8.0),
-                  child: AssetActionWidget(
-                    direction: Axis.vertical,
-                    models: _models,
-                    deviceData: dd,
-                    onAssetModelTapped: widget.onAssetModelTapped,
-                    onDeviceModelTapped: widget.onDeviceModelTapped,
-                    onTimeSeriesDoubleTapped: widget.onAnalyticsDoubleTapped,
-                    onTimeSeriesTapped: widget.onAnalyticsTapped,
-                  ),
-                ),
-              SizedBox(
-                width: colWidth,
-                child: AssetInfoWidget(
-                  models: _models,
-                  deviceData: dd,
-                  onClientTapped: widget.onClientTapped,
-                  onAssetTapped: widget.onAssetTapped,
-                  onFacilityTapped: widget.onFacilityTapped,
-                  onPremiseTapped: widget.onPremiseTapped,
-                  onFloorTapped: widget.onFloorTapped,
-                  onAssetModelTapped: widget.onAssetModelTapped,
-                  onDeviceModelTapped: widget.onDeviceModelTapped,
-                  onTimeSeriesDoubleTapped: widget.onAnalyticsDoubleTapped,
-                  onTimeSeriesTapped: widget.onAnalyticsTapped,
-                ),
-              ),
-              divider(horizontal: true),
-              SizedBox(
-                width: colWidth,
-                child: LocationInfoWidget(
-                  deviceData: dd,
-                  onClientTapped: widget.onClientTapped,
-                  onFacilityTapped: widget.onFacilityTapped,
-                  onPremiseTapped: widget.onPremiseTapped,
-                  onFloorTapped: widget.onFloorTapped,
-                ),
-              ),
-              divider(horizontal: true),
-              DeviceFieldWidget(
-                deviceData: dd,
-                models: _models,
-                onDeviceAnalyticsTapped: widget.onDeviceAnalyticsTapped,
-                onDeviceAnalyticsDoubleTapped:
-                    widget.onDeviceAnalyticsDoubleTapped,
-              ),
-            ],
-          ),
-        ));
+      if (dd.geolocation != null) {
+        geoLocationList.add(dd.geolocation!);
+      }
 
-        _children.add(Padding(
-          padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-          child: Container(
-            width: MediaQuery.of(context).size.width - 10,
-            height: 1,
-            decoration: BoxDecoration(
-                border: Border.all(color: theme.getPrimaryColor())),
-          ),
-        ));
-      });
+      var dT = DateTime.fromMillisecondsSinceEpoch(dd.updatedStamp);
+      _children.add(SizedBox(
+        width: MediaQuery.of(context).size.width,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (smallScreen && (dd.assetId?.isNotEmpty ?? false))
+              Wrap(
+                spacing: 5.0,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  InkWell(
+                    onTap: () {
+                      widget.onAssetTapped(dd.assetId!, dd);
+                    },
+                    child: Text(
+                      dd.asset!,
+                      style: theme.getStyle().copyWith(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                          color: theme.getPrimaryColor()),
+                    ),
+                  ),
+                  Text(
+                    timeago.format(dT, locale: 'en'),
+                    style: theme
+                        .getStyle()
+                        .copyWith(fontWeight: FontWeight.bold, fontSize: 14),
+                  ),
+                ],
+              ),
+            if (smallScreen && (dd.assetId?.isEmpty ?? true))
+              Wrap(
+                spacing: 5.0,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  Text(
+                    dd.deviceName!,
+                    style: theme.getStyle().copyWith(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                        color: theme.getPrimaryColor()),
+                  ),
+                  Text(
+                    timeago.format(dT, locale: 'en'),
+                    style: theme
+                        .getStyle()
+                        .copyWith(fontWeight: FontWeight.bold, fontSize: 14),
+                  ),
+                ],
+              ),
+            if (smallScreen) divider(),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  if (smallScreen)
+                    Padding(
+                      padding: const EdgeInsets.only(right: 8.0),
+                      child: AssetActionWidget(
+                        direction: Axis.vertical,
+                        models: _models,
+                        deviceData: dd,
+                        onTimeSeriesDoubleTapped:
+                            widget.onAnalyticsDoubleTapped,
+                        onTimeSeriesTapped: widget.onAnalyticsTapped,
+                      ),
+                    ),
+                  if (!smallScreen)
+                    SizedBox(
+                      width: colWidth,
+                      child: AssetInfoWidget(
+                        models: _models,
+                        deviceData: dd,
+                        onClientTapped: widget.onClientTapped,
+                        onAssetTapped: widget.onAssetTapped,
+                        onFacilityTapped: widget.onFacilityTapped,
+                        onPremiseTapped: widget.onPremiseTapped,
+                        onFloorTapped: widget.onFloorTapped,
+                        onAssetModelTapped: widget.onAssetModelTapped,
+                        onDeviceModelTapped: widget.onDeviceModelTapped,
+                        onTimeSeriesDoubleTapped:
+                            widget.onAnalyticsDoubleTapped,
+                        onTimeSeriesTapped: widget.onAnalyticsTapped,
+                      ),
+                    ),
+                  if (!smallScreen)
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8.0),
+                      child: SizedBox(
+                        width: colWidth,
+                        child: LocationInfoWidget(
+                          deviceData: dd,
+                          onClientTapped: widget.onClientTapped,
+                          onFacilityTapped: widget.onFacilityTapped,
+                          onPremiseTapped: widget.onPremiseTapped,
+                          onFloorTapped: widget.onFloorTapped,
+                        ),
+                      ),
+                    ),
+                  divider(horizontal: true),
+                  DeviceFieldWidget(
+                    deviceData: dd,
+                    models: _models,
+                    onDeviceAnalyticsTapped: widget.onDeviceAnalyticsTapped,
+                    onDeviceAnalyticsDoubleTapped:
+                        widget.onDeviceAnalyticsDoubleTapped,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ));
+
+      _children.add(Padding(
+        padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+        child: Container(
+          width: MediaQuery.of(context).size.width - 10,
+          height: 1,
+          decoration:
+              BoxDecoration(border: Border.all(color: theme.getPrimaryColor())),
+        ),
+      ));
     }
 
-    if (_data.isEmpty) {
+    if ((_data.isEmpty && !loading)) {
       _children.add(Row(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            'No Data',
-            style: theme.getStyle().copyWith(fontSize: 20),
+          Center(
+            child: Text(
+              'No Data',
+              style: theme.getStyle().copyWith(fontSize: 20),
+            ),
           ),
         ],
       ));
@@ -1091,7 +1153,10 @@ class DataGridHistorySnippetState extends BaseState<DataGridHistorySnippet> {
             },
           if (widget.deviceIds.isNotEmpty)
             {
-              "terms": {'deviceId': widget.deviceIds}
+              "terms": {
+                'deviceId${widget.oldVersion ? '.keyword' : ''}':
+                    widget.deviceIds
+              }
             },
           if (widget.assetIds.isNotEmpty ||
               null != _assetGroup && _assetGroup!.assetIds.isNotEmpty)
