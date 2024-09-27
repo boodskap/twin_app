@@ -52,7 +52,12 @@ class _DeviceFieldWidgetState extends BaseState<DeviceFieldWidget> {
             onTap: !hasSeries
                 ? null
                 : () {
-                    widget.onDeviceAnalyticsTapped(field, deviceModel, dd);
+                    if (!smallScreen) {
+                      widget.onDeviceAnalyticsTapped(field, deviceModel, dd);
+                    } else {
+                      widget.onDeviceAnalyticsDoubleTapped(
+                          field, deviceModel, dd);
+                    }
                   },
             onDoubleTap: !hasSeries
                 ? null
