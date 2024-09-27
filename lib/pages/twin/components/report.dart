@@ -90,11 +90,16 @@ class _AssetReportListState extends BaseState<AssetReportList> {
             ],
           ),
         if (_cards.isNotEmpty)
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: _cards,
+          Expanded(
+            child: SingleChildScrollView(
+              child: Wrap(
+                spacing: 8.0,
+                runSpacing: 8.0,
+                alignment: WrapAlignment.start,
+                crossAxisAlignment: WrapCrossAlignment.start,
+                runAlignment: WrapAlignment.start,
+                children: _cards,
+              ),
             ),
           ),
       ],
