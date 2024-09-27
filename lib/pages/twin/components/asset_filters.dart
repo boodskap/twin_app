@@ -10,10 +10,10 @@ import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:twin_commons/core/twin_image_helper.dart';
 import 'package:twin_commons/core/twinned_session.dart';
 import 'package:twin_commons/widgets/common/label_text_field.dart';
-import 'package:twinned_api/api/twinned.swagger.dart' as twinned;
-import 'package:twinned_api/twinned_api.dart' as tapi;
 import 'package:twinned_widgets/core/device_model_dropdown.dart';
 import 'package:twinned_widgets/core/top_bar.dart';
+import 'package:twinned_api/api/twinned.swagger.dart' as twinned;
+import 'package:twinned_api/twinned_api.dart' as tapi;
 
 class AssetFilterList extends StatefulWidget {
   final twinned.DataFilterInfoTarget target;
@@ -285,7 +285,9 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
             SizedBox(
               width: 250,
               child: DeviceModelDropdown(
-                  style: theme.getStyle(),
+                  style: theme
+                      .getStyle()
+                      .copyWith(color: smallScreen ? Colors.black : null),
                   selectedItem: _selectedDeviceModel?.id,
                   onDeviceModelSelected: (e) {
                     setState(() {
@@ -875,76 +877,82 @@ class _AssetFilterContentState extends BaseState<AssetFilterContent> {
                 color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
           ),
           divider(),
-          Row(
-            children: [
-              divider(horizontal: true),
-              Expanded(
-                flex: 1,
-                child: LabelTextField(
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Wrap(
+              alignment: WrapAlignment.end,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                LabelTextField(
                   label: 'Asset Filter Name',
                   controller: _name,
                   style: theme.getStyle(),
                   labelTextStyle: theme.getStyle(),
                 ),
-              ),
-              divider(horizontal: true),
-              Expanded(
-                flex: 2,
-                child: LabelTextField(
+                LabelTextField(
                   label: 'Description',
                   controller: _desc,
                   style: theme.getStyle(),
                   labelTextStyle: theme.getStyle(),
                 ),
-              ),
-              divider(horizontal: true),
-              Expanded(
-                flex: 2,
-                child: LabelTextField(
+                LabelTextField(
                   label: 'Tags',
                   controller: _tags,
                   style: theme.getStyle(),
                   labelTextStyle: theme.getStyle(),
                 ),
-              ),
-              divider(horizontal: true),
-            ],
+                divider(horizontal: true),
+              ],
+            ),
           ),
           divider(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              const BusyIndicator(),
-              divider(horizontal: true),
-              SecondaryButton(
-                labelKey: "Cancel",
-                onPressed: () {
-                  _close();
-                },
-              ),
-              divider(horizontal: true),
-              PrimaryButton(
-                leading: const Icon(
-                  Icons.save,
-                  color: Colors.white,
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Wrap(
+                  spacing: 8,
+                  alignment: WrapAlignment.end,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  runSpacing: 8,
+                  children: [
+                    const BusyIndicator(),
+                    SecondaryButton(
+                      labelKey: "Cancel",
+                      onPressed: () {
+                        _close();
+                      },
+                      minimumSize: smallScreen ? Size(100, 50) : Size(150, 50),
+                    ),
+                    PrimaryButton(
+                      leading: const Icon(
+                        Icons.save,
+                        color: Colors.white,
+                      ),
+                      labelKey: "Save",
+                      onPressed: () async {
+                        await _save();
+                      },
+                      minimumSize: smallScreen ? Size(100, 50) : Size(150, 50),
+                    ),
+                    PrimaryButton(
+                      labelKey: "Add New",
+                      onPressed: () {
+                        _addNew();
+                      },
+                      leading: const Icon(
+                        Icons.add_box,
+                        color: Colors.white,
+                      ),
+                      minimumSize: smallScreen ? Size(100, 50) : Size(150, 50),
+                    ),
+                  ],
                 ),
-                labelKey: "Save",
-                onPressed: () async {
-                  await _save();
-                },
-              ),
-              divider(horizontal: true),
-              PrimaryButton(
-                labelKey: "Add New",
-                onPressed: () {
-                  _addNew();
-                },
-                leading: const Icon(
-                  Icons.add_box,
-                  color: Colors.white,
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
           divider(),
           Expanded(
@@ -1038,13 +1046,14 @@ class _MatchGroupFilterWidgetState extends BaseState<_MatchGroupFilterWidget> {
     List<Widget> selected = [];
     selected.addAll(_selected.values);
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+    return Wrap(
+      crossAxisAlignment: WrapCrossAlignment.center,
+      spacing: 8,
+      runSpacing: 8,
       children: [
         Text('IF',
             style: theme.getStyle().copyWith(
                 fontSize: 18, fontWeight: FontWeight.bold, color: Colors.red)),
-        divider(horizontal: true),
         SizedBox(
           width: 400,
           height: 200,
@@ -1112,7 +1121,6 @@ class _MatchGroupFilterWidgetState extends BaseState<_MatchGroupFilterWidget> {
             ],
           ),
         ),
-        divider(horizontal: true),
         if (widget.filter.matchGroups[widget.index].conditionIds?.isNotEmpty ??
             false)
           Text('MATCHES',
@@ -1120,7 +1128,6 @@ class _MatchGroupFilterWidgetState extends BaseState<_MatchGroupFilterWidget> {
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: Colors.blue)),
-        divider(horizontal: true),
         if (widget.filter.matchGroups[widget.index].conditionIds?.isNotEmpty ??
             false)
           DropdownMenu<twinned.FilterMatchGroupMatchType>(

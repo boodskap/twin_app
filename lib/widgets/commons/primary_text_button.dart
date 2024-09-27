@@ -24,7 +24,7 @@ class _PrimaryTextButtonState extends State<PrimaryTextButton> {
       child: Text(
         widget.labelKey,
         style: theme.getStyle().copyWith(
-              fontSize: 16,
+              fontSize: smallScreen ? 14 : 16,
               color: theme.getPrimaryColor(),
             ),
       ).tr(),

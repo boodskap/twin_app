@@ -105,7 +105,6 @@ class _DashboardHistoryState extends BaseState<DashboardHistory> {
                 oldVersion: widget.oldVersion,
                 assetIds: widget.assetIds,
                 deviceIds: widget.deviceIds,
-                isTwin: true,
                 onPremiseTapped: (id, dd) {
                   _showDashboard(dd.premise ?? '', premiseIds: [id]);
                 },
