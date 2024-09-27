@@ -34,7 +34,7 @@ class _PrimaryButtonState extends State<PrimaryButton> {
             widget.labelKey,
             style: theme.getStyle().copyWith(
                   color: Colors.white,
-                  fontSize: 18,
+                  fontSize: smallScreen ? 14 : 18,
                 ),
           ).tr(),
           if (null != widget.trailing) widget.trailing!,

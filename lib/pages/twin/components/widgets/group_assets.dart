@@ -69,31 +69,27 @@ class _GroupAssetsState extends BaseState<GroupAssets> {
   }
 
   Widget _buildAsset(int idx) {
-    return Tooltip(
-      message:
-          'Double click to associate ${_assets[idx].name} with ${widget.group.name}',
-      child: InkWell(
-        onDoubleTap: () {
-          setState(() {
-            _selected.add(_assets.removeAt(idx));
-          });
-        },
-        child: SizedBox(
-          width: 250,
-          child: Card(
-            elevation: 5,
-            child: Container(
-              color: Colors.white,
-              child: Align(
-                alignment: Alignment.center,
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 8.0, top: 2.0),
-                  child: Text(
-                    _assets[idx].name,
-                    style: theme.getStyle().copyWith(
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                  ),
+    return InkWell(
+      onDoubleTap: () {
+        setState(() {
+          _selected.add(_assets.removeAt(idx));
+        });
+      },
+      child: SizedBox(
+        width: 250,
+        child: Card(
+          elevation: 5,
+          child: Container(
+            color: Colors.white,
+            child: Align(
+              alignment: Alignment.center,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 8.0, top: 2.0),
+                child: Text(
+                  _assets[idx].name,
+                  style: theme.getStyle().copyWith(
+                        overflow: TextOverflow.ellipsis,
+                      ),
                 ),
               ),
             ),
@@ -161,7 +157,9 @@ class _GroupAssetsState extends BaseState<GroupAssets> {
             name: widget.group.name,
             description: widget.group.description,
             tags: widget.group.tags,
-            target: AssetGroupInfoTarget.app,
+            target: widget.group.target == AssetGroupTarget.app
+                ? AssetGroupInfoTarget.app
+                : AssetGroupInfoTarget.user,
             assetIds: widget.group.assetIds,
             clientIds: clientIds,
           ));
@@ -224,17 +222,18 @@ class _GroupAssetsState extends BaseState<GroupAssets> {
               alignment: Alignment.topCenter,
               child: Text(
                 'Asset Group - ${widget.group.name}',
-                style: theme
-                    .getStyle()
-                    .copyWith(fontWeight: FontWeight.bold, fontSize: 15),
+                style: theme.getStyle().copyWith(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                    ),
               )),
-          divider(),
+          divider(height: 12),
           SizedBox(
             height: 40,
             child: Align(
               alignment: Alignment.topRight,
               child: SearchBar(
-                hintText: 'Search Assets Groups',
+                hintText: 'search assets',
                 hintStyle: WidgetStatePropertyAll(theme.getStyle()),
                 textStyle: WidgetStatePropertyAll(theme.getStyle()),
                 leading: const Icon(Icons.search),
@@ -244,14 +243,27 @@ class _GroupAssetsState extends BaseState<GroupAssets> {
               ),
             ),
           ),
-          divider(),
+          divider(height: 12),
           Align(
               alignment: Alignment.topLeft,
-              child: Text(
-                'Available Assets',
-                style: theme
-                    .getStyle()
-                    .copyWith(fontWeight: FontWeight.bold, fontSize: 15),
+              child: Row(
+                children: [
+                  Text(
+                    'Available Assets',
+                    style: theme.getStyle().copyWith(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                        ),
+                  ),
+                  divider(horizontal: true),
+                  Text(
+                    '(double click to select)',
+                    style: theme.getStyle().copyWith(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 10,
+                        ),
+                  ),
+                ],
               )),
           SizedBox(
             height: 165,
@@ -271,9 +283,10 @@ class _GroupAssetsState extends BaseState<GroupAssets> {
               alignment: Alignment.topLeft,
               child: Text(
                 'Selected Assets',
-                style: theme
-                    .getStyle()
-                    .copyWith(fontWeight: FontWeight.bold, fontSize: 15),
+                style: theme.getStyle().copyWith(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                    ),
               )),
           SizedBox(
             height: 300,

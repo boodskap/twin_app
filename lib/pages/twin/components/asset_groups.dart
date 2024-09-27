@@ -161,7 +161,8 @@ class _AssetGroupListState extends BaseState<AssetGroupList> {
                 Icons.add,
                 color: Colors.white,
               ),
-              onPressed: (canCreate())
+              onPressed: (widget.target == twinned.AssetGroupInfoTarget.user ||
+                      canCreate())
                   ? () {
                       _addNew();
                     }
@@ -319,9 +320,11 @@ class _AssetGroupListState extends BaseState<AssetGroupList> {
       barrierDismissible: false,
       builder: (context) {
         return AlertDialog(
+          //backgroundColor: Colors.white,
           titleTextStyle: theme.getStyle().copyWith(
                 fontWeight: FontWeight.bold,
                 fontSize: 18,
+                color: Colors.black,
               ),
           contentTextStyle: theme.getStyle(),
           scrollable: true,

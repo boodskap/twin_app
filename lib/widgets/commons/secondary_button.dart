@@ -25,7 +25,7 @@ class _SecondaryButtonState extends State<SecondaryButton> {
         widget.labelKey,
         style: theme.getStyle().copyWith(
             color: theme.getPrimaryColor(),
-            fontSize: 18,
+            fontSize: smallScreen ? 14 : 18,
             fontWeight: FontWeight.bold),
       ).tr(),
       style: ElevatedButton.styleFrom(

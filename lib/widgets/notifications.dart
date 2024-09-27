@@ -33,13 +33,8 @@ class _AlarmsNotificationsGridState extends BaseState<AlarmsNotificationsGrid> {
   int totalCount = 0;
   final List<TriggeredEvent> _twinNotifications = [];
   String _searchQuery = '*';
-  bool isShowAll = true;
+  bool isShowAll = false;
   TwinUser? user;
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   List<TriggeredEvent> _getFilteredData() {
     // DateTime now = DateTime.now();
@@ -428,10 +423,10 @@ class _AlarmsNotificationsGridState extends BaseState<AlarmsNotificationsGrid> {
                 true,
                 false,
                 ""),
-            _buildTableCell('Triggered By', true, false, ""),
             _buildTableCell('Delivery Status', true, false, ""),
-            _buildTableCell('Created Time', true, false, ""),
-            _buildTableCell('Updated Time', true, false, ""),
+            if (!smallScreen) _buildTableCell('Triggered By', true, false, ""),
+            if (!smallScreen) _buildTableCell('Created Time', true, false, ""),
+            if (!smallScreen) _buildTableCell('Updated Time', true, false, ""),
           ],
         ),
       ],
@@ -492,16 +487,19 @@ class _AlarmsNotificationsGridState extends BaseState<AlarmsNotificationsGrid> {
                           if (_isVoiceView)
                             _buildDataTableCell(event.voiceMessage!, event),
                         ]),
-                        getSourceType(event.sourceType!, event),
                         _buildTableCell(
                             getDeliveryStatusName(event.deliveryStatus!),
                             false,
                             false,
                             ""),
-                        _buildTableCell(timeAgoCustomize(event.createdStamp!),
-                            false, true, timeFormatText(event.createdStamp!)),
-                        _buildTableCell(timeAgoCustomize(event.updatedStamp!),
-                            false, true, timeFormatText(event.createdStamp!)),
+                        if (!smallScreen)
+                          getSourceType(event.sourceType!, event),
+                        if (!smallScreen)
+                          _buildTableCell(timeAgoCustomize(event.createdStamp!),
+                              false, true, timeFormatText(event.createdStamp!)),
+                        if (!smallScreen)
+                          _buildTableCell(timeAgoCustomize(event.updatedStamp!),
+                              false, true, timeFormatText(event.createdStamp!)),
                       ],
                     ),
                   ],
@@ -571,18 +569,19 @@ class _AlarmsNotificationsGridState extends BaseState<AlarmsNotificationsGrid> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            InkWell(
-              onTap: () {
-                showEventLogs(context, eventData);
-              },
-              child: const Tooltip(
-                  message: 'View Email Logs Data',
-                  child: Icon(
-                    Icons.remove_red_eye,
-                    size: 20,
-                  )),
-            ),
-            SizedBox(width: 3),
+            if (!smallScreen)
+              InkWell(
+                onTap: () {
+                  showEventLogs(context, eventData);
+                },
+                child: const Tooltip(
+                    message: 'View Email Logs Data',
+                    child: Icon(
+                      Icons.remove_red_eye,
+                      size: 20,
+                    )),
+              ),
+            if (!smallScreen) SizedBox(width: 3),
             Flexible(
               child: Tooltip(
                 message: text,
@@ -780,6 +779,7 @@ class _AlarmsNotificationsGridState extends BaseState<AlarmsNotificationsGrid> {
 
   @override
   void setup() {
+    isShowAll = super.isAdmin();
     _load();
   }
 
