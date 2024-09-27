@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:twin_app/core/session_variables.dart';
+import 'package:twin_app/pages/twin/components/report-view.dart';
+import 'package:twin_app/pages/wrapper_page.dart';
 import 'package:twin_app/widgets/commons/alarm_search.dart';
 import 'package:twin_app/widgets/commons/asset_action_widget.dart';
 import 'package:twin_app/widgets/commons/asset_group_search.dart';
@@ -16,6 +18,7 @@ import 'package:twin_app/widgets/commons/premise_search.dart';
 import 'package:twin_commons/core/base_state.dart';
 import 'package:twin_commons/core/busy_indicator.dart';
 import 'package:twin_commons/core/twinned_session.dart';
+import 'package:twin_commons/core/twin_image_helper.dart';
 import 'package:twin_commons/widgets/default_deviceview.dart';
 import 'google_map.dart';
 import 'package:twinned_api/api/twinned.swagger.dart' as tapi;
@@ -97,6 +100,7 @@ class DataGridSnippet extends StatefulWidget {
 class DataGridSnippetState extends BaseState<DataGridSnippet> {
   final List<tapi.DeviceData> _data = [];
   final List<Widget> _children = [];
+  final List<Widget> _reports = [];
   final Map<String, tapi.DeviceModel> _models = {};
   final List<String> _modelIds = [];
   Timer? timer;
@@ -121,8 +125,9 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
   }
 
   @override
-  void setup() {
-    _load();
+  void setup() async {
+    await _loadReports();
+    await _load();
     if (widget.autoRefresh) {
       timer = Timer.periodic(
           Duration(seconds: widget.autoRefreshInterval), (Timer t) => _load());
@@ -533,6 +538,64 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                           },
                         ),
                       ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Tooltip(
+                          message: "Grid view",
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: _isTableView
+                                  ? Colors.blue[200]
+                                  : Colors.transparent,
+                              shape: BoxShape.circle,
+                            ),
+                            child: InkWell(
+                              onTap: () {
+                                setState(() {
+                                  _isMapView = false;
+                                  _isTableView = true;
+                                });
+                                _buildChildren();
+                              },
+                              child: Icon(
+                                Icons.grid_on,
+                                color: _isTableView
+                                    ? Colors.black
+                                    : theme.getPrimaryColor(),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Tooltip(
+                          message: "Map view",
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: !_isTableView
+                                  ? Colors.blue[200]
+                                  : Colors.transparent,
+                              shape: BoxShape.circle,
+                            ),
+                            child: InkWell(
+                              onTap: () {
+                                setState(() {
+                                  _isMapView = true;
+                                  _isTableView = false;
+                                });
+                                _buildChildren();
+                              },
+                              child: Icon(
+                                Icons.location_on,
+                                color: !_isTableView
+                                    ? Colors.black
+                                    : theme.getPrimaryColor(),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                     InkWell(
                         onTap: () {
                           _load();
@@ -1166,6 +1229,58 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                                       },
                                     ),
                                   ),
+                                Tooltip(
+                                  message: "Grid view",
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: _isTableView
+                                          ? Colors.blue[200]
+                                          : Colors.transparent,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: IconButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          _isMapView = false;
+                                          _isTableView = true;
+                                        });
+                                        _buildChildren();
+                                      },
+                                      icon: Icon(
+                                        Icons.grid_on,
+                                        color: _isTableView
+                                            ? Colors.black
+                                            : theme.getPrimaryColor(),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Tooltip(
+                                  message: "Map view",
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: !_isTableView
+                                          ? Colors.blue[200]
+                                          : Colors.transparent,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: IconButton(
+                                      onPressed: () {
+                                        setState(() {
+                                          _isMapView = true;
+                                          _isTableView = false;
+                                        });
+                                        _buildChildren();
+                                      },
+                                      icon: Icon(
+                                        Icons.location_on,
+                                        color: !_isTableView
+                                            ? Colors.black
+                                            : theme.getPrimaryColor(),
+                                      ),
+                                    ),
+                                  ),
+                                ),
                                 Padding(
                                   padding: const EdgeInsets.only(top: 5),
                                   child: InkWell(
@@ -1206,6 +1321,25 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                                   ),
                               ],
                             ),
+                            if (_reports.isNotEmpty)
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(top: 8.0, right: 8.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    SingleChildScrollView(
+                                      child: Wrap(
+                                        spacing: 5,
+                                        runSpacing: 5,
+                                        crossAxisAlignment:
+                                            WrapCrossAlignment.center,
+                                        children: _reports,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                           ],
                         ),
                       )
@@ -1247,65 +1381,6 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
                       ),
                   ],
                 ),
-              ),
-            if (!loading && _children.isNotEmpty)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Tooltip(
-                    message: "Grid view",
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: _isTableView
-                            ? Colors.blue[200]
-                            : Colors.transparent,
-                        shape: BoxShape.circle,
-                      ),
-                      child: IconButton(
-                        icon: Icon(
-                          Icons.grid_on,
-                          color: _isTableView
-                              ? Colors.black
-                              : theme.getPrimaryColor(),
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _isMapView = false;
-                            _isTableView = true;
-                          });
-                          _buildChildren();
-                        },
-                      ),
-                    ),
-                  ),
-                  divider(horizontal: true),
-                  Tooltip(
-                    message: "Map view",
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: !_isTableView
-                            ? Colors.blue[200]
-                            : Colors.transparent,
-                        shape: BoxShape.circle,
-                      ),
-                      child: IconButton(
-                        icon: Icon(
-                          Icons.location_on,
-                          color: !_isTableView
-                              ? Colors.black
-                              : theme.getPrimaryColor(),
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _isMapView = true;
-                            _isTableView = false;
-                          });
-                          _buildChildren();
-                        },
-                      ),
-                    ),
-                  ),
-                ],
               ),
             Flexible(
               child: SingleChildScrollView(
@@ -1511,6 +1586,47 @@ class DataGridSnippetState extends BaseState<DataGridSnippet> {
         ],
       ));
     }
+  }
+
+  Future _loadReports() async {
+    await execute(() async {
+      var res = await TwinnedSession.instance.twin.searchReports(
+        apikey: TwinnedSession.instance.authToken,
+        body: tapi.SearchReq(search: '*', page: 0, size: 100),
+      );
+
+      if (validateResponse(res)) {
+        for (tapi.Report r in res.body?.values ?? []) {
+          _reports.add(Chip(
+              elevation: 5,
+              avatar: (r.icon?.isEmpty ?? true)
+                  ? null
+                  : TwinImageHelper.getCachedDomainImage(r.icon!,
+                      width: 32, height: 32),
+              label: InkWell(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => Scaffold(
+                                body: WrapperPage(
+                                  title: r.name,
+                                  child: ReportViewGrid(
+                                    entity: r,
+                                  ),
+                                ),
+                              )));
+                },
+                child: Text(
+                  r.name,
+                  style: theme
+                      .getStyle()
+                      .copyWith(fontSize: 12, color: theme.getPrimaryColor()),
+                ),
+              )));
+        }
+      }
+    });
   }
 
   Future _load({String search = '*', int page = 0, int size = 1000}) async {

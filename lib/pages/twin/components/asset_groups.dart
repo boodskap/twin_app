@@ -16,14 +16,10 @@ typedef BasicInfoCallback = Future<void> Function(
 
 class AssetGroupList extends StatefulWidget {
   final twinned.AssetGroupInfoTarget target;
-  final double cardWidth;
-  final double cardHeight;
 
   const AssetGroupList({
     super.key,
     required this.target,
-    this.cardWidth = 200,
-    this.cardHeight = 200,
   });
 
   @override
@@ -33,10 +29,17 @@ class AssetGroupList extends StatefulWidget {
 class _AssetGroupListState extends BaseState<AssetGroupList> {
   final List<twinned.AssetGroup> _groups = [];
   Map<String, bool> _editable = Map<String, bool>();
+  double cardWidth = 200;
+  double cardHeight = 200;
 
   @override
   Widget build(BuildContext context) {
     final List<Widget> cards = [];
+
+    if (smallScreen) {
+      cardWidth = (MediaQuery.of(context).size.width / 2) - 15;
+      cardHeight = cardWidth;
+    }
 
     for (var group in _groups) {
       bool editable = _editable[group.id] ?? false;
@@ -55,8 +58,8 @@ class _AssetGroupListState extends BaseState<AssetGroupList> {
           elevation: 10,
           child: Container(
             color: Colors.white,
-            width: widget.cardWidth,
-            height: widget.cardHeight,
+            width: cardWidth,
+            height: cardHeight,
             child: Stack(
               children: [
                 Center(
@@ -182,23 +185,18 @@ class _AssetGroupListState extends BaseState<AssetGroupList> {
                 Text('No asset group found', style: theme.getStyle()),
             ],
           ),
-        if (_groups.isNotEmpty && !smallScreen)
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
+        Expanded(
+          child: SingleChildScrollView(
+            child: Wrap(
+              spacing: 8.0,
+              runSpacing: 8.0,
+              alignment: WrapAlignment.start,
+              crossAxisAlignment: WrapCrossAlignment.start,
+              runAlignment: WrapAlignment.start,
               children: cards,
             ),
           ),
-        if (_groups.isNotEmpty && smallScreen)
-          Expanded(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              child: Wrap(
-                children: cards,
-              ),
-            ),
-          ),
+        ),
       ],
     );
   }

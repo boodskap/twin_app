@@ -17,14 +17,10 @@ import 'package:twinned_api/twinned_api.dart' as tapi;
 
 class AssetFilterList extends StatefulWidget {
   final twinned.DataFilterInfoTarget target;
-  final double cardWidth;
-  final double cardHeight;
 
   const AssetFilterList({
     super.key,
     required this.target,
-    this.cardWidth = 200,
-    this.cardHeight = 200,
   });
 
   @override
@@ -36,10 +32,17 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
   final List<twinned.FieldFilter> _fieldFilters = [];
   tapi.DeviceModel? _selectedDeviceModel;
   Map<String, bool> _editable = Map<String, bool>();
+  double cardWidth = 200;
+  double cardHeight = 200;
 
   @override
   Widget build(BuildContext context) {
     final List<Widget> cards = [];
+
+    if (smallScreen) {
+      cardWidth = (MediaQuery.of(context).size.width / 2) - 15;
+      cardHeight = cardWidth;
+    }
 
     for (var group in _fieldFilters) {
       bool editable = _editable[group.id] ?? false;
@@ -67,8 +70,8 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
             elevation: 10,
             child: Container(
               color: Colors.white,
-              width: widget.cardWidth,
-              height: widget.cardHeight,
+              width: cardWidth,
+              height: cardHeight,
               child: Stack(
                 children: [
                   Center(
@@ -179,8 +182,8 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
             elevation: 10,
             child: Container(
               color: Colors.white,
-              width: widget.cardWidth,
-              height: widget.cardHeight,
+              width: cardWidth,
+              height: cardHeight,
               child: Stack(
                 children: [
                   Center(
@@ -350,27 +353,18 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
                 ),
             ],
           ),
-        if (cards.isNotEmpty && !smallScreen)
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
+        Expanded(
+          child: SingleChildScrollView(
+            child: Wrap(
+              spacing: 8.0,
+              runSpacing: 8.0,
+              alignment: WrapAlignment.start,
+              crossAxisAlignment: WrapCrossAlignment.start,
+              runAlignment: WrapAlignment.start,
               children: cards,
             ),
           ),
-        if (cards.isNotEmpty && smallScreen)
-          Expanded(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              child: Wrap(
-                direction: Axis.vertical,
-                spacing: 8.0,
-                runSpacing: 8.0,
-                alignment: WrapAlignment.center,
-                children: cards,
-              ),
-            ),
-          ),
+        ),
       ],
     );
   }
