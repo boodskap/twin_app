@@ -112,14 +112,6 @@ class _ReportViewGridState extends BaseState<ReportViewGrid> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            TopBar(
-              title: 'Custom Report View',
-              style: theme.getStyle().copyWith(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-            ),
             Expanded(
               child: Center(
                 child: Container(
@@ -424,7 +416,7 @@ class _ReportViewGridState extends BaseState<ReportViewGrid> {
     if (loading) return;
     loading = true;
     _twinReportsData.clear();
-   
+
     await execute(() async {
       var qres = await TwinnedSession.instance.twin.queryEqlDeviceData(
         apikey: TwinnedSession.instance.authToken,
