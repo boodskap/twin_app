@@ -237,6 +237,7 @@ class HomeScreenState extends BaseState<HomeScreen> {
   bool firstTime = true;
   late StreamAuth auth;
   GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  String fullName = '';
 
   @override
   initState() {
@@ -471,10 +472,24 @@ class HomeScreenState extends BaseState<HomeScreen> {
             OrgChangeWidget(onSelected: _switchOrg),
           if (!session.smallScreen && session.orgs.length > 1)
             const SizedBox(width: 8),
-          Text(
-            toCamelCase(user!.name),
-            style: session.theme.getStyle().copyWith(color: Colors.white),
-          ),
+          if (!session.smallScreen)
+            Text(
+              toCamelCase(user!.name),
+              style: session.theme.getStyle().copyWith(color: Colors.white),
+            ),
+          if (session.smallScreen)
+            CircleAvatar(
+              radius: 12,
+              backgroundColor: Colors.white,
+              child: Text(
+                getInitials(user!.name),
+                style: session.theme.getStyle().copyWith(
+                      color: session.theme.getPrimaryColor(),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+              ),
+            ),
           IconButton(
             icon: Icon(Icons.person),
             onPressed: () {
@@ -622,6 +637,16 @@ class HomeScreenState extends BaseState<HomeScreen> {
           ? '${word[0].toUpperCase()}${word.substring(1).toLowerCase()}'
           : '';
     }).join(' ');
+  }
+
+  String getInitials(String fullName) {
+    String firstLetter = fullName.isNotEmpty ? fullName[0].toUpperCase() : '';
+    int spaceIndex = fullName.indexOf(' ');
+    if (spaceIndex != -1) {
+      String secondLetter = fullName[spaceIndex + 1].toUpperCase();
+      return '$firstLetter$secondLetter';
+    }
+    return firstLetter;
   }
 
   Future _switchOrg(tapi.OrgInfo o) async {
