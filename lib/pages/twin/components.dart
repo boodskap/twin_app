@@ -5,6 +5,7 @@ import 'package:twin_app/pages/twin/components/asset_groups.dart';
 import 'package:twin_app/pages/twin/components/asset_library.dart';
 import 'package:twin_app/pages/twin/components/assets.dart';
 import 'package:twin_app/pages/twin/components/condition_rules.dart';
+import 'package:twin_app/pages/twin/components/custom_entities.dart';
 import 'package:twin_app/pages/twin/components/device_library.dart';
 import 'package:twin_app/pages/twin/components/events.dart';
 import 'package:twin_app/pages/twin/components/facilities.dart';
@@ -96,6 +97,10 @@ class _ComponentsState extends BaseState<Components> {
         page: AssetReportList(
           target: tapi.ReportInfoTarget.app,
         )));
+    _list.add(_createChild(
+        icon: Icons.data_object,
+        title: 'Custom Entities',
+        page: CustomEntities()));
 
     _children.addAll(_list);
   }
