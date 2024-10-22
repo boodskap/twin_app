@@ -521,8 +521,6 @@ class _UsersState extends BaseState<Users> {
   }
 
   void _addUpdateUserDialog({tapi.TwinUser? twinUser}) async {
-     print("user");
-    print(twinUser);
     await super.alertDialog(
       titleStyle:
           theme.getStyle().copyWith(fontWeight: FontWeight.bold, fontSize: 18),
