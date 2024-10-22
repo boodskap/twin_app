@@ -13,7 +13,7 @@ dependencies:
   twinned_widgets:
       git:
         url: https://github.com/boodskap/twinned_widgets.git
-        ref: development
+        ref: main
   #    path:
   #      twin_commons
 
