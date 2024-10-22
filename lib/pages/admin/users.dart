@@ -260,6 +260,7 @@ class _UsersState extends BaseState<Users> {
 
     if (user.platformRoles!.contains("clientadmin")) {
       isClientAdminStatus = true;
+      
     }
     String? countryCode = countryCodeMap[user.countryCode];
     String formattedPhone = user.phone != null && user.phone!.isNotEmpty
@@ -520,6 +521,8 @@ class _UsersState extends BaseState<Users> {
   }
 
   void _addUpdateUserDialog({tapi.TwinUser? twinUser}) async {
+     print("user");
+    print(twinUser);
     await super.alertDialog(
       titleStyle:
           theme.getStyle().copyWith(fontWeight: FontWeight.bold, fontSize: 18),
