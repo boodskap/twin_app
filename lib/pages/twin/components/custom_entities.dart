@@ -20,7 +20,6 @@ class CustomEntities extends StatefulWidget {
 class _CustomEntitiesState extends BaseState<CustomEntities> {
   final List<tapi.CustomEntityMapping> _entities = [];
   final List<Widget> _cards = [];
-  String _search = '';
 
   @override
   void initState() {
@@ -55,20 +54,6 @@ class _CustomEntitiesState extends BaseState<CustomEntities> {
                       }
                     : null,
               ),
-              divider(horizontal: true),
-              SizedBox(
-                  height: 40,
-                  width: 250,
-                  child: SearchBar(
-                    textStyle: WidgetStatePropertyAll(theme.getStyle()),
-                    hintStyle: WidgetStatePropertyAll(theme.getStyle()),
-                    leading: Icon(Icons.search),
-                    hintText: 'Search Assets',
-                    onChanged: (val) {
-                      _search = val.trim();
-                      _load();
-                    },
-                  )),
             ],
           ),
           divider(),
@@ -87,17 +72,19 @@ class _CustomEntitiesState extends BaseState<CustomEntities> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'No asset found',
+                  'No entity found',
                   style: theme.getStyle(),
                 ),
               ],
             ),
           if (!loading && _cards.isNotEmpty)
-            SingleChildScrollView(
-              child: Wrap(
-                spacing: 8,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: _cards,
+            Expanded(
+              child: SingleChildScrollView(
+                child: Wrap(
+                  spacing: 8,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: _cards,
+                ),
               ),
             ),
         ],
@@ -109,21 +96,24 @@ class _CustomEntitiesState extends BaseState<CustomEntities> {
     double width = MediaQuery.of(context).size.width / 7;
     List<Widget> children = [];
 
-    children.add(Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        Checkbox(
-            key: Key(Uuid().v4()),
-            value: !e.relaxed,
-            onChanged: (value) {
-              e = e.copyWith(relaxed: value ?? false);
-              _updateRelaxed(e);
-            }),
-        Text(
-          'Strict field check',
-          style: theme.getStyle(),
-        )
-      ],
+    children.add(Padding(
+      padding: const EdgeInsets.only(right: 8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Checkbox(
+              key: Key(Uuid().v4()),
+              value: !e.relaxed,
+              onChanged: (value) {
+                e = e.copyWith(relaxed: value ?? false);
+                _updateRelaxed(e);
+              }),
+          Text(
+            'Strict field check',
+            style: theme.getStyle(),
+          )
+        ],
+      ),
     ));
 
     children.add(const SizedBox(
@@ -199,12 +189,13 @@ class _CustomEntitiesState extends BaseState<CustomEntities> {
               ),
               Positioned(
                   top: 50,
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(12, 0, 12, 30),
-                    child: SingleChildScrollView(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                  child: SizedBox(
+                    height: (width * 2) - 50,
+                    width: width - 10,
+                    child: Padding(
+                      padding:
+                          const EdgeInsets.only(bottom: 25, left: 8, right: 8),
+                      child: ListView(
                         children: children,
                       ),
                     ),
