@@ -436,7 +436,7 @@ class _DeviceContentPageState extends BaseState<DeviceContentPage> {
             if (validateResponse(res)) {
               widget.device!.images!.remove(image);
               setup();
-              alert('Image', 'Device model image deleted',
+              alert('Image', 'Device Library image deleted',
                   contentStyle: theme.getStyle(),
                   titleStyle: theme
                       .getStyle()
