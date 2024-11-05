@@ -49,6 +49,8 @@ class _VisualAlarmsState extends BaseState<VisualAlarms> {
             SizedBox(
               width: 250,
               child: DeviceModelDropdown(
+                  hint: 'Select Device Library',
+                  searchHint: 'Select Device Library',
                   style: theme.getStyle(),
                   selectedItem: _selectedDeviceModel?.id,
                   onDeviceModelSelected: (e) {
