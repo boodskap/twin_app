@@ -334,12 +334,12 @@ class CustomInfoWindow extends StatelessWidget {
 }
 
 class LocationPoint {
-  final LatLng coordinates;
+  final tapi.GeoLocation geoPoint;
   final String type;
   final String name;
 
   LocationPoint(
-      {required this.coordinates, required this.type, required this.name});
+      {required this.geoPoint, required this.type, required this.name});
 }
 
 // ignore: must_be_immutable
@@ -385,13 +385,13 @@ class _GoogleMapRoutePlanState extends State<GoogleMapRoutePlan> {
       _markers.add(
         Marker(
           markerId: MarkerId('marker_$uniqueStartId'),
-          position: widget.startLocation.coordinates,
+          position: LatLng(widget.startLocation.geoPoint.coordinates[0], widget.startLocation.geoPoint.coordinates[1]),
           infoWindow: InfoWindow(title: 'Start'),
           icon: startIcon,
         ),
       );
 
-      _polylineCoordinates.add(widget.startLocation.coordinates);
+      _polylineCoordinates.add(LatLng(widget.startLocation.geoPoint.coordinates[0], widget.startLocation.geoPoint.coordinates[1]));
     }
 
     if (widget.endLocation.type != "") {
@@ -399,19 +399,19 @@ class _GoogleMapRoutePlanState extends State<GoogleMapRoutePlan> {
       _markers.add(
         Marker(
           markerId: MarkerId('marker_$uniqueEndId'),
-          position: widget.endLocation.coordinates,
+          position: LatLng(widget.endLocation.geoPoint.coordinates[0], widget.endLocation.geoPoint.coordinates[1]),
           infoWindow: InfoWindow(title: 'End'),
           icon: flagIcon,
         ),
       );
 
-      _polylineCoordinates.add(widget.endLocation.coordinates);
+      _polylineCoordinates.add(LatLng(widget.endLocation.geoPoint.coordinates[0], widget.endLocation.geoPoint.coordinates[1]));
     }
 
     if (widget.deliveryLocations.isNotEmpty) {
       for (int i = 0; i < widget.deliveryLocations.length; i++) {
         String uniqueMidId = uuid.v4();
-        LatLng point = widget.deliveryLocations[i].coordinates;
+        LatLng point = LatLng(widget.deliveryLocations[i].geoPoint.coordinates[0], widget.deliveryLocations[i].geoPoint.coordinates[1]);
 
         BitmapDescriptor markerIcon;
 
@@ -491,7 +491,7 @@ class _GoogleMapRoutePlanState extends State<GoogleMapRoutePlan> {
   Widget build(BuildContext context) {
     return GoogleMap(
       initialCameraPosition: CameraPosition(
-        target: widget.startLocation.coordinates,
+        target: LatLng(widget.startLocation.geoPoint.coordinates[0], widget.startLocation.geoPoint.coordinates[1]),
         zoom: 12,
       ),
       markers: Set<Marker>.of(_markers),
