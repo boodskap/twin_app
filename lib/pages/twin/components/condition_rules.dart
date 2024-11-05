@@ -48,6 +48,8 @@ class _ConditionRulesState extends BaseState<ConditionRules> {
             SizedBox(
               width: 250,
               child: DeviceModelDropdown(
+                  hint: 'Select Device Library',
+                  searchHint: 'Select Device Library',
                   style: theme.getStyle(),
                   selectedItem: _selectedDeviceModel?.id,
                   onDeviceModelSelected: (e) {
@@ -64,7 +66,9 @@ class _ConditionRulesState extends BaseState<ConditionRules> {
                 Icons.add,
                 color: Colors.white,
               ),
-              onPressed: (canCreate()&&_selectedDeviceModel!=null) ? _create : null,
+              onPressed: (canCreate() && _selectedDeviceModel != null)
+                  ? _create
+                  : null,
             ),
             divider(horizontal: true),
             SizedBox(

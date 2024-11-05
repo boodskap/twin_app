@@ -288,6 +288,8 @@ class _AssetFilterListState extends BaseState<AssetFilterList> {
             SizedBox(
               width: 250,
               child: DeviceModelDropdown(
+                  hint: 'Select Device Library',
+                  searchHint: 'Select Device Library',
                   style: theme
                       .getStyle()
                       .copyWith(color: smallScreen ? Colors.black : null),

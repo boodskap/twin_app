@@ -547,6 +547,8 @@ class _CreateEditConditionSnippetState
             child: SizedBox(
               width: 250,
               child: DeviceModelDropdown(
+                  hint: 'Select Device Library',
+                  searchHint: 'Select Device Library',
                   style: theme.getStyle(),
                   selectedItem: _selectedModel?.id,
                   onDeviceModelSelected: (dm) {
