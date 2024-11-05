@@ -724,7 +724,7 @@ class _AlarmsNotificationsGridState extends BaseState<AlarmsNotificationsGrid> {
             eventData.floorName!, "Triggered by Floor", Icons.cabin);
       default:
         return _buildTriggeredCell(eventData.modelName!,
-            "Triggered by Device Model", Icons.developer_board_rounded);
+            "Triggered by Device Library", Icons.developer_board_rounded);
     }
   }
 

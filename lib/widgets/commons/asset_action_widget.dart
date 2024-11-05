@@ -77,7 +77,7 @@ class _AssetActionWidgetState extends State<AssetActionWidget> {
               widget.onDeviceModelTapped!(dd.modelId, dd);
             },
             child: Tooltip(
-                message: 'Filter device model ${dd.modelName} assets',
+                message: 'Filter device library ${dd.modelName} assets',
                 child: Icon(Icons.memory_rounded)),
           ),
         if (null != widget.onAssetModelTapped &&
