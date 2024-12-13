@@ -6,6 +6,7 @@ import 'package:twin_app/core/session_variables.dart';
 import 'package:twin_commons/core/twinned_session.dart';
 import 'package:twin_commons/util/nocode_utils.dart';
 import 'package:twin_commons/core/storage.dart';
+import 'package:twin_commons/core/base_state.dart';
 import 'package:twinned_api/twinned_api.dart' as tapi;
 import 'package:verification_api/api/verification.swagger.dart' as vapi;
 import 'package:nocode_api/api/nocode.swagger.dart' as ncapi;
@@ -17,7 +18,9 @@ class TwinHelper {
 
   static Future<void> execute(Function f, {Function()? onError}) async {
     try {
+      BaseState.emitPageEvent(PageEvent.busyOn);
       await f();
+      BaseState.emitPageEvent(PageEvent.busyOff);
     } catch (e, s) {
       debugPrintStack();
       debugPrint('ERROR: $e');
