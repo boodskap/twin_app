@@ -485,16 +485,16 @@ class HomeScreenState extends BaseState<HomeScreen> {
               thumbIcon: WidgetStateProperty.resolveWith<Icon?>(
                 (Set<WidgetState> states) {
                   if (states.contains(WidgetState.selected)) {
-                    return const Icon(Icons.nightlight_round,
-                        color: Color(0XFF003062));
+                    return  Icon(Icons.nightlight_round,
+                        color: session.theme.getPrimaryColor());
                   }
-                  return const Icon(Icons.wb_sunny, color: Color(0XFF003062));
+                  return  Icon(Icons.wb_sunny, color:session.theme.getPrimaryColor());
                 },
               ),
               activeColor: Colors.white,
               activeTrackColor: Colors.grey,
               inactiveThumbColor: Colors.white,
-              inactiveTrackColor: const Color(0XFF003062),
+              inactiveTrackColor: session.theme.getSecondaryColor(),
             ),
           const SizedBox(width: 4),
           if (!session.smallScreen)
