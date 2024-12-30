@@ -29,6 +29,7 @@ void main() async {
 
 void start({
   bool disableTwinApp = false,
+   bool disableTheme = true,
   String flavour = "dev",
   required String appTitle,
   required dynamic homeMenu,
@@ -40,6 +41,7 @@ void start({
   session.PostSignUpHook? postSignUpHook = _createDefaultClient,
 }) async {
   session.twinAppDisabled = disableTwinApp;
+  session.themeDisabled = disableTheme;
   session.appTitle = appTitle;
   session.selectedMenuTitle = homeMenuTitle;
   session.menuItems.addAll(menuItems);
