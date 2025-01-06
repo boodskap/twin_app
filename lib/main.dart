@@ -30,6 +30,7 @@ void main() async {
 void start({
   bool disableTwinApp = false,
    bool disableTheme = true,
+   bool isDarkTheme  = true, 
   String flavour = "dev",
   required String appTitle,
   required dynamic homeMenu,
@@ -42,6 +43,7 @@ void start({
 }) async {
   session.twinAppDisabled = disableTwinApp;
   session.themeDisabled = disableTheme;
+  session.defaultDarkTheme = isDarkTheme;
   session.appTitle = appTitle;
   session.selectedMenuTitle = homeMenuTitle;
   session.menuItems.addAll(menuItems);
