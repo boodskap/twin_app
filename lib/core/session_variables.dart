@@ -40,6 +40,7 @@ double credScreenWidth = 450;
 //Widget? homeScreen;
 bool twinAppDisabled = false;
 bool themeDisabled = true;
+bool defaultDarkTheme = true;
 final String defaultFont = 'Open Sans';
 final List<TwinMenuItem> menuItems = [];
 String appTitle = 'My Digital Twin App';
