@@ -29,8 +29,8 @@ void main() async {
 
 void start({
   bool disableTwinApp = false,
-   bool disableTheme = true,
-   bool isDarkTheme  = true, 
+  bool disableTheme = true,
+  bool isDarkTheme = true,
   String flavour = "dev",
   required String appTitle,
   required dynamic homeMenu,

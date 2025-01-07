@@ -8,7 +8,7 @@ const String mqttTcpUrl =
     production ? 'platform.boodskap.io' : 'nocode.boodskap.io';
 const String mqttWsUrl = 'wss://$mqttTcpUrl/mqtt';
 const int mqttTcpPort = 1883;
-const int mqttTcpSslPort = 1883;
+const int mqttTcpSslPort = 8883;
 const int mqttWsPort = 443;
 const String hostName = production ? 'rest.boodskap.io' : 'restdev.boodskap.io';
 
@@ -22,7 +22,7 @@ ClientID              = $apiKey
 
 Topic                 = /${TwinnedSession.instance.domainKey}/$hardwareDeviceId/pub/0
 
-Ex: mosquitto_pub -i $apiKey -h $mqttTcpUrl -p $mqttTcpPort -t "/${TwinnedSession.instance.domainKey}/$hardwareDeviceId/pub/0" -m "{"rpm": 1024}"
+Ex: mosquitto_pub -i $apiKey -h $mqttTcpUrl -p $mqttTcpPort -t "/${TwinnedSession.instance.domainKey}/$hardwareDeviceId/pub/0" -m '{"rpm": 1024}'
 
 curl -X 'POST' \
   'https://$hostName/rest/nocode/DeviceData/send' \
