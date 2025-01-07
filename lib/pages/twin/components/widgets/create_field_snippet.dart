@@ -209,6 +209,8 @@ class _CreateFieldSnippetState extends BaseState<CreateFieldSnippet> {
 
     List<tapi.CustomEntityField> fields = [];
     fields.addAll(widget.mapping.fields);
+    fields.add(tapi.CustomEntityField(
+        name: nameController.text.trim(), type: fieldType!));
 
     tapi.CustomEntityMappingInfo entity = tapi.CustomEntityMappingInfo(
         name: widget.mapping.name,

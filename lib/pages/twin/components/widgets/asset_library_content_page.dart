@@ -235,7 +235,7 @@ class _AssetLibraryContentPageState extends BaseState<AssetLibraryContentPage> {
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
                                   Text(
-                                    'Device Models',
+                                    'Device Libraries',
                                     style: theme.getStyle().copyWith(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 14),
@@ -268,7 +268,7 @@ class _AssetLibraryContentPageState extends BaseState<AssetLibraryContentPage> {
                               ),
                               divider(),
                               Text(
-                                'Allowed Device Models',
+                                'Allowed Device Libraries',
                                 style: theme.getStyle().copyWith(
                                     fontWeight: FontWeight.bold, fontSize: 16),
                               ),

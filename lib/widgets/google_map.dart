@@ -1,8 +1,11 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:twin_app/core/session_variables.dart';
 import 'package:twinned_api/api/twinned.swagger.dart' as tapi;
 import 'package:twin_commons/widgets/default_deviceview.dart';
+import 'package:uuid/uuid.dart';
 
 class GoogleMapWidget extends StatefulWidget {
   final double longitude;
@@ -295,7 +298,9 @@ class CustomInfoWindow extends StatelessWidget {
                     ),
                     Text(
                       dynamicLevelData['level'].toString() + " %",
-                      style: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
+                      style: theme
+                          .getStyle()
+                          .copyWith(fontWeight: FontWeight.bold),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],
@@ -314,7 +319,8 @@ class CustomInfoWindow extends StatelessWidget {
                                 deviceData.updatedStamp)
                             .toString()
                         : '-',
-                    style: theme.getStyle().copyWith(fontWeight: FontWeight.bold),
+                    style:
+                        theme.getStyle().copyWith(fontWeight: FontWeight.bold),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
@@ -326,3 +332,174 @@ class CustomInfoWindow extends StatelessWidget {
     );
   }
 }
+
+class LocationPoint {
+  final tapi.GeoLocation geoPoint;
+  final String type;
+  final String name;
+
+  LocationPoint(
+      {required this.geoPoint, required this.type, required this.name});
+}
+
+// ignore: must_be_immutable
+class GoogleMapRoutePlan extends StatefulWidget {
+  final LocationPoint startLocation;
+  final LocationPoint endLocation;
+  List<LocationPoint> deliveryLocations;
+  GoogleMapRoutePlan(
+      {super.key,
+      required this.startLocation,
+      required this.endLocation,
+      required this.deliveryLocations});
+
+  @override
+  State<GoogleMapRoutePlan> createState() => _GoogleMapRoutePlanState();
+}
+
+class _GoogleMapRoutePlanState extends State<GoogleMapRoutePlan> {
+  GoogleMapController? _mapController;
+  List<Marker> _markers = [];
+  List<LatLng> _polylineCoordinates = [];
+  Polyline _polyline = const Polyline(polylineId: PolylineId('route'));
+
+  @override
+  void initState() {
+    super.initState();
+
+    _addMarkers();
+  }
+
+  void _addMarkers() async {
+    final startIcon = await BitmapDescriptor.asset(
+      const ImageConfiguration(size: Size(40, 40)),
+      'assets/images/begin-flag.png',
+    );
+    final flagIcon = await BitmapDescriptor.asset(
+      const ImageConfiguration(size: Size(35, 35)),
+      'assets/images/end-flag.png',
+    );
+    var uuid = Uuid();
+    if (widget.startLocation.type != "") {
+      String uniqueStartId = uuid.v4();
+      _markers.add(
+        Marker(
+          markerId: MarkerId('marker_$uniqueStartId'),
+          position: LatLng(widget.startLocation.geoPoint.coordinates[0], widget.startLocation.geoPoint.coordinates[1]),
+          infoWindow: InfoWindow(title: 'Start'),
+          icon: startIcon,
+        ),
+      );
+
+      _polylineCoordinates.add(LatLng(widget.startLocation.geoPoint.coordinates[0], widget.startLocation.geoPoint.coordinates[1]));
+    }
+
+    if (widget.endLocation.type != "") {
+      String uniqueEndId = uuid.v4();
+      _markers.add(
+        Marker(
+          markerId: MarkerId('marker_$uniqueEndId'),
+          position: LatLng(widget.endLocation.geoPoint.coordinates[0], widget.endLocation.geoPoint.coordinates[1]),
+          infoWindow: InfoWindow(title: 'End'),
+          icon: flagIcon,
+        ),
+      );
+
+      _polylineCoordinates.add(LatLng(widget.endLocation.geoPoint.coordinates[0], widget.endLocation.geoPoint.coordinates[1]));
+    }
+
+    if (widget.deliveryLocations.isNotEmpty) {
+      for (int i = 0; i < widget.deliveryLocations.length; i++) {
+        String uniqueMidId = uuid.v4();
+        LatLng point = LatLng(widget.deliveryLocations[i].geoPoint.coordinates[0], widget.deliveryLocations[i].geoPoint.coordinates[1]);
+
+        BitmapDescriptor markerIcon;
+
+        markerIcon = await createCustomMarkerBitmap(
+            i, 'assets/images/marker.png', i + 1);
+        _markers.add(
+          Marker(
+            markerId: MarkerId('marker_$uniqueMidId'),
+            position: point,
+            infoWindow: InfoWindow(title: widget.deliveryLocations[i].name),
+            icon: markerIcon,
+          ),
+        );
+
+        _polylineCoordinates.add(point);
+      }
+    }
+
+    _updatePolyline();
+    setState(() {});
+  }
+
+  void _updatePolyline() {
+    _polyline = Polyline(
+      polylineId: const PolylineId('route'),
+      points: _polylineCoordinates,
+      color: Colors.blue.withOpacity(0.6),
+      width: 5,
+      patterns: [PatternItem.dot, PatternItem.gap(10)],
+      jointType: JointType.round,
+      endCap: Cap.roundCap,
+      startCap: Cap.roundCap,
+    );
+  }
+
+  Future<BitmapDescriptor> createCustomMarkerBitmap(
+      int markerNumber, String imageURL, int indicator) async {
+    int markerWidth = 40;
+    PictureRecorder recorder = new PictureRecorder();
+    Canvas c = Canvas(recorder);
+
+    final data1 = await rootBundle.load(imageURL);
+    var markerImage = await decodeImageFromList(data1.buffer.asUint8List());
+    c.drawImageRect(
+      markerImage,
+      Rect.fromLTRB(0.0, 0.0, markerImage.width.toDouble(),
+          markerImage.height.toDouble()),
+      Rect.fromLTRB(0.0, 0.0, markerWidth.toDouble(), markerWidth.toDouble()),
+      Paint(),
+    );
+
+    TextSpan span = TextSpan(
+      style: TextStyle(
+          color: Colors.black,
+          fontSize: markerWidth / 3,
+          fontWeight: FontWeight.bold),
+      text: indicator.toString(),
+    );
+    TextPainter tp = TextPainter(
+        text: span,
+        textAlign: TextAlign.left,
+        textDirection: TextDirection.ltr);
+    tp.layout();
+    tp.paint(
+        c,
+        Offset(markerNumber > 9 ? markerWidth / 3.5 : markerWidth / 2.5,
+            markerWidth / 5.5));
+
+    var p = recorder.endRecording();
+    ByteData? pngBytes = await (await p.toImage(markerWidth, markerWidth))
+        .toByteData(format: ImageByteFormat.png);
+    Uint8List data = Uint8List.view(pngBytes!.buffer);
+    return BitmapDescriptor.bytes(data);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GoogleMap(
+      initialCameraPosition: CameraPosition(
+        target: LatLng(widget.startLocation.geoPoint.coordinates[0], widget.startLocation.geoPoint.coordinates[1]),
+        zoom: 12,
+      ),
+      markers: Set<Marker>.of(_markers),
+      polylines: Set<Polyline>.of([_polyline]),
+      onMapCreated: (controller) {
+        _mapController = controller;
+      },
+    );
+  }
+}
+

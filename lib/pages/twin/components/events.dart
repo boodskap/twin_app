@@ -49,6 +49,8 @@ class _EventsState extends BaseState<Events> {
             SizedBox(
               width: 250,
               child: DeviceModelDropdown(
+                  hint: 'Select Device Library',
+                  searchHint: 'Select Device Library',
                   style: theme.getStyle(),
                   selectedItem: _selectedDeviceModel?.id,
                   onDeviceModelSelected: (e) {

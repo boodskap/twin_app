@@ -10,6 +10,7 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:twin_app/auth.dart';
+import 'package:twin_app/core/theme_notifier.dart';
 import 'package:twin_app/core/twin_helper.dart';
 import 'package:twin_app/foundation/logger/logger.dart';
 import 'package:twin_app/pages/admin/clients.dart';
@@ -245,6 +246,9 @@ class HomeScreenState extends BaseState<HomeScreen> {
     menuItems.addAll(session.menuItems);
     menuItems.addAll(session.twinAppDisabled ? [] : _menuItems);
     showScreen(session.selectedMenu);
+     themeNotifier.addListener(() {
+      setState(() {});
+    });
   }
 
   ListTile? _createMenuItem(session.TwinMenuItem cci) {
@@ -471,7 +475,28 @@ class HomeScreenState extends BaseState<HomeScreen> {
           if (!session.smallScreen && session.orgs.length > 1)
             OrgChangeWidget(onSelected: _switchOrg),
           if (!session.smallScreen && session.orgs.length > 1)
-            const SizedBox(width: 8),
+           const SizedBox(width: 4),
+          if (!session.themeDisabled)
+            Switch(
+              value: themeNotifier.isDarkTheme,
+              onChanged: (value) {
+                themeNotifier.toggleTheme(value);
+              },
+              thumbIcon: WidgetStateProperty.resolveWith<Icon?>(
+                (Set<WidgetState> states) {
+                  if (states.contains(WidgetState.selected)) {
+                    return  Icon(Icons.nightlight_round,
+                        color: session.theme.getPrimaryColor());
+                  }
+                  return  Icon(Icons.wb_sunny, color:session.theme.getPrimaryColor());
+                },
+              ),
+              activeColor: Colors.white,
+              activeTrackColor: Colors.grey,
+              inactiveThumbColor: Colors.white,
+              inactiveTrackColor: session.theme.getSecondaryColor(),
+            ),
+          const SizedBox(width: 4),
           if (!session.smallScreen)
             Text(
               toCamelCase(user!.name),
@@ -629,6 +654,14 @@ class HomeScreenState extends BaseState<HomeScreen> {
     }
 
     return widget;
+  }
+  
+  @override
+  void dispose() {
+    themeNotifier.removeListener(() {
+      setState(() {});
+    });
+    super.dispose();
   }
 
   String toCamelCase(String text) {

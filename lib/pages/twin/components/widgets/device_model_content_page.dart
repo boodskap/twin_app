@@ -1373,26 +1373,26 @@ class _DeviceModelContentPageState extends BaseState<DeviceModelContentPage> {
                         divider(horizontal: true),
                         Column(
                           children: [
-                            Row(
-                              children: [
-                                DropdownButton<int>(
-                                  items: imageItems,
-                                  onChanged: (int? value) {
-                                    setState(() {
-                                      _selectedImage = value ?? -1;
-                                    });
-                                  },
-                                  value: _selectedImage,
-                                ),
-                                divider(horizontal: true),
-                                PrimaryButton(
-                                  labelKey: "Upload Image",
-                                  onPressed: () {
-                                    _uploadImage();
-                                  },
-                                ),
-                              ],
-                            ),
+                            // Row(
+                            //   children: [
+                            //     DropdownButton<int>(
+                            //       items: imageItems,
+                            //       onChanged: (int? value) {
+                            //         setState(() {
+                            //           _selectedImage = value ?? -1;
+                            //         });
+                            //       },
+                            //       value: _selectedImage,
+                            //     ),
+                            //     divider(horizontal: true),
+                            //     PrimaryButton(
+                            //       labelKey: "Upload Image",
+                            //       onPressed: () {
+                            //         _uploadImage();
+                            //       },
+                            //     ),
+                            //   ],
+                            // ),
                             divider(horizontal: true),
                             if (displayCards)
                               SafeArea(

@@ -260,6 +260,7 @@ class _UsersState extends BaseState<Users> {
 
     if (user.platformRoles!.contains("clientadmin")) {
       isClientAdminStatus = true;
+      
     }
     String? countryCode = countryCodeMap[user.countryCode];
     String formattedPhone = user.phone != null && user.phone!.isNotEmpty
