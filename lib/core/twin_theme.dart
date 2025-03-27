@@ -76,10 +76,16 @@ final List<TwinTheme> themes = [
     Color(0xff9ABC38),
     Color(0xff175A50),
   ]),
-   TwinTheme(name: 'Ocean', fontFamily: 'Arimo', colors: [
+  TwinTheme(name: 'Ocean', fontFamily: 'Arimo', colors: [
     Color(0xFFFFFFFF),
     Color.fromARGB(255, 80, 184, 224),
     Color(0xFF27a3d6),
     Color(0XFF003062),
+  ]),
+  TwinTheme(name: 'LightGreeny', fontFamily: 'Arimo', colors: [
+    Color(0xFFFFFFFF),
+    Color(0Xff77D4A5),
+    Color(0Xff70A48A),
+    Color(0xff175A50),
   ]),
 ];
